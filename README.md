@@ -36,7 +36,12 @@ This project delivers a modular, real-time Digital Twin and Prognostics & Health
   - Physics-grounded lubrication degradation in `LubricationSystem`: hydraulic delivery pressure reduction $P_{\text{oil}} = P_{\text{nom}} \cdot (1 - k_{\text{p\_loss}} \cdot \sigma)$, increased boundary friction heat, and reduced cooler heat rejection.
   - Compound pressure drop and monotonic oil temperature rise with natural dynamic recovery.
   - Interactive validation plots (`docs/plots/10_lubrication_degradation_transient.html`, `docs/plots/11_lubrication_severity_sweep.html`).
-  - 66/66 automated tests passing.
+- **Phase 4D: Fuel / Injection Abnormality Physics** — Complete ✅
+  - Physics-grounded fuel and injection abnormality model supporting typed `FuelMixtureMode.LEAN` and `FuelMixtureMode.RICH`.
+  - Lean abnormality: fuel mass flow reduction, delayed exhaust burn elevating EGT, and natural combustion efficiency power droop.
+  - Rich abnormality: excess fuel flow, fuel vaporization quenching lowering EGT, and incomplete burn power droop.
+  - Interactive validation plots (`docs/plots/12_fuel_injection_transient.html`, `docs/plots/13_fuel_injection_severity_sweep.html`).
+  - 77/77 automated tests passing.
 
 > **Engineering Reference Anchor & Disclaimer:**  
 > The engine simulator uses the **Rotax 912 ULS** strictly as a publicly documented engineering anchor (58 kW continuous power @ 5500 RPM, max 5800 RPM). It is a **reduced-order physics-informed / grey-box model**, **NOT** a CFD solver, certified OEM engine model, or actual classified UAV engine. Synthetic telemetry is never represented as actual UAV flight data.
@@ -147,7 +152,7 @@ pip install -r requirements.txt
 
 ## 7. Running Verification & Validation
 
-### Run Full Test Suite (66 tests)
+### Run Full Test Suite (77 tests)
 ```bash
 pytest -v
 ```

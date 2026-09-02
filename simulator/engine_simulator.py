@@ -148,6 +148,8 @@ class EngineSimulator(BaseEngineSimulator):
 
         cooling_severity = 0.0
         lubrication_severity = 0.0
+        fuel_severity = 0.0
+        mixture_mode = "lean"
         # Resolve fault state and telemetry fault tags if provided
         if fault_state is not None:
             from simulator.fault_interface import FaultState, FaultSchedule, FaultType
@@ -159,6 +161,10 @@ class EngineSimulator(BaseEngineSimulator):
                         cooling_severity = fault_sev_val
                     elif fault_state.fault_type == FaultType.LUBRICATION_DEGRADATION:
                         lubrication_severity = fault_sev_val
+                    elif fault_state.fault_type == FaultType.FUEL_INJECTION_ABNORMALITY:
+                        fuel_severity = fault_sev_val
+                        mode_p = fault_state.parameters.get("mode", "lean") if fault_state.parameters else "lean"
+                        mixture_mode = mode_p.value if hasattr(mode_p, "value") else str(mode_p)
             elif isinstance(fault_state, FaultSchedule):
                 primary = fault_state.get_primary_fault(step_time)
                 if primary is not None:
@@ -169,6 +175,10 @@ class EngineSimulator(BaseEngineSimulator):
                         cooling_severity = max(cooling_severity, f.get_effective_severity(step_time))
                     elif f.fault_type == FaultType.LUBRICATION_DEGRADATION:
                         lubrication_severity = max(lubrication_severity, f.get_effective_severity(step_time))
+                    elif f.fault_type == FaultType.FUEL_INJECTION_ABNORMALITY:
+                        fuel_severity = max(fuel_severity, f.get_effective_severity(step_time))
+                        mode_p = f.parameters.get("mode", "lean") if f.parameters else "lean"
+                        mixture_mode = mode_p.value if hasattr(mode_p, "value") else str(mode_p)
             elif isinstance(fault_state, dict):
                 f_obj = FaultState.from_dict(fault_state)
                 if f_obj.is_active_at(step_time):
@@ -178,21 +188,37 @@ class EngineSimulator(BaseEngineSimulator):
                         cooling_severity = fault_sev_val
                     elif f_obj.fault_type == FaultType.LUBRICATION_DEGRADATION:
                         lubrication_severity = fault_sev_val
+                    elif f_obj.fault_type == FaultType.FUEL_INJECTION_ABNORMALITY:
+                        fuel_severity = fault_sev_val
+                        mode_p = f_obj.parameters.get("mode", "lean") if f_obj.parameters else "lean"
+                        mixture_mode = mode_p.value if hasattr(mode_p, "value") else str(mode_p)
 
         # 1. Atmosphere
         atmo_state = self.atmosphere.compute(altitude_m=altitude_m, temp_offset_k=temp_offset_k)
 
-        # 2. Rotational Dynamics (RK4)
+        # 2. Rotational Dynamics (RK4) with combustion efficiency factor
+        comb_eff = 1.0
+        if fuel_severity > 0.0:
+            if "rich" in mixture_mode.lower():
+                comb_eff = 1.0 - getattr(self.sim_config.tier_c, "k_comb_loss_rich", 0.06) * fuel_severity
+            else:
+                comb_eff = 1.0 - getattr(self.sim_config.tier_c, "k_comb_loss_lean", 0.08) * fuel_severity
+
         op_point = self.dynamics.step(
             throttle_pct=throttle_pct,
             density_factor=atmo_state.density_factor,
             dt=dt,
+            combustion_efficiency_factor=comb_eff,
         )
 
-        # 3. Fuel System (Willans-line)
-        fuel_state = self.fuel.compute(power_target_w=op_point.power_target_w)
+        # 3. Fuel System (Willans-line with abnormality scaling)
+        fuel_state = self.fuel.compute(
+            power_target_w=op_point.power_target_w,
+            fuel_severity=fuel_severity,
+            mixture_mode=mixture_mode,
+        )
 
-        # 4. Thermal System (EGT + CHT)
+        # 4. Thermal System (EGT + CHT with mixture shift)
         thermal_state = self.thermal.step(
             rpm=op_point.rpm,
             load_pct=op_point.engine_load_pct,
@@ -202,6 +228,8 @@ class EngineSimulator(BaseEngineSimulator):
             airspeed_ms=airspeed_ms,
             dt=dt,
             cooling_severity=cooling_severity,
+            fuel_severity=fuel_severity,
+            mixture_mode=mixture_mode,
         )
 
         # 5. Lubrication System (Oil temp + pressure)

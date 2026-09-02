@@ -72,17 +72,23 @@ class RotationalDynamics:
         return max(0.35, min(1.05, eff))
 
     def _torque_derivatives(
-        self, omega: float, throttle_pct: float, density_factor: float
+        self,
+        omega: float,
+        throttle_pct: float,
+        density_factor: float,
+        combustion_efficiency_factor: float = 1.0,
     ) -> tuple:
         """
         Calculate instantaneous torques and domega/dt at given state.
+        Supports Phase 4D power degradation via combustion_efficiency_factor.
         """
         rpm = self.omega_to_rpm(omega)
         throttle_norm = max(0.0, min(100.0, throttle_pct)) / 100.0
         eff = self.compute_rpm_efficiency(rpm)
 
-        # Indicated power target: P_max * throttle * density * efficiency
-        p_combustion = self.tier_a.power_max_continuous_w * throttle_norm * density_factor * eff
+        # Indicated power target: P_max * throttle * density * efficiency * combustion_eff
+        comb_factor = max(0.1, float(combustion_efficiency_factor))
+        p_combustion = self.tier_a.power_max_continuous_w * throttle_norm * density_factor * eff * comb_factor
 
         # Indicated engine torque with smooth idle circuit assist at low throttle
         omega_safe = max(omega, 10.0)
@@ -109,29 +115,41 @@ class RotationalDynamics:
             domega_dt,
         )
 
-    def _rk4_single_step(self, dt: float, throttle_pct: float, density_factor: float) -> None:
+    def _rk4_single_step(
+        self,
+        dt: float,
+        throttle_pct: float,
+        density_factor: float,
+        combustion_efficiency_factor: float = 1.0,
+    ) -> None:
         """Internal single RK4 integration step."""
         omega_0 = self.omega
 
         # k1
-        _, _, _, _, _, k1 = self._torque_derivatives(omega_0, throttle_pct, density_factor)
+        _, _, _, _, _, k1 = self._torque_derivatives(omega_0, throttle_pct, density_factor, combustion_efficiency_factor)
 
         # k2
         omega_k2 = max(0.0, omega_0 + 0.5 * dt * k1)
-        _, _, _, _, _, k2 = self._torque_derivatives(omega_k2, throttle_pct, density_factor)
+        _, _, _, _, _, k2 = self._torque_derivatives(omega_k2, throttle_pct, density_factor, combustion_efficiency_factor)
 
         # k3
         omega_k3 = max(0.0, omega_0 + 0.5 * dt * k2)
-        _, _, _, _, _, k3 = self._torque_derivatives(omega_k3, throttle_pct, density_factor)
+        _, _, _, _, _, k3 = self._torque_derivatives(omega_k3, throttle_pct, density_factor, combustion_efficiency_factor)
 
         # k4
         omega_k4 = max(0.0, omega_0 + dt * k3)
-        _, _, _, _, _, k4 = self._torque_derivatives(omega_k4, throttle_pct, density_factor)
+        _, _, _, _, _, k4 = self._torque_derivatives(omega_k4, throttle_pct, density_factor, combustion_efficiency_factor)
 
         # Update state with RK4 weighted average
         self.omega = max(0.0, omega_0 + (dt / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4))
 
-    def step(self, throttle_pct: float, density_factor: float, dt: float) -> OperatingPoint:
+    def step(
+        self,
+        throttle_pct: float,
+        density_factor: float,
+        dt: float,
+        combustion_efficiency_factor: float = 1.0,
+    ) -> OperatingPoint:
         """
         Advance rotational dynamics using sub-stepped 4th-Order Runge-Kutta (RK4) integration.
         Sub-stepping guarantees unconditional numerical stability across arbitrary external time steps.
@@ -141,14 +159,14 @@ class RotationalDynamics:
 
         while remaining_time > 1e-6:
             sub_dt = min(remaining_time, max_sub_dt)
-            self._rk4_single_step(sub_dt, throttle_pct, density_factor)
+            self._rk4_single_step(sub_dt, throttle_pct, density_factor, combustion_efficiency_factor)
             remaining_time -= sub_dt
 
         rpm = self.omega_to_rpm(self.omega)
 
         # Compute full operating point diagnostics at updated state
         p_target, t_eng, t_load, t_fric, net_t, domega_dt = self._torque_derivatives(
-            self.omega, throttle_pct, density_factor
+            self.omega, throttle_pct, density_factor, combustion_efficiency_factor
         )
 
         # Engine load percentage proxy based on power output relative to density-adjusted max continuous

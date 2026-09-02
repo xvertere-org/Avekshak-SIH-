@@ -50,10 +50,12 @@ class ThermalSystem:
         airspeed_ms: float,
         dt: float,
         cooling_severity: float = 0.0,
+        fuel_severity: float = 0.0,
+        mixture_mode: str = "lean",
     ) -> ThermalState:
         """
         Advance CHT and EGT states by time step dt.
-        Supports Phase 4B cooling degradation physics via cooling_severity.
+        Supports Phase 4B cooling degradation and Phase 4D fuel/injection abnormality physics.
         """
         dt_safe = max(1e-4, float(dt))
         load_norm = max(0.0, min(100.0, load_pct)) / 100.0
@@ -61,12 +63,24 @@ class ThermalSystem:
         # --- 1. EGT Calculation ---
         # Steady-state target
         rpm_offset = max(0.0, rpm - self.tier_c.rpm_idle)
-        egt_ss = (
+        egt_ss_base = (
             self.tier_c.t_egt_base_c
             + self.tier_c.k_egt_load * load_norm
             + self.tier_c.k_egt_rpm * rpm_offset
             - self.tier_c.k_egt_density * density_factor
         )
+
+        # Phase 4D: Mixture shift on exhaust enthalpy / burn timing
+        sev_fuel = max(0.0, min(1.0, float(fuel_severity)))
+        mode_str = str(mixture_mode).lower().strip()
+        delta_egt_mixture = 0.0
+        if sev_fuel > 0.0:
+            if "rich" in mode_str:
+                delta_egt_mixture = -getattr(self.tier_c, "k_egt_rich_drop_c", 80.0) * sev_fuel
+            else:  # lean
+                delta_egt_mixture = getattr(self.tier_c, "k_egt_lean_gain_c", 95.0) * sev_fuel
+
+        egt_ss = max(100.0, egt_ss_base + delta_egt_mixture)
 
         # Unconditionally stable exponential decay update for first-order lag
         tau_egt = max(0.1, self.tier_c.tau_egt_s)

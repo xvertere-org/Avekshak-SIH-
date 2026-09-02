@@ -473,9 +473,126 @@ def plot_lubrication_severity_sweep():
     print(" -> Saved 11_lubrication_severity_sweep.html")
 
 
+def plot_fuel_injection_transient():
+    """12: Fuel Flow, EGT, RPM, and Fault Severity vs Time during scheduled Lean and Rich abnormality."""
+    from simulator.fault_interface import FaultState, FaultSchedule, FaultType
+    seg = PhaseSegment(FlightPhase.CRUISE, 220.0, 75.0, 75.0, 2000.0, 2000.0)
+    profile = MissionProfile(segments=[seg])
+
+    f_lean = FaultState(
+        fault_type=FaultType.FUEL_INJECTION_ABNORMALITY,
+        severity=0.65,
+        start_time=30.0,
+        end_time=85.0,
+        parameters={"mode": "lean", "ramp_duration": 10.0},
+    )
+    f_rich = FaultState(
+        fault_type=FaultType.FUEL_INJECTION_ABNORMALITY,
+        severity=0.65,
+        start_time=130.0,
+        end_time=185.0,
+        parameters={"mode": "rich", "ramp_duration": 10.0},
+    )
+    sched = FaultSchedule(faults=[f_lean, f_rich])
+
+    sim_h = EngineSimulator(seed=42)
+    sim_f = EngineSimulator(seed=42)
+
+    df_h = sim_h.run_to_dataframe(profile, dt=0.2)
+    df_f = sim_f.run_to_dataframe(profile, dt=0.2, fault_schedule=sched)
+
+    fig = make_subplots(
+        rows=4, cols=1, shared_xaxes=True, vertical_spacing=0.05,
+        subplot_titles=[
+            "<b>Fuel Flow (L/h): Lean Drop vs Rich Increase</b>",
+            "<b>Exhaust Gas Temperature (EGT °C): Lean Elevation vs Rich Fuel Quench</b>",
+            "<b>Engine Speed (RPM): Natural Combustion Efficiency Droop</b>",
+            "<b>Active Fault State & Abnormality Window</b>",
+        ]
+    )
+
+    t = df_f["timestamp"]
+    # Row 1: Fuel Flow
+    fig.add_trace(go.Scatter(x=t, y=df_h["fuel_flow"], name="Nominal Fuel Flow", line=dict(color="#00e676", width=2, dash="dot")), row=1, col=1)
+    fig.add_trace(go.Scatter(x=t, y=df_f["fuel_flow"], name="Abnormal Fuel Flow", line=dict(color="#d500f9", width=2.5)), row=1, col=1)
+
+    # Row 2: EGT
+    fig.add_trace(go.Scatter(x=t, y=df_h["egt"], name="Nominal EGT", line=dict(color="#ff9100", width=2, dash="dot")), row=2, col=1)
+    fig.add_trace(go.Scatter(x=t, y=df_f["egt"], name="Abnormal EGT", line=dict(color="#ff1744", width=2.5)), row=2, col=1)
+    fig.add_hline(y=800.0, line_dash="dash", line_color="#ff1744", annotation_text="EGT Max Reference Limit (800°C)", row=2, col=1)
+
+    # Row 3: RPM
+    fig.add_trace(go.Scatter(x=t, y=df_h["rpm"], name="Nominal RPM", line=dict(color="#00e5ff", width=2, dash="dot")), row=3, col=1)
+    fig.add_trace(go.Scatter(x=t, y=df_f["rpm"], name="Abnormal RPM", line=dict(color="#ffd600", width=2.5)), row=3, col=1)
+
+    # Row 4: Severity
+    fig.add_trace(go.Scatter(x=t, y=df_f["fault_severity"], name="Fault Severity", line=dict(color="#e040fb", width=2), fill="tozeroy"), row=4, col=1)
+
+    fig.update_layout(
+        template="plotly_dark", height=900,
+        title="<b>Phase 4D: Fuel / Injection Abnormality Dynamic Response (Lean Window -> Recovery -> Rich Window)</b>"
+    )
+    fig.update_xaxes(title_text="Simulation Time (s)", row=4, col=1)
+    fig.update_yaxes(title_text="Fuel Flow (L/h)", row=1, col=1)
+    fig.update_yaxes(title_text="EGT (°C)", row=2, col=1)
+    fig.update_yaxes(title_text="RPM", row=3, col=1)
+    fig.update_yaxes(title_text="Severity", row=4, col=1)
+    fig.write_html(OUTPUT_DIR / "12_fuel_injection_transient.html")
+    print(" -> Saved 12_fuel_injection_transient.html")
+
+
+def plot_fuel_injection_severity_sweep():
+    """13: Steady-State Fuel Flow and EGT vs Severity for Lean and Rich Abnormality."""
+    from simulator.fault_interface import FaultState, FaultType
+    severities = [0.0, 0.20, 0.40, 0.60, 0.80, 1.0]
+    fuel_lean, egt_lean = [], []
+    fuel_rich, egt_rich = [], []
+
+    seg = PhaseSegment(FlightPhase.CRUISE, 60.0, 75.0, 75.0, 2000.0, 2000.0)
+    profile = MissionProfile(segments=[seg])
+
+    for s in severities:
+        sim_l = EngineSimulator(seed=42)
+        fl = FaultState(FaultType.FUEL_INJECTION_ABNORMALITY, severity=s, start_time=5.0, end_time=60.0, parameters={"mode": "lean"})
+        df_l = sim_l.run_to_dataframe(profile, dt=0.5, fault_schedule=fl)
+        fuel_lean.append(float(df_l["fuel_flow"].iloc[-1]))
+        egt_lean.append(float(df_l["egt"].iloc[-1]))
+
+        sim_r = EngineSimulator(seed=42)
+        fr = FaultState(FaultType.FUEL_INJECTION_ABNORMALITY, severity=s, start_time=5.0, end_time=60.0, parameters={"mode": "rich"})
+        df_r = sim_r.run_to_dataframe(profile, dt=0.5, fault_schedule=fr)
+        fuel_rich.append(float(df_r["fuel_flow"].iloc[-1]))
+        egt_rich.append(float(df_r["egt"].iloc[-1]))
+
+    fig = make_subplots(
+        rows=1, cols=2, shared_yaxes=False,
+        subplot_titles=["<b>Fuel Flow vs Severity: Lean vs Rich</b>", "<b>EGT vs Severity: Lean vs Rich</b>"]
+    )
+
+    # Subplot 1: Fuel Flow
+    fig.add_trace(go.Scatter(x=severities, y=fuel_lean, mode="lines+markers", name="Lean Fuel Flow (L/h)", line=dict(color="#00e676", width=2.5), marker=dict(size=8)), row=1, col=1)
+    fig.add_trace(go.Scatter(x=severities, y=fuel_rich, mode="lines+markers", name="Rich Fuel Flow (L/h)", line=dict(color="#d500f9", width=2.5), marker=dict(size=8)), row=1, col=1)
+
+    # Subplot 2: EGT
+    fig.add_trace(go.Scatter(x=severities, y=egt_lean, mode="lines+markers", name="Lean EGT (°C)", line=dict(color="#ff1744", width=2.5), marker=dict(size=8)), row=1, col=2)
+    fig.add_trace(go.Scatter(x=severities, y=egt_rich, mode="lines+markers", name="Rich EGT (°C)", line=dict(color="#2979ff", width=2.5), marker=dict(size=8)), row=1, col=2)
+    fig.add_hline(y=800.0, line_dash="dash", line_color="#ff1744", annotation_text="800°C Max Limit", row=1, col=2)
+
+    fig.update_layout(
+        template="plotly_dark", height=450,
+        title="<b>Phase 4D: Steady-State Lean & Rich Fuel / EGT Response across Severity Sweep [0.0 - 1.0]</b>"
+    )
+    fig.update_xaxes(title_text="Abnormality Severity", row=1, col=1)
+    fig.update_xaxes(title_text="Abnormality Severity", row=1, col=2)
+    fig.update_yaxes(title_text="Steady-State Fuel Flow (L/h)", row=1, col=1)
+    fig.update_yaxes(title_text="Steady-State EGT (°C)", row=1, col=2)
+    fig.write_html(OUTPUT_DIR / "13_fuel_injection_severity_sweep.html")
+    print(" -> Saved 13_fuel_injection_severity_sweep.html")
+
+
 def main():
     ensure_output_dir()
-    print("Generating Validation & Calibration Plots (Phases 2B, 3, 4B, 4C)...")
+    print("Generating Validation & Calibration Plots (Phases 2B, 3, 4B, 4C, 4D)...")
     plot_throttle_step_rpm()
     plot_thermal_dynamics()
     plot_oil_pressure_and_fuel_flow()
@@ -487,6 +604,8 @@ def main():
     plot_cooling_severity_sweep()
     plot_lubrication_degradation_transient()
     plot_lubrication_severity_sweep()
+    plot_fuel_injection_transient()
+    plot_fuel_injection_severity_sweep()
     print(f"[SUCCESS] All validation plots generated in '{OUTPUT_DIR}'.")
 
 

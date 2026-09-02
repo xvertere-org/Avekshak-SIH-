@@ -69,6 +69,10 @@ class TierCParameters:
     a_fuel_kg_per_j: float = 6.8e-8             # Specific fuel consumption slope (kg/J, ~245 g/kWh)
     b_fuel_kg_per_s: float = 0.00032            # Idle fuel consumption rate (kg/s, ~1.15 kg/h)
     fuel_density_kg_per_l: float = 0.72         # Avgas / Mogas fuel density (kg/L)
+    k_fuel_flow_lean: float = 0.25              # Fuel mass flow reduction fraction at lean severity=1.0 (Tier C/D)
+    k_fuel_flow_rich: float = 0.30              # Fuel mass flow increase fraction at rich severity=1.0 (Tier C/D)
+    k_comb_loss_lean: float = 0.08              # Indicated combustion power reduction fraction at lean severity=1.0 (Tier C/D)
+    k_comb_loss_rich: float = 0.06              # Indicated combustion power reduction fraction at rich severity=1.0 (Tier C/D)
 
     # Thermal CHT calibration (lumped thermal capacitance)
     c_th_cht: float = 920.0                     # Lumped CHT thermal capacitance (J/K)
@@ -85,6 +89,8 @@ class TierCParameters:
     k_egt_rpm: float = 0.018                    # EGT sensitivity to RPM offset (°C/RPM)
     k_egt_density: float = 35.0                 # EGT sensitivity to density factor (°C)
     tau_egt_s: float = 2.5                      # EGT thermocouple dynamic lag time constant (s)
+    k_egt_lean_gain_c: float = 95.0             # Steady-state EGT elevation at lean severity=1.0 (°C, Tier C/D)
+    k_egt_rich_drop_c: float = 80.0             # Steady-state EGT drop at rich severity=1.0 (°C, Tier C/D)
 
     # Lubrication / Oil thermal & pressure calibration
     c_oil: float = 1350.0                       # Oil system thermal capacitance (J/K)

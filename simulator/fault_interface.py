@@ -43,6 +43,14 @@ class FaultSubsystem(str, Enum):
     SENSOR = "sensor"
 
 
+class FuelMixtureMode(str, Enum):
+    """
+    Mixture abnormality modes for FUEL_INJECTION_ABNORMALITY faults.
+    """
+    LEAN = "lean"
+    RICH = "rich"
+
+
 @dataclass
 class FaultState:
     """
