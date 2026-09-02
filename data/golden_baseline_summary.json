@@ -1,0 +1,105 @@
+{
+  "golden_baseline_version": "1.0.0-phase3",
+  "provenance": {
+    "seed": 42,
+    "dt_s": 0.1,
+    "duration_s": 1719.9,
+    "sample_count": 17200,
+    "mission_id": "MISSION_MALE_UAV_001",
+    "engine_id": "ENGINE_UAV_01",
+    "simulation_version": "0.2.0-phase2b-physics",
+    "reference_anchor": "Rotax 912 ULS (Public engineering anchor, 58 kW continuous)"
+  },
+  "channel_quantiles": {
+    "rpm": {
+      "min": 1943.8,
+      "p25": 3787.4,
+      "median": 4167.8,
+      "p75": 4176.4,
+      "max": 5276.2,
+      "mean": 4050.34,
+      "std": 536.22
+    },
+    "cht": {
+      "min": 35.28,
+      "p25": 47.77,
+      "median": 54.59,
+      "p75": 56.53,
+      "max": 115.87,
+      "mean": 59.08,
+      "std": 17.97
+    },
+    "egt": {
+      "min": 516.22,
+      "p25": 646.36,
+      "median": 687.06,
+      "p75": 691.0,
+      "max": 767.41,
+      "mean": 668.49,
+      "std": 52.1
+    },
+    "oil_temp": {
+      "min": 47.05,
+      "p25": 59.35,
+      "median": 74.33,
+      "p75": 81.09,
+      "max": 130.52,
+      "mean": 76.7,
+      "std": 23.17
+    },
+    "oil_pressure": {
+      "min": 2.5,
+      "p25": 4.1,
+      "median": 4.3,
+      "p75": 4.37,
+      "max": 5.36,
+      "mean": 4.23,
+      "std": 0.31
+    },
+    "fuel_flow": {
+      "min": 2.66,
+      "p25": 9.19,
+      "median": 11.55,
+      "p75": 11.88,
+      "max": 21.6,
+      "mean": 11.25,
+      "std": 3.7
+    },
+    "vibration": {
+      "min": 0.26,
+      "p25": 0.5,
+      "median": 0.57,
+      "p75": 0.6,
+      "max": 0.77,
+      "mean": 0.55,
+      "std": 0.09
+    },
+    "altitude": {
+      "min": 0.0,
+      "p25": 1634.8,
+      "median": 3000.0,
+      "p75": 3000.0,
+      "max": 3000.0,
+      "mean": 2304.07,
+      "std": 1017.74
+    },
+    "throttle": {
+      "min": 10.0,
+      "p25": 60.0,
+      "median": 75.0,
+      "p75": 75.0,
+      "max": 100.0,
+      "mean": 66.89,
+      "std": 19.42
+    },
+    "load": {
+      "min": 6.7,
+      "p25": 52.9,
+      "median": 69.0,
+      "p75": 69.0,
+      "max": 99.2,
+      "mean": 61.31,
+      "std": 20.42
+    }
+  }
+}

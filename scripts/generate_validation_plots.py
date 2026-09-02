@@ -228,19 +228,78 @@ def plot_full_mission_overview():
     # Row 4, Col 2
     fig.add_trace(go.Scatter(x=t, y=df["vibration"], name="Vibration (g)", line=dict(color="#651fff")), row=4, col=2)
 
-    fig.update_layout(template="plotly_dark", height=900, title="<b>Complete MALE UAV 6-Phase Flight Mission Synthetic Telemetry Overview</b>")
+    fig.update_layout(template="plotly_dark", height=900, title="<b>Representative MALE UAV 6-Phase Flight Mission Synthetic Telemetry Overview</b>")
     fig.write_html(OUTPUT_DIR / "5_full_mission_overview.html")
     print(" -> Saved 5_full_mission_overview.html")
 
 
+def plot_timestep_comparison():
+    """6: Timestep stability comparison across dt = [0.05, 0.1, 0.2, 0.5, 1.0] s."""
+    timesteps = [0.05, 0.1, 0.2, 0.5, 1.0]
+    colors = ["#00e5ff", "#00e676", "#ffea00", "#ff9100", "#ff1744"]
+
+    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.08,
+                        subplot_titles=["<b>Engine RPM Trajectory across Integration Timesteps</b>", "<b>Cylinder Head Temperature (CHT) Trajectory</b>"])
+
+    profile = MissionProfile(
+        segments=[
+            PhaseSegment(FlightPhase.TAKEOFF, 10.0, 100.0, 100.0, 0.0, 200.0),
+            PhaseSegment(FlightPhase.CRUISE, 20.0, 75.0, 75.0, 2000.0, 2000.0),
+        ]
+    )
+
+    for dt, col in zip(timesteps, colors):
+        sim = EngineSimulator(seed=42)
+        df = sim.run_to_dataframe(mission_profile=profile, dt=dt)
+        fig.add_trace(go.Scatter(x=df["timestamp"], y=df["rpm"], name=f"dt = {dt}s", line=dict(color=col, width=1.8)), row=1, col=1)
+        fig.add_trace(go.Scatter(x=df["timestamp"], y=df["cht"], name=f"dt = {dt}s", line=dict(color=col, width=1.8), showlegend=False), row=2, col=1)
+
+    fig.update_layout(template="plotly_dark", height=600, title="<b>Empirical Timestep Stability Sweep Comparison (dt = 0.05s to 1.0s)</b>")
+    fig.update_xaxes(title_text="Simulation Time (s)", row=2, col=1)
+    fig.update_yaxes(title_text="RPM", row=1, col=1)
+    fig.update_yaxes(title_text="CHT (°C)", row=2, col=1)
+    fig.write_html(OUTPUT_DIR / "6_timestep_stability_comparison.html")
+    print(" -> Saved 6_timestep_stability_comparison.html")
+
+
+def plot_correlation_matrix():
+    """7: Cross-channel correlation matrix heatmap."""
+    sim = EngineSimulator(seed=42)
+    profile = MissionProfile()
+    df = sim.run_to_dataframe(mission_profile=profile, dt=0.5)
+
+    channels = ["throttle", "load", "rpm", "fuel_flow", "cht", "egt", "oil_temp", "oil_pressure", "vibration"]
+    corr_matrix = df[channels].corr().round(3)
+
+    fig = go.Figure(data=go.Heatmap(
+        z=corr_matrix.values,
+        x=channels,
+        y=channels,
+        colorscale="Viridis",
+        text=corr_matrix.values,
+        texttemplate="%{text}",
+        textfont={"size": 11},
+    ))
+
+    fig.update_layout(
+        template="plotly_dark",
+        height=650,
+        title="<b>Cross-Channel Correlation Matrix (Physical Telemetry Coherence)</b>",
+    )
+    fig.write_html(OUTPUT_DIR / "7_cross_channel_correlation_matrix.html")
+    print(" -> Saved 7_cross_channel_correlation_matrix.html")
+
+
 def main():
     ensure_output_dir()
-    print("Generating Phase 2B Physics Validation Plots...")
+    print("Generating Phase 3 Physics Validation & Calibration Plots...")
     plot_throttle_step_rpm()
     plot_thermal_dynamics()
     plot_oil_pressure_and_fuel_flow()
     plot_vibration_and_fft()
     plot_full_mission_overview()
+    plot_timestep_comparison()
+    plot_correlation_matrix()
     print(f"[SUCCESS] All validation plots generated in '{OUTPUT_DIR}'.")
 
 

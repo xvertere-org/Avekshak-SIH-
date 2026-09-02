@@ -87,12 +87,12 @@ class TierCParameters:
 
     # Lubrication / Oil thermal & pressure calibration
     c_oil: float = 1350.0                       # Oil system thermal capacitance (J/K)
-    q_oil_fraction: float = 0.045               # Fraction of fuel energy transferred to oil
-    h_oil_cool: float = 7.5                     # Oil radiator cooling conductance (W/K)
-    k_oil_cht_couple: float = 2.2               # Thermal conduction coupling between CHT and oil (W/K)
+    q_oil_fraction: float = 0.016               # Fraction of fuel energy transferred to oil (~1.6%)
+    h_oil_cool: float = 20.0                    # Oil radiator cooling conductance (W/K)
+    k_oil_cht_couple: float = 2.5               # Thermal conduction coupling between CHT and oil (W/K)
     oil_press_base_bar: float = 1.0             # Base static oil pressure (bar)
-    k_oil_p_rpm: float = 0.00075                # Oil pressure gain per RPM (bar/RPM)
-    k_oil_p_temp: float = 0.022                 # Oil pressure drop per °C temp rise above nominal (bar/°C)
+    k_oil_p_rpm: float = 0.00085                # Oil pressure gain per RPM (bar/RPM)
+    k_oil_p_temp: float = 0.008                 # Oil pressure drop per °C temp rise above nominal (bar/°C)
 
     # Vibration synthesis calibration
     vib_order1_base_g: float = 0.32             # 1x rotational order baseline amplitude (g)

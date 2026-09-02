@@ -16,14 +16,13 @@ This project delivers a modular, real-time Digital Twin and Prognostics & Health
 
 - **Phase 1: Project Setup + Architecture** — Complete ✅
 - **Phase 2B: Physics-Informed Engine Simulator** — Complete ✅
-  - Lumped-parameter grey-box engine simulator operating across all flight phases.
-  - Rotational dynamics with RK4 numerical integration and torque balance.
-  - Willans-line fuel flow and BSFC model.
-  - Lumped thermal CHT capacitance and lagging EGT models.
-  - Coupled oil thermal dynamics and viscosity-dependent oil pressure.
-  - Order-based vibration synthesis (1x, 2x crankshaft harmonics + broadband noise).
-  - ISA atmosphere model with altitude power derating.
-  - Calibrated sensor measurement noise and full provenance tracking.
+- **Phase 3: Simulator Calibration & Validation** — Complete ✅
+  - 8 automated validation suites (bounds, monotonicity, dynamic lag hierarchy, timestep sweep, steady-state stability, cross-channel coherence, vibration orders, representative flight mission).
+  - Recommended operating timestep locked at **$dt = 0.1\text{ s}$** (10 Hz).
+  - Validated Golden Baseline summary exported to `data/golden_baseline_summary.json` (17,200 samples).
+  - Comprehensive calibration documentation & parameter inventory in `docs/simulator_validation.md`.
+  - 7 interactive Plotly validation figures in `docs/plots/`.
+  - 38/38 automated unit & regression tests passing.
 
 > **Engineering Reference Anchor & Disclaimer:**  
 > The engine simulator uses the **Rotax 912 ULS** strictly as a publicly documented engineering anchor (58 kW continuous power @ 5500 RPM, max 5800 RPM). It is a **reduced-order physics-informed / grey-box model**, **NOT** a CFD solver, certified OEM engine model, or actual classified UAV engine. Synthetic telemetry is never represented as actual UAV flight data.
@@ -72,41 +71,38 @@ Dashboard Interface (Operator Situational Payload)
 
 ```
 NIRVANAA-SIH-SUBMISSION/
-├── simulator/
+├── simulator/            # Physics-Informed Engine Simulator & Subsystems
+├── validation/           # Validation suites, metrics, and calibration sweeps
 │   ├── __init__.py
-│   ├── base.py                 # Abstract base class BaseEngineSimulator
-│   ├── config.py               # Tiered parameter definitions (Tiers A, B, C, D)
-│   ├── engine_simulator.py      # Simulator orchestrator (batch & streaming)
-│   ├── telemetry_generator.py  # Telemetry conversion & calibrated sensor noise
-│   └── subsystems/
-│       ├── __init__.py
-│       ├── atmosphere.py       # ISA standard atmosphere model
-│       ├── mission.py          # Mission profile generator & step interpolator
-│       ├── dynamics.py         # Power target, load torque, friction, RK4 rotational dynamics
-│       ├── fuel.py             # Willans-line fuel consumption model
-│       ├── thermal.py          # CHT lumped thermal capacitance & EGT lag
-│       ├── lubrication.py      # Coupled oil thermal model & oil pressure
-│       └── vibration.py        # Order-based vibration synthesis (1x, 2x) & FFT
-├── telemetry/                  # Schemas, provenance tracking, and buffer
-├── digital_twin/               # Digital Twin state tracking & residual engine
-├── phm/                        # Prognostics & Health Management
-├── forecasting/                # RUL and time-series forecasting interfaces
-├── explainability/             # Explainable AI (XAI) feature attribution
-├── dashboard/                  # Operator dashboard interface
-├── configs/                    # Mission, engine, and telemetry configurations
-├── data/                       # Data storage hierarchy (raw, processed, external)
-├── docs/                       # Specifications, physics manual & validation plots
+│   ├── metrics.py
+│   ├── calibration.py
+│   └── validation_runner.py
+├── telemetry/            # Schemas, provenance tracking, and buffer
+├── digital_twin/         # Digital Twin state tracking & residual engine
+├── phm/                  # Prognostics & Health Management
+├── forecasting/          # RUL and time-series forecasting interfaces
+├── explainability/       # Explainable AI (XAI) feature attribution
+├── dashboard/            # Operator dashboard interface
+├── configs/              # Mission, engine, and telemetry configurations
+├── data/                 # Data storage & Golden Baseline summary
+│   ├── golden_baseline_summary.json
+│   ├── raw/
+│   ├── processed/
+│   └── external/
+├── docs/                 # Specifications, physics manual, validation report & plots
 │   ├── architecture.md
 │   ├── simulator_physics.md
+│   ├── simulator_validation.md
 │   └── plots/
 ├── scripts/
 │   └── generate_validation_plots.py  # Diagnostic Plotly visualization generator
-├── tests/                      # Automated test suite (28 test cases)
+├── tests/                # Automated test suite (38 test cases)
 │   ├── test_schemas.py
 │   ├── test_imports.py
 │   ├── test_interfaces.py
 │   ├── test_physics_checkpoint_rpm.py
-│   └── test_physics_validation.py
+│   ├── test_physics_validation.py
+│   └── test_validation_framework.py
 ├── requirements.txt
 └── main.py
 ```
@@ -137,9 +133,14 @@ pip install -r requirements.txt
 
 ## 7. Running Verification & Validation
 
-### Run Automated Tests (28 tests)
+### Run Full Test Suite (38 tests)
 ```bash
 pytest -v
+```
+
+### Run Validation Runner & Golden Baseline
+```bash
+python validation/validation_runner.py
 ```
 
 ### Run End-to-End Pipeline Dry-Run
@@ -147,7 +148,7 @@ pytest -v
 python main.py --dry-run
 ```
 
-### Generate Interactive Physics Validation Plots
+### Generate Interactive Validation Plots
 ```bash
 python scripts/generate_validation_plots.py
 ```

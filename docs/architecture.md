@@ -16,7 +16,7 @@ The SIH26054 Digital Twin platform follows a modular, decoupled pipeline archite
          │
          ▼
 ┌─────────────────────────────────────────┐
-│   Physics-Informed Engine Simulator     │  (Phase 2B: Reduced-order grey-box model)
+│   Physics-Informed Engine Simulator     │  (Phase 2B/3: Calibrated & Validated Grey-Box)
 │   - Atmosphere (ISA)                    │
 │   - Rotational Dynamics (RK4)           │
 │   - Fuel Flow (Willans-line)            │
@@ -60,10 +60,14 @@ The SIH26054 Digital Twin platform follows a modular, decoupled pipeline archite
 
 ## 2. Module Responsibilities
 
-### 2.1 Simulator (`simulator/`)
+### 2.1 Simulator (`simulator/` & `validation/`)
 - **Responsibility**: Simulates aero piston engine thermal, mechanical, and fluid dynamic responses across flight envelopes (Takeoff, Climb, Cruise, Loiter, Descent, Landing).
-- **Phase 2B Status**: Fully operational reduced-order grey-box physical engine simulator.
+- **Phase 2B/3 Status**: Fully operational, calibrated, and validated grey-box physical engine simulator.
 - **Reference Anchor Disclaimer**: The simulator uses the **Rotax 912 ULS** strictly as a publicly documented engineering reference anchor. It is **NOT** a computational fluid dynamics (CFD) solver, certified engine model, or actual classified UAV engine.
+- **Validation Framework (`validation/`)**:
+  - 8 automated validation suites (Physical bounds, monotonicity, transient lag hierarchy, empirical timestep sweep, steady-state stability, cross-channel coherence, vibration order tracking, representative mission).
+  - Recommended operating timestep: $dt = 0.1\text{ s}$ (10 Hz).
+  - Golden baseline reference: `data/golden_baseline_summary.json` (17,200 samples).
 - **Subsystem Architecture**:
   - `simulator/config.py`: Segregated parameter tiers (Tier A: Public reference, Tier B: Physics-derived, Tier C: Calibration, Tier D: Engineering assumptions).
   - `simulator/subsystems/atmosphere.py`: ISA troposphere pressure, temperature, and density lapse model.
