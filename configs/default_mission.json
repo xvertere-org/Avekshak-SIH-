@@ -1,0 +1,16 @@
+{
+  "mission_id": "MISSION_MALE_UAV_001",
+  "engine_id": "ENGINE_UAV_01",
+  "altitude": 3000.0,
+  "ambient_temperature": 15.0,
+  "duration": 3600.0,
+  "throttle": 75.0,
+  "engine_load": 70.0,
+  "mission_phase": "CRUISE",
+  "fault_type": "none",
+  "fault_severity": 0.0,
+  "metadata": {
+    "target_platform": "MALE_UAV_SIM",
+    "notes": "Standard cruise baseline profile"
+  }
+}

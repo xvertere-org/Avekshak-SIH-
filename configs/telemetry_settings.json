@@ -1,0 +1,21 @@
+{
+  "sampling_rate_hz": 1.0,
+  "provenance": {
+    "default_source": "simulator_v1",
+    "default_source_type": "simulated",
+    "simulation_version": "0.1.0-phase1-stub"
+  },
+  "channels": {
+    "altitude": {"unit": "m", "description": "Pressure/GPS altitude"},
+    "ambient_temp": {"unit": "deg_C", "description": "Outside Air Temperature"},
+    "throttle": {"unit": "percent", "description": "Throttle position command"},
+    "load": {"unit": "percent", "description": "Engine load factor"},
+    "rpm": {"unit": "RPM", "description": "Engine crankshaft speed"},
+    "cht": {"unit": "deg_C", "description": "Cylinder Head Temperature"},
+    "egt": {"unit": "deg_C", "description": "Exhaust Gas Temperature"},
+    "oil_temp": {"unit": "deg_C", "description": "Engine oil temperature"},
+    "oil_pressure": {"unit": "bar", "description": "Engine oil pressure"},
+    "fuel_flow": {"unit": "L/h", "description": "Fuel consumption rate"},
+    "vibration": {"unit": "g", "description": "Mount vibration amplitude"}
+  }
+}

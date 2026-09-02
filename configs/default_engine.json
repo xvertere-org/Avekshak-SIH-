@@ -1,0 +1,17 @@
+{
+  "engine_id": "ENGINE_UAV_01",
+  "model_template_name": "GENERIC_MALE_UAV_PISTON_4CYL",
+  "displacement_cc": null,
+  "compression_ratio": null,
+  "max_rpm": null,
+  "rated_power_hp": null,
+  "cooling_type": "air_liquid_hybrid",
+  "num_cylinders": 4,
+  "parameters": {
+    "disclaimer": "Non-authoritative grey-box parameter template. Does not represent certified OEM specifications.",
+    "baseline_cht_target_c": 175.0,
+    "baseline_egt_target_c": 710.0,
+    "baseline_oil_press_bar": 4.5,
+    "baseline_oil_temp_c": 82.0
+  }
+}
