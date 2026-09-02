@@ -12,40 +12,55 @@ This project delivers a modular, real-time Digital Twin and Prognostics & Health
 
 ---
 
-## 2. MVP Objective
+## 2. MVP Objective & Current Status
 
-The primary objective of the initial MVP is to establish an end-to-end monitoring pipeline for a simulated MALE UAV aero piston engine:
-1. Simulating engine thermal/fluid/mechanical parameters across mission profiles.
-2. Generating typed telemetry streams with provenance tracking.
-3. Tracking nominal physical baselines with a Digital Twin residual engine.
-4. Detecting anomalies and diagnosing fault categories (cooling degradation, lubrication issues, injector abnormalities, mechanical vibration, sensor drift).
-5. Forecasting degradation trends and Remaining Useful Life (RUL).
-6. Delivering explainable diagnostic insights to operators via an interactive dashboard.
+- **Phase 1: Project Setup + Architecture** — Complete ✅
+- **Phase 2B: Physics-Informed Engine Simulator** — Complete ✅
+  - Lumped-parameter grey-box engine simulator operating across all flight phases.
+  - Rotational dynamics with RK4 numerical integration and torque balance.
+  - Willans-line fuel flow and BSFC model.
+  - Lumped thermal CHT capacitance and lagging EGT models.
+  - Coupled oil thermal dynamics and viscosity-dependent oil pressure.
+  - Order-based vibration synthesis (1x, 2x crankshaft harmonics + broadband noise).
+  - ISA atmosphere model with altitude power derating.
+  - Calibrated sensor measurement noise and full provenance tracking.
+
+> **Engineering Reference Anchor & Disclaimer:**  
+> The engine simulator uses the **Rotax 912 ULS** strictly as a publicly documented engineering anchor (58 kW continuous power @ 5500 RPM, max 5800 RPM). It is a **reduced-order physics-informed / grey-box model**, **NOT** a CFD solver, certified OEM engine model, or actual classified UAV engine. Synthetic telemetry is never represented as actual UAV flight data.
 
 ---
 
-## 3. High-Level Architecture & Phase 1 Flow
+## 3. High-Level Architecture & Data Flow
 
 ```
-MissionConfig
+MissionConfig / FlightPhase (TAKEOFF, CLIMB, CRUISE, LOITER, DESCENT, LANDING)
      │
      ▼
-Simulator Interface (Reduced-Order Grey-Box)
+Atmosphere Layer (ISA Lapse, Pressure, Density Factor)
      │
      ▼
-TelemetryRecord (Channels + Units + Provenance)
+Rotational Dynamics (P_target, Load Torque, Friction, RK4 Engine Speed)
      │
      ▼
-DigitalTwin Interface (State Estimation & Residuals)
+Fuel & Thermal Subsystems (Willans Fuel, CHT Lumped Capacitance, EGT Lag)
+     │
+     ▼
+Lubrication & Vibration Subsystems (Oil Temp/Pressure, 1x & 2x Orders)
+     │
+     ▼
+TelemetryRecord (Typed Channels, Calibrated Sensor Noise, Provenance Metadata)
+     │
+     ▼
+DigitalTwin Interface (State Estimation & Residual Engine)
      │
      ▼
 PHM Interface (Anomaly Detection & Fault Categorization)
      │
      ▼
-Forecasting / RUL Interface (Trajectory & Bounds)
+Forecasting / RUL Interface (Degradation Trajectory & Uncertainty Bounds)
      │
      ▼
-Explainability Interface (Feature Attribution & Summary)
+Explainability Interface (Feature Attribution & Diagnostic Summary)
      │
      ▼
 Dashboard Interface (Operator Situational Payload)
@@ -53,124 +68,87 @@ Dashboard Interface (Operator Situational Payload)
 
 ---
 
-## 4. Phase 1 Scope
-
-Phase 1 establishes the foundational software architecture, typed contracts, modular interfaces, configuration management, and testing infrastructure:
-- **Zero Placeholder Math**: Pure interface and contract definitions without uncalibrated mock physics or stub ML models.
-- **Strict Separation of Concerns**: Each pipeline stage is an independent module with clean abstractions.
-- **Provenance & Telemetry Standards**: Complete telemetry schema with physical units and source metadata.
-- **Testing & Verification**: Automated unit and interface tests verifying end-to-end connectivity.
-
-> **Important Engineering Disclaimer:**  
-> The engine simulator in this project is designed as a **reduced-order physics-informed / grey-box model**. It is **NOT** a computational fluid dynamics (CFD) solver or an authoritative certified OEM engine model. Engine configurations provided in templates are non-authoritative baseline parameters.
-
----
-
-## 5. Project Directory Structure
+## 4. Project Directory Structure
 
 ```
 NIRVANAA-SIH-SUBMISSION/
-├── simulator/            # Physics-Informed Engine Simulator interfaces and stubs
+├── simulator/
 │   ├── __init__.py
-│   ├── base.py
-│   └── engine_simulator.py
-├── telemetry/            # Telemetry schema, provenance, and stream buffer
-│   ├── __init__.py
-│   ├── schema.py
-│   └── streamer.py
-├── digital_twin/         # Digital Twin state tracking and residual engine
-│   ├── __init__.py
-│   └── twin_model.py
-├── phm/                  # Prognostics and Health Management
-│   ├── __init__.py
-│   └── detector.py
-├── forecasting/          # RUL and Time-series forecasting interfaces
-│   ├── __init__.py
-│   └── rul_predictor.py
-├── explainability/       # Explainable AI (XAI) feature attribution
-│   ├── __init__.py
-│   └── explainer.py
-├── dashboard/            # Operator dashboard interface
-│   ├── __init__.py
-│   └── app.py
-├── configs/              # Mission, Engine, and Telemetry configurations
-│   ├── __init__.py
-│   ├── config_loader.py
-│   ├── default_mission.json
-│   ├── default_engine.json
-│   └── telemetry_settings.json
-├── data/                 # Data storage hierarchy
-│   ├── raw/
-│   ├── processed/
-│   └── external/
-├── docs/                 # Architectural specifications
-│   └── architecture.md
-├── tests/                # Test suite
-│   ├── __init__.py
+│   ├── base.py                 # Abstract base class BaseEngineSimulator
+│   ├── config.py               # Tiered parameter definitions (Tiers A, B, C, D)
+│   ├── engine_simulator.py      # Simulator orchestrator (batch & streaming)
+│   ├── telemetry_generator.py  # Telemetry conversion & calibrated sensor noise
+│   └── subsystems/
+│       ├── __init__.py
+│       ├── atmosphere.py       # ISA standard atmosphere model
+│       ├── mission.py          # Mission profile generator & step interpolator
+│       ├── dynamics.py         # Power target, load torque, friction, RK4 rotational dynamics
+│       ├── fuel.py             # Willans-line fuel consumption model
+│       ├── thermal.py          # CHT lumped thermal capacitance & EGT lag
+│       ├── lubrication.py      # Coupled oil thermal model & oil pressure
+│       └── vibration.py        # Order-based vibration synthesis (1x, 2x) & FFT
+├── telemetry/                  # Schemas, provenance tracking, and buffer
+├── digital_twin/               # Digital Twin state tracking & residual engine
+├── phm/                        # Prognostics & Health Management
+├── forecasting/                # RUL and time-series forecasting interfaces
+├── explainability/             # Explainable AI (XAI) feature attribution
+├── dashboard/                  # Operator dashboard interface
+├── configs/                    # Mission, engine, and telemetry configurations
+├── data/                       # Data storage hierarchy (raw, processed, external)
+├── docs/                       # Specifications, physics manual & validation plots
+│   ├── architecture.md
+│   ├── simulator_physics.md
+│   └── plots/
+├── scripts/
+│   └── generate_validation_plots.py  # Diagnostic Plotly visualization generator
+├── tests/                      # Automated test suite (28 test cases)
 │   ├── test_schemas.py
 │   ├── test_imports.py
-│   └── test_interfaces.py
-├── .gitignore
+│   ├── test_interfaces.py
+│   ├── test_physics_checkpoint_rpm.py
+│   └── test_physics_validation.py
 ├── requirements.txt
-├── README.md
 └── main.py
 ```
 
 ---
 
-## 6. Technology Stack
+## 5. Technology Stack
 
 - **Core Runtime**: Python 3.10+
 - **Data & Scientific Computing**: `numpy`, `scipy`, `pandas`
 - **Machine Learning & Modeling**: `scikit-learn`, `xgboost`
-- **Visualization & UI**: `plotly`, `streamlit`
+- **Visualization & UI**: `plotly`, `streamlit`, `matplotlib`
 - **Explainability**: `shap`
 - **Experiment Tracking**: `mlflow`
 - **Testing**: `pytest`
 
 ---
 
-## 7. Installation & Setup
+## 6. Installation & Setup
 
-### Clone Repository
 ```bash
 git clone https://github.com/Yashuuuu02/NIRVANAA-SIH-SUBMISSION.git
 cd NIRVANAA-SIH-SUBMISSION
-```
-
-### Create Virtual Environment
-```bash
-python -m venv .venv
-# On Windows:
-.venv\Scripts\activate
-# On Linux/macOS:
-source .venv/bin/activate
-```
-
-### Install Dependencies
-```bash
 pip install -r requirements.txt
 ```
 
 ---
 
-## 8. Running Verification & Tests
+## 7. Running Verification & Validation
 
-### Run Automated Tests
+### Run Automated Tests (28 tests)
 ```bash
 pytest -v
 ```
 
-### Run Phase 1 Pipeline Dry-Run
+### Run End-to-End Pipeline Dry-Run
 ```bash
 python main.py --dry-run
 ```
 
----
-
-## 9. Next Steps (Phase 2 Roadmap)
-
-- Implement reduced-order thermal-fluid grey-box equations in `simulator/`.
-- Calibrate nominal operational curves for aero piston engine profiles.
-- Implement fault injection modes for cooling, fuel, lubrication, mechanical, and sensor anomalies.
-- Connect digital twin state estimator to live telemetry streams.
+### Generate Interactive Physics Validation Plots
+```bash
+python scripts/generate_validation_plots.py
+```
+*(Interactive HTML validation artifacts are generated in `docs/plots/`)*

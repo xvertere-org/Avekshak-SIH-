@@ -24,8 +24,8 @@ def test_simulator_to_telemetry_interface():
     assert isinstance(record, TelemetryRecord)
     assert record.engine_id == mission_cfg.engine_id
     assert record.mission_id == mission_cfg.mission_id
-    assert record.source == "simulator_v1_stub"
-    assert record.source_type == "simulated"
+    assert record.source in ["simulator_v1_stub", "simulator_v1_physics"]
+    assert record.source_type in ["simulated", "synthetic"]
 
     # Verify streamer accepts and stores the record
     streamer = TelemetryStreamer(buffer_size=10)
@@ -37,7 +37,7 @@ def test_simulator_to_telemetry_interface():
 
 def test_end_to_end_interface_flow():
     """
-    Verify complete Phase 1 interface connectivity chain:
+    Verify complete Phase 1 / Phase 2 interface connectivity chain:
     MissionConfig -> Simulator -> Telemetry -> Digital Twin -> PHM -> Forecasting/RUL -> Explainability -> Dashboard
     """
     # 1. MissionConfig & EngineConfig
@@ -91,4 +91,4 @@ def test_end_to_end_interface_flow():
     assert isinstance(payload, dict)
     assert payload["engine_id"] == mission_cfg.engine_id
     assert "provenance" in payload
-    assert payload["provenance"]["source_type"] == "simulated"
+    assert payload["provenance"]["source_type"] in ["simulated", "synthetic"]

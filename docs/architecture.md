@@ -1,4 +1,4 @@
-# SIH26054 Architecture Specification (Phase 1)
+# SIH26054 Architecture Specification (Phase 2B)
 
 ## Project Title
 **AI-Enabled Real-Time Digital Twin System for Health Monitoring, Fault Prediction and Mission Reliability Enhancement of Aero Piston Engines used in MALE UAVs.**
@@ -16,12 +16,18 @@ The SIH26054 Digital Twin platform follows a modular, decoupled pipeline archite
          │
          ▼
 ┌─────────────────────────────────────────┐
-│   Physics-Informed Engine Simulator     │  (Reduced-order grey-box model)
+│   Physics-Informed Engine Simulator     │  (Phase 2B: Reduced-order grey-box model)
+│   - Atmosphere (ISA)                    │
+│   - Rotational Dynamics (RK4)           │
+│   - Fuel Flow (Willans-line)            │
+│   - Thermal Dynamics (CHT & EGT)        │
+│   - Lubrication & Oil Pressure          │
+│   - Order Vibration Synthesis (1x, 2x)  │
 └────────┬────────────────────────────────┘
          │
          ▼
 ┌─────────────────────────────────────────┐
-│        Telemetry Layer & Buffer         │  (Typed channels + Provenance)
+│        Telemetry Layer & Buffer         │  (Typed channels + Sensor Noise + Provenance)
 └────────┬────────────────────────────────┘
          │
          ▼
@@ -56,8 +62,19 @@ The SIH26054 Digital Twin platform follows a modular, decoupled pipeline archite
 
 ### 2.1 Simulator (`simulator/`)
 - **Responsibility**: Simulates aero piston engine thermal, mechanical, and fluid dynamic responses across flight envelopes (Takeoff, Climb, Cruise, Loiter, Descent, Landing).
-- **Phase 1 Scope**: Lightweight abstract base interface (`BaseEngineSimulator`) and schema-compliant execution stub (`EngineSimulator`).
-- **Reduced-Order Physics Disclaimer**: The future simulator is designed as a reduced-order grey-box model combining lumped thermal-fluid equations and empirical parameters. It is **NOT** a computational fluid dynamics (CFD) solver or an authoritative certified OEM engine model.
+- **Phase 2B Status**: Fully operational reduced-order grey-box physical engine simulator.
+- **Reference Anchor Disclaimer**: The simulator uses the **Rotax 912 ULS** strictly as a publicly documented engineering reference anchor. It is **NOT** a computational fluid dynamics (CFD) solver, certified engine model, or actual classified UAV engine.
+- **Subsystem Architecture**:
+  - `simulator/config.py`: Segregated parameter tiers (Tier A: Public reference, Tier B: Physics-derived, Tier C: Calibration, Tier D: Engineering assumptions).
+  - `simulator/subsystems/atmosphere.py`: ISA troposphere pressure, temperature, and density lapse model.
+  - `simulator/subsystems/mission.py`: Multi-phase flight plan generator and step interpolator.
+  - `simulator/subsystems/dynamics.py`: 4th-Order Runge-Kutta (RK4) rotational dynamics with torque balance.
+  - `simulator/subsystems/fuel.py`: Willans-line fuel consumption and BSFC estimation.
+  - `simulator/subsystems/thermal.py`: Lumped capacitance CHT model and first-order lagging EGT.
+  - `simulator/subsystems/lubrication.py`: Coupled oil thermal model and temperature/viscosity oil pressure.
+  - `simulator/subsystems/vibration.py`: 1x and 2x crankshaft order harmonics, broadband process noise, and FFT analytics.
+  - `simulator/telemetry_generator.py`: Packaging of physical states into `TelemetryRecord` with calibrated sensor noise.
+  - `simulator/engine_simulator.py`: Batch and streaming execution orchestrator.
 
 ### 2.2 Telemetry (`telemetry/`)
 - **Responsibility**: Defines strict data contracts, unit representations, and stream buffering.
@@ -65,47 +82,31 @@ The SIH26054 Digital Twin platform follows a modular, decoupled pipeline archite
   - `altitude` (m), `ambient_temp` (°C), `throttle` (%), `load` (%)
   - `rpm` (RPM), `cht` (°C), `egt` (°C), `oil_temp` (°C), `oil_pressure` (bar), `fuel_flow` (L/h), `vibration` (g)
 - **Provenance Tracking**:
-  - `source`: Generator / dataset tag (e.g. `simulator_v1_stub`, `test_bench_data`)
-  - `source_type`: Origin classification (`simulated`, `synthetic`, `test_bench`, `flight_test`)
+  - `source`: Generator / dataset tag (e.g. `simulator_v1_physics`, `test_bench_data`)
+  - `source_type`: Origin classification (`synthetic`, `simulated`, `test_bench`, `flight_test`)
   - `simulation_version`: Codebase/model iteration tag
 
 ### 2.3 Digital Twin (`digital_twin/`)
 - **Responsibility**: Tracks expected nominal engine physics states for any given operating point and computes dynamic residuals (e.g., $\Delta \text{CHT} = \text{CHT}_{\text{observed}} - \text{CHT}_{\text{nominal}}$).
-- **Phase 1 Scope**: Interface (`DigitalTwin`) outputting `DigitalTwinState`.
 
 ### 2.4 Prognostics & Health Management (`phm/`)
 - **Responsibility**: Evaluates residuals and telemetry trends to generate an overall Health Index (0.0–1.0), flag anomaly events, and categorize operational faults.
-- **Target Fault Categories**:
-  - `cooling_degradation`
-  - `injector_fuel_abnormality`
-  - `lubrication_issue`
-  - `mechanical_vibration_fault`
-  - `sensor_drift_failure`
-  - `none` (nominal)
 
 ### 2.5 Forecasting & RUL (`forecasting/`)
 - **Responsibility**: Predicts Remaining Useful Life (RUL) in operational hours with upper/lower uncertainty bounds and degradation trajectories.
-- **Phase 1 Scope**: Interface (`RULPredictor`) providing `RULPrediction` contracts.
 
 ### 2.6 Explainability (`explainability/`)
 - **Responsibility**: Attributes anomalous behavior to root physical drivers (residuals, temperature trends, pressure drops) for human-in-the-loop engineering trust.
-- **Phase 1 Scope**: Interface (`ExplainabilityEngine`) providing `ExplanationReport`.
 
 ### 2.7 Dashboard (`dashboard/`)
 - **Responsibility**: Packages real-time telemetry, twin state, diagnostics, RUL, and explanations into clean payloads for Streamlit/Plotly operator views.
 
 ---
 
-## 3. Configuration Management (`configs/`)
+## 3. Parameter Tier Structure
 
-Configuration is cleanly isolated from code logic:
-- `default_mission.json`: Defines flight parameters, target altitude, ambient temperature, mission phase, duration, and fault injection tags.
-- `default_engine.json`: Defines generic engine parameters. All specifications are non-authoritative templates.
-- `telemetry_settings.json`: Declares channel metadata, units, and provenance standards.
-- `config_loader.py`: Safe parsing utilities with dataclass validation.
-
----
-
-## 4. Multi-Engine & Multi-UAV Scalability
-
-Although the Phase 1 MVP targets a single UAV and single aero piston engine (`ENGINE_UAV_01`), all schemas and interfaces enforce explicit `mission_id`, `engine_id`, timestamps, and provenance metadata to enable multi-engine and fleet-wide monitoring without refactoring core contracts.
+All simulator parameters are structured in `simulator/config.py`:
+- **Tier A (Public Reference)**: Rotax 912 ULS anchor specifications (58 kW continuous power @ 5500 RPM, 5800 max RPM, CHT limit 135 °C, oil temp/pressure envelopes, ISA constants).
+- **Tier B (Physics-Derived)**: Analytical conversions for atmospheric density factor $\sigma$, $\omega$, torque, and power derating.
+- **Tier C (Calibration Parameters)**: Inertia ($I=0.28\text{ kg}\cdot\text{m}^2$), propeller load constant $k_{\text{load}}$, friction parameters, thermal conductances, Willans fuel slope/intercept, and sensor noise variances.
+- **Tier D (Engineering Assumptions)**: Combustion efficiency curve approximation, airspeed proxies, and vibration order weights.

@@ -1,70 +1,261 @@
 """
-Physics-Informed Aero Piston Engine Simulator interface and Phase 1 stub.
+Physics-Informed Aero Piston Engine Simulator Orchestrator for SIH26054.
+
+Coordinates atmosphere, mission, rotational dynamics, fuel, thermal, lubrication,
+and vibration subsystems to produce physically correlated telemetry streams.
 
 DISCLAIMER:
-This simulator is designed as a future reduced-order physics-informed/grey-box model.
-It is NOT a computational fluid dynamics (CFD) solver or an authoritative certified OEM engine model.
+Uses the Rotax 912 ULS ONLY as a publicly documented engineering reference anchor.
+This simulator is a reduced-order lumped-parameter grey-box model and does NOT represent
+a certified OEM engine model or actual classified MALE-UAV propulsion system.
 """
 
-from typing import List, Optional
+import numpy as np
+from typing import List, Optional, Dict, Any, Union
+import pandas as pd
+
 from simulator.base import BaseEngineSimulator
-from telemetry.schema import MissionConfig, EngineConfig, TelemetryRecord, MissionPhase, FaultCategory
+from simulator.config import SimulatorConfig
+from simulator.subsystems.atmosphere import Atmosphere
+from simulator.subsystems.mission import MissionProfile, MissionStep, FlightPhase
+from simulator.subsystems.dynamics import RotationalDynamics
+from simulator.subsystems.fuel import FuelSystem
+from simulator.subsystems.thermal import ThermalSystem
+from simulator.subsystems.lubrication import LubricationSystem
+from simulator.subsystems.vibration import VibrationSystem
+from simulator.telemetry_generator import TelemetryGenerator
+from telemetry.schema import MissionConfig, EngineConfig, TelemetryRecord, FaultCategory
 
 
 class EngineSimulator(BaseEngineSimulator):
     """
-    Modular engine simulator interface.
-    Phase 1: Stub returning schema-compliant telemetry without actual physics computation.
+    Modular physics-informed grey-box engine simulator.
+    Supports both discrete streaming steps and batch mission execution.
     """
 
-    def __init__(self, engine_config: Optional[EngineConfig] = None):
+    def __init__(
+        self,
+        engine_config: Optional[EngineConfig] = None,
+        sim_config: Optional[SimulatorConfig] = None,
+        seed: Optional[int] = None,
+    ):
         if engine_config is None:
             engine_config = EngineConfig()
         super().__init__(engine_config)
-        self.current_time = 0.0
 
-    def step(self, mission_config: MissionConfig, time_step: float = 1.0) -> TelemetryRecord:
-        """
-        Produce a single step of telemetry based on mission inputs.
-        Phase 1 provides a synthetic nominal/fault-flagged stub record.
-        """
-        self.current_time += time_step
+        self.sim_config = sim_config or SimulatorConfig()
+        if seed is not None:
+            self.sim_config.random_seed = seed
 
-        # Default placeholder values compliant with schema
-        record = TelemetryRecord(
-            timestamp=self.current_time,
-            mission_id=mission_config.mission_id,
-            engine_id=mission_config.engine_id or self.engine_config.engine_id,
-            mission_phase=mission_config.mission_phase,
-            altitude=mission_config.altitude,
-            ambient_temp=mission_config.ambient_temperature,
-            throttle=mission_config.throttle,
-            load=mission_config.engine_load,
-            rpm=2400.0 * (mission_config.throttle / 100.0),
-            cht=180.0,
-            egt=720.0,
-            oil_temp=85.0,
-            oil_pressure=4.2,
-            fuel_flow=22.5,
-            vibration=0.8,
-            fault_type=mission_config.fault_type,
-            fault_severity=mission_config.fault_severity,
-            source="simulator_v1_stub",
-            source_type="simulated",
-            simulation_version="0.1.0-phase1-stub",
+        self.rng = np.random.default_rng(self.sim_config.random_seed)
+        self.current_time_s = 0.0
+
+        # Instantiate physical subsystems
+        self.atmosphere = Atmosphere(tier_a=self.sim_config.tier_a)
+        self.dynamics = RotationalDynamics(
+            tier_a=self.sim_config.tier_a,
+            tier_c=self.sim_config.tier_c,
+            tier_d=self.sim_config.tier_d,
+            initial_rpm=self.sim_config.tier_c.rpm_idle,
+        )
+        self.fuel = FuelSystem(tier_c=self.sim_config.tier_c)
+        self.thermal = ThermalSystem(
+            tier_a=self.sim_config.tier_a,
+            tier_c=self.sim_config.tier_c,
+        )
+        self.lubrication = LubricationSystem(
+            tier_a=self.sim_config.tier_a,
+            tier_c=self.sim_config.tier_c,
+        )
+        self.vibration = VibrationSystem(
+            tier_c=self.sim_config.tier_c,
+            tier_d=self.sim_config.tier_d,
+            rng=self.rng,
+        )
+        self.telemetry_gen = TelemetryGenerator(
+            config=self.sim_config,
+            rng=self.rng,
+            apply_sensor_noise=True,
+        )
+
+    def reset(self, seed: Optional[int] = None) -> None:
+        """Reset internal simulator states to initial baseline conditions."""
+        if seed is not None:
+            self.sim_config.random_seed = seed
+        self.rng = np.random.default_rng(self.sim_config.random_seed)
+        self.current_time_s = 0.0
+
+        self.dynamics.set_rpm(self.sim_config.tier_c.rpm_idle)
+        self.thermal.set_states(cht_c=85.0, egt_c=580.0)
+        self.lubrication.set_oil_temp(65.0)
+        self.vibration.phase_1 = 0.0
+        self.vibration.phase_2 = 0.0
+
+    def step(
+        self,
+        mission_config: Optional[Union[MissionConfig, MissionStep]] = None,
+        time_step: Optional[float] = None,
+        mission_input: Optional[Union[MissionConfig, MissionStep]] = None,
+        fault_state: Optional[Dict[str, Any]] = None,
+    ) -> TelemetryRecord:
+        """
+        Advance the simulation by one discrete time step.
+
+        Args:
+            mission_config: MissionConfig or MissionStep with current flight demands.
+            time_step: Simulation time increment (seconds). Defaults to config default_dt.
+            mission_input: Alias for mission_config.
+            fault_state: Placeholder hook for future Phase 4 fault injection.
+
+        Returns:
+            Fully populated and schema-compliant TelemetryRecord.
+        """
+        inp = mission_config if mission_config is not None else mission_input
+        dt = time_step if time_step is not None else self.sim_config.default_dt
+        self.current_time_s += dt
+
+        # Normalize mission inputs
+        if isinstance(inp, MissionStep):
+            throttle_pct = inp.throttle_pct
+            altitude_m = inp.altitude_m
+            airspeed_ms = inp.airspeed_ms
+            temp_offset_k = inp.temp_offset_k
+            mission_phase_val = inp.phase.value if hasattr(inp.phase, "value") else str(inp.phase)
+            mission_id_val = "MISSION_MALE_UAV_001"
+            fault_type_val = FaultCategory.NONE.value
+            fault_sev_val = 0.0
+            step_time = inp.timestamp_s
+        elif isinstance(inp, MissionConfig):
+            throttle_pct = inp.throttle
+            altitude_m = inp.altitude
+            airspeed_ms = 45.0  # nominal proxy
+            temp_offset_k = inp.ambient_temperature - 15.0
+            mission_phase_val = inp.mission_phase
+            mission_id_val = inp.mission_id
+            fault_type_val = inp.fault_type
+            fault_sev_val = inp.fault_severity
+            step_time = self.current_time_s
+        else:
+            throttle_pct = 75.0
+            altitude_m = 3000.0
+            airspeed_ms = 45.0
+            temp_offset_k = 0.0
+            mission_phase_val = FlightPhase.CRUISE.value
+            mission_id_val = "MISSION_MALE_UAV_001"
+            fault_type_val = FaultCategory.NONE.value
+            fault_sev_val = 0.0
+            step_time = self.current_time_s
+
+        # 1. Atmosphere
+        atmo_state = self.atmosphere.compute(altitude_m=altitude_m, temp_offset_k=temp_offset_k)
+
+        # 2. Rotational Dynamics (RK4)
+        op_point = self.dynamics.step(
+            throttle_pct=throttle_pct,
+            density_factor=atmo_state.density_factor,
+            dt=dt,
+        )
+
+        # 3. Fuel System (Willans-line)
+        fuel_state = self.fuel.compute(power_target_w=op_point.power_target_w)
+
+        # 4. Thermal System (EGT + CHT)
+        thermal_state = self.thermal.step(
+            rpm=op_point.rpm,
+            load_pct=op_point.engine_load_pct,
+            fuel_mass_flow_kg_s=fuel_state.mass_flow_kg_s,
+            density_factor=atmo_state.density_factor,
+            ambient_temp_c=atmo_state.temperature_c,
+            airspeed_ms=airspeed_ms,
+            dt=dt,
+        )
+
+        # 5. Lubrication System (Oil temp + pressure)
+        lub_state = self.lubrication.step(
+            rpm=op_point.rpm,
+            cht_c=thermal_state.cht_c,
+            fuel_mass_flow_kg_s=fuel_state.mass_flow_kg_s,
+            ambient_temp_c=atmo_state.temperature_c,
+            dt=dt,
+        )
+
+        # 6. Vibration System (1x, 2x orders + noise)
+        vib_state = self.vibration.step(
+            rpm=op_point.rpm,
+            load_pct=op_point.engine_load_pct,
+            dt=dt,
+        )
+
+        # 7. Synthesize TelemetryRecord
+        m_step_proxy = MissionStep(
+            timestamp_s=step_time,
+            phase=mission_phase_val,
+            throttle_pct=throttle_pct,
+            altitude_m=altitude_m,
+            airspeed_ms=airspeed_ms,
+            temp_offset_k=temp_offset_k,
+            progress_pct=0.0,
+        )
+
+        record = self.telemetry_gen.generate(
+            mission_step=m_step_proxy,
+            atmo_state=atmo_state,
+            op_point=op_point,
+            fuel_state=fuel_state,
+            thermal_state=thermal_state,
+            lub_state=lub_state,
+            vib_state=vib_state,
+            engine_id=self.engine_config.engine_id,
+            mission_id=mission_id_val,
+            fault_type=fault_type_val,
+            fault_severity=fault_sev_val,
         )
         return record
 
-    def run_mission(self, mission_config: MissionConfig, time_step: float = 1.0) -> List[TelemetryRecord]:
+    def run(
+        self,
+        mission_profile: Optional[MissionProfile] = None,
+        dt: Optional[float] = None,
+        fault_schedule: Optional[Dict[str, Any]] = None,
+    ) -> List[TelemetryRecord]:
         """
-        Execute mission simulation loop.
-        Phase 1 generates stub records across the mission duration.
+        Execute full mission profile simulation in batch mode.
         """
+        profile = mission_profile or MissionProfile()
+        step_dt = dt if dt is not None else self.sim_config.default_dt
+        self.reset()
+
         records: List[TelemetryRecord] = []
-        steps = int(max(1, mission_config.duration / time_step))
-        
-        # In Phase 1 stub mode, limit max generated records for dry-run efficiency
-        max_stub_steps = min(steps, 10)
-        for _ in range(max_stub_steps):
-            records.append(self.step(mission_config, time_step))
+        for step in profile.generate_steps(dt=step_dt):
+            rec = self.step(mission_config=step, time_step=step_dt, fault_state=None)
+            records.append(rec)
+
         return records
+
+    def run_mission(
+        self,
+        mission_config: MissionConfig,
+        time_step: float = 0.1,
+    ) -> List[TelemetryRecord]:
+        """
+        Phase 1 compatibility interface for running a configured mission.
+        """
+        steps = max(1, int(mission_config.duration / time_step))
+        self.reset()
+        records: List[TelemetryRecord] = []
+        for _ in range(steps):
+            records.append(self.step(mission_config=mission_config, time_step=time_step))
+        return records
+
+    def run_to_dataframe(
+        self,
+        mission_profile: Optional[MissionProfile] = None,
+        dt: Optional[float] = None,
+    ) -> pd.DataFrame:
+        """
+        Execute simulation and return a pandas DataFrame for analysis and visualization.
+        """
+        records = self.run(mission_profile=mission_profile, dt=dt)
+        data = [r.to_dict() for r in records]
+        df = pd.DataFrame(data)
+        return df
