@@ -146,6 +146,24 @@ class EngineSimulator(BaseEngineSimulator):
             fault_sev_val = 0.0
             step_time = self.current_time_s
 
+        # Resolve fault state and telemetry fault tags if provided
+        if fault_state is not None:
+            from simulator.fault_interface import FaultState, FaultSchedule
+            if isinstance(fault_state, FaultState):
+                if fault_state.is_active_at(step_time):
+                    fault_type_val = fault_state.fault_type.value if hasattr(fault_state.fault_type, "value") else str(fault_state.fault_type)
+                    fault_sev_val = fault_state.get_effective_severity(step_time)
+            elif isinstance(fault_state, FaultSchedule):
+                primary = fault_state.get_primary_fault(step_time)
+                if primary is not None:
+                    fault_type_val = primary.fault_type.value if hasattr(primary.fault_type, "value") else str(primary.fault_type)
+                    fault_sev_val = primary.get_effective_severity(step_time)
+            elif isinstance(fault_state, dict):
+                f_obj = FaultState.from_dict(fault_state)
+                if f_obj.is_active_at(step_time):
+                    fault_type_val = f_obj.fault_type.value if hasattr(f_obj.fault_type, "value") else str(f_obj.fault_type)
+                    fault_sev_val = f_obj.get_effective_severity(step_time)
+
         # 1. Atmosphere
         atmo_state = self.atmosphere.compute(altitude_m=altitude_m, temp_offset_k=temp_offset_k)
 
@@ -216,18 +234,30 @@ class EngineSimulator(BaseEngineSimulator):
         self,
         mission_profile: Optional[MissionProfile] = None,
         dt: Optional[float] = None,
-        fault_schedule: Optional[Dict[str, Any]] = None,
+        fault_schedule: Optional[Any] = None,
     ) -> List[TelemetryRecord]:
         """
-        Execute full mission profile simulation in batch mode.
+        Execute full mission profile simulation in batch mode with optional fault schedule.
         """
         profile = mission_profile or MissionProfile()
         step_dt = dt if dt is not None else self.sim_config.default_dt
         self.reset()
 
+        schedule_obj = None
+        if fault_schedule is not None:
+            from simulator.fault_interface import FaultSchedule, FaultState
+            if isinstance(fault_schedule, FaultSchedule):
+                schedule_obj = fault_schedule
+            elif isinstance(fault_schedule, list):
+                schedule_obj = FaultSchedule(fault_schedule)
+            elif isinstance(fault_schedule, FaultState):
+                schedule_obj = FaultSchedule([fault_schedule])
+            elif isinstance(fault_schedule, dict):
+                schedule_obj = FaultSchedule([FaultState.from_dict(fault_schedule)])
+
         records: List[TelemetryRecord] = []
         for step in profile.generate_steps(dt=step_dt):
-            rec = self.step(mission_config=step, time_step=step_dt, fault_state=None)
+            rec = self.step(mission_config=step, time_step=step_dt, fault_state=schedule_obj)
             records.append(rec)
 
         return records

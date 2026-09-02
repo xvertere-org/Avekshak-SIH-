@@ -23,6 +23,11 @@ This project delivers a modular, real-time Digital Twin and Prognostics & Health
   - Comprehensive calibration documentation & parameter inventory in `docs/simulator_validation.md`.
   - 7 interactive Plotly validation figures in `docs/plots/`.
   - 38/38 automated unit & regression tests passing.
+- **Phase 4A: Fault & Degradation Interface** — Complete ✅
+  - Standardized typed fault contracts (`FaultType`, `FaultSubsystem`, `FaultState`, `FaultSchedule`).
+  - Strict separation of fault definition/scheduling from downstream physical fault dynamics (Phases 4B–4F).
+  - 100% backward compatibility preserved for healthy simulation trajectories.
+  - 50/50 automated tests passing.
 
 > **Engineering Reference Anchor & Disclaimer:**  
 > The engine simulator uses the **Rotax 912 ULS** strictly as a publicly documented engineering anchor (58 kW continuous power @ 5500 RPM, max 5800 RPM). It is a **reduced-order physics-informed / grey-box model**, **NOT** a CFD solver, certified OEM engine model, or actual classified UAV engine. Synthetic telemetry is never represented as actual UAV flight data.

@@ -9,6 +9,12 @@ from simulator.config import (
     TierCParameters,
     TierDParameters,
 )
+from simulator.fault_interface import (
+    FaultType,
+    FaultSubsystem,
+    FaultState,
+    FaultSchedule,
+)
 from simulator.engine_simulator import EngineSimulator
 from simulator.telemetry_generator import TelemetryGenerator
 from simulator.subsystems.atmosphere import Atmosphere, ISAState
@@ -25,6 +31,10 @@ __all__ = [
     "TierAParameters",
     "TierCParameters",
     "TierDParameters",
+    "FaultType",
+    "FaultSubsystem",
+    "FaultState",
+    "FaultSchedule",
     "EngineSimulator",
     "TelemetryGenerator",
     "Atmosphere",

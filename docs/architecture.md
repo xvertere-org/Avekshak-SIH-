@@ -68,6 +68,9 @@ The SIH26054 Digital Twin platform follows a modular, decoupled pipeline archite
   - 8 automated validation suites (Physical bounds, monotonicity, transient lag hierarchy, empirical timestep sweep, steady-state stability, cross-channel coherence, vibration order tracking, representative mission).
   - Recommended operating timestep: $dt = 0.1\text{ s}$ (10 Hz).
   - Golden baseline reference: `data/golden_baseline_summary.json` (17,200 samples).
+- **Fault Interface (`simulator/fault_interface.py`)**:
+  - Phase 4A establishes typed fault contracts (`FaultType`, `FaultSubsystem`, `FaultState`, `FaultSchedule`) supporting cooling, lubrication, fuel, mechanical, and sensor degradation modes.
+  - Strictly separates fault definition/scheduling from downstream physical fault dynamics (Phases 4B–4F).
 - **Subsystem Architecture**:
   - `simulator/config.py`: Segregated parameter tiers (Tier A: Public reference, Tier B: Physics-derived, Tier C: Calibration, Tier D: Engineering assumptions).
   - `simulator/subsystems/atmosphere.py`: ISA troposphere pressure, temperature, and density lapse model.
