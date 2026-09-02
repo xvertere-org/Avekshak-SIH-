@@ -32,7 +32,11 @@ This project delivers a modular, real-time Digital Twin and Prognostics & Health
   - Direct CHT elevation with natural secondary oil temperature rise via conduction coupling.
   - Natural thermal recovery dynamics without artificial state resets.
   - Interactive validation plots (`docs/plots/8_cooling_degradation_transient.html`, `docs/plots/9_cooling_severity_sweep.html`).
-  - 58/58 automated tests passing.
+- **Phase 4C: Lubrication Degradation Physics** — Complete ✅
+  - Physics-grounded lubrication degradation in `LubricationSystem`: hydraulic delivery pressure reduction $P_{\text{oil}} = P_{\text{nom}} \cdot (1 - k_{\text{p\_loss}} \cdot \sigma)$, increased boundary friction heat, and reduced cooler heat rejection.
+  - Compound pressure drop and monotonic oil temperature rise with natural dynamic recovery.
+  - Interactive validation plots (`docs/plots/10_lubrication_degradation_transient.html`, `docs/plots/11_lubrication_severity_sweep.html`).
+  - 66/66 automated tests passing.
 
 > **Engineering Reference Anchor & Disclaimer:**  
 > The engine simulator uses the **Rotax 912 ULS** strictly as a publicly documented engineering anchor (58 kW continuous power @ 5500 RPM, max 5800 RPM). It is a **reduced-order physics-informed / grey-box model**, **NOT** a CFD solver, certified OEM engine model, or actual classified UAV engine. Synthetic telemetry is never represented as actual UAV flight data.
@@ -143,7 +147,7 @@ pip install -r requirements.txt
 
 ## 7. Running Verification & Validation
 
-### Run Full Test Suite (58 tests)
+### Run Full Test Suite (66 tests)
 ```bash
 pytest -v
 ```

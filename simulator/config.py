@@ -94,6 +94,9 @@ class TierCParameters:
     oil_press_base_bar: float = 1.0             # Base static oil pressure (bar)
     k_oil_p_rpm: float = 0.00085                # Oil pressure gain per RPM (bar/RPM)
     k_oil_p_temp: float = 0.008                 # Oil pressure drop per °C temp rise above nominal (bar/°C)
+    k_lub_p_loss: float = 0.55                  # Max hydraulic oil pressure loss fraction at severity=1.0 (Tier C/D)
+    k_lub_heat_gain: float = 0.20               # Oil frictional heat generation gain fraction at severity=1.0 (Tier C/D)
+    k_lub_cool_loss: float = 0.20               # Oil cooler heat rejection reduction fraction at severity=1.0 (Tier C/D)
 
     # Vibration synthesis calibration
     vib_order1_base_g: float = 0.32             # 1x rotational order baseline amplitude (g)

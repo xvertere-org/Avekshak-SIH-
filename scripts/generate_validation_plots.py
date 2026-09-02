@@ -381,9 +381,101 @@ def plot_cooling_severity_sweep():
     print(" -> Saved 9_cooling_severity_sweep.html")
 
 
+def plot_lubrication_degradation_transient():
+    """10: Oil Pressure, Oil Temperature, and Severity vs Time during lubrication fault and recovery."""
+    from simulator.fault_interface import FaultState, FaultType
+    sim_healthy = EngineSimulator(seed=42)
+    sim_faulted = EngineSimulator(seed=42)
+
+    seg = PhaseSegment(FlightPhase.CRUISE, 180.0, 75.0, 75.0, 2000.0, 2000.0)
+    profile = MissionProfile(segments=[seg])
+
+    fault = FaultState(
+        fault_type=FaultType.LUBRICATION_DEGRADATION,
+        severity=0.65,
+        start_time=30.0,
+        end_time=110.0,
+        parameters={"ramp_duration": 15.0},
+    )
+
+    df_h = sim_healthy.run_to_dataframe(profile, dt=0.2)
+    df_f = sim_faulted.run_to_dataframe(profile, dt=0.2, fault_schedule=fault)
+
+    fig = make_subplots(
+        rows=3, cols=1, shared_xaxes=True, vertical_spacing=0.06,
+        subplot_titles=[
+            "<b>Oil Pressure (bar): Healthy vs Lubrication Degradation Drop</b>",
+            "<b>Oil Temperature (°C): Secondary Frictional & Heat Rejection Rise</b>",
+            "<b>Active Lubrication Fault Severity & Activation Window</b>",
+        ]
+    )
+
+    t = df_f["timestamp"]
+    # Row 1: Oil Pressure
+    fig.add_trace(go.Scatter(x=t, y=df_h["oil_pressure"], name="Nominal Oil Press", line=dict(color="#00e5ff", width=2, dash="dot")), row=1, col=1)
+    fig.add_trace(go.Scatter(x=t, y=df_f["oil_pressure"], name="Degraded Oil Press", line=dict(color="#ff1744", width=2.5)), row=1, col=1)
+    fig.add_hline(y=2.0, line_dash="dash", line_color="#ff5252", annotation_text="Low Oil Press Warning (2.0 bar)", row=1, col=1)
+
+    # Row 2: Oil Temp
+    fig.add_trace(go.Scatter(x=t, y=df_h["oil_temp"], name="Nominal Oil Temp", line=dict(color="#00e676", width=2, dash="dot")), row=2, col=1)
+    fig.add_trace(go.Scatter(x=t, y=df_f["oil_temp"], name="Degraded Oil Temp", line=dict(color="#ff9100", width=2.5)), row=2, col=1)
+    fig.add_hline(y=130.0, line_dash="dash", line_color="#ff1744", annotation_text="Max Oil Temp Limit (130°C)", row=2, col=1)
+
+    # Row 3: Fault Severity
+    fig.add_trace(go.Scatter(x=t, y=df_f["fault_severity"], name="Lubrication Severity", line=dict(color="#00e5ff", width=2), fill="tozeroy"), row=3, col=1)
+
+    fig.update_layout(
+        template="plotly_dark", height=800,
+        title="<b>Phase 4C: Lubrication Degradation Transient Dynamics (Pressure Drop, Thermal Rise & Recovery)</b>",
+    )
+    fig.update_xaxes(title_text="Simulation Time (s)", row=3, col=1)
+    fig.update_yaxes(title_text="Oil Pressure (bar)", row=1, col=1)
+    fig.update_yaxes(title_text="Oil Temp (°C)", row=2, col=1)
+    fig.update_yaxes(title_text="Severity", row=3, col=1)
+    fig.write_html(OUTPUT_DIR / "10_lubrication_degradation_transient.html")
+    print(" -> Saved 10_lubrication_degradation_transient.html")
+
+
+def plot_lubrication_severity_sweep():
+    """11: Steady-State Oil Pressure and Oil Temperature vs Lubrication Fault Severity."""
+    from simulator.fault_interface import FaultState, FaultType
+    severities = [0.0, 0.20, 0.40, 0.60, 0.80, 1.0]
+    pressures, oil_temps = [], []
+
+    seg = PhaseSegment(FlightPhase.CRUISE, 150.0, 75.0, 75.0, 2000.0, 2000.0)
+    profile = MissionProfile(segments=[seg])
+
+    for s in severities:
+        sim = EngineSimulator(seed=42)
+        f = FaultState(FaultType.LUBRICATION_DEGRADATION, severity=s, start_time=10.0, end_time=150.0)
+        df = sim.run_to_dataframe(profile, dt=0.5, fault_schedule=f)
+        pressures.append(float(df["oil_pressure"].iloc[-1]))
+        oil_temps.append(float(df["oil_temp"].iloc[-1]))
+
+    fig = make_subplots(
+        rows=1, cols=2, shared_yaxes=False,
+        subplot_titles=["<b>Steady-State Oil Pressure vs Severity (Monotonic Drop)</b>", "<b>Steady-State Oil Temp vs Severity (Monotonic Rise)</b>"]
+    )
+
+    fig.add_trace(go.Scatter(x=severities, y=pressures, mode="lines+markers", name="Oil Press (bar)", line=dict(color="#00e5ff", width=2.5), marker=dict(size=8)), row=1, col=1)
+    fig.add_trace(go.Scatter(x=severities, y=oil_temps, mode="lines+markers", name="Oil Temp (°C)", line=dict(color="#ff9100", width=2.5), marker=dict(size=8)), row=1, col=2)
+    fig.add_hline(y=2.0, line_dash="dash", line_color="#ff1744", annotation_text="2.0 bar Warning", row=1, col=1)
+
+    fig.update_layout(
+        template="plotly_dark", height=450,
+        title="<b>Phase 4C: Steady-State Lubrication Response across Severity Sweep [0.0 - 1.0]</b>"
+    )
+    fig.update_xaxes(title_text="Lubrication Severity (0 = nominal, 1 = max degradation)", row=1, col=1)
+    fig.update_xaxes(title_text="Lubrication Severity (0 = nominal, 1 = max degradation)", row=1, col=2)
+    fig.update_yaxes(title_text="Steady-State Oil Pressure (bar)", row=1, col=1)
+    fig.update_yaxes(title_text="Steady-State Oil Temp (°C)", row=1, col=2)
+    fig.write_html(OUTPUT_DIR / "11_lubrication_severity_sweep.html")
+    print(" -> Saved 11_lubrication_severity_sweep.html")
+
+
 def main():
     ensure_output_dir()
-    print("Generating Validation & Calibration Plots (Phases 2B, 3, 4B)...")
+    print("Generating Validation & Calibration Plots (Phases 2B, 3, 4B, 4C)...")
     plot_throttle_step_rpm()
     plot_thermal_dynamics()
     plot_oil_pressure_and_fuel_flow()
@@ -393,6 +485,8 @@ def main():
     plot_correlation_matrix()
     plot_cooling_degradation_transient()
     plot_cooling_severity_sweep()
+    plot_lubrication_degradation_transient()
+    plot_lubrication_severity_sweep()
     print(f"[SUCCESS] All validation plots generated in '{OUTPUT_DIR}'.")
 
 

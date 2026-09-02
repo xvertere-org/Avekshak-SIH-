@@ -71,6 +71,7 @@ The SIH26054 Digital Twin platform follows a modular, decoupled pipeline archite
 - **Fault Degradation & Physics (`simulator/fault_interface.py` & Subsystems)**:
   - Phase 4A establishes typed fault contracts (`FaultType`, `FaultSubsystem`, `FaultState`, `FaultSchedule`).
   - Phase 4B implements physics-grounded **Cooling Degradation** in `ThermalSystem`, reducing effective convective cooling conductance $h_{\text{cool\_effective}} = h_{\text{cool}} \cdot (1 - k_{\text{loss}} \cdot \sigma)$. Produces natural CHT elevation and secondary delayed oil temperature rise via conduction coupling.
+  - Phase 4C implements physics-grounded **Lubrication Degradation** in `LubricationSystem`, reducing hydraulic delivery pressure $P_{\text{oil}} = P_{\text{nom}} \cdot (1 - k_{\text{p\_loss}} \cdot \sigma)$, increasing frictional heat generation, and reducing radiator heat rejection. Produces compound pressure drop and monotonic oil temperature rise.
 - **Subsystem Architecture**:
   - `simulator/config.py`: Segregated parameter tiers (Tier A: Public reference, Tier B: Physics-derived, Tier C: Calibration, Tier D: Engineering assumptions).
   - `simulator/subsystems/atmosphere.py`: ISA troposphere pressure, temperature, and density lapse model.
