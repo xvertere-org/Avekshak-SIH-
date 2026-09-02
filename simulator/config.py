@@ -77,6 +77,7 @@ class TierCParameters:
     h_cool_base: float = 16.0                   # Base convective cooling conductance (W/K)
     h_cool_rpm: float = 0.012                   # Convective cooling conductance per RPM (W/(K·RPM))
     h_cool_airspeed: float = 0.35               # Convective cooling conductance per m/s airspeed (W/(K·(m/s)))
+    k_cooling_max_loss: float = 0.55            # Max cooling conductance loss fraction at severity=1.0 (Tier C/D)
 
     # Thermal EGT calibration
     t_egt_base_c: float = 520.0                 # Base EGT at idle/low load (°C)

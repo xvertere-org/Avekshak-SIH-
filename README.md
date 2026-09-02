@@ -27,7 +27,12 @@ This project delivers a modular, real-time Digital Twin and Prognostics & Health
   - Standardized typed fault contracts (`FaultType`, `FaultSubsystem`, `FaultState`, `FaultSchedule`).
   - Strict separation of fault definition/scheduling from downstream physical fault dynamics (Phases 4B–4F).
   - 100% backward compatibility preserved for healthy simulation trajectories.
-  - 50/50 automated tests passing.
+- **Phase 4B: Cooling Degradation Physics** — Complete ✅
+  - Physics-grounded cooling conductance degradation in `ThermalSystem`: $h_{\text{cool\_effective}} = h_{\text{cool}} \cdot (1 - k_{\text{loss}} \cdot \sigma)$.
+  - Direct CHT elevation with natural secondary oil temperature rise via conduction coupling.
+  - Natural thermal recovery dynamics without artificial state resets.
+  - Interactive validation plots (`docs/plots/8_cooling_degradation_transient.html`, `docs/plots/9_cooling_severity_sweep.html`).
+  - 58/58 automated tests passing.
 
 > **Engineering Reference Anchor & Disclaimer:**  
 > The engine simulator uses the **Rotax 912 ULS** strictly as a publicly documented engineering anchor (58 kW continuous power @ 5500 RPM, max 5800 RPM). It is a **reduced-order physics-informed / grey-box model**, **NOT** a CFD solver, certified OEM engine model, or actual classified UAV engine. Synthetic telemetry is never represented as actual UAV flight data.
@@ -138,7 +143,7 @@ pip install -r requirements.txt
 
 ## 7. Running Verification & Validation
 
-### Run Full Test Suite (38 tests)
+### Run Full Test Suite (58 tests)
 ```bash
 pytest -v
 ```

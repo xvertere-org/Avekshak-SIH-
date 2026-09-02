@@ -290,9 +290,100 @@ def plot_correlation_matrix():
     print(" -> Saved 7_cross_channel_correlation_matrix.html")
 
 
+def plot_cooling_degradation_transient():
+    """8: CHT, Oil Temperature, and Fault Severity vs Time during cooling fault and recovery."""
+    from simulator.fault_interface import FaultState, FaultType
+    sim_healthy = EngineSimulator(seed=42)
+    sim_faulted = EngineSimulator(seed=42)
+
+    seg = PhaseSegment(FlightPhase.CRUISE, 180.0, 75.0, 75.0, 2000.0, 2000.0)
+    profile = MissionProfile(segments=[seg])
+
+    fault = FaultState(
+        fault_type=FaultType.COOLING_DEGRADATION,
+        severity=0.65,
+        start_time=30.0,
+        end_time=110.0,
+        parameters={"ramp_duration": 15.0},
+    )
+
+    df_h = sim_healthy.run_to_dataframe(profile, dt=0.2)
+    df_f = sim_faulted.run_to_dataframe(profile, dt=0.2, fault_schedule=fault)
+
+    fig = make_subplots(
+        rows=3, cols=1, shared_xaxes=True, vertical_spacing=0.06,
+        subplot_titles=[
+            "<b>Cylinder Head Temperature (CHT): Healthy vs Cooling Degradation</b>",
+            "<b>Oil Temperature: Natural Secondary Rise via Conduction Coupling</b>",
+            "<b>Active Fault Severity & Activation Window</b>",
+        ]
+    )
+
+    t = df_f["timestamp"]
+    # Row 1: CHT
+    fig.add_trace(go.Scatter(x=t, y=df_h["cht"], name="Nominal CHT", line=dict(color="#00e676", width=2, dash="dot")), row=1, col=1)
+    fig.add_trace(go.Scatter(x=t, y=df_f["cht"], name="Degraded CHT", line=dict(color="#ff1744", width=2.5)), row=1, col=1)
+    fig.add_hline(y=150.0, line_dash="dash", line_color="#ff5252", annotation_text="CHT Limit (150°C)", row=1, col=1)
+
+    # Row 2: Oil Temp
+    fig.add_trace(go.Scatter(x=t, y=df_h["oil_temp"], name="Nominal Oil Temp", line=dict(color="#00e5ff", width=2, dash="dot")), row=2, col=1)
+    fig.add_trace(go.Scatter(x=t, y=df_f["oil_temp"], name="Degraded Oil Temp", line=dict(color="#ff9100", width=2.5)), row=2, col=1)
+
+    # Row 3: Fault Severity
+    fig.add_trace(go.Scatter(x=t, y=df_f["fault_severity"], name="Fault Severity", line=dict(color="#d500f9", width=2), fill="tozeroy"), row=3, col=1)
+
+    fig.update_layout(
+        template="plotly_dark", height=800,
+        title="<b>Phase 4B: Cooling Degradation Transient Response, Secondary Coupling & Natural Recovery</b>",
+    )
+    fig.update_xaxes(title_text="Simulation Time (s)", row=3, col=1)
+    fig.update_yaxes(title_text="CHT (°C)", row=1, col=1)
+    fig.update_yaxes(title_text="Oil Temp (°C)", row=2, col=1)
+    fig.update_yaxes(title_text="Severity", row=3, col=1)
+    fig.write_html(OUTPUT_DIR / "8_cooling_degradation_transient.html")
+    print(" -> Saved 8_cooling_degradation_transient.html")
+
+
+def plot_cooling_severity_sweep():
+    """9: Steady-State CHT and Oil Temperature as a function of cooling fault severity."""
+    from simulator.fault_interface import FaultState, FaultType
+    severities = [0.0, 0.20, 0.40, 0.60, 0.80, 1.0]
+    chts, oils = [], []
+
+    seg = PhaseSegment(FlightPhase.CRUISE, 150.0, 75.0, 75.0, 2000.0, 2000.0)
+    profile = MissionProfile(segments=[seg])
+
+    for s in severities:
+        sim = EngineSimulator(seed=42)
+        f = FaultState(FaultType.COOLING_DEGRADATION, severity=s, start_time=10.0, end_time=150.0)
+        df = sim.run_to_dataframe(profile, dt=0.5, fault_schedule=f)
+        chts.append(float(df["cht"].iloc[-1]))
+        oils.append(float(df["oil_temp"].iloc[-1]))
+
+    fig = make_subplots(
+        rows=1, cols=2, shared_yaxes=False,
+        subplot_titles=["<b>Steady-State CHT vs Cooling Severity</b>", "<b>Steady-State Oil Temp vs Cooling Severity</b>"]
+    )
+
+    fig.add_trace(go.Scatter(x=severities, y=chts, mode="lines+markers", name="CHT (°C)", line=dict(color="#ff5252", width=2.5), marker=dict(size=8)), row=1, col=1)
+    fig.add_trace(go.Scatter(x=severities, y=oils, mode="lines+markers", name="Oil Temp (°C)", line=dict(color="#ffab00", width=2.5), marker=dict(size=8)), row=1, col=2)
+    fig.add_hline(y=150.0, line_dash="dash", line_color="#ff1744", annotation_text="150°C CHT Limit", row=1, col=1)
+
+    fig.update_layout(
+        template="plotly_dark", height=450,
+        title="<b>Phase 4B: Steady-State Thermal Response across Cooling Severity Sweep [0.0 - 1.0]</b>"
+    )
+    fig.update_xaxes(title_text="Cooling Severity (0 = nominal, 1 = max degradation)", row=1, col=1)
+    fig.update_xaxes(title_text="Cooling Severity (0 = nominal, 1 = max degradation)", row=1, col=2)
+    fig.update_yaxes(title_text="Steady-State CHT (°C)", row=1, col=1)
+    fig.update_yaxes(title_text="Steady-State Oil Temp (°C)", row=1, col=2)
+    fig.write_html(OUTPUT_DIR / "9_cooling_severity_sweep.html")
+    print(" -> Saved 9_cooling_severity_sweep.html")
+
+
 def main():
     ensure_output_dir()
-    print("Generating Phase 3 Physics Validation & Calibration Plots...")
+    print("Generating Validation & Calibration Plots (Phases 2B, 3, 4B)...")
     plot_throttle_step_rpm()
     plot_thermal_dynamics()
     plot_oil_pressure_and_fuel_flow()
@@ -300,6 +391,8 @@ def main():
     plot_full_mission_overview()
     plot_timestep_comparison()
     plot_correlation_matrix()
+    plot_cooling_degradation_transient()
+    plot_cooling_severity_sweep()
     print(f"[SUCCESS] All validation plots generated in '{OUTPUT_DIR}'.")
 
 

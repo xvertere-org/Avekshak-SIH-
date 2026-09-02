@@ -49,9 +49,11 @@ class ThermalSystem:
         ambient_temp_c: float,
         airspeed_ms: float,
         dt: float,
+        cooling_severity: float = 0.0,
     ) -> ThermalState:
         """
         Advance CHT and EGT states by time step dt.
+        Supports Phase 4B cooling degradation physics via cooling_severity.
         """
         dt_safe = max(1e-4, float(dt))
         load_norm = max(0.0, min(100.0, load_pct)) / 100.0
@@ -75,13 +77,19 @@ class ThermalSystem:
         # Heat generation from combustion: fuel energy rate * thermal fraction
         q_gen = max(0.0, fuel_mass_flow_kg_s * self.tier_c.fuel_lhv_j_per_kg * self.tier_c.q_gen_fraction)
 
-        # Total convective cooling conductance (W/K)
-        h_cool = (
+        # Total nominal convective cooling conductance (W/K)
+        h_cool_nominal = (
             self.tier_c.h_cool_base
             + self.tier_c.h_cool_rpm * rpm
             + self.tier_c.h_cool_airspeed * max(0.0, airspeed_ms)
         )
-        h_cool = max(1.0, h_cool)
+        h_cool_nominal = max(1.0, h_cool_nominal)
+
+        # Phase 4B: Apply cooling degradation fault physics
+        # h_cool_effective = h_cool_nominal * (1 - k_cooling_max_loss * severity)
+        sev_clamped = max(0.0, min(1.0, float(cooling_severity)))
+        degradation_factor = getattr(self.tier_c, "k_cooling_max_loss", 0.55) * sev_clamped
+        h_cool = max(1.0, h_cool_nominal * (1.0 - degradation_factor))
 
         # Differential: C_th * dT_cht/dt = Q_gen - h_cool * (T_cht - T_ambient)
         cht_target_ss = ambient_temp_c + (q_gen / h_cool)

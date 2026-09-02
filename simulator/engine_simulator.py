@@ -146,23 +146,31 @@ class EngineSimulator(BaseEngineSimulator):
             fault_sev_val = 0.0
             step_time = self.current_time_s
 
+        cooling_severity = 0.0
         # Resolve fault state and telemetry fault tags if provided
         if fault_state is not None:
-            from simulator.fault_interface import FaultState, FaultSchedule
+            from simulator.fault_interface import FaultState, FaultSchedule, FaultType
             if isinstance(fault_state, FaultState):
                 if fault_state.is_active_at(step_time):
                     fault_type_val = fault_state.fault_type.value if hasattr(fault_state.fault_type, "value") else str(fault_state.fault_type)
                     fault_sev_val = fault_state.get_effective_severity(step_time)
+                    if fault_state.fault_type == FaultType.COOLING_DEGRADATION:
+                        cooling_severity = fault_sev_val
             elif isinstance(fault_state, FaultSchedule):
                 primary = fault_state.get_primary_fault(step_time)
                 if primary is not None:
                     fault_type_val = primary.fault_type.value if hasattr(primary.fault_type, "value") else str(primary.fault_type)
                     fault_sev_val = primary.get_effective_severity(step_time)
+                for f in fault_state.get_active_faults(step_time):
+                    if f.fault_type == FaultType.COOLING_DEGRADATION:
+                        cooling_severity = max(cooling_severity, f.get_effective_severity(step_time))
             elif isinstance(fault_state, dict):
                 f_obj = FaultState.from_dict(fault_state)
                 if f_obj.is_active_at(step_time):
                     fault_type_val = f_obj.fault_type.value if hasattr(f_obj.fault_type, "value") else str(f_obj.fault_type)
                     fault_sev_val = f_obj.get_effective_severity(step_time)
+                    if f_obj.fault_type == FaultType.COOLING_DEGRADATION:
+                        cooling_severity = fault_sev_val
 
         # 1. Atmosphere
         atmo_state = self.atmosphere.compute(altitude_m=altitude_m, temp_offset_k=temp_offset_k)
@@ -186,6 +194,7 @@ class EngineSimulator(BaseEngineSimulator):
             ambient_temp_c=atmo_state.temperature_c,
             airspeed_ms=airspeed_ms,
             dt=dt,
+            cooling_severity=cooling_severity,
         )
 
         # 5. Lubrication System (Oil temp + pressure)
@@ -281,11 +290,12 @@ class EngineSimulator(BaseEngineSimulator):
         self,
         mission_profile: Optional[MissionProfile] = None,
         dt: Optional[float] = None,
+        fault_schedule: Optional[Any] = None,
     ) -> pd.DataFrame:
         """
         Execute simulation and return a pandas DataFrame for analysis and visualization.
         """
-        records = self.run(mission_profile=mission_profile, dt=dt)
+        records = self.run(mission_profile=mission_profile, dt=dt, fault_schedule=fault_schedule)
         data = [r.to_dict() for r in records]
         df = pd.DataFrame(data)
         return df
