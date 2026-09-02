@@ -20,7 +20,7 @@ To ensure complete transparency and eliminate hidden magic numbers, all paramete
 - **Continuous RPM**: 5500 RPM
 - **Continuous Power**: 58,000 W (58 kW / ~77.8 hp @ 5500 RPM)
 - **Operational Envelopes**:
-  - Maximum CHT: 135.0 °C
+  - Maximum CHT: 150.0 °C (Rotax 912 ULS reference anchor limit)
   - Oil Temperature Range: 50.0 °C to 130.0 °C (Nominal: 90.0–110.0 °C)
   - Oil Pressure Range: 0.8 bar to 7.0 bar (Nominal: 2.0–5.0 bar)
 - **ISA Constants**: Sea-level pressure $p_0 = 101325\text{ Pa}$, temperature $T_0 = 288.15\text{ K}$, density $\rho_0 = 1.225\text{ kg/m}^3$, lapse rate $L = 0.0065\text{ K/m}$, gas constant $R = 287.05\text{ J/(kg}\cdot\text{K)}$.

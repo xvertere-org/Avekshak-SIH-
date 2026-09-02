@@ -95,7 +95,7 @@ def test_thermal_cht_and_egt_dynamics():
 
     assert state_full.cht_c > state_idle.cht_c
     assert state_full.egt_c > state_idle.egt_c
-    assert state_full.cht_c <= 135.0  # Within nominal design envelope
+    assert state_full.cht_c <= 150.0  # Within nominal design envelope (150°C reference limit)
     assert 600.0 <= state_full.egt_c <= 850.0
 
 

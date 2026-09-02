@@ -30,7 +30,7 @@ class TierAParameters:
     power_max_continuous_w: float = 58000.0     # 58 kW (~77.8 hp) continuous power @ 5500 RPM
 
     # Operational reference limits
-    cht_limit_c: float = 135.0                  # Max CHT limit (°C)
+    cht_limit_c: float = 150.0                  # Max CHT limit (°C) (Rotax 912 ULS reference anchor)
     cht_nominal_c: float = 100.0                # Typical nominal CHT (°C)
     oil_temp_min_c: float = 50.0                # Minimum operating oil temp (°C)
     oil_temp_max_c: float = 130.0               # Maximum permissible oil temp (°C)
