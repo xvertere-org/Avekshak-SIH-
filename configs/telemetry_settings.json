@@ -1,9 +1,14 @@
 {
-  "sampling_rate_hz": 1.0,
+  "sampling_rate_hz": 10.0,
+  "recommended_physics_dt_s": 0.1,
   "provenance": {
-    "default_source": "simulator_v1",
-    "default_source_type": "simulated",
-    "simulation_version": "0.1.0-phase1-stub"
+    "default_source": "simulator_v1_physics",
+    "default_source_type": "synthetic",
+    "simulation_version": "0.2.0-phase2b-physics"
+  },
+  "notes": {
+    "architecture": "One TelemetryRecord is emitted per physics integration step. At the recommended dt=0.1s, this produces 10 Hz telemetry. RK4 sub-stepping occurs internally within each physics step (max_sub_dt=0.02s) and is not visible at the telemetry level.",
+    "timestamp_semantics": "TelemetryRecord.timestamp = cumulative simulation elapsed time in seconds, monotonically increasing by dt per record."
   },
   "channels": {
     "altitude": {"unit": "m", "description": "Pressure/GPS altitude"},

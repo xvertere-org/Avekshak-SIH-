@@ -132,8 +132,12 @@ class EngineSimulator(BaseEngineSimulator):
             temp_offset_k = inp.ambient_temperature - 15.0
             mission_phase_val = inp.mission_phase
             mission_id_val = inp.mission_id
-            fault_type_val = inp.fault_type
-            fault_sev_val = inp.fault_severity
+            # FIX #2 (Pre-4E Audit): MissionConfig.fault_type / fault_severity are Phase 1
+            # schema stubs. Telemetry fault labels must reflect actual physics, not requested
+            # labels. Physical fault injection is exclusively controlled via the fault_state
+            # parameter using FaultState / FaultSchedule (Phase 4A contract).
+            fault_type_val = FaultCategory.NONE.value
+            fault_sev_val = 0.0
             step_time = self.current_time_s
         else:
             throttle_pct = 75.0

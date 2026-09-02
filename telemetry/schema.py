@@ -128,7 +128,7 @@ class TelemetryRecord:
     fault_severity: float = 0.0
     source: str = "simulator_v1"
     source_type: str = "simulated"
-    simulation_version: str = "0.1.0-phase1-stub"
+    simulation_version: str = "0.2.0-phase2b-physics"
     metadata: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
