@@ -15,6 +15,11 @@ from simulator.fault_interface import (
     FaultState,
     FaultSchedule,
 )
+from simulator.sensor_faults import (
+    SensorFaultMode,
+    SensorChannel,
+    SensorFaultProcessor,
+)
 from simulator.engine_simulator import EngineSimulator
 from simulator.telemetry_generator import TelemetryGenerator
 from simulator.subsystems.atmosphere import Atmosphere, ISAState
@@ -35,6 +40,9 @@ __all__ = [
     "FaultSubsystem",
     "FaultState",
     "FaultSchedule",
+    "SensorFaultMode",
+    "SensorChannel",
+    "SensorFaultProcessor",
     "EngineSimulator",
     "TelemetryGenerator",
     "Atmosphere",
@@ -54,3 +62,4 @@ __all__ = [
     "VibrationSystem",
     "VibrationState",
 ]
+

@@ -91,6 +91,9 @@ class EngineSimulator(BaseEngineSimulator):
         self.vibration.phase_1 = 0.0
         self.vibration.phase_2 = 0.0
 
+        # Phase 4F: Clear sensor fault stateful tracking (STUCK latches, etc.)
+        self.telemetry_gen.sensor_fault_processor.reset()
+
     def step(
         self,
         mission_config: Optional[Union[MissionConfig, MissionStep]] = None,
@@ -155,11 +158,18 @@ class EngineSimulator(BaseEngineSimulator):
         fuel_severity = 0.0
         mechanical_severity = 0.0
         mixture_mode = "lean"
+        sensor_fault_list = []  # Phase 4F: sensor faults routed to telemetry layer
         # Resolve fault state and telemetry fault tags if provided
         if fault_state is not None:
             from simulator.fault_interface import FaultState, FaultSchedule, FaultType
             if isinstance(fault_state, FaultState):
-                if fault_state.is_active_at(step_time):
+                if fault_state.fault_type == FaultType.SENSOR_FAULT:
+                    # Phase 4F: sensor faults bypass physics entirely
+                    sensor_fault_list.append(fault_state)
+                    if fault_state.is_active_at(step_time):
+                        fault_type_val = fault_state.fault_type.value if hasattr(fault_state.fault_type, "value") else str(fault_state.fault_type)
+                        fault_sev_val = fault_state.get_effective_severity(step_time)
+                elif fault_state.is_active_at(step_time):
                     fault_type_val = fault_state.fault_type.value if hasattr(fault_state.fault_type, "value") else str(fault_state.fault_type)
                     fault_sev_val = fault_state.get_effective_severity(step_time)
                     if fault_state.fault_type == FaultType.COOLING_DEGRADATION:
@@ -173,10 +183,28 @@ class EngineSimulator(BaseEngineSimulator):
                     elif fault_state.fault_type == FaultType.MECHANICAL_DEGRADATION:
                         mechanical_severity = fault_sev_val
             elif isinstance(fault_state, FaultSchedule):
-                primary = fault_state.get_primary_fault(step_time)
-                if primary is not None:
+                # Separate sensor faults from physical faults
+                for f in fault_state.get_active_faults(step_time):
+                    if f.fault_type == FaultType.SENSOR_FAULT:
+                        sensor_fault_list.append(f)
+                # Also include inactive sensor faults for STUCK latch tracking
+                for f in fault_state._faults:
+                    if f.fault_type == FaultType.SENSOR_FAULT and f not in sensor_fault_list:
+                        sensor_fault_list.append(f)
+                # Find primary non-sensor fault for telemetry labels
+                non_sensor_active = [f for f in fault_state.get_active_faults(step_time)
+                                     if f.fault_type != FaultType.SENSOR_FAULT]
+                if non_sensor_active:
+                    primary = max(non_sensor_active, key=lambda f: f.get_effective_severity(step_time))
                     fault_type_val = primary.fault_type.value if hasattr(primary.fault_type, "value") else str(primary.fault_type)
                     fault_sev_val = primary.get_effective_severity(step_time)
+                elif sensor_fault_list:
+                    # Only sensor faults active
+                    active_sf = [f for f in sensor_fault_list if f.is_active_at(step_time)]
+                    if active_sf:
+                        primary_sf = max(active_sf, key=lambda f: f.get_effective_severity(step_time))
+                        fault_type_val = primary_sf.fault_type.value if hasattr(primary_sf.fault_type, "value") else str(primary_sf.fault_type)
+                        fault_sev_val = primary_sf.get_effective_severity(step_time)
                 for f in fault_state.get_active_faults(step_time):
                     if f.fault_type == FaultType.COOLING_DEGRADATION:
                         cooling_severity = max(cooling_severity, f.get_effective_severity(step_time))
@@ -190,7 +218,12 @@ class EngineSimulator(BaseEngineSimulator):
                         mechanical_severity = max(mechanical_severity, f.get_effective_severity(step_time))
             elif isinstance(fault_state, dict):
                 f_obj = FaultState.from_dict(fault_state)
-                if f_obj.is_active_at(step_time):
+                if f_obj.fault_type == FaultType.SENSOR_FAULT:
+                    sensor_fault_list.append(f_obj)
+                    if f_obj.is_active_at(step_time):
+                        fault_type_val = f_obj.fault_type.value if hasattr(f_obj.fault_type, "value") else str(f_obj.fault_type)
+                        fault_sev_val = f_obj.get_effective_severity(step_time)
+                elif f_obj.is_active_at(step_time):
                     fault_type_val = f_obj.fault_type.value if hasattr(f_obj.fault_type, "value") else str(f_obj.fault_type)
                     fault_sev_val = f_obj.get_effective_severity(step_time)
                     if f_obj.fault_type == FaultType.COOLING_DEGRADATION:
@@ -294,6 +327,7 @@ class EngineSimulator(BaseEngineSimulator):
             mission_id=mission_id_val,
             fault_type=fault_type_val,
             fault_severity=fault_sev_val,
+            sensor_faults=sensor_fault_list if sensor_fault_list else None,
         )
         return record
 

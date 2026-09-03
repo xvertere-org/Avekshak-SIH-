@@ -124,6 +124,33 @@ class TierCParameters:
     sensor_noise_fuel_flow: float = 0.15        # L/h
     sensor_noise_vibration: float = 0.015       # g
 
+    # Phase 4F: Sensor fault default magnitudes (Tier C/D engineering assumptions)
+    # These are NOT measured or certified UAV-engine sensor characteristics.
+    # Bias magnitudes (max offset at severity=1.0)
+    sensor_bias_rpm: float = 50.0               # RPM
+    sensor_bias_cht: float = 8.0                # °C
+    sensor_bias_egt: float = 15.0               # °C
+    sensor_bias_oil_temp: float = 6.0           # °C
+    sensor_bias_oil_press: float = 0.5          # bar
+    sensor_bias_fuel_flow: float = 2.0          # L/h
+    sensor_bias_vibration: float = 0.15         # g
+    # Drift rates (max rate per second at severity=1.0)
+    sensor_drift_rate_rpm: float = 5.0          # RPM/s
+    sensor_drift_rate_cht: float = 0.8          # °C/s
+    sensor_drift_rate_egt: float = 1.5          # °C/s
+    sensor_drift_rate_oil_temp: float = 0.6     # °C/s
+    sensor_drift_rate_oil_press: float = 0.05   # bar/s
+    sensor_drift_rate_fuel_flow: float = 0.2    # L/h/s
+    sensor_drift_rate_vibration: float = 0.015  # g/s
+    # Fault-induced noise std (additional noise at severity=1.0)
+    sensor_noise_fault_rpm: float = 20.0        # RPM
+    sensor_noise_fault_cht: float = 3.0         # °C
+    sensor_noise_fault_egt: float = 8.0         # °C
+    sensor_noise_fault_oil_temp: float = 2.0    # °C
+    sensor_noise_fault_oil_press: float = 0.2   # bar
+    sensor_noise_fault_fuel_flow: float = 1.0   # L/h
+    sensor_noise_fault_vibration: float = 0.08  # g
+
 
 @dataclass
 class TierDParameters:
