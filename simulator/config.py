@@ -110,6 +110,11 @@ class TierCParameters:
     vib_load_gain: float = 0.45                 # Vibration amplitude scaling with load
     vib_noise_std_g: float = 0.06               # Broadband process vibration noise standard deviation (g)
 
+    # Mechanical degradation calibration (Phase 4E — Tier C/D assumptions, NOT measured engine data)
+    k_mech_vib_gain: float = 1.8                # Max 1×/2× amplitude multiplier increase at severity=1.0 (mechanical_condition = 1 + 1.8 = 2.8×)
+    k_mech_noise_gain: float = 2.5              # Max broadband noise std multiplier increase at severity=1.0 (noise_std *= 1 + 2.5 = 3.5×)
+    k_mech_friction_gain: float = 0.08          # Max friction torque increase fraction at severity=1.0 (secondary effect, 8% max)
+
     # Sensor measurement noise calibration (standard deviations)
     sensor_noise_rpm: float = 4.0               # RPM
     sensor_noise_cht: float = 0.4               # °C

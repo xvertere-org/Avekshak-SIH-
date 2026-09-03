@@ -153,6 +153,7 @@ class EngineSimulator(BaseEngineSimulator):
         cooling_severity = 0.0
         lubrication_severity = 0.0
         fuel_severity = 0.0
+        mechanical_severity = 0.0
         mixture_mode = "lean"
         # Resolve fault state and telemetry fault tags if provided
         if fault_state is not None:
@@ -169,6 +170,8 @@ class EngineSimulator(BaseEngineSimulator):
                         fuel_severity = fault_sev_val
                         mode_p = fault_state.parameters.get("mode", "lean") if fault_state.parameters else "lean"
                         mixture_mode = mode_p.value if hasattr(mode_p, "value") else str(mode_p)
+                    elif fault_state.fault_type == FaultType.MECHANICAL_DEGRADATION:
+                        mechanical_severity = fault_sev_val
             elif isinstance(fault_state, FaultSchedule):
                 primary = fault_state.get_primary_fault(step_time)
                 if primary is not None:
@@ -183,6 +186,8 @@ class EngineSimulator(BaseEngineSimulator):
                         fuel_severity = max(fuel_severity, f.get_effective_severity(step_time))
                         mode_p = f.parameters.get("mode", "lean") if f.parameters else "lean"
                         mixture_mode = mode_p.value if hasattr(mode_p, "value") else str(mode_p)
+                    elif f.fault_type == FaultType.MECHANICAL_DEGRADATION:
+                        mechanical_severity = max(mechanical_severity, f.get_effective_severity(step_time))
             elif isinstance(fault_state, dict):
                 f_obj = FaultState.from_dict(fault_state)
                 if f_obj.is_active_at(step_time):
@@ -196,11 +201,13 @@ class EngineSimulator(BaseEngineSimulator):
                         fuel_severity = fault_sev_val
                         mode_p = f_obj.parameters.get("mode", "lean") if f_obj.parameters else "lean"
                         mixture_mode = mode_p.value if hasattr(mode_p, "value") else str(mode_p)
+                    elif f_obj.fault_type == FaultType.MECHANICAL_DEGRADATION:
+                        mechanical_severity = fault_sev_val
 
         # 1. Atmosphere
         atmo_state = self.atmosphere.compute(altitude_m=altitude_m, temp_offset_k=temp_offset_k)
 
-        # 2. Rotational Dynamics (RK4) with combustion efficiency factor
+        # 2. Rotational Dynamics (RK4) with combustion efficiency factor and friction factor
         comb_eff = 1.0
         if fuel_severity > 0.0:
             if "rich" in mixture_mode.lower():
@@ -208,11 +215,15 @@ class EngineSimulator(BaseEngineSimulator):
             else:
                 comb_eff = 1.0 - getattr(self.sim_config.tier_c, "k_comb_loss_lean", 0.08) * fuel_severity
 
+        # Phase 4E: mechanical degradation friction factor (Tier C/D assumption)
+        friction_factor = 1.0 + self.sim_config.tier_c.k_mech_friction_gain * mechanical_severity
+
         op_point = self.dynamics.step(
             throttle_pct=throttle_pct,
             density_factor=atmo_state.density_factor,
             dt=dt,
             combustion_efficiency_factor=comb_eff,
+            friction_factor=friction_factor,
         )
 
         # 3. Fuel System (Willans-line with abnormality scaling)
@@ -246,11 +257,18 @@ class EngineSimulator(BaseEngineSimulator):
             lubrication_severity=lubrication_severity,
         )
 
-        # 6. Vibration System (1x, 2x orders + noise)
+        # 6. Vibration System (1x, 2x orders + noise) with mechanical degradation
+        # Phase 4E: mechanical_condition amplifies 1×/2× harmonics,
+        #           mechanical_noise_factor amplifies broadband process noise only.
+        mechanical_condition = 1.0 + self.sim_config.tier_c.k_mech_vib_gain * mechanical_severity
+        mechanical_noise_factor = 1.0 + self.sim_config.tier_c.k_mech_noise_gain * mechanical_severity
+
         vib_state = self.vibration.step(
             rpm=op_point.rpm,
             load_pct=op_point.engine_load_pct,
             dt=dt,
+            mechanical_condition=mechanical_condition,
+            mechanical_noise_factor=mechanical_noise_factor,
         )
 
         # 7. Synthesize TelemetryRecord

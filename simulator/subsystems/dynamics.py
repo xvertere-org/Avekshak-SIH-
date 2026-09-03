@@ -77,10 +77,12 @@ class RotationalDynamics:
         throttle_pct: float,
         density_factor: float,
         combustion_efficiency_factor: float = 1.0,
+        friction_factor: float = 1.0,
     ) -> tuple:
         """
         Calculate instantaneous torques and domega/dt at given state.
         Supports Phase 4D power degradation via combustion_efficiency_factor.
+        Supports Phase 4E mechanical degradation via friction_factor.
         """
         rpm = self.omega_to_rpm(omega)
         throttle_norm = max(0.0, min(100.0, throttle_pct)) / 100.0
@@ -99,8 +101,8 @@ class RotationalDynamics:
         # Propeller load torque: k_load * omega^2
         torque_load = self.tier_c.k_load * (omega ** 2)
 
-        # Mechanical and pumping friction torque
-        torque_friction = self.tier_c.k_fric_linear * omega + self.tier_c.torque_fric_static
+        # Mechanical and pumping friction torque (scaled by friction_factor for Phase 4E)
+        torque_friction = (self.tier_c.k_fric_linear * omega + self.tier_c.torque_fric_static) * friction_factor
 
         # Net acceleration torque
         net_torque = torque_engine - torque_load - torque_friction
@@ -121,24 +123,25 @@ class RotationalDynamics:
         throttle_pct: float,
         density_factor: float,
         combustion_efficiency_factor: float = 1.0,
+        friction_factor: float = 1.0,
     ) -> None:
         """Internal single RK4 integration step."""
         omega_0 = self.omega
 
         # k1
-        _, _, _, _, _, k1 = self._torque_derivatives(omega_0, throttle_pct, density_factor, combustion_efficiency_factor)
+        _, _, _, _, _, k1 = self._torque_derivatives(omega_0, throttle_pct, density_factor, combustion_efficiency_factor, friction_factor)
 
         # k2
         omega_k2 = max(0.0, omega_0 + 0.5 * dt * k1)
-        _, _, _, _, _, k2 = self._torque_derivatives(omega_k2, throttle_pct, density_factor, combustion_efficiency_factor)
+        _, _, _, _, _, k2 = self._torque_derivatives(omega_k2, throttle_pct, density_factor, combustion_efficiency_factor, friction_factor)
 
         # k3
         omega_k3 = max(0.0, omega_0 + 0.5 * dt * k2)
-        _, _, _, _, _, k3 = self._torque_derivatives(omega_k3, throttle_pct, density_factor, combustion_efficiency_factor)
+        _, _, _, _, _, k3 = self._torque_derivatives(omega_k3, throttle_pct, density_factor, combustion_efficiency_factor, friction_factor)
 
         # k4
         omega_k4 = max(0.0, omega_0 + dt * k3)
-        _, _, _, _, _, k4 = self._torque_derivatives(omega_k4, throttle_pct, density_factor, combustion_efficiency_factor)
+        _, _, _, _, _, k4 = self._torque_derivatives(omega_k4, throttle_pct, density_factor, combustion_efficiency_factor, friction_factor)
 
         # Update state with RK4 weighted average
         self.omega = max(0.0, omega_0 + (dt / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4))
@@ -149,24 +152,30 @@ class RotationalDynamics:
         density_factor: float,
         dt: float,
         combustion_efficiency_factor: float = 1.0,
+        friction_factor: float = 1.0,
     ) -> OperatingPoint:
         """
         Advance rotational dynamics using sub-stepped 4th-Order Runge-Kutta (RK4) integration.
         Sub-stepping guarantees unconditional numerical stability across arbitrary external time steps.
+
+        Args:
+            friction_factor: Multiplier for mechanical friction torque.
+                1.0 = nominal. Values > 1.0 model increased friction from mechanical
+                degradation (Phase 4E). (Tier C/D calibration assumption.)
         """
         max_sub_dt = 0.02
         remaining_time = max(1e-4, float(dt))
 
         while remaining_time > 1e-6:
             sub_dt = min(remaining_time, max_sub_dt)
-            self._rk4_single_step(sub_dt, throttle_pct, density_factor, combustion_efficiency_factor)
+            self._rk4_single_step(sub_dt, throttle_pct, density_factor, combustion_efficiency_factor, friction_factor)
             remaining_time -= sub_dt
 
         rpm = self.omega_to_rpm(self.omega)
 
         # Compute full operating point diagnostics at updated state
         p_target, t_eng, t_load, t_fric, net_t, domega_dt = self._torque_derivatives(
-            self.omega, throttle_pct, density_factor, combustion_efficiency_factor
+            self.omega, throttle_pct, density_factor, combustion_efficiency_factor, friction_factor
         )
 
         # Engine load percentage proxy based on power output relative to density-adjusted max continuous

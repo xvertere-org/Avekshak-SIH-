@@ -47,14 +47,21 @@ class VibrationSystem:
         load_pct: float,
         dt: float,
         mechanical_condition: Optional[float] = None,
+        mechanical_noise_factor: float = 1.0,
     ) -> VibrationState:
         """
         Advance vibration state and calculate RMS & instantaneous vibration metrics.
+
+        Args:
+            mechanical_noise_factor: Multiplier for broadband process noise std dev.
+                1.0 = nominal. Values > 1.0 model increased broadband vibration
+                from mechanical degradation without affecting deterministic harmonic
+                frequencies. (Tier C/D calibration assumption.)
         """
         load_norm = max(0.0, min(100.0, load_pct)) / 100.0
         m_cond = mechanical_condition if mechanical_condition is not None else self.tier_d.mechanical_condition
 
-        # Fundamental rotational frequencies
+        # Fundamental rotational frequencies (deterministic, NOT affected by noise factor)
         f_rot = max(0.0, rpm) / 60.0
         f_order1 = f_rot
         f_order2 = 2.0 * f_rot
@@ -67,14 +74,15 @@ class VibrationSystem:
         self.phase_1 = (self.phase_1 + 2.0 * math.pi * f_order1 * dt) % (2.0 * math.pi)
         self.phase_2 = (self.phase_2 + 2.0 * math.pi * f_order2 * dt) % (2.0 * math.pi)
 
-        # Process noise sample
-        noise_g = float(self.rng.normal(0.0, self.tier_c.vib_noise_std_g))
+        # Process noise sample — broadband component scales with mechanical_noise_factor
+        effective_noise_std = self.tier_c.vib_noise_std_g * mechanical_noise_factor
+        noise_g = float(self.rng.normal(0.0, effective_noise_std))
 
         # Instantaneous waveform point
         inst_g = amp_1x * math.sin(self.phase_1) + amp_2x * math.sin(self.phase_2) + noise_g
 
         # Theoretical RMS value for multi-sine + Gaussian noise: sqrt(0.5*A1^2 + 0.5*A2^2 + sigma^2)
-        rms_g = math.sqrt(0.5 * (amp_1x ** 2) + 0.5 * (amp_2x ** 2) + (self.tier_c.vib_noise_std_g ** 2))
+        rms_g = math.sqrt(0.5 * (amp_1x ** 2) + 0.5 * (amp_2x ** 2) + (effective_noise_std ** 2))
 
         # Dominant frequency based on largest amplitude order
         dominant_f = f_order1 if amp_1x >= amp_2x else f_order2
@@ -96,9 +104,13 @@ class VibrationSystem:
         duration_s: float = 1.0,
         sampling_rate_hz: float = 1000.0,
         mechanical_condition: Optional[float] = None,
+        mechanical_noise_factor: float = 1.0,
     ) -> Tuple[np.ndarray, np.ndarray, float, float]:
         """
         Generate a high-rate time-domain vibration waveform for FFT and spectral validation.
+
+        Args:
+            mechanical_noise_factor: Multiplier for broadband process noise std dev.
 
         Returns:
             (time_array, signal_array, order_1x_freq, order_2x_freq)
@@ -115,7 +127,8 @@ class VibrationSystem:
         amp_1x = (self.tier_c.vib_order1_base_g + self.tier_c.vib_load_gain * load_norm) * m_cond
         amp_2x = (self.tier_c.vib_order2_base_g + self.tier_c.vib_load_gain * load_norm) * m_cond
 
-        noise = self.rng.normal(0.0, self.tier_c.vib_noise_std_g, size=num_samples)
+        effective_noise_std = self.tier_c.vib_noise_std_g * mechanical_noise_factor
+        noise = self.rng.normal(0.0, effective_noise_std, size=num_samples)
         signal = amp_1x * np.sin(2.0 * np.pi * f_order1 * t) + amp_2x * np.sin(2.0 * np.pi * f_order2 * t) + noise
 
         return t, signal, f_order1, f_order2
