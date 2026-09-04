@@ -58,6 +58,24 @@ class TelemetryGenerator:
             rng=self._sensor_fault_rng
         )
 
+    def reset(self, rng: Optional[np.random.Generator] = None) -> None:
+        """
+        Reset telemetry generator RNG and child sensor fault processor.
+        """
+        if rng is not None:
+            self.rng = rng
+        else:
+            self.rng = np.random.default_rng(self.config.random_seed)
+
+        parent_ss = getattr(self.rng.bit_generator, "seed_seq", None)
+        if parent_ss is not None:
+            child_ss = parent_ss.spawn(1)[0]
+        else:
+            child_ss = np.random.SeedSequence(self.config.random_seed + 7919)
+        self._sensor_fault_rng = np.random.default_rng(child_ss)
+        self.sensor_fault_processor.rng = self._sensor_fault_rng
+        self.sensor_fault_processor.reset()
+
     def generate(
         self,
         mission_step: MissionStep,

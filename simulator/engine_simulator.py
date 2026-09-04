@@ -90,9 +90,10 @@ class EngineSimulator(BaseEngineSimulator):
         self.lubrication.set_oil_temp(65.0)
         self.vibration.phase_1 = 0.0
         self.vibration.phase_2 = 0.0
+        self.vibration.rng = self.rng
 
-        # Phase 4F: Clear sensor fault stateful tracking (STUCK latches, etc.)
-        self.telemetry_gen.sensor_fault_processor.reset()
+        # Re-point telemetry generator RNG and clear sensor fault stateful tracking
+        self.telemetry_gen.reset(rng=self.rng)
 
     def step(
         self,
