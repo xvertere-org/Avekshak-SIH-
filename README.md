@@ -12,135 +12,121 @@ This project delivers a modular, real-time Digital Twin and Prognostics & Health
 
 ---
 
-## 2. MVP Objective & Current Status
+## 2. System Status — Complete ✅
 
-- **Phase 1: Project Setup + Architecture** — Complete ✅
-- **Phase 2B: Physics-Informed Engine Simulator** — Complete ✅
-- **Phase 3: Simulator Calibration & Validation** — Complete ✅
-  - 8 automated validation suites (bounds, monotonicity, dynamic lag hierarchy, timestep sweep, steady-state stability, cross-channel coherence, vibration orders, representative flight mission).
-  - Recommended operating timestep locked at **$dt = 0.1\text{ s}$** (10 Hz).
-  - Validated Golden Baseline summary exported to `data/golden_baseline_summary.json` (17,200 samples).
-  - Comprehensive calibration documentation & parameter inventory in `docs/simulator_validation.md`.
-  - 7 interactive Plotly validation figures in `docs/plots/`.
-  - 38/38 automated unit & regression tests passing.
-- **Phase 4A: Fault & Degradation Interface** — Complete ✅
-  - Standardized typed fault contracts (`FaultType`, `FaultSubsystem`, `FaultState`, `FaultSchedule`).
-  - Strict separation of fault definition/scheduling from downstream physical fault dynamics (Phases 4B–4F).
-  - 100% backward compatibility preserved for healthy simulation trajectories.
-- **Phase 4B: Cooling Degradation Physics** — Complete ✅
-  - Physics-grounded cooling conductance degradation in `ThermalSystem`: $h_{\text{cool\_effective}} = h_{\text{cool}} \cdot (1 - k_{\text{loss}} \cdot \sigma)$.
-  - Direct CHT elevation with natural secondary oil temperature rise via conduction coupling.
-  - Natural thermal recovery dynamics without artificial state resets.
-  - Interactive validation plots (`docs/plots/8_cooling_degradation_transient.html`, `docs/plots/9_cooling_severity_sweep.html`).
-- **Phase 4C: Lubrication Degradation Physics** — Complete ✅
-  - Physics-grounded lubrication degradation in `LubricationSystem`: hydraulic delivery pressure reduction $P_{\text{oil}} = P_{\text{nom}} \cdot (1 - k_{\text{p\_loss}} \cdot \sigma)$, increased boundary friction heat, and reduced cooler heat rejection.
-  - Compound pressure drop and monotonic oil temperature rise with natural dynamic recovery.
-  - Interactive validation plots (`docs/plots/10_lubrication_degradation_transient.html`, `docs/plots/11_lubrication_severity_sweep.html`).
-- **Phase 4D: Fuel / Injection Abnormality Physics** — Complete ✅
-  - Physics-grounded fuel and injection abnormality model supporting typed `FuelMixtureMode.LEAN` and `FuelMixtureMode.RICH`.
-  - Lean abnormality: fuel mass flow reduction, delayed exhaust burn elevating EGT, and natural combustion efficiency power droop.
-  - Rich abnormality: excess fuel flow, fuel vaporization quenching lowering EGT, and incomplete burn power droop.
-  - Interactive validation plots (`docs/plots/12_fuel_injection_transient.html`, `docs/plots/13_fuel_injection_severity_sweep.html`).
-  - 77/77 automated tests passing.
+| Phase | Component | Status |
+| :--- | :--- | :--- |
+| **Phase 1** | Project Setup & Architecture | ✅ Complete |
+| **Phase 2B** | Physics-Informed Engine Simulator (Rotax 914 F Grey-Box) | ✅ Complete |
+| **Phase 3** | Simulator Calibration & Validation (8 suites, golden baseline) | ✅ Complete |
+| **Phase 4A** | Fault & Degradation Interface (typed contracts) | ✅ Complete |
+| **Phase 4B** | Cooling Degradation Physics (conductance degradation) | ✅ Complete |
+| **Phase 4C** | Lubrication Degradation Physics (pressure/friction) | ✅ Complete |
+| **Phase 4D** | Fuel / Injection Abnormality Physics (lean/rich) | ✅ Complete |
+| **Phase 4E** | Mechanical Degradation Physics (bearing wear, vibration) | ✅ Complete |
+| **Phase 4F** | Sensor Fault Physics (bias, drift, stochastic noise) | ✅ Complete |
+| **Phase 5** | Telemetry Pipeline & Canonical Ingestion | ✅ Complete |
+| **Phase 6** | Digital Twin State Estimation & Residual Generation | ✅ Complete |
+| **Phase 7** | Hybrid Anomaly Detection (Threshold + EWMA + Persistence + Isolation Forest) | ✅ Complete |
+| **Phase 8** | Multiclass Fault Diagnosis (XGBoost 6-Class Classifier) | ✅ Complete |
+| **Phase 9** | Health Index & Causal Degradation Tracking | ✅ Complete |
+| **Phase 10** | TimesFM-3 Future Telemetry Forecasting (Gated/Baseline Fallback) | ✅ Complete |
+| **Phase 11** | Authoritative RUL & Prognostics (Theil–Sen + MC Uncertainty) | ✅ Complete |
+| **Phase 12** | Explainability & Multi-Modal Evidence Fusion (SHAP + Physics + Temporal) | ✅ Complete |
+| **Phase 13** | Unified System Pipeline Orchestrator | ✅ Complete |
 
-> **Engineering Reference Anchor & Disclaimer:**  
-> The engine simulator uses the **Rotax 912 ULS** strictly as a publicly documented engineering anchor (58 kW continuous power @ 5500 RPM, max 5800 RPM). It is a **reduced-order physics-informed / grey-box model**, **NOT** a CFD solver, certified OEM engine model, or actual classified UAV engine. Synthetic telemetry is never represented as actual UAV flight data.
+**Total Automated Tests: 340 passed (100% green)**
 
 ---
 
-## 3. High-Level Architecture & Data Flow
+## 3. End-to-End Pipeline Architecture
 
 ```
-MissionConfig / FlightPhase (TAKEOFF, CLIMB, CRUISE, LOITER, DESCENT, LANDING)
-     │
-     ▼
-Atmosphere Layer (ISA Lapse, Pressure, Density Factor)
-     │
-     ▼
-Rotational Dynamics (P_target, Load Torque, Friction, RK4 Engine Speed)
-     │
-     ▼
-Fuel & Thermal Subsystems (Willans Fuel, CHT Lumped Capacitance, EGT Lag)
-     │
-     ▼
-Lubrication & Vibration Subsystems (Oil Temp/Pressure, 1x & 2x Orders)
-     │
-     ▼
-TelemetryRecord (Typed Channels, Calibrated Sensor Noise, Provenance Metadata)
-     │
-     ▼
-DigitalTwin Interface (State Estimation & Residual Engine)
-     │
-     ▼
-PHM Interface (Anomaly Detection & Fault Categorization)
-     │
-     ▼
-Forecasting / RUL Interface (Degradation Trajectory & Uncertainty Bounds)
-     │
-     ▼
-Explainability Interface (Feature Attribution & Diagnostic Summary)
-     │
-     ▼
-Dashboard Interface (Operator Situational Payload)
+Mission Configuration & Fault Scenario
+                  ↓
+Physics-Informed Engine Simulator (Tier-D Rotax 914 F)
+                  ↓
+Canonical Telemetry Ingestion (with quality & dropout handling)
+                  ↓
+Phase 6: Physics-Informed Digital Twin & Dynamic Residuals
+                  ↓
+Phase 7: Hybrid Anomaly Detection (Threshold + EWMA + Persistence + Isolation Forest)
+                  ↓
+Phase 8: Multiclass Supervised Fault Diagnosis (XGBoost 6-Class)
+                  ↓
+Phase 9: Health Index & Causal Degradation Tracking (HI + Rate + Trend + Sensor Isolation)
+                  ↓
+Phase 10: TimesFM-3 Future Telemetry Forecasting (with Gated/Baseline Fallback)
+                  ↓
+Phase 11: Authoritative Prognostics & RUL (Theil–Sen + MC Uncertainty + Weakest Link EOL)
+                  ↓
+Phase 12: Explainability & Multi-Modal Evidence Fusion (SHAP + Physics + Temporal + RUL)
+                  ↓
+DashboardStatePayload (Unified System State)
+                  ↓
+Streamlit UI & Operator Decision Support Advisory
 ```
 
 ---
 
-## 4. Project Directory Structure
+## 4. Key Performance Metrics
+
+| Metric | Value | Budget |
+| :--- | :--- | :--- |
+| **Mean Inference Latency** | ~53 ms | < 200 ms |
+| **Median (P50) Latency** | ~55 ms | < 200 ms |
+| **P95 Latency** | ~84 ms | < 200 ms |
+| **P99 Latency** | ~88 ms | < 200 ms |
+| **Real-Time Margin** | >16× | > 1× |
+| **Forecast Mode** | Causal EWMA Baseline | (TimesFM gated) |
+| **Orchestrator Init (Bootstrap)** | ~4.8 s | One-time |
+
+*Standard aero telemetry at 1.0 Hz (1000 ms budget). Pipeline processes in ~55 ms.*
+
+---
+
+## 5. Project Directory Structure
 
 ```
 NIRVANAA-SIH-SUBMISSION/
 ├── simulator/            # Physics-Informed Engine Simulator & Subsystems
 ├── validation/           # Validation suites, metrics, and calibration sweeps
-│   ├── __init__.py
-│   ├── metrics.py
-│   ├── calibration.py
-│   └── validation_runner.py
 ├── telemetry/            # Schemas, provenance tracking, and buffer
 ├── digital_twin/         # Digital Twin state tracking & residual engine
-├── phm/                  # Prognostics & Health Management
-├── forecasting/          # RUL and time-series forecasting interfaces
-├── explainability/       # Explainable AI (XAI) feature attribution
+├── anomaly_detection/    # Phase 7: Hybrid anomaly detection
+├── fault_diagnosis/      # Phase 8: XGBoost multiclass fault classification
+├── health_index/         # Phase 9: Health index & degradation tracking
+├── forecasting/          # Phase 10: TimesFM forecasting (gated/baseline)
+├── prognostics/          # Phase 11: RUL & prognostic estimation
+├── explainability/       # Phase 12: Multi-modal evidence fusion (SHAP+Physics+Temporal)
+├── orchestrator/         # Phase 13: Unified system pipeline orchestrator
+├── phm/                  # Legacy PHM interface (Phase 1)
 ├── dashboard/            # Operator dashboard interface
 ├── configs/              # Mission, engine, and telemetry configurations
 ├── data/                 # Data storage & Golden Baseline summary
-│   ├── golden_baseline_summary.json
-│   ├── raw/
-│   ├── processed/
-│   └── external/
-├── docs/                 # Specifications, physics manual, validation report & plots
-│   ├── architecture.md
-│   ├── simulator_physics.md
-│   ├── simulator_validation.md
-│   └── plots/
-├── scripts/
-│   └── generate_validation_plots.py  # Diagnostic Plotly visualization generator
-├── tests/                # Automated test suite (38 test cases)
-│   ├── test_schemas.py
-│   ├── test_imports.py
-│   ├── test_interfaces.py
-│   ├── test_physics_checkpoint_rpm.py
-│   ├── test_physics_validation.py
-│   └── test_validation_framework.py
+├── docs/                 # Architecture docs, physics manual, validation reports
+│   └── plots/            # Interactive Plotly validation figures (13 plots)
+├── evidence/             # Final validation & evidence package
+├── scripts/              # Validation plot & evidence generation scripts
+├── tests/                # Automated test suite (340 test cases, 23 test files)
 ├── requirements.txt
-└── main.py
+└── main.py               # Phase 13 production entrypoint
 ```
 
 ---
 
-## 5. Technology Stack
+## 6. Technology Stack
 
 - **Core Runtime**: Python 3.10+
 - **Data & Scientific Computing**: `numpy`, `scipy`, `pandas`
 - **Machine Learning & Modeling**: `scikit-learn`, `xgboost`
 - **Visualization & UI**: `plotly`, `streamlit`, `matplotlib`
 - **Explainability**: `shap`
-- **Experiment Tracking**: `mlflow`
 - **Testing**: `pytest`
 
 ---
 
-## 6. Installation & Setup
+## 7. Installation & Setup
 
 ```bash
 git clone https://github.com/Yashuuuu02/NIRVANAA-SIH-SUBMISSION.git
@@ -150,25 +136,72 @@ pip install -r requirements.txt
 
 ---
 
-## 7. Running Verification & Validation
+## 8. Running the System
 
-### Run Full Test Suite (77 tests)
+### Run Full Test Suite (340 tests)
 ```bash
 pytest -v
 ```
 
-### Run Validation Runner & Golden Baseline
+### Run Production Pipeline (Phase 13)
 ```bash
-python validation/validation_runner.py
+python main.py                                    # Healthy scenario (35s)
+python main.py --scenario cooling --duration 120  # Cooling fault injection
+python main.py --scenario cooling --benchmark     # With latency profiling
 ```
 
-### Run End-to-End Pipeline Dry-Run
+### Run Legacy Phase 1 Dry-Run
 ```bash
-python main.py --dry-run
+python main.py --legacy-phase1
+```
+
+### Generate Evidence Package
+```bash
+python scripts/generate_evidence_package.py
 ```
 
 ### Generate Interactive Validation Plots
 ```bash
 python scripts/generate_validation_plots.py
 ```
-*(Interactive HTML validation artifacts are generated in `docs/plots/`)*
+
+### Run Simulator Validation Runner
+```bash
+python validation/validation_runner.py
+```
+
+---
+
+## 9. Architectural Declarations
+
+### Algorithm Freezing Statement
+Phase 13 does not redesign, retune, replace, or modify the algorithms, thresholds, schemas, or training procedures of Phases 1–12. For runtime inference, Phase 13 deterministically bootstraps Phase 7 Isolation Forest and Phase 8 XGBoost model instances using the existing training procedures and synthetic simulator-generated data. This is synthetic bootstrap model fitting, not external-dataset training or algorithm redesign.
+
+### Preserved Distinctions
+- **Algorithm & Training Procedure Freezing**: Feature schemas, classifier configurations, EWMA thresholds, Theil–Sen estimator rules, and multi-modal fusion equations from Phases 1–12 remain unmodified.
+- **Runtime Model Fitting**: Deterministic synthetic bootstrap fitting is executed on synthetic simulator data with fixed seeds during orchestrator startup.
+- **Pretrained TimesFM Weights**: Gated external model weights remain unauthenticated in the local execution environment, preserving the explicit fallback path (`BLOCKED_UNAUTHENTICATED_GATED`) without fabricating weights.
+
+### Engineering Reference Anchor & Disclaimer
+The engine simulator uses the **Rotax 912 ULS / 914 F** strictly as a publicly documented engineering anchor. It is a **reduced-order physics-informed / grey-box model**, **NOT** a CFD solver, certified OEM engine model, or actual classified UAV engine. Synthetic telemetry is never represented as actual UAV flight data. All operator recommendations are decision-support aids — explicitly NOT airworthiness limits, FAA/DRDO safety directives, or certified OEM failure criteria.
+
+---
+
+## 10. Documentation
+
+| Document | Description |
+| :--- | :--- |
+| `docs/architecture.md` | System architecture specification |
+| `docs/simulator_physics.md` | Physics subsystem equations & parameters |
+| `docs/simulator_validation.md` | Calibration & validation report |
+| `docs/anomaly_detection.md` | Phase 7: Anomaly detection design |
+| `docs/fault_diagnosis.md` | Phase 8: Fault diagnosis design |
+| `docs/health_index.md` | Phase 9: Health index design |
+| `docs/forecasting.md` | Phase 10: Forecasting design |
+| `docs/prognostics_rul.md` | Phase 11: RUL & prognostics design |
+| `docs/explainability.md` | Phase 12: Explainability design |
+| `docs/system_orchestrator.md` | Phase 13: System orchestrator design |
+| `docs/cooling_degradation.md` | Cooling fault physics |
+| `docs/lubrication_degradation.md` | Lubrication fault physics |
+| `docs/fuel_injection_abnormality.md` | Fuel injection fault physics |
+| `docs/fault_interface.md` | Fault interface contracts |

@@ -1,0 +1,2233 @@
+{
+  "project": "SIH26054",
+  "title": "AI-Enabled Real-Time Digital Twin System for Health Monitoring, Fault Prediction and Mission Reliability Enhancement of Aero-Piston Engines used in MALE UAVs",
+  "generated_at": "2026-09-04T19:24:26.176851Z",
+  "system_info": {
+    "orchestrator_init_time_s": 4.798,
+    "bootstrap_metadata": {
+      "bootstrap_elapsed_seconds": 4.114,
+      "fast_mode": true,
+      "seed": 42,
+      "phase7_calibration_samples": 32,
+      "phase8_training_samples": 242,
+      "phase8_classes": [
+        "cooling_degradation",
+        "fuel_injection_abnormality",
+        "lubrication_degradation",
+        "mechanical_degradation",
+        "none",
+        "sensor_fault"
+      ],
+      "provenance": "PHYSICS_INFORMED_SYNTHETIC_BOOTSTRAP",
+      "disclaimer": "Calibrated entirely on synthetic physics simulation data. No external flight-test or operational aero-engine datasets used."
+    }
+  },
+  "module_inventory": {
+    "phase_1": {
+      "name": "Project Setup & Architecture",
+      "status": "COMPLETE",
+      "key_files": [
+        "configs/config_loader.py",
+        "configs/default_engine.json",
+        "configs/default_mission.json"
+      ],
+      "file_exists": {
+        "configs/config_loader.py": true,
+        "configs/default_engine.json": true,
+        "configs/default_mission.json": true
+      }
+    },
+    "phase_2b": {
+      "name": "Physics-Informed Engine Simulator",
+      "status": "COMPLETE",
+      "key_files": [
+        "simulator/engine_simulator.py",
+        "simulator/config.py",
+        "simulator/subsystems/atmosphere.py",
+        "simulator/subsystems/dynamics.py",
+        "simulator/subsystems/thermal.py",
+        "simulator/subsystems/fuel.py",
+        "simulator/subsystems/lubrication.py",
+        "simulator/subsystems/vibration.py"
+      ],
+      "file_exists": {
+        "simulator/engine_simulator.py": true,
+        "simulator/config.py": true,
+        "simulator/subsystems/atmosphere.py": true,
+        "simulator/subsystems/dynamics.py": true,
+        "simulator/subsystems/thermal.py": true,
+        "simulator/subsystems/fuel.py": true,
+        "simulator/subsystems/lubrication.py": true,
+        "simulator/subsystems/vibration.py": true
+      }
+    },
+    "phase_3": {
+      "name": "Simulator Calibration & Validation",
+      "status": "COMPLETE",
+      "key_files": [
+        "validation/validation_runner.py",
+        "validation/metrics.py",
+        "validation/calibration.py",
+        "data/golden_baseline_summary.json"
+      ],
+      "file_exists": {
+        "validation/validation_runner.py": true,
+        "validation/metrics.py": true,
+        "validation/calibration.py": true,
+        "data/golden_baseline_summary.json": true
+      }
+    },
+    "phase_4a": {
+      "name": "Fault & Degradation Interface",
+      "status": "COMPLETE",
+      "key_files": [
+        "simulator/fault_interface.py"
+      ],
+      "file_exists": {
+        "simulator/fault_interface.py": true
+      }
+    },
+    "phase_4b_4f": {
+      "name": "Fault Physics (Cooling, Lubrication, Fuel, Mechanical, Sensor)",
+      "status": "COMPLETE",
+      "key_files": [
+        "simulator/subsystems/thermal.py",
+        "simulator/subsystems/lubrication.py",
+        "simulator/subsystems/fuel.py",
+        "simulator/subsystems/vibration.py"
+      ],
+      "file_exists": {
+        "simulator/subsystems/thermal.py": true,
+        "simulator/subsystems/lubrication.py": true,
+        "simulator/subsystems/fuel.py": true,
+        "simulator/subsystems/vibration.py": true
+      }
+    },
+    "phase_5": {
+      "name": "Telemetry Pipeline",
+      "status": "COMPLETE",
+      "key_files": [
+        "telemetry/streamer.py",
+        "telemetry/ingestion.py",
+        "telemetry/schema.py"
+      ],
+      "file_exists": {
+        "telemetry/streamer.py": true,
+        "telemetry/ingestion.py": true,
+        "telemetry/schema.py": true
+      }
+    },
+    "phase_6": {
+      "name": "Digital Twin & Residual Generation",
+      "status": "COMPLETE",
+      "key_files": [
+        "digital_twin/twin_model.py",
+        "digital_twin/residuals.py"
+      ],
+      "file_exists": {
+        "digital_twin/twin_model.py": true,
+        "digital_twin/residuals.py": true
+      }
+    },
+    "phase_7": {
+      "name": "Hybrid Anomaly Detection",
+      "status": "COMPLETE",
+      "key_files": [
+        "anomaly_detection/pipeline.py",
+        "anomaly_detection/schema.py"
+      ],
+      "file_exists": {
+        "anomaly_detection/pipeline.py": true,
+        "anomaly_detection/schema.py": true
+      }
+    },
+    "phase_8": {
+      "name": "Multiclass Fault Diagnosis (XGBoost)",
+      "status": "COMPLETE",
+      "key_files": [
+        "fault_diagnosis/pipeline.py",
+        "fault_diagnosis/classifier.py",
+        "fault_diagnosis/features.py",
+        "fault_diagnosis/schema.py"
+      ],
+      "file_exists": {
+        "fault_diagnosis/pipeline.py": true,
+        "fault_diagnosis/classifier.py": true,
+        "fault_diagnosis/features.py": true,
+        "fault_diagnosis/schema.py": true
+      }
+    },
+    "phase_9": {
+      "name": "Health Index & Degradation Tracking",
+      "status": "COMPLETE",
+      "key_files": [
+        "health_index/pipeline.py",
+        "health_index/schema.py"
+      ],
+      "file_exists": {
+        "health_index/pipeline.py": true,
+        "health_index/schema.py": true
+      }
+    },
+    "phase_10": {
+      "name": "TimesFM Forecasting (Gated/Baseline)",
+      "status": "COMPLETE",
+      "key_files": [
+        "forecasting/pipeline.py",
+        "forecasting/schema.py"
+      ],
+      "file_exists": {
+        "forecasting/pipeline.py": true,
+        "forecasting/schema.py": true
+      }
+    },
+    "phase_11": {
+      "name": "RUL & Prognostics",
+      "status": "COMPLETE",
+      "key_files": [
+        "prognostics/pipeline.py",
+        "prognostics/schema.py",
+        "prognostics/threshold.py",
+        "prognostics/evaluation.py"
+      ],
+      "file_exists": {
+        "prognostics/pipeline.py": true,
+        "prognostics/schema.py": true,
+        "prognostics/threshold.py": true,
+        "prognostics/evaluation.py": true
+      }
+    },
+    "phase_12": {
+      "name": "Explainability & Evidence Fusion",
+      "status": "COMPLETE",
+      "key_files": [
+        "explainability/pipeline.py",
+        "explainability/fusion.py",
+        "explainability/schema.py"
+      ],
+      "file_exists": {
+        "explainability/pipeline.py": true,
+        "explainability/fusion.py": true,
+        "explainability/schema.py": true
+      }
+    },
+    "phase_13": {
+      "name": "Unified System Pipeline Orchestrator",
+      "status": "COMPLETE",
+      "key_files": [
+        "orchestrator/pipeline.py",
+        "orchestrator/adapter.py",
+        "orchestrator/bootstrap.py",
+        "orchestrator/advisor.py",
+        "orchestrator/schema.py"
+      ],
+      "file_exists": {
+        "orchestrator/pipeline.py": true,
+        "orchestrator/adapter.py": true,
+        "orchestrator/bootstrap.py": true,
+        "orchestrator/advisor.py": true,
+        "orchestrator/schema.py": true
+      }
+    }
+  },
+  "documentation_inventory": {
+    "documentation_files": {
+      "anomaly_detection.md": {
+        "path": "docs\\anomaly_detection.md",
+        "size_bytes": 12566
+      },
+      "architecture.md": {
+        "path": "docs\\architecture.md",
+        "size_bytes": 9470
+      },
+      "cooling_degradation.md": {
+        "path": "docs\\cooling_degradation.md",
+        "size_bytes": 7457
+      },
+      "explainability.md": {
+        "path": "docs\\explainability.md",
+        "size_bytes": 9737
+      },
+      "fault_diagnosis.md": {
+        "path": "docs\\fault_diagnosis.md",
+        "size_bytes": 8144
+      },
+      "fault_interface.md": {
+        "path": "docs\\fault_interface.md",
+        "size_bytes": 7189
+      },
+      "forecasting.md": {
+        "path": "docs\\forecasting.md",
+        "size_bytes": 17971
+      },
+      "fuel_injection_abnormality.md": {
+        "path": "docs\\fuel_injection_abnormality.md",
+        "size_bytes": 10572
+      },
+      "health_index.md": {
+        "path": "docs\\health_index.md",
+        "size_bytes": 8560
+      },
+      "lubrication_degradation.md": {
+        "path": "docs\\lubrication_degradation.md",
+        "size_bytes": 8508
+      },
+      "prognostics_rul.md": {
+        "path": "docs\\prognostics_rul.md",
+        "size_bytes": 19001
+      },
+      "simulator_physics.md": {
+        "path": "docs\\simulator_physics.md",
+        "size_bytes": 8509
+      },
+      "simulator_validation.md": {
+        "path": "docs\\simulator_validation.md",
+        "size_bytes": 12865
+      },
+      "system_orchestrator.md": {
+        "path": "docs\\system_orchestrator.md",
+        "size_bytes": 12976
+      }
+    },
+    "validation_plots": {
+      "10_lubrication_degradation_transient.html": {
+        "path": "docs\\plots\\10_lubrication_degradation_transient.html",
+        "size_bytes": 4406768
+      },
+      "11_lubrication_severity_sweep.html": {
+        "path": "docs\\plots\\11_lubrication_severity_sweep.html",
+        "size_bytes": 4306331
+      },
+      "12_fuel_injection_transient.html": {
+        "path": "docs\\plots\\12_fuel_injection_transient.html",
+        "size_bytes": 4477403
+      },
+      "13_fuel_injection_severity_sweep.html": {
+        "path": "docs\\plots\\13_fuel_injection_severity_sweep.html",
+        "size_bytes": 4306715
+      },
+      "1_rpm_throttle_response.html": {
+        "path": "docs\\plots\\1_rpm_throttle_response.html",
+        "size_bytes": 4394380
+      },
+      "2_thermal_dynamics.html": {
+        "path": "docs\\plots\\2_thermal_dynamics.html",
+        "size_bytes": 4379708
+      },
+      "3_oil_and_fuel_physics.html": {
+        "path": "docs\\plots\\3_oil_and_fuel_physics.html",
+        "size_bytes": 4310334
+      },
+      "4_vibration_fft_spectrum.html": {
+        "path": "docs\\plots\\4_vibration_fft_spectrum.html",
+        "size_bytes": 4313650
+      },
+      "5_full_mission_overview.html": {
+        "path": "docs\\plots\\5_full_mission_overview.html",
+        "size_bytes": 4987059
+      },
+      "6_timestep_stability_comparison.html": {
+        "path": "docs\\plots\\6_timestep_stability_comparison.html",
+        "size_bytes": 4357088
+      },
+      "7_cross_channel_correlation_matrix.html": {
+        "path": "docs\\plots\\7_cross_channel_correlation_matrix.html",
+        "size_bytes": 4307578
+      },
+      "8_cooling_degradation_transient.html": {
+        "path": "docs\\plots\\8_cooling_degradation_transient.html",
+        "size_bytes": 4406443
+      },
+      "9_cooling_severity_sweep.html": {
+        "path": "docs\\plots\\9_cooling_severity_sweep.html",
+        "size_bytes": 4306292
+      }
+    },
+    "total_docs": 14,
+    "total_plots": 13
+  },
+  "test_inventory": {
+    "test_files": {
+      "test_anomaly_detection.py": {
+        "path": "tests\\test_anomaly_detection.py",
+        "size_bytes": 27482
+      },
+      "test_audit_cleanup.py": {
+        "path": "tests\\test_audit_cleanup.py",
+        "size_bytes": 15108
+      },
+      "test_cooling_degradation.py": {
+        "path": "tests\\test_cooling_degradation.py",
+        "size_bytes": 9271
+      },
+      "test_digital_twin.py": {
+        "path": "tests\\test_digital_twin.py",
+        "size_bytes": 25182
+      },
+      "test_explainability.py": {
+        "path": "tests\\test_explainability.py",
+        "size_bytes": 22853
+      },
+      "test_fault_diagnosis.py": {
+        "path": "tests\\test_fault_diagnosis.py",
+        "size_bytes": 29402
+      },
+      "test_fault_interface.py": {
+        "path": "tests\\test_fault_interface.py",
+        "size_bytes": 9600
+      },
+      "test_forecasting.py": {
+        "path": "tests\\test_forecasting.py",
+        "size_bytes": 27455
+      },
+      "test_fuel_injection_abnormality.py": {
+        "path": "tests\\test_fuel_injection_abnormality.py",
+        "size_bytes": 13445
+      },
+      "test_health_index.py": {
+        "path": "tests\\test_health_index.py",
+        "size_bytes": 35717
+      },
+      "test_imports.py": {
+        "path": "tests\\test_imports.py",
+        "size_bytes": 1941
+      },
+      "test_interfaces.py": {
+        "path": "tests\\test_interfaces.py",
+        "size_bytes": 3510
+      },
+      "test_lubrication_degradation.py": {
+        "path": "tests\\test_lubrication_degradation.py",
+        "size_bytes": 9901
+      },
+      "test_mechanical_degradation.py": {
+        "path": "tests\\test_mechanical_degradation.py",
+        "size_bytes": 17009
+      },
+      "test_physics_checkpoint_rpm.py": {
+        "path": "tests\\test_physics_checkpoint_rpm.py",
+        "size_bytes": 3975
+      },
+      "test_physics_validation.py": {
+        "path": "tests\\test_physics_validation.py",
+        "size_bytes": 9182
+      },
+      "test_prognostics.py": {
+        "path": "tests\\test_prognostics.py",
+        "size_bytes": 19422
+      },
+      "test_schemas.py": {
+        "path": "tests\\test_schemas.py",
+        "size_bytes": 3385
+      },
+      "test_sensor_faults.py": {
+        "path": "tests\\test_sensor_faults.py",
+        "size_bytes": 41049
+      },
+      "test_system_orchestrator.py": {
+        "path": "tests\\test_system_orchestrator.py",
+        "size_bytes": 25078
+      },
+      "test_telemetry_pipeline.py": {
+        "path": "tests\\test_telemetry_pipeline.py",
+        "size_bytes": 29472
+      },
+      "test_validation_framework.py": {
+        "path": "tests\\test_validation_framework.py",
+        "size_bytes": 5623
+      }
+    },
+    "total_test_files": 22
+  },
+  "scenario_results": {
+    "healthy": {
+      "scenario_name": "healthy",
+      "duration_s": 60.0,
+      "fault_type": "none",
+      "fault_start_s": 0.0,
+      "fault_severity": 0.0,
+      "total_timesteps": 60,
+      "total_wall_time_s": 2.156,
+      "latency_stats": {
+        "all_steps": {
+          "sample_count": 60,
+          "mean_ms": 35.215,
+          "median_p50_ms": 32.515,
+          "p95_ms": 54.038,
+          "p99_ms": 56.485,
+          "min_ms": 30.732,
+          "max_ms": 56.812,
+          "std_ms": 7.158
+        },
+        "steady_state": {
+          "sample_count": 50,
+          "mean_ms": 35.045,
+          "median_p50_ms": 32.686,
+          "p95_ms": 53.788,
+          "p99_ms": 55.386,
+          "min_ms": 30.732,
+          "max_ms": 56.258,
+          "std_ms": 6.686
+        },
+        "warmup_excluded_steps": 10
+      },
+      "anomaly_detection": {
+        "post_fault_anomaly_rate": 0.0909,
+        "post_fault_anomaly_count": 5,
+        "post_fault_total_steps": 55,
+        "final_anomaly_status": "NORMAL",
+        "final_anomaly_score": 0.0698,
+        "expected_anomaly_at_end": false
+      },
+      "fault_classification": {
+        "expected_class": "healthy",
+        "final_predicted_class": "none",
+        "final_confidence": 1.0,
+        "last_10_accuracy": 0.0
+      },
+      "health_index": {
+        "hi_start": 0.956,
+        "hi_end": 1.0,
+        "hi_delta": 0.044,
+        "final_health_state": "HEALTHY",
+        "final_degradation_trend": "STABLE",
+        "dominant_channels": []
+      },
+      "rul_prognostics": {
+        "rul_available_count": 0,
+        "final_rul_state": "RECOVERING",
+        "final_point_rul_s": null,
+        "final_limiting_factor": "NONE",
+        "rul_trajectory_sample": []
+      },
+      "forecasting": {
+        "final_forecast_status": "BLOCKED_UNAUTHENTICATED_GATED",
+        "final_forecast_source": "timesfm-3.0",
+        "final_forecast_horizon": 16
+      },
+      "explainability": {
+        "final_quality": "HIGH"
+      },
+      "advisory": {
+        "final_action": "NORMAL_MONITORING",
+        "final_recommendation": "Continue nominal flight monitoring."
+      },
+      "timestep_trail": {
+        "first_3": [
+          {
+            "timestamp": 0.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "ANOMALY",
+            "anomaly_score": 0.9,
+            "persistence_count": 1,
+            "predicted_fault_class": "sensor_fault",
+            "diagnostic_confidence": 0.2643,
+            "raw_health_index": 0.8042,
+            "smoothed_health_index": 0.8042,
+            "health_state": "DEGRADED",
+            "degradation_trend": "INSUFFICIENT_HISTORY",
+            "dominant_channels": [
+              "rpm",
+              "oil_pressure",
+              "fuel_flow"
+            ],
+            "forecast_status": "BUFFERING",
+            "forecast_source": "TIMESFM_OR_BASELINE",
+            "forecast_horizon": 16,
+            "rul_state": "INSUFFICIENT_HISTORY",
+            "point_rul_seconds": null,
+            "limiting_factor": "INSUFFICIENT_HISTORY",
+            "explainability_quality": "LOW",
+            "advisory_action": "ADVISORY_CAUTION",
+            "recommended_action": "Diagnosis: SENSOR_FAULT\nML Evidence (Confidence: 26.4%):\n  - load: 63.50 (SHAP attribution: -0.743, AWAY_FROM_PREDICTED_CLASS)\n  - rpm_norm_residual: 17.67 (SHAP attribution: -0.265, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 1.46 (SHAP attribution: -0.207, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: RPM ELEVATED, OIL_PRESSURE ELEVATED, FUEL_FLOW ELEVATED\n  - Consistency Assessment: Multi-channel physical residual divergence is consistent with physical engine degradation rather than single-sensor failure.\nHealth Evidence (HI = 0.804, State = DEGRADED):\n  - Dominant Degraded Channels: rpm, oil_pressure, fuel_flow\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: LOW\nSummary: Multi-channel physical residual divergence is consistent with physical engine degradation rather than single-sensor failure.",
+            "execution_latency_ms": 56.812
+          },
+          {
+            "timestamp": 1.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "ANOMALY",
+            "anomaly_score": 0.9,
+            "persistence_count": 2,
+            "predicted_fault_class": "none",
+            "diagnostic_confidence": 0.3281,
+            "raw_health_index": 0.8578,
+            "smoothed_health_index": 0.8122,
+            "health_state": "DEGRADED",
+            "degradation_trend": "INSUFFICIENT_HISTORY",
+            "dominant_channels": [
+              "rpm",
+              "fuel_flow"
+            ],
+            "forecast_status": "BUFFERING",
+            "forecast_source": "TIMESFM_OR_BASELINE",
+            "forecast_horizon": 16,
+            "rul_state": "INSUFFICIENT_HISTORY",
+            "point_rul_seconds": null,
+            "limiting_factor": "INSUFFICIENT_HISTORY",
+            "explainability_quality": "LOW",
+            "advisory_action": "ADVISORY_CAUTION",
+            "recommended_action": "Diagnosis: NONE\nML Evidence (Confidence: 32.8%):\n  - fuel_flow_norm_residual: 2.29 (SHAP attribution: -0.535, AWAY_FROM_PREDICTED_CLASS)\n  - load: 68.70 (SHAP attribution: -0.137, AWAY_FROM_PREDICTED_CLASS)\n  - vibration_norm_residual: 0.56 (SHAP attribution: +0.134, TOWARD_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: RPM ELEVATED, CHT NOMINAL, EGT ELEVATED, OIL_TEMP NOMINAL, OIL_PRESSURE NOMINAL, FUEL_FLOW ELEVATED, VIBRATION NOMINAL\n  - Consistency Assessment: Significant multi-channel residual divergence conflicts with healthy nominal engine state.\nHealth Evidence (HI = 0.812, State = DEGRADED):\n  - Dominant Degraded Channels: rpm, fuel_flow\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: LOW\nSummary: Significant multi-channel residual divergence conflicts with healthy nominal engine state.",
+            "execution_latency_ms": 51.377
+          },
+          {
+            "timestamp": 2.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "ANOMALY",
+            "anomaly_score": 0.7935,
+            "persistence_count": 3,
+            "predicted_fault_class": "fuel_injection_abnormality",
+            "diagnostic_confidence": 0.5874,
+            "raw_health_index": 0.9879,
+            "smoothed_health_index": 0.8386,
+            "health_state": "DEGRADED",
+            "degradation_trend": "INSUFFICIENT_HISTORY",
+            "dominant_channels": [],
+            "forecast_status": "BUFFERING",
+            "forecast_source": "TIMESFM_OR_BASELINE",
+            "forecast_horizon": 16,
+            "rul_state": "INSUFFICIENT_HISTORY",
+            "point_rul_seconds": null,
+            "limiting_factor": "INSUFFICIENT_HISTORY",
+            "explainability_quality": "MEDIUM",
+            "advisory_action": "ADVISORY_CAUTION",
+            "recommended_action": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 58.7%):\n  - fuel_flow_norm_residual: 0.56 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: 1.72 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 1.63 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: PARTIALLY_SUPPORTED\n  - Observed Signatures: EGT ELEVATED, FUEL_FLOW NOMINAL\n  - Consistency Assessment: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.\nHealth Evidence (HI = 0.839, State = DEGRADED):\n  - No dominant degraded channels (system within nominal operating limits).\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: MEDIUM\nSummary: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.",
+            "execution_latency_ms": 31.067
+          }
+        ],
+        "last_3": [
+          {
+            "timestamp": 57.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "NORMAL",
+            "anomaly_score": 0.0932,
+            "persistence_count": 0,
+            "predicted_fault_class": "none",
+            "diagnostic_confidence": 1.0,
+            "raw_health_index": 1.0,
+            "smoothed_health_index": 1.0,
+            "health_state": "HEALTHY",
+            "degradation_trend": "STABLE",
+            "dominant_channels": [],
+            "forecast_status": "BLOCKED_UNAUTHENTICATED_GATED",
+            "forecast_source": "timesfm-3.0",
+            "forecast_horizon": 16,
+            "rul_state": "RECOVERING",
+            "point_rul_seconds": null,
+            "limiting_factor": "NONE",
+            "explainability_quality": "HIGH",
+            "advisory_action": "NORMAL_MONITORING",
+            "recommended_action": "Continue nominal flight monitoring.",
+            "execution_latency_ms": 31.737
+          },
+          {
+            "timestamp": 58.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "NORMAL",
+            "anomaly_score": 0.0592,
+            "persistence_count": 0,
+            "predicted_fault_class": "none",
+            "diagnostic_confidence": 1.0,
+            "raw_health_index": 1.0,
+            "smoothed_health_index": 1.0,
+            "health_state": "HEALTHY",
+            "degradation_trend": "STABLE",
+            "dominant_channels": [],
+            "forecast_status": "BLOCKED_UNAUTHENTICATED_GATED",
+            "forecast_source": "timesfm-3.0",
+            "forecast_horizon": 16,
+            "rul_state": "RECOVERING",
+            "point_rul_seconds": null,
+            "limiting_factor": "NONE",
+            "explainability_quality": "HIGH",
+            "advisory_action": "NORMAL_MONITORING",
+            "recommended_action": "Continue nominal flight monitoring.",
+            "execution_latency_ms": 33.357
+          },
+          {
+            "timestamp": 59.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "NORMAL",
+            "anomaly_score": 0.0698,
+            "persistence_count": 0,
+            "predicted_fault_class": "none",
+            "diagnostic_confidence": 1.0,
+            "raw_health_index": 1.0,
+            "smoothed_health_index": 1.0,
+            "health_state": "HEALTHY",
+            "degradation_trend": "STABLE",
+            "dominant_channels": [],
+            "forecast_status": "BLOCKED_UNAUTHENTICATED_GATED",
+            "forecast_source": "timesfm-3.0",
+            "forecast_horizon": 16,
+            "rul_state": "RECOVERING",
+            "point_rul_seconds": null,
+            "limiting_factor": "NONE",
+            "explainability_quality": "HIGH",
+            "advisory_action": "NORMAL_MONITORING",
+            "recommended_action": "Continue nominal flight monitoring.",
+            "execution_latency_ms": 33.502
+          }
+        ]
+      }
+    },
+    "cooling_degradation": {
+      "scenario_name": "cooling_degradation",
+      "duration_s": 120.0,
+      "fault_type": "cooling_degradation",
+      "fault_start_s": 15.0,
+      "fault_severity": 0.6,
+      "total_timesteps": 120,
+      "total_wall_time_s": 6.019,
+      "latency_stats": {
+        "all_steps": {
+          "sample_count": 120,
+          "mean_ms": 49.472,
+          "median_p50_ms": 51.331,
+          "p95_ms": 79.001,
+          "p99_ms": 83.276,
+          "min_ms": 30.718,
+          "max_ms": 91.693,
+          "std_ms": 12.731
+        },
+        "steady_state": {
+          "sample_count": 110,
+          "mean_ms": 51.065,
+          "median_p50_ms": 51.827,
+          "p95_ms": 80.029,
+          "p99_ms": 83.347,
+          "min_ms": 31.446,
+          "max_ms": 91.693,
+          "std_ms": 12.094
+        },
+        "warmup_excluded_steps": 10
+      },
+      "anomaly_detection": {
+        "post_fault_anomaly_rate": 0.87,
+        "post_fault_anomaly_count": 87,
+        "post_fault_total_steps": 100,
+        "final_anomaly_status": "ANOMALY",
+        "final_anomaly_score": 0.7994,
+        "expected_anomaly_at_end": true
+      },
+      "fault_classification": {
+        "expected_class": "cooling_degradation",
+        "final_predicted_class": "fuel_injection_abnormality",
+        "final_confidence": 0.3532,
+        "last_10_accuracy": 0.0
+      },
+      "health_index": {
+        "hi_start": 0.956,
+        "hi_end": 0.9042,
+        "hi_delta": -0.0518,
+        "final_health_state": "HEALTHY",
+        "final_degradation_trend": "STABLE",
+        "dominant_channels": [
+          "cht"
+        ]
+      },
+      "rul_prognostics": {
+        "rul_available_count": 37,
+        "final_rul_state": "NOT_DEGRADING",
+        "final_point_rul_s": null,
+        "final_limiting_factor": "NONE",
+        "rul_trajectory_sample": [
+          {
+            "t": 83.0,
+            "rul_s": 397.4263464036619
+          },
+          {
+            "t": 84.0,
+            "rul_s": 423.31391902682026
+          },
+          {
+            "t": 85.0,
+            "rul_s": 462.76377920695836
+          },
+          {
+            "t": 86.0,
+            "rul_s": 489.937896556373
+          },
+          {
+            "t": 87.0,
+            "rul_s": 517.9701282748375
+          }
+        ]
+      },
+      "forecasting": {
+        "final_forecast_status": "BLOCKED_UNAUTHENTICATED_GATED",
+        "final_forecast_source": "timesfm-3.0",
+        "final_forecast_horizon": 16
+      },
+      "explainability": {
+        "final_quality": "LOW"
+      },
+      "advisory": {
+        "final_action": "ADVISORY_CAUTION",
+        "final_recommendation": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 35.3%):\n  - fuel_flow_norm_residual: 0.00 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: -0.05 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 0.12 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: EGT NOMINAL, FUEL_FLOW NOMINAL\n  - Consistency Assessment: Both EGT and fuel flow residuals remain in nominal band, lacking combustion abnormality evidence.\nHealth Evidence (HI = 0.904, State = HEALTHY):\n  - Dominant Degraded Channels: cht\nTemporal Evidence: STABLE (Rate: 0.00012/s, Trend: STABLE)\nPrognostic RUL: Unavailable | Status: NOT_DEGRADING\nOverall Evidence Consistency: LOW\nSummary: Both EGT and fuel flow residuals remain in nominal band, lacking combustion abnormality evidence."
+      },
+      "timestep_trail": {
+        "first_3": [
+          {
+            "timestamp": 0.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "ANOMALY",
+            "anomaly_score": 0.9,
+            "persistence_count": 1,
+            "predicted_fault_class": "sensor_fault",
+            "diagnostic_confidence": 0.2643,
+            "raw_health_index": 0.8042,
+            "smoothed_health_index": 0.8042,
+            "health_state": "DEGRADED",
+            "degradation_trend": "INSUFFICIENT_HISTORY",
+            "dominant_channels": [
+              "rpm",
+              "oil_pressure",
+              "fuel_flow"
+            ],
+            "forecast_status": "BUFFERING",
+            "forecast_source": "TIMESFM_OR_BASELINE",
+            "forecast_horizon": 16,
+            "rul_state": "INSUFFICIENT_HISTORY",
+            "point_rul_seconds": null,
+            "limiting_factor": "INSUFFICIENT_HISTORY",
+            "explainability_quality": "LOW",
+            "advisory_action": "ADVISORY_CAUTION",
+            "recommended_action": "Diagnosis: SENSOR_FAULT\nML Evidence (Confidence: 26.4%):\n  - load: 63.50 (SHAP attribution: -0.743, AWAY_FROM_PREDICTED_CLASS)\n  - rpm_norm_residual: 17.67 (SHAP attribution: -0.265, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 1.46 (SHAP attribution: -0.207, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: RPM ELEVATED, OIL_PRESSURE ELEVATED, FUEL_FLOW ELEVATED\n  - Consistency Assessment: Multi-channel physical residual divergence is consistent with physical engine degradation rather than single-sensor failure.\nHealth Evidence (HI = 0.804, State = DEGRADED):\n  - Dominant Degraded Channels: rpm, oil_pressure, fuel_flow\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: LOW\nSummary: Multi-channel physical residual divergence is consistent with physical engine degradation rather than single-sensor failure.",
+            "execution_latency_ms": 33.616
+          },
+          {
+            "timestamp": 1.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "ANOMALY",
+            "anomaly_score": 0.9,
+            "persistence_count": 2,
+            "predicted_fault_class": "none",
+            "diagnostic_confidence": 0.3281,
+            "raw_health_index": 0.8578,
+            "smoothed_health_index": 0.8122,
+            "health_state": "DEGRADED",
+            "degradation_trend": "INSUFFICIENT_HISTORY",
+            "dominant_channels": [
+              "rpm",
+              "fuel_flow"
+            ],
+            "forecast_status": "BUFFERING",
+            "forecast_source": "TIMESFM_OR_BASELINE",
+            "forecast_horizon": 16,
+            "rul_state": "INSUFFICIENT_HISTORY",
+            "point_rul_seconds": null,
+            "limiting_factor": "INSUFFICIENT_HISTORY",
+            "explainability_quality": "LOW",
+            "advisory_action": "ADVISORY_CAUTION",
+            "recommended_action": "Diagnosis: NONE\nML Evidence (Confidence: 32.8%):\n  - fuel_flow_norm_residual: 2.29 (SHAP attribution: -0.535, AWAY_FROM_PREDICTED_CLASS)\n  - load: 68.70 (SHAP attribution: -0.137, AWAY_FROM_PREDICTED_CLASS)\n  - vibration_norm_residual: 0.56 (SHAP attribution: +0.134, TOWARD_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: RPM ELEVATED, CHT NOMINAL, EGT ELEVATED, OIL_TEMP NOMINAL, OIL_PRESSURE NOMINAL, FUEL_FLOW ELEVATED, VIBRATION NOMINAL\n  - Consistency Assessment: Significant multi-channel residual divergence conflicts with healthy nominal engine state.\nHealth Evidence (HI = 0.812, State = DEGRADED):\n  - Dominant Degraded Channels: rpm, fuel_flow\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: LOW\nSummary: Significant multi-channel residual divergence conflicts with healthy nominal engine state.",
+            "execution_latency_ms": 31.902
+          },
+          {
+            "timestamp": 2.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "ANOMALY",
+            "anomaly_score": 0.7935,
+            "persistence_count": 3,
+            "predicted_fault_class": "fuel_injection_abnormality",
+            "diagnostic_confidence": 0.5874,
+            "raw_health_index": 0.9879,
+            "smoothed_health_index": 0.8386,
+            "health_state": "DEGRADED",
+            "degradation_trend": "INSUFFICIENT_HISTORY",
+            "dominant_channels": [],
+            "forecast_status": "BUFFERING",
+            "forecast_source": "TIMESFM_OR_BASELINE",
+            "forecast_horizon": 16,
+            "rul_state": "INSUFFICIENT_HISTORY",
+            "point_rul_seconds": null,
+            "limiting_factor": "INSUFFICIENT_HISTORY",
+            "explainability_quality": "MEDIUM",
+            "advisory_action": "ADVISORY_CAUTION",
+            "recommended_action": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 58.7%):\n  - fuel_flow_norm_residual: 0.56 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: 1.72 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 1.63 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: PARTIALLY_SUPPORTED\n  - Observed Signatures: EGT ELEVATED, FUEL_FLOW NOMINAL\n  - Consistency Assessment: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.\nHealth Evidence (HI = 0.839, State = DEGRADED):\n  - No dominant degraded channels (system within nominal operating limits).\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: MEDIUM\nSummary: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.",
+            "execution_latency_ms": 30.856
+          }
+        ],
+        "last_3": [
+          {
+            "timestamp": 117.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "ANOMALY",
+            "anomaly_score": 0.7698,
+            "persistence_count": 87,
+            "predicted_fault_class": "fuel_injection_abnormality",
+            "diagnostic_confidence": 0.3532,
+            "raw_health_index": 0.903,
+            "smoothed_health_index": 0.9036,
+            "health_state": "HEALTHY",
+            "degradation_trend": "STABLE",
+            "dominant_channels": [
+              "cht"
+            ],
+            "forecast_status": "BLOCKED_UNAUTHENTICATED_GATED",
+            "forecast_source": "timesfm-3.0",
+            "forecast_horizon": 16,
+            "rul_state": "NOT_DEGRADING",
+            "point_rul_seconds": null,
+            "limiting_factor": "NONE",
+            "explainability_quality": "LOW",
+            "advisory_action": "ADVISORY_CAUTION",
+            "recommended_action": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 35.3%):\n  - fuel_flow_norm_residual: 0.04 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: -0.00 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 0.08 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: EGT NOMINAL, FUEL_FLOW NOMINAL\n  - Consistency Assessment: Both EGT and fuel flow residuals remain in nominal band, lacking combustion abnormality evidence.\nHealth Evidence (HI = 0.904, State = HEALTHY):\n  - Dominant Degraded Channels: cht\nTemporal Evidence: STABLE (Rate: 0.00019/s, Trend: STABLE)\nPrognostic RUL: Unavailable | Status: NOT_DEGRADING\nOverall Evidence Consistency: LOW\nSummary: Both EGT and fuel flow residuals remain in nominal band, lacking combustion abnormality evidence.",
+            "execution_latency_ms": 52.567
+          },
+          {
+            "timestamp": 118.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "ANOMALY",
+            "anomaly_score": 0.8177,
+            "persistence_count": 88,
+            "predicted_fault_class": "fuel_injection_abnormality",
+            "diagnostic_confidence": 0.3532,
+            "raw_health_index": 0.9045,
+            "smoothed_health_index": 0.9037,
+            "health_state": "HEALTHY",
+            "degradation_trend": "STABLE",
+            "dominant_channels": [
+              "cht"
+            ],
+            "forecast_status": "BLOCKED_UNAUTHENTICATED_GATED",
+            "forecast_source": "timesfm-3.0",
+            "forecast_horizon": 16,
+            "rul_state": "NOT_DEGRADING",
+            "point_rul_seconds": null,
+            "limiting_factor": "NONE",
+            "explainability_quality": "LOW",
+            "advisory_action": "ADVISORY_CAUTION",
+            "recommended_action": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 35.3%):\n  - fuel_flow_norm_residual: -0.12 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: -0.01 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: -0.26 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: EGT NOMINAL, FUEL_FLOW NOMINAL\n  - Consistency Assessment: Both EGT and fuel flow residuals remain in nominal band, lacking combustion abnormality evidence.\nHealth Evidence (HI = 0.904, State = HEALTHY):\n  - Dominant Degraded Channels: cht\nTemporal Evidence: STABLE (Rate: 0.00014/s, Trend: STABLE)\nPrognostic RUL: Unavailable | Status: NOT_DEGRADING\nOverall Evidence Consistency: LOW\nSummary: Both EGT and fuel flow residuals remain in nominal band, lacking combustion abnormality evidence.",
+            "execution_latency_ms": 52.237
+          },
+          {
+            "timestamp": 119.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "ANOMALY",
+            "anomaly_score": 0.7994,
+            "persistence_count": 89,
+            "predicted_fault_class": "fuel_injection_abnormality",
+            "diagnostic_confidence": 0.3532,
+            "raw_health_index": 0.9069,
+            "smoothed_health_index": 0.9042,
+            "health_state": "HEALTHY",
+            "degradation_trend": "STABLE",
+            "dominant_channels": [
+              "cht"
+            ],
+            "forecast_status": "BLOCKED_UNAUTHENTICATED_GATED",
+            "forecast_source": "timesfm-3.0",
+            "forecast_horizon": 16,
+            "rul_state": "NOT_DEGRADING",
+            "point_rul_seconds": null,
+            "limiting_factor": "NONE",
+            "explainability_quality": "LOW",
+            "advisory_action": "ADVISORY_CAUTION",
+            "recommended_action": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 35.3%):\n  - fuel_flow_norm_residual: 0.00 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: -0.05 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 0.12 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: EGT NOMINAL, FUEL_FLOW NOMINAL\n  - Consistency Assessment: Both EGT and fuel flow residuals remain in nominal band, lacking combustion abnormality evidence.\nHealth Evidence (HI = 0.904, State = HEALTHY):\n  - Dominant Degraded Channels: cht\nTemporal Evidence: STABLE (Rate: 0.00012/s, Trend: STABLE)\nPrognostic RUL: Unavailable | Status: NOT_DEGRADING\nOverall Evidence Consistency: LOW\nSummary: Both EGT and fuel flow residuals remain in nominal band, lacking combustion abnormality evidence.",
+            "execution_latency_ms": 49.125
+          }
+        ]
+      }
+    },
+    "lubrication_degradation": {
+      "scenario_name": "lubrication_degradation",
+      "duration_s": 120.0,
+      "fault_type": "lubrication_degradation",
+      "fault_start_s": 15.0,
+      "fault_severity": 0.6,
+      "total_timesteps": 120,
+      "total_wall_time_s": 7.806,
+      "latency_stats": {
+        "all_steps": {
+          "sample_count": 120,
+          "mean_ms": 64.134,
+          "median_p50_ms": 56.736,
+          "p95_ms": 99.843,
+          "p99_ms": 111.451,
+          "min_ms": 39.753,
+          "max_ms": 119.01,
+          "std_ms": 18.187
+        },
+        "steady_state": {
+          "sample_count": 110,
+          "mean_ms": 64.427,
+          "median_p50_ms": 56.736,
+          "p95_ms": 100.04,
+          "p99_ms": 111.783,
+          "min_ms": 46.95,
+          "max_ms": 119.01,
+          "std_ms": 18.387
+        },
+        "warmup_excluded_steps": 10
+      },
+      "anomaly_detection": {
+        "post_fault_anomaly_rate": 0.98,
+        "post_fault_anomaly_count": 98,
+        "post_fault_total_steps": 100,
+        "final_anomaly_status": "ANOMALY",
+        "final_anomaly_score": 0.75,
+        "expected_anomaly_at_end": true
+      },
+      "fault_classification": {
+        "expected_class": "lubrication_degradation",
+        "final_predicted_class": "fuel_injection_abnormality",
+        "final_confidence": 0.3826,
+        "last_10_accuracy": 0.0
+      },
+      "health_index": {
+        "hi_start": 0.956,
+        "hi_end": 0.9048,
+        "hi_delta": -0.0512,
+        "final_health_state": "HEALTHY",
+        "final_degradation_trend": "STABLE",
+        "dominant_channels": [
+          "oil_pressure"
+        ]
+      },
+      "rul_prognostics": {
+        "rul_available_count": 0,
+        "final_rul_state": "NOT_DEGRADING",
+        "final_point_rul_s": null,
+        "final_limiting_factor": "NONE",
+        "rul_trajectory_sample": []
+      },
+      "forecasting": {
+        "final_forecast_status": "BLOCKED_UNAUTHENTICATED_GATED",
+        "final_forecast_source": "timesfm-3.0",
+        "final_forecast_horizon": 16
+      },
+      "explainability": {
+        "final_quality": "LOW"
+      },
+      "advisory": {
+        "final_action": "ADVISORY_CAUTION",
+        "final_recommendation": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 38.3%):\n  - fuel_flow_norm_residual: 0.00 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: -0.05 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 0.12 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: EGT NOMINAL, FUEL_FLOW NOMINAL\n  - Consistency Assessment: Both EGT and fuel flow residuals remain in nominal band, lacking combustion abnormality evidence.\nHealth Evidence (HI = 0.905, State = HEALTHY):\n  - Dominant Degraded Channels: oil_pressure\nTemporal Evidence: STABLE (Rate: -0.00026/s, Trend: STABLE)\nPrognostic RUL: Unavailable | Status: NOT_DEGRADING\nOverall Evidence Consistency: LOW\nSummary: Both EGT and fuel flow residuals remain in nominal band, lacking combustion abnormality evidence."
+      },
+      "timestep_trail": {
+        "first_3": [
+          {
+            "timestamp": 0.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "ANOMALY",
+            "anomaly_score": 0.9,
+            "persistence_count": 1,
+            "predicted_fault_class": "sensor_fault",
+            "diagnostic_confidence": 0.2643,
+            "raw_health_index": 0.8042,
+            "smoothed_health_index": 0.8042,
+            "health_state": "DEGRADED",
+            "degradation_trend": "INSUFFICIENT_HISTORY",
+            "dominant_channels": [
+              "rpm",
+              "oil_pressure",
+              "fuel_flow"
+            ],
+            "forecast_status": "BUFFERING",
+            "forecast_source": "TIMESFM_OR_BASELINE",
+            "forecast_horizon": 16,
+            "rul_state": "INSUFFICIENT_HISTORY",
+            "point_rul_seconds": null,
+            "limiting_factor": "INSUFFICIENT_HISTORY",
+            "explainability_quality": "LOW",
+            "advisory_action": "ADVISORY_CAUTION",
+            "recommended_action": "Diagnosis: SENSOR_FAULT\nML Evidence (Confidence: 26.4%):\n  - load: 63.50 (SHAP attribution: -0.743, AWAY_FROM_PREDICTED_CLASS)\n  - rpm_norm_residual: 17.67 (SHAP attribution: -0.265, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 1.46 (SHAP attribution: -0.207, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: RPM ELEVATED, OIL_PRESSURE ELEVATED, FUEL_FLOW ELEVATED\n  - Consistency Assessment: Multi-channel physical residual divergence is consistent with physical engine degradation rather than single-sensor failure.\nHealth Evidence (HI = 0.804, State = DEGRADED):\n  - Dominant Degraded Channels: rpm, oil_pressure, fuel_flow\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: LOW\nSummary: Multi-channel physical residual divergence is consistent with physical engine degradation rather than single-sensor failure.",
+            "execution_latency_ms": 39.753
+          },
+          {
+            "timestamp": 1.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "ANOMALY",
+            "anomaly_score": 0.9,
+            "persistence_count": 2,
+            "predicted_fault_class": "none",
+            "diagnostic_confidence": 0.3281,
+            "raw_health_index": 0.8578,
+            "smoothed_health_index": 0.8122,
+            "health_state": "DEGRADED",
+            "degradation_trend": "INSUFFICIENT_HISTORY",
+            "dominant_channels": [
+              "rpm",
+              "fuel_flow"
+            ],
+            "forecast_status": "BUFFERING",
+            "forecast_source": "TIMESFM_OR_BASELINE",
+            "forecast_horizon": 16,
+            "rul_state": "INSUFFICIENT_HISTORY",
+            "point_rul_seconds": null,
+            "limiting_factor": "INSUFFICIENT_HISTORY",
+            "explainability_quality": "LOW",
+            "advisory_action": "ADVISORY_CAUTION",
+            "recommended_action": "Diagnosis: NONE\nML Evidence (Confidence: 32.8%):\n  - fuel_flow_norm_residual: 2.29 (SHAP attribution: -0.535, AWAY_FROM_PREDICTED_CLASS)\n  - load: 68.70 (SHAP attribution: -0.137, AWAY_FROM_PREDICTED_CLASS)\n  - vibration_norm_residual: 0.56 (SHAP attribution: +0.134, TOWARD_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: RPM ELEVATED, CHT NOMINAL, EGT ELEVATED, OIL_TEMP NOMINAL, OIL_PRESSURE NOMINAL, FUEL_FLOW ELEVATED, VIBRATION NOMINAL\n  - Consistency Assessment: Significant multi-channel residual divergence conflicts with healthy nominal engine state.\nHealth Evidence (HI = 0.812, State = DEGRADED):\n  - Dominant Degraded Channels: rpm, fuel_flow\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: LOW\nSummary: Significant multi-channel residual divergence conflicts with healthy nominal engine state.",
+            "execution_latency_ms": 45.549
+          },
+          {
+            "timestamp": 2.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "ANOMALY",
+            "anomaly_score": 0.7935,
+            "persistence_count": 3,
+            "predicted_fault_class": "fuel_injection_abnormality",
+            "diagnostic_confidence": 0.5874,
+            "raw_health_index": 0.9879,
+            "smoothed_health_index": 0.8386,
+            "health_state": "DEGRADED",
+            "degradation_trend": "INSUFFICIENT_HISTORY",
+            "dominant_channels": [],
+            "forecast_status": "BUFFERING",
+            "forecast_source": "TIMESFM_OR_BASELINE",
+            "forecast_horizon": 16,
+            "rul_state": "INSUFFICIENT_HISTORY",
+            "point_rul_seconds": null,
+            "limiting_factor": "INSUFFICIENT_HISTORY",
+            "explainability_quality": "MEDIUM",
+            "advisory_action": "ADVISORY_CAUTION",
+            "recommended_action": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 58.7%):\n  - fuel_flow_norm_residual: 0.56 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: 1.72 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 1.63 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: PARTIALLY_SUPPORTED\n  - Observed Signatures: EGT ELEVATED, FUEL_FLOW NOMINAL\n  - Consistency Assessment: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.\nHealth Evidence (HI = 0.839, State = DEGRADED):\n  - No dominant degraded channels (system within nominal operating limits).\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: MEDIUM\nSummary: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.",
+            "execution_latency_ms": 47.14
+          }
+        ],
+        "last_3": [
+          {
+            "timestamp": 117.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "ANOMALY",
+            "anomaly_score": 0.7529,
+            "persistence_count": 98,
+            "predicted_fault_class": "fuel_injection_abnormality",
+            "diagnostic_confidence": 0.3826,
+            "raw_health_index": 0.9052,
+            "smoothed_health_index": 0.9061,
+            "health_state": "HEALTHY",
+            "degradation_trend": "STABLE",
+            "dominant_channels": [
+              "oil_pressure"
+            ],
+            "forecast_status": "BLOCKED_UNAUTHENTICATED_GATED",
+            "forecast_source": "timesfm-3.0",
+            "forecast_horizon": 16,
+            "rul_state": "NOT_DEGRADING",
+            "point_rul_seconds": null,
+            "limiting_factor": "NONE",
+            "explainability_quality": "LOW",
+            "advisory_action": "ADVISORY_CAUTION",
+            "recommended_action": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 38.3%):\n  - fuel_flow_norm_residual: 0.04 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: -0.00 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 0.08 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: EGT NOMINAL, FUEL_FLOW NOMINAL\n  - Consistency Assessment: Both EGT and fuel flow residuals remain in nominal band, lacking combustion abnormality evidence.\nHealth Evidence (HI = 0.906, State = HEALTHY):\n  - Dominant Degraded Channels: oil_pressure\nTemporal Evidence: STABLE (Rate: -0.00018/s, Trend: STABLE)\nPrognostic RUL: Unavailable | Status: NOT_DEGRADING\nOverall Evidence Consistency: LOW\nSummary: Both EGT and fuel flow residuals remain in nominal band, lacking combustion abnormality evidence.",
+            "execution_latency_ms": 71.568
+          },
+          {
+            "timestamp": 118.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "ANOMALY",
+            "anomaly_score": 0.8043,
+            "persistence_count": 99,
+            "predicted_fault_class": "fuel_injection_abnormality",
+            "diagnostic_confidence": 0.3826,
+            "raw_health_index": 0.8918,
+            "smoothed_health_index": 0.9039,
+            "health_state": "HEALTHY",
+            "degradation_trend": "STABLE",
+            "dominant_channels": [
+              "oil_pressure"
+            ],
+            "forecast_status": "BLOCKED_UNAUTHENTICATED_GATED",
+            "forecast_source": "timesfm-3.0",
+            "forecast_horizon": 16,
+            "rul_state": "NOT_DEGRADING",
+            "point_rul_seconds": null,
+            "limiting_factor": "NONE",
+            "explainability_quality": "LOW",
+            "advisory_action": "ADVISORY_CAUTION",
+            "recommended_action": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 38.3%):\n  - fuel_flow_norm_residual: -0.12 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: -0.01 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: -0.26 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: EGT NOMINAL, FUEL_FLOW NOMINAL\n  - Consistency Assessment: Both EGT and fuel flow residuals remain in nominal band, lacking combustion abnormality evidence.\nHealth Evidence (HI = 0.904, State = HEALTHY):\n  - Dominant Degraded Channels: oil_pressure\nTemporal Evidence: STABLE (Rate: -0.00038/s, Trend: STABLE)\nPrognostic RUL: Unavailable | Status: NOT_DEGRADING\nOverall Evidence Consistency: LOW\nSummary: Both EGT and fuel flow residuals remain in nominal band, lacking combustion abnormality evidence.",
+            "execution_latency_ms": 64.46
+          },
+          {
+            "timestamp": 119.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "ANOMALY",
+            "anomaly_score": 0.75,
+            "persistence_count": 100,
+            "predicted_fault_class": "fuel_injection_abnormality",
+            "diagnostic_confidence": 0.3826,
+            "raw_health_index": 0.9095,
+            "smoothed_health_index": 0.9048,
+            "health_state": "HEALTHY",
+            "degradation_trend": "STABLE",
+            "dominant_channels": [
+              "oil_pressure"
+            ],
+            "forecast_status": "BLOCKED_UNAUTHENTICATED_GATED",
+            "forecast_source": "timesfm-3.0",
+            "forecast_horizon": 16,
+            "rul_state": "NOT_DEGRADING",
+            "point_rul_seconds": null,
+            "limiting_factor": "NONE",
+            "explainability_quality": "LOW",
+            "advisory_action": "ADVISORY_CAUTION",
+            "recommended_action": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 38.3%):\n  - fuel_flow_norm_residual: 0.00 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: -0.05 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 0.12 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: EGT NOMINAL, FUEL_FLOW NOMINAL\n  - Consistency Assessment: Both EGT and fuel flow residuals remain in nominal band, lacking combustion abnormality evidence.\nHealth Evidence (HI = 0.905, State = HEALTHY):\n  - Dominant Degraded Channels: oil_pressure\nTemporal Evidence: STABLE (Rate: -0.00026/s, Trend: STABLE)\nPrognostic RUL: Unavailable | Status: NOT_DEGRADING\nOverall Evidence Consistency: LOW\nSummary: Both EGT and fuel flow residuals remain in nominal band, lacking combustion abnormality evidence.",
+            "execution_latency_ms": 66.994
+          }
+        ]
+      }
+    },
+    "fuel_abnormality": {
+      "scenario_name": "fuel_abnormality",
+      "duration_s": 120.0,
+      "fault_type": "fuel_injection_abnormality",
+      "fault_start_s": 15.0,
+      "fault_severity": 0.6,
+      "total_timesteps": 120,
+      "total_wall_time_s": 7.887,
+      "latency_stats": {
+        "all_steps": {
+          "sample_count": 120,
+          "mean_ms": 64.647,
+          "median_p50_ms": 60.294,
+          "p95_ms": 94.986,
+          "p99_ms": 117.338,
+          "min_ms": 49.73,
+          "max_ms": 184.968,
+          "std_ms": 17.351
+        },
+        "steady_state": {
+          "sample_count": 110,
+          "mean_ms": 64.628,
+          "median_p50_ms": 59.064,
+          "p95_ms": 95.829,
+          "p99_ms": 119.038,
+          "min_ms": 50.493,
+          "max_ms": 184.968,
+          "std_ms": 17.993
+        },
+        "warmup_excluded_steps": 10
+      },
+      "anomaly_detection": {
+        "post_fault_anomaly_rate": 0.89,
+        "post_fault_anomaly_count": 89,
+        "post_fault_total_steps": 100,
+        "final_anomaly_status": "ANOMALY",
+        "final_anomaly_score": 0.75,
+        "expected_anomaly_at_end": true
+      },
+      "fault_classification": {
+        "expected_class": "fuel_injection_abnormality",
+        "final_predicted_class": "fuel_injection_abnormality",
+        "final_confidence": 0.5887,
+        "last_10_accuracy": 1.0
+      },
+      "health_index": {
+        "hi_start": 0.956,
+        "hi_end": 0.9619,
+        "hi_delta": 0.0059,
+        "final_health_state": "HEALTHY",
+        "final_degradation_trend": "STABLE",
+        "dominant_channels": [
+          "egt"
+        ]
+      },
+      "rul_prognostics": {
+        "rul_available_count": 0,
+        "final_rul_state": "NOT_DEGRADING",
+        "final_point_rul_s": null,
+        "final_limiting_factor": "NONE",
+        "rul_trajectory_sample": []
+      },
+      "forecasting": {
+        "final_forecast_status": "BLOCKED_UNAUTHENTICATED_GATED",
+        "final_forecast_source": "timesfm-3.0",
+        "final_forecast_horizon": 16
+      },
+      "explainability": {
+        "final_quality": "MEDIUM"
+      },
+      "advisory": {
+        "final_action": "ADVISORY_CAUTION",
+        "final_recommendation": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 58.9%):\n  - fuel_flow_norm_residual: -1.24 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: -0.93 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 2.48 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: PARTIALLY_SUPPORTED\n  - Observed Signatures: EGT ELEVATED, FUEL_FLOW NOMINAL\n  - Consistency Assessment: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.\nHealth Evidence (HI = 0.962, State = HEALTHY):\n  - Dominant Degraded Channels: egt\nTemporal Evidence: STABLE (Rate: -0.00007/s, Trend: STABLE)\nPrognostic RUL: Unavailable | Status: NOT_DEGRADING\nOverall Evidence Consistency: MEDIUM\nSummary: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band."
+      },
+      "timestep_trail": {
+        "first_3": [
+          {
+            "timestamp": 0.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "ANOMALY",
+            "anomaly_score": 0.9,
+            "persistence_count": 1,
+            "predicted_fault_class": "sensor_fault",
+            "diagnostic_confidence": 0.2643,
+            "raw_health_index": 0.8042,
+            "smoothed_health_index": 0.8042,
+            "health_state": "DEGRADED",
+            "degradation_trend": "INSUFFICIENT_HISTORY",
+            "dominant_channels": [
+              "rpm",
+              "oil_pressure",
+              "fuel_flow"
+            ],
+            "forecast_status": "BUFFERING",
+            "forecast_source": "TIMESFM_OR_BASELINE",
+            "forecast_horizon": 16,
+            "rul_state": "INSUFFICIENT_HISTORY",
+            "point_rul_seconds": null,
+            "limiting_factor": "INSUFFICIENT_HISTORY",
+            "explainability_quality": "LOW",
+            "advisory_action": "ADVISORY_CAUTION",
+            "recommended_action": "Diagnosis: SENSOR_FAULT\nML Evidence (Confidence: 26.4%):\n  - load: 63.50 (SHAP attribution: -0.743, AWAY_FROM_PREDICTED_CLASS)\n  - rpm_norm_residual: 17.67 (SHAP attribution: -0.265, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 1.46 (SHAP attribution: -0.207, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: RPM ELEVATED, OIL_PRESSURE ELEVATED, FUEL_FLOW ELEVATED\n  - Consistency Assessment: Multi-channel physical residual divergence is consistent with physical engine degradation rather than single-sensor failure.\nHealth Evidence (HI = 0.804, State = DEGRADED):\n  - Dominant Degraded Channels: rpm, oil_pressure, fuel_flow\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: LOW\nSummary: Multi-channel physical residual divergence is consistent with physical engine degradation rather than single-sensor failure.",
+            "execution_latency_ms": 49.73
+          },
+          {
+            "timestamp": 1.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "ANOMALY",
+            "anomaly_score": 0.9,
+            "persistence_count": 2,
+            "predicted_fault_class": "none",
+            "diagnostic_confidence": 0.3281,
+            "raw_health_index": 0.8578,
+            "smoothed_health_index": 0.8122,
+            "health_state": "DEGRADED",
+            "degradation_trend": "INSUFFICIENT_HISTORY",
+            "dominant_channels": [
+              "rpm",
+              "fuel_flow"
+            ],
+            "forecast_status": "BUFFERING",
+            "forecast_source": "TIMESFM_OR_BASELINE",
+            "forecast_horizon": 16,
+            "rul_state": "INSUFFICIENT_HISTORY",
+            "point_rul_seconds": null,
+            "limiting_factor": "INSUFFICIENT_HISTORY",
+            "explainability_quality": "LOW",
+            "advisory_action": "ADVISORY_CAUTION",
+            "recommended_action": "Diagnosis: NONE\nML Evidence (Confidence: 32.8%):\n  - fuel_flow_norm_residual: 2.29 (SHAP attribution: -0.535, AWAY_FROM_PREDICTED_CLASS)\n  - load: 68.70 (SHAP attribution: -0.137, AWAY_FROM_PREDICTED_CLASS)\n  - vibration_norm_residual: 0.56 (SHAP attribution: +0.134, TOWARD_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: RPM ELEVATED, CHT NOMINAL, EGT ELEVATED, OIL_TEMP NOMINAL, OIL_PRESSURE NOMINAL, FUEL_FLOW ELEVATED, VIBRATION NOMINAL\n  - Consistency Assessment: Significant multi-channel residual divergence conflicts with healthy nominal engine state.\nHealth Evidence (HI = 0.812, State = DEGRADED):\n  - Dominant Degraded Channels: rpm, fuel_flow\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: LOW\nSummary: Significant multi-channel residual divergence conflicts with healthy nominal engine state.",
+            "execution_latency_ms": 62.619
+          },
+          {
+            "timestamp": 2.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "ANOMALY",
+            "anomaly_score": 0.7935,
+            "persistence_count": 3,
+            "predicted_fault_class": "fuel_injection_abnormality",
+            "diagnostic_confidence": 0.5874,
+            "raw_health_index": 0.9879,
+            "smoothed_health_index": 0.8386,
+            "health_state": "DEGRADED",
+            "degradation_trend": "INSUFFICIENT_HISTORY",
+            "dominant_channels": [],
+            "forecast_status": "BUFFERING",
+            "forecast_source": "TIMESFM_OR_BASELINE",
+            "forecast_horizon": 16,
+            "rul_state": "INSUFFICIENT_HISTORY",
+            "point_rul_seconds": null,
+            "limiting_factor": "INSUFFICIENT_HISTORY",
+            "explainability_quality": "MEDIUM",
+            "advisory_action": "ADVISORY_CAUTION",
+            "recommended_action": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 58.7%):\n  - fuel_flow_norm_residual: 0.56 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: 1.72 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 1.63 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: PARTIALLY_SUPPORTED\n  - Observed Signatures: EGT ELEVATED, FUEL_FLOW NOMINAL\n  - Consistency Assessment: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.\nHealth Evidence (HI = 0.839, State = DEGRADED):\n  - No dominant degraded channels (system within nominal operating limits).\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: MEDIUM\nSummary: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.",
+            "execution_latency_ms": 57.328
+          }
+        ],
+        "last_3": [
+          {
+            "timestamp": 117.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "ANOMALY",
+            "anomaly_score": 0.75,
+            "persistence_count": 89,
+            "predicted_fault_class": "fuel_injection_abnormality",
+            "diagnostic_confidence": 0.5887,
+            "raw_health_index": 0.9571,
+            "smoothed_health_index": 0.9615,
+            "health_state": "HEALTHY",
+            "degradation_trend": "STABLE",
+            "dominant_channels": [
+              "egt"
+            ],
+            "forecast_status": "BLOCKED_UNAUTHENTICATED_GATED",
+            "forecast_source": "timesfm-3.0",
+            "forecast_horizon": 16,
+            "rul_state": "NOT_DEGRADING",
+            "point_rul_seconds": null,
+            "limiting_factor": "NONE",
+            "explainability_quality": "MEDIUM",
+            "advisory_action": "ADVISORY_CAUTION",
+            "recommended_action": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 58.9%):\n  - fuel_flow_norm_residual: -1.21 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: -0.88 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 2.44 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: PARTIALLY_SUPPORTED\n  - Observed Signatures: EGT ELEVATED, FUEL_FLOW NOMINAL\n  - Consistency Assessment: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.\nHealth Evidence (HI = 0.962, State = HEALTHY):\n  - Dominant Degraded Channels: egt\nTemporal Evidence: STABLE (Rate: 0.00000/s, Trend: STABLE)\nPrognostic RUL: Unavailable | Status: NOT_DEGRADING\nOverall Evidence Consistency: MEDIUM\nSummary: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.",
+            "execution_latency_ms": 52.41
+          },
+          {
+            "timestamp": 118.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "ANOMALY",
+            "anomaly_score": 0.75,
+            "persistence_count": 90,
+            "predicted_fault_class": "fuel_injection_abnormality",
+            "diagnostic_confidence": 0.5885,
+            "raw_health_index": 0.9727,
+            "smoothed_health_index": 0.9631,
+            "health_state": "HEALTHY",
+            "degradation_trend": "STABLE",
+            "dominant_channels": [],
+            "forecast_status": "BLOCKED_UNAUTHENTICATED_GATED",
+            "forecast_source": "timesfm-3.0",
+            "forecast_horizon": 16,
+            "rul_state": "NOT_DEGRADING",
+            "point_rul_seconds": null,
+            "limiting_factor": "NONE",
+            "explainability_quality": "MEDIUM",
+            "advisory_action": "ADVISORY_CAUTION",
+            "recommended_action": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 58.9%):\n  - fuel_flow_norm_residual: -1.37 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: -0.89 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 2.10 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: PARTIALLY_SUPPORTED\n  - Observed Signatures: EGT ELEVATED, FUEL_FLOW NOMINAL\n  - Consistency Assessment: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.\nHealth Evidence (HI = 0.963, State = HEALTHY):\n  - No dominant degraded channels (system within nominal operating limits).\nTemporal Evidence: STABLE (Rate: 0.00016/s, Trend: STABLE)\nPrognostic RUL: Unavailable | Status: NOT_DEGRADING\nOverall Evidence Consistency: MEDIUM\nSummary: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.",
+            "execution_latency_ms": 54.27
+          },
+          {
+            "timestamp": 119.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "ANOMALY",
+            "anomaly_score": 0.75,
+            "persistence_count": 91,
+            "predicted_fault_class": "fuel_injection_abnormality",
+            "diagnostic_confidence": 0.5887,
+            "raw_health_index": 0.955,
+            "smoothed_health_index": 0.9619,
+            "health_state": "HEALTHY",
+            "degradation_trend": "STABLE",
+            "dominant_channels": [
+              "egt"
+            ],
+            "forecast_status": "BLOCKED_UNAUTHENTICATED_GATED",
+            "forecast_source": "timesfm-3.0",
+            "forecast_horizon": 16,
+            "rul_state": "NOT_DEGRADING",
+            "point_rul_seconds": null,
+            "limiting_factor": "NONE",
+            "explainability_quality": "MEDIUM",
+            "advisory_action": "ADVISORY_CAUTION",
+            "recommended_action": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 58.9%):\n  - fuel_flow_norm_residual: -1.24 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: -0.93 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 2.48 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: PARTIALLY_SUPPORTED\n  - Observed Signatures: EGT ELEVATED, FUEL_FLOW NOMINAL\n  - Consistency Assessment: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.\nHealth Evidence (HI = 0.962, State = HEALTHY):\n  - Dominant Degraded Channels: egt\nTemporal Evidence: STABLE (Rate: -0.00007/s, Trend: STABLE)\nPrognostic RUL: Unavailable | Status: NOT_DEGRADING\nOverall Evidence Consistency: MEDIUM\nSummary: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.",
+            "execution_latency_ms": 55.803
+          }
+        ]
+      }
+    },
+    "mechanical_degradation": {
+      "scenario_name": "mechanical_degradation",
+      "duration_s": 120.0,
+      "fault_type": "mechanical_degradation",
+      "fault_start_s": 15.0,
+      "fault_severity": 0.6,
+      "total_timesteps": 120,
+      "total_wall_time_s": 9.74,
+      "latency_stats": {
+        "all_steps": {
+          "sample_count": 120,
+          "mean_ms": 80.177,
+          "median_p50_ms": 78.852,
+          "p95_ms": 99.71,
+          "p99_ms": 157.461,
+          "min_ms": 48.694,
+          "max_ms": 179.653,
+          "std_ms": 17.527
+        },
+        "steady_state": {
+          "sample_count": 110,
+          "mean_ms": 82.338,
+          "median_p50_ms": 79.5,
+          "p95_ms": 101.955,
+          "p99_ms": 160.642,
+          "min_ms": 55.878,
+          "max_ms": 179.653,
+          "std_ms": 16.34
+        },
+        "warmup_excluded_steps": 10
+      },
+      "anomaly_detection": {
+        "post_fault_anomaly_rate": 1.0,
+        "post_fault_anomaly_count": 100,
+        "post_fault_total_steps": 100,
+        "final_anomaly_status": "ANOMALY",
+        "final_anomaly_score": 0.8113,
+        "expected_anomaly_at_end": true
+      },
+      "fault_classification": {
+        "expected_class": "mechanical_degradation",
+        "final_predicted_class": "mechanical_degradation",
+        "final_confidence": 0.2824,
+        "last_10_accuracy": 1.0
+      },
+      "health_index": {
+        "hi_start": 0.956,
+        "hi_end": 0.931,
+        "hi_delta": -0.025,
+        "final_health_state": "HEALTHY",
+        "final_degradation_trend": "STABLE",
+        "dominant_channels": [
+          "vibration"
+        ]
+      },
+      "rul_prognostics": {
+        "rul_available_count": 0,
+        "final_rul_state": "NOT_DEGRADING",
+        "final_point_rul_s": null,
+        "final_limiting_factor": "NONE",
+        "rul_trajectory_sample": []
+      },
+      "forecasting": {
+        "final_forecast_status": "BLOCKED_UNAUTHENTICATED_GATED",
+        "final_forecast_source": "timesfm-3.0",
+        "final_forecast_horizon": 16
+      },
+      "explainability": {
+        "final_quality": "HIGH"
+      },
+      "advisory": {
+        "final_action": "ADVISORY_CAUTION",
+        "final_recommendation": "Diagnosis: MECHANICAL_DEGRADATION\nML Evidence (Confidence: 28.2%):\n  - vibration_norm_residual: 3.23 (SHAP attribution: +2.780, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: -0.17 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 0.10 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: SUPPORTED\n  - Observed Signatures: VIBRATION ELEVATED\n  - Consistency Assessment: Elevated structural vibration residual is consistent with mechanical degradation and structural unbalance.\nHealth Evidence (HI = 0.931, State = HEALTHY):\n  - Dominant Degraded Channels: vibration\nTemporal Evidence: STABLE (Rate: -0.00014/s, Trend: STABLE)\nPrognostic RUL: Unavailable | Status: NOT_DEGRADING\nOverall Evidence Consistency: HIGH\nSummary: Elevated structural vibration residual is consistent with mechanical degradation and structural unbalance."
+      },
+      "timestep_trail": {
+        "first_3": [
+          {
+            "timestamp": 0.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "ANOMALY",
+            "anomaly_score": 0.9,
+            "persistence_count": 1,
+            "predicted_fault_class": "sensor_fault",
+            "diagnostic_confidence": 0.2643,
+            "raw_health_index": 0.8042,
+            "smoothed_health_index": 0.8042,
+            "health_state": "DEGRADED",
+            "degradation_trend": "INSUFFICIENT_HISTORY",
+            "dominant_channels": [
+              "rpm",
+              "oil_pressure",
+              "fuel_flow"
+            ],
+            "forecast_status": "BUFFERING",
+            "forecast_source": "TIMESFM_OR_BASELINE",
+            "forecast_horizon": 16,
+            "rul_state": "INSUFFICIENT_HISTORY",
+            "point_rul_seconds": null,
+            "limiting_factor": "INSUFFICIENT_HISTORY",
+            "explainability_quality": "LOW",
+            "advisory_action": "ADVISORY_CAUTION",
+            "recommended_action": "Diagnosis: SENSOR_FAULT\nML Evidence (Confidence: 26.4%):\n  - load: 63.50 (SHAP attribution: -0.743, AWAY_FROM_PREDICTED_CLASS)\n  - rpm_norm_residual: 17.67 (SHAP attribution: -0.265, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 1.46 (SHAP attribution: -0.207, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: RPM ELEVATED, OIL_PRESSURE ELEVATED, FUEL_FLOW ELEVATED\n  - Consistency Assessment: Multi-channel physical residual divergence is consistent with physical engine degradation rather than single-sensor failure.\nHealth Evidence (HI = 0.804, State = DEGRADED):\n  - Dominant Degraded Channels: rpm, oil_pressure, fuel_flow\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: LOW\nSummary: Multi-channel physical residual divergence is consistent with physical engine degradation rather than single-sensor failure.",
+            "execution_latency_ms": 55.071
+          },
+          {
+            "timestamp": 1.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "ANOMALY",
+            "anomaly_score": 0.9,
+            "persistence_count": 2,
+            "predicted_fault_class": "none",
+            "diagnostic_confidence": 0.3281,
+            "raw_health_index": 0.8578,
+            "smoothed_health_index": 0.8122,
+            "health_state": "DEGRADED",
+            "degradation_trend": "INSUFFICIENT_HISTORY",
+            "dominant_channels": [
+              "rpm",
+              "fuel_flow"
+            ],
+            "forecast_status": "BUFFERING",
+            "forecast_source": "TIMESFM_OR_BASELINE",
+            "forecast_horizon": 16,
+            "rul_state": "INSUFFICIENT_HISTORY",
+            "point_rul_seconds": null,
+            "limiting_factor": "INSUFFICIENT_HISTORY",
+            "explainability_quality": "LOW",
+            "advisory_action": "ADVISORY_CAUTION",
+            "recommended_action": "Diagnosis: NONE\nML Evidence (Confidence: 32.8%):\n  - fuel_flow_norm_residual: 2.29 (SHAP attribution: -0.535, AWAY_FROM_PREDICTED_CLASS)\n  - load: 68.70 (SHAP attribution: -0.137, AWAY_FROM_PREDICTED_CLASS)\n  - vibration_norm_residual: 0.56 (SHAP attribution: +0.134, TOWARD_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: RPM ELEVATED, CHT NOMINAL, EGT ELEVATED, OIL_TEMP NOMINAL, OIL_PRESSURE NOMINAL, FUEL_FLOW ELEVATED, VIBRATION NOMINAL\n  - Consistency Assessment: Significant multi-channel residual divergence conflicts with healthy nominal engine state.\nHealth Evidence (HI = 0.812, State = DEGRADED):\n  - Dominant Degraded Channels: rpm, fuel_flow\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: LOW\nSummary: Significant multi-channel residual divergence conflicts with healthy nominal engine state.",
+            "execution_latency_ms": 48.694
+          },
+          {
+            "timestamp": 2.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "ANOMALY",
+            "anomaly_score": 0.7935,
+            "persistence_count": 3,
+            "predicted_fault_class": "fuel_injection_abnormality",
+            "diagnostic_confidence": 0.5874,
+            "raw_health_index": 0.9879,
+            "smoothed_health_index": 0.8386,
+            "health_state": "DEGRADED",
+            "degradation_trend": "INSUFFICIENT_HISTORY",
+            "dominant_channels": [],
+            "forecast_status": "BUFFERING",
+            "forecast_source": "TIMESFM_OR_BASELINE",
+            "forecast_horizon": 16,
+            "rul_state": "INSUFFICIENT_HISTORY",
+            "point_rul_seconds": null,
+            "limiting_factor": "INSUFFICIENT_HISTORY",
+            "explainability_quality": "MEDIUM",
+            "advisory_action": "ADVISORY_CAUTION",
+            "recommended_action": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 58.7%):\n  - fuel_flow_norm_residual: 0.56 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: 1.72 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 1.63 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: PARTIALLY_SUPPORTED\n  - Observed Signatures: EGT ELEVATED, FUEL_FLOW NOMINAL\n  - Consistency Assessment: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.\nHealth Evidence (HI = 0.839, State = DEGRADED):\n  - No dominant degraded channels (system within nominal operating limits).\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: MEDIUM\nSummary: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.",
+            "execution_latency_ms": 49.357
+          }
+        ],
+        "last_3": [
+          {
+            "timestamp": 117.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "ANOMALY",
+            "anomaly_score": 0.77,
+            "persistence_count": 103,
+            "predicted_fault_class": "mechanical_degradation",
+            "diagnostic_confidence": 0.2824,
+            "raw_health_index": 0.9282,
+            "smoothed_health_index": 0.9311,
+            "health_state": "HEALTHY",
+            "degradation_trend": "STABLE",
+            "dominant_channels": [
+              "vibration"
+            ],
+            "forecast_status": "BLOCKED_UNAUTHENTICATED_GATED",
+            "forecast_source": "timesfm-3.0",
+            "forecast_horizon": 16,
+            "rul_state": "NOT_DEGRADING",
+            "point_rul_seconds": null,
+            "limiting_factor": "NONE",
+            "explainability_quality": "HIGH",
+            "advisory_action": "ADVISORY_CAUTION",
+            "recommended_action": "Diagnosis: MECHANICAL_DEGRADATION\nML Evidence (Confidence: 28.2%):\n  - vibration_norm_residual: 3.29 (SHAP attribution: +2.780, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: -0.12 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 0.06 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: SUPPORTED\n  - Observed Signatures: VIBRATION ELEVATED\n  - Consistency Assessment: Elevated structural vibration residual is consistent with mechanical degradation and structural unbalance.\nHealth Evidence (HI = 0.931, State = HEALTHY):\n  - Dominant Degraded Channels: vibration\nTemporal Evidence: STABLE (Rate: -0.00008/s, Trend: STABLE)\nPrognostic RUL: Unavailable | Status: NOT_DEGRADING\nOverall Evidence Consistency: HIGH\nSummary: Elevated structural vibration residual is consistent with mechanical degradation and structural unbalance.",
+            "execution_latency_ms": 76.632
+          },
+          {
+            "timestamp": 118.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "ANOMALY",
+            "anomaly_score": 0.8033,
+            "persistence_count": 104,
+            "predicted_fault_class": "mechanical_degradation",
+            "diagnostic_confidence": 0.2824,
+            "raw_health_index": 0.9306,
+            "smoothed_health_index": 0.931,
+            "health_state": "HEALTHY",
+            "degradation_trend": "STABLE",
+            "dominant_channels": [
+              "vibration"
+            ],
+            "forecast_status": "BLOCKED_UNAUTHENTICATED_GATED",
+            "forecast_source": "timesfm-3.0",
+            "forecast_horizon": 16,
+            "rul_state": "NOT_DEGRADING",
+            "point_rul_seconds": null,
+            "limiting_factor": "NONE",
+            "explainability_quality": "HIGH",
+            "advisory_action": "ADVISORY_CAUTION",
+            "recommended_action": "Diagnosis: MECHANICAL_DEGRADATION\nML Evidence (Confidence: 28.2%):\n  - vibration_norm_residual: 3.23 (SHAP attribution: +2.780, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: -0.14 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: -0.28 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: SUPPORTED\n  - Observed Signatures: VIBRATION ELEVATED\n  - Consistency Assessment: Elevated structural vibration residual is consistent with mechanical degradation and structural unbalance.\nHealth Evidence (HI = 0.931, State = HEALTHY):\n  - Dominant Degraded Channels: vibration\nTemporal Evidence: STABLE (Rate: -0.00014/s, Trend: STABLE)\nPrognostic RUL: Unavailable | Status: NOT_DEGRADING\nOverall Evidence Consistency: HIGH\nSummary: Elevated structural vibration residual is consistent with mechanical degradation and structural unbalance.",
+            "execution_latency_ms": 78.609
+          },
+          {
+            "timestamp": 119.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "ANOMALY",
+            "anomaly_score": 0.8113,
+            "persistence_count": 105,
+            "predicted_fault_class": "mechanical_degradation",
+            "diagnostic_confidence": 0.2824,
+            "raw_health_index": 0.9306,
+            "smoothed_health_index": 0.931,
+            "health_state": "HEALTHY",
+            "degradation_trend": "STABLE",
+            "dominant_channels": [
+              "vibration"
+            ],
+            "forecast_status": "BLOCKED_UNAUTHENTICATED_GATED",
+            "forecast_source": "timesfm-3.0",
+            "forecast_horizon": 16,
+            "rul_state": "NOT_DEGRADING",
+            "point_rul_seconds": null,
+            "limiting_factor": "NONE",
+            "explainability_quality": "HIGH",
+            "advisory_action": "ADVISORY_CAUTION",
+            "recommended_action": "Diagnosis: MECHANICAL_DEGRADATION\nML Evidence (Confidence: 28.2%):\n  - vibration_norm_residual: 3.23 (SHAP attribution: +2.780, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: -0.17 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 0.10 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: SUPPORTED\n  - Observed Signatures: VIBRATION ELEVATED\n  - Consistency Assessment: Elevated structural vibration residual is consistent with mechanical degradation and structural unbalance.\nHealth Evidence (HI = 0.931, State = HEALTHY):\n  - Dominant Degraded Channels: vibration\nTemporal Evidence: STABLE (Rate: -0.00014/s, Trend: STABLE)\nPrognostic RUL: Unavailable | Status: NOT_DEGRADING\nOverall Evidence Consistency: HIGH\nSummary: Elevated structural vibration residual is consistent with mechanical degradation and structural unbalance.",
+            "execution_latency_ms": 78.798
+          }
+        ]
+      }
+    },
+    "sensor_fault": {
+      "scenario_name": "sensor_fault",
+      "duration_s": 120.0,
+      "fault_type": "sensor_fault",
+      "fault_start_s": 15.0,
+      "fault_severity": 0.6,
+      "total_timesteps": 120,
+      "total_wall_time_s": 9.41,
+      "latency_stats": {
+        "all_steps": {
+          "sample_count": 120,
+          "mean_ms": 77.315,
+          "median_p50_ms": 76.965,
+          "p95_ms": 80.729,
+          "p99_ms": 94.988,
+          "min_ms": 72.523,
+          "max_ms": 132.162,
+          "std_ms": 5.872
+        },
+        "steady_state": {
+          "sample_count": 110,
+          "mean_ms": 77.583,
+          "median_p50_ms": 76.999,
+          "p95_ms": 81.17,
+          "p99_ms": 95.56,
+          "min_ms": 72.523,
+          "max_ms": 132.162,
+          "std_ms": 6.035
+        },
+        "warmup_excluded_steps": 10
+      },
+      "anomaly_detection": {
+        "post_fault_anomaly_rate": 0.0,
+        "post_fault_anomaly_count": 0,
+        "post_fault_total_steps": 100,
+        "final_anomaly_status": "NORMAL",
+        "final_anomaly_score": 0.1541,
+        "expected_anomaly_at_end": true
+      },
+      "fault_classification": {
+        "expected_class": "sensor_fault",
+        "final_predicted_class": "none",
+        "final_confidence": 1.0,
+        "last_10_accuracy": 0.0
+      },
+      "health_index": {
+        "hi_start": 0.956,
+        "hi_end": 1.0,
+        "hi_delta": 0.044,
+        "final_health_state": "HEALTHY",
+        "final_degradation_trend": "STABLE",
+        "dominant_channels": []
+      },
+      "rul_prognostics": {
+        "rul_available_count": 0,
+        "final_rul_state": "NOT_DEGRADING",
+        "final_point_rul_s": null,
+        "final_limiting_factor": "NONE",
+        "rul_trajectory_sample": []
+      },
+      "forecasting": {
+        "final_forecast_status": "BLOCKED_UNAUTHENTICATED_GATED",
+        "final_forecast_source": "timesfm-3.0",
+        "final_forecast_horizon": 16
+      },
+      "explainability": {
+        "final_quality": "HIGH"
+      },
+      "advisory": {
+        "final_action": "NORMAL_MONITORING",
+        "final_recommendation": "Continue nominal flight monitoring."
+      },
+      "timestep_trail": {
+        "first_3": [
+          {
+            "timestamp": 0.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "ANOMALY",
+            "anomaly_score": 0.9,
+            "persistence_count": 1,
+            "predicted_fault_class": "sensor_fault",
+            "diagnostic_confidence": 0.2643,
+            "raw_health_index": 0.8042,
+            "smoothed_health_index": 0.8042,
+            "health_state": "DEGRADED",
+            "degradation_trend": "INSUFFICIENT_HISTORY",
+            "dominant_channels": [
+              "rpm",
+              "oil_pressure",
+              "fuel_flow"
+            ],
+            "forecast_status": "BUFFERING",
+            "forecast_source": "TIMESFM_OR_BASELINE",
+            "forecast_horizon": 16,
+            "rul_state": "INSUFFICIENT_HISTORY",
+            "point_rul_seconds": null,
+            "limiting_factor": "INSUFFICIENT_HISTORY",
+            "explainability_quality": "LOW",
+            "advisory_action": "ADVISORY_CAUTION",
+            "recommended_action": "Diagnosis: SENSOR_FAULT\nML Evidence (Confidence: 26.4%):\n  - load: 63.50 (SHAP attribution: -0.743, AWAY_FROM_PREDICTED_CLASS)\n  - rpm_norm_residual: 17.67 (SHAP attribution: -0.265, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 1.46 (SHAP attribution: -0.207, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: RPM ELEVATED, OIL_PRESSURE ELEVATED, FUEL_FLOW ELEVATED\n  - Consistency Assessment: Multi-channel physical residual divergence is consistent with physical engine degradation rather than single-sensor failure.\nHealth Evidence (HI = 0.804, State = DEGRADED):\n  - Dominant Degraded Channels: rpm, oil_pressure, fuel_flow\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: LOW\nSummary: Multi-channel physical residual divergence is consistent with physical engine degradation rather than single-sensor failure.",
+            "execution_latency_ms": 79.932
+          },
+          {
+            "timestamp": 1.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "ANOMALY",
+            "anomaly_score": 0.9,
+            "persistence_count": 2,
+            "predicted_fault_class": "none",
+            "diagnostic_confidence": 0.3281,
+            "raw_health_index": 0.8578,
+            "smoothed_health_index": 0.8122,
+            "health_state": "DEGRADED",
+            "degradation_trend": "INSUFFICIENT_HISTORY",
+            "dominant_channels": [
+              "rpm",
+              "fuel_flow"
+            ],
+            "forecast_status": "BUFFERING",
+            "forecast_source": "TIMESFM_OR_BASELINE",
+            "forecast_horizon": 16,
+            "rul_state": "INSUFFICIENT_HISTORY",
+            "point_rul_seconds": null,
+            "limiting_factor": "INSUFFICIENT_HISTORY",
+            "explainability_quality": "LOW",
+            "advisory_action": "ADVISORY_CAUTION",
+            "recommended_action": "Diagnosis: NONE\nML Evidence (Confidence: 32.8%):\n  - fuel_flow_norm_residual: 2.29 (SHAP attribution: -0.535, AWAY_FROM_PREDICTED_CLASS)\n  - load: 68.70 (SHAP attribution: -0.137, AWAY_FROM_PREDICTED_CLASS)\n  - vibration_norm_residual: 0.56 (SHAP attribution: +0.134, TOWARD_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: RPM ELEVATED, CHT NOMINAL, EGT ELEVATED, OIL_TEMP NOMINAL, OIL_PRESSURE NOMINAL, FUEL_FLOW ELEVATED, VIBRATION NOMINAL\n  - Consistency Assessment: Significant multi-channel residual divergence conflicts with healthy nominal engine state.\nHealth Evidence (HI = 0.812, State = DEGRADED):\n  - Dominant Degraded Channels: rpm, fuel_flow\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: LOW\nSummary: Significant multi-channel residual divergence conflicts with healthy nominal engine state.",
+            "execution_latency_ms": 73.453
+          },
+          {
+            "timestamp": 2.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "ANOMALY",
+            "anomaly_score": 0.7935,
+            "persistence_count": 3,
+            "predicted_fault_class": "fuel_injection_abnormality",
+            "diagnostic_confidence": 0.5874,
+            "raw_health_index": 0.9879,
+            "smoothed_health_index": 0.8386,
+            "health_state": "DEGRADED",
+            "degradation_trend": "INSUFFICIENT_HISTORY",
+            "dominant_channels": [],
+            "forecast_status": "BUFFERING",
+            "forecast_source": "TIMESFM_OR_BASELINE",
+            "forecast_horizon": 16,
+            "rul_state": "INSUFFICIENT_HISTORY",
+            "point_rul_seconds": null,
+            "limiting_factor": "INSUFFICIENT_HISTORY",
+            "explainability_quality": "MEDIUM",
+            "advisory_action": "ADVISORY_CAUTION",
+            "recommended_action": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 58.7%):\n  - fuel_flow_norm_residual: 0.56 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: 1.72 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 1.63 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: PARTIALLY_SUPPORTED\n  - Observed Signatures: EGT ELEVATED, FUEL_FLOW NOMINAL\n  - Consistency Assessment: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.\nHealth Evidence (HI = 0.839, State = DEGRADED):\n  - No dominant degraded channels (system within nominal operating limits).\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: MEDIUM\nSummary: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.",
+            "execution_latency_ms": 74.468
+          }
+        ],
+        "last_3": [
+          {
+            "timestamp": 117.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "NORMAL",
+            "anomaly_score": 0.1318,
+            "persistence_count": 0,
+            "predicted_fault_class": "none",
+            "diagnostic_confidence": 1.0,
+            "raw_health_index": 1.0,
+            "smoothed_health_index": 1.0,
+            "health_state": "HEALTHY",
+            "degradation_trend": "STABLE",
+            "dominant_channels": [],
+            "forecast_status": "BLOCKED_UNAUTHENTICATED_GATED",
+            "forecast_source": "timesfm-3.0",
+            "forecast_horizon": 16,
+            "rul_state": "NOT_DEGRADING",
+            "point_rul_seconds": null,
+            "limiting_factor": "NONE",
+            "explainability_quality": "HIGH",
+            "advisory_action": "NORMAL_MONITORING",
+            "recommended_action": "Continue nominal flight monitoring.",
+            "execution_latency_ms": 76.936
+          },
+          {
+            "timestamp": 118.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "NORMAL",
+            "anomaly_score": 0.1544,
+            "persistence_count": 0,
+            "predicted_fault_class": "none",
+            "diagnostic_confidence": 1.0,
+            "raw_health_index": 1.0,
+            "smoothed_health_index": 1.0,
+            "health_state": "HEALTHY",
+            "degradation_trend": "STABLE",
+            "dominant_channels": [],
+            "forecast_status": "BLOCKED_UNAUTHENTICATED_GATED",
+            "forecast_source": "timesfm-3.0",
+            "forecast_horizon": 16,
+            "rul_state": "NOT_DEGRADING",
+            "point_rul_seconds": null,
+            "limiting_factor": "NONE",
+            "explainability_quality": "HIGH",
+            "advisory_action": "NORMAL_MONITORING",
+            "recommended_action": "Continue nominal flight monitoring.",
+            "execution_latency_ms": 77.055
+          },
+          {
+            "timestamp": 119.0,
+            "engine_id": "ENGINE_UAV_01",
+            "mission_id": "MISSION_MALE_UAV_001",
+            "mission_phase": "CRUISE",
+            "anomaly_status": "NORMAL",
+            "anomaly_score": 0.1541,
+            "persistence_count": 0,
+            "predicted_fault_class": "none",
+            "diagnostic_confidence": 1.0,
+            "raw_health_index": 1.0,
+            "smoothed_health_index": 1.0,
+            "health_state": "HEALTHY",
+            "degradation_trend": "STABLE",
+            "dominant_channels": [],
+            "forecast_status": "BLOCKED_UNAUTHENTICATED_GATED",
+            "forecast_source": "timesfm-3.0",
+            "forecast_horizon": 16,
+            "rul_state": "NOT_DEGRADING",
+            "point_rul_seconds": null,
+            "limiting_factor": "NONE",
+            "explainability_quality": "HIGH",
+            "advisory_action": "NORMAL_MONITORING",
+            "recommended_action": "Continue nominal flight monitoring.",
+            "execution_latency_ms": 75.867
+          }
+        ]
+      }
+    }
+  },
+  "claims_validation": {
+    "claims": [
+      {
+        "claim_id": "RT-001",
+        "claim": "Per-step inference latency < 200ms (real-time at 1 Hz)",
+        "metric": "global_mean_latency_ms",
+        "value": 62.51,
+        "threshold": 200.0,
+        "passed": "True",
+        "evidence": "Mean=62.51ms across all scenarios, worst P99=160.64ms"
+      },
+      {
+        "claim_id": "RT-002",
+        "claim": "P99 latency < 200ms",
+        "metric": "worst_p99_latency_ms",
+        "value": 160.64,
+        "threshold": 200.0,
+        "passed": true,
+        "evidence": "Worst-case P99=160.64ms across all scenarios"
+      },
+      {
+        "claim_id": "FP-001",
+        "claim": "Healthy scenario produces NORMAL anomaly status (no false alarm at end)",
+        "metric": "healthy_final_status",
+        "value": "NORMAL",
+        "threshold": "NORMAL",
+        "passed": true,
+        "evidence": "Final anomaly status=NORMAL"
+      },
+      {
+        "claim_id": "AD-COOL",
+        "claim": "cooling_degradation: anomaly detection rate > 0 post-fault",
+        "metric": "post_fault_anomaly_detection_rate",
+        "value": 0.87,
+        "threshold": 0.0,
+        "passed": true,
+        "evidence": "Post-fault anomaly detection rate=87.0%"
+      },
+      {
+        "claim_id": "AD-LUBR",
+        "claim": "lubrication_degradation: anomaly detection rate > 0 post-fault",
+        "metric": "post_fault_anomaly_detection_rate",
+        "value": 0.98,
+        "threshold": 0.0,
+        "passed": true,
+        "evidence": "Post-fault anomaly detection rate=98.0%"
+      },
+      {
+        "claim_id": "AD-FUEL",
+        "claim": "fuel_abnormality: anomaly detection rate > 0 post-fault",
+        "metric": "post_fault_anomaly_detection_rate",
+        "value": 0.89,
+        "threshold": 0.0,
+        "passed": true,
+        "evidence": "Post-fault anomaly detection rate=89.0%"
+      },
+      {
+        "claim_id": "AD-MECH",
+        "claim": "mechanical_degradation: anomaly detection rate > 0 post-fault",
+        "metric": "post_fault_anomaly_detection_rate",
+        "value": 1.0,
+        "threshold": 0.0,
+        "passed": true,
+        "evidence": "Post-fault anomaly detection rate=100.0%"
+      },
+      {
+        "claim_id": "AD-SENS",
+        "claim": "sensor_fault: anomaly detection rate > 0 post-fault",
+        "metric": "post_fault_anomaly_detection_rate",
+        "value": 0.0,
+        "threshold": 0.0,
+        "passed": false,
+        "evidence": "Post-fault anomaly detection rate=0.0%"
+      },
+      {
+        "claim_id": "FC-COOL",
+        "claim": "cooling_degradation: fault classification accuracy > 0.5 in last 10 steps",
+        "metric": "last_10_fault_classification_accuracy",
+        "value": 0.0,
+        "threshold": 0.5,
+        "passed": false,
+        "evidence": "Accuracy=0.0%, expected=cooling_degradation, predicted=fuel_injection_abnormality"
+      },
+      {
+        "claim_id": "FC-LUBR",
+        "claim": "lubrication_degradation: fault classification accuracy > 0.5 in last 10 steps",
+        "metric": "last_10_fault_classification_accuracy",
+        "value": 0.0,
+        "threshold": 0.5,
+        "passed": false,
+        "evidence": "Accuracy=0.0%, expected=lubrication_degradation, predicted=fuel_injection_abnormality"
+      },
+      {
+        "claim_id": "FC-FUEL",
+        "claim": "fuel_abnormality: fault classification accuracy > 0.5 in last 10 steps",
+        "metric": "last_10_fault_classification_accuracy",
+        "value": 1.0,
+        "threshold": 0.5,
+        "passed": true,
+        "evidence": "Accuracy=100.0%, expected=fuel_injection_abnormality, predicted=fuel_injection_abnormality"
+      },
+      {
+        "claim_id": "FC-MECH",
+        "claim": "mechanical_degradation: fault classification accuracy > 0.5 in last 10 steps",
+        "metric": "last_10_fault_classification_accuracy",
+        "value": 1.0,
+        "threshold": 0.5,
+        "passed": true,
+        "evidence": "Accuracy=100.0%, expected=mechanical_degradation, predicted=mechanical_degradation"
+      },
+      {
+        "claim_id": "FC-SENS",
+        "claim": "sensor_fault: fault classification accuracy > 0.5 in last 10 steps",
+        "metric": "last_10_fault_classification_accuracy",
+        "value": 0.0,
+        "threshold": 0.5,
+        "passed": false,
+        "evidence": "Accuracy=0.0%, expected=sensor_fault, predicted=none"
+      },
+      {
+        "claim_id": "HI-COOL",
+        "claim": "cooling_degradation: health index decreases during fault injection",
+        "metric": "hi_delta",
+        "value": -0.0518,
+        "threshold": "< 0.0",
+        "passed": true,
+        "evidence": "HI start=0.956, end=0.9042, delta=-0.0518"
+      },
+      {
+        "claim_id": "HI-LUBR",
+        "claim": "lubrication_degradation: health index decreases during fault injection",
+        "metric": "hi_delta",
+        "value": -0.0512,
+        "threshold": "< 0.0",
+        "passed": true,
+        "evidence": "HI start=0.956, end=0.9048, delta=-0.0512"
+      },
+      {
+        "claim_id": "HI-FUEL",
+        "claim": "fuel_abnormality: health index decreases during fault injection",
+        "metric": "hi_delta",
+        "value": 0.0059,
+        "threshold": "< 0.0",
+        "passed": false,
+        "evidence": "HI start=0.956, end=0.9619, delta=0.0059"
+      },
+      {
+        "claim_id": "HI-MECH",
+        "claim": "mechanical_degradation: health index decreases during fault injection",
+        "metric": "hi_delta",
+        "value": -0.025,
+        "threshold": "< 0.0",
+        "passed": true,
+        "evidence": "HI start=0.956, end=0.931, delta=-0.025"
+      },
+      {
+        "claim_id": "XAI-HEAL",
+        "claim": "healthy: explainability generates quality assessment",
+        "metric": "explainability_quality",
+        "value": "HIGH",
+        "threshold": "not None",
+        "passed": true,
+        "evidence": "Quality=HIGH"
+      },
+      {
+        "claim_id": "XAI-COOL",
+        "claim": "cooling_degradation: explainability generates quality assessment",
+        "metric": "explainability_quality",
+        "value": "LOW",
+        "threshold": "not None",
+        "passed": true,
+        "evidence": "Quality=LOW"
+      },
+      {
+        "claim_id": "XAI-LUBR",
+        "claim": "lubrication_degradation: explainability generates quality assessment",
+        "metric": "explainability_quality",
+        "value": "LOW",
+        "threshold": "not None",
+        "passed": true,
+        "evidence": "Quality=LOW"
+      },
+      {
+        "claim_id": "XAI-FUEL",
+        "claim": "fuel_abnormality: explainability generates quality assessment",
+        "metric": "explainability_quality",
+        "value": "MEDIUM",
+        "threshold": "not None",
+        "passed": true,
+        "evidence": "Quality=MEDIUM"
+      },
+      {
+        "claim_id": "XAI-MECH",
+        "claim": "mechanical_degradation: explainability generates quality assessment",
+        "metric": "explainability_quality",
+        "value": "HIGH",
+        "threshold": "not None",
+        "passed": true,
+        "evidence": "Quality=HIGH"
+      },
+      {
+        "claim_id": "XAI-SENS",
+        "claim": "sensor_fault: explainability generates quality assessment",
+        "metric": "explainability_quality",
+        "value": "HIGH",
+        "threshold": "not None",
+        "passed": true,
+        "evidence": "Quality=HIGH"
+      },
+      {
+        "claim_id": "CAUSAL-HEAL",
+        "claim": "healthy: timestamps are monotonically non-decreasing",
+        "metric": "timestamp_monotonicity",
+        "value": true,
+        "threshold": true,
+        "passed": true,
+        "evidence": "Verified across first/last 3 timestep trail"
+      },
+      {
+        "claim_id": "CAUSAL-COOL",
+        "claim": "cooling_degradation: timestamps are monotonically non-decreasing",
+        "metric": "timestamp_monotonicity",
+        "value": true,
+        "threshold": true,
+        "passed": true,
+        "evidence": "Verified across first/last 3 timestep trail"
+      },
+      {
+        "claim_id": "CAUSAL-LUBR",
+        "claim": "lubrication_degradation: timestamps are monotonically non-decreasing",
+        "metric": "timestamp_monotonicity",
+        "value": true,
+        "threshold": true,
+        "passed": true,
+        "evidence": "Verified across first/last 3 timestep trail"
+      },
+      {
+        "claim_id": "CAUSAL-FUEL",
+        "claim": "fuel_abnormality: timestamps are monotonically non-decreasing",
+        "metric": "timestamp_monotonicity",
+        "value": true,
+        "threshold": true,
+        "passed": true,
+        "evidence": "Verified across first/last 3 timestep trail"
+      },
+      {
+        "claim_id": "CAUSAL-MECH",
+        "claim": "mechanical_degradation: timestamps are monotonically non-decreasing",
+        "metric": "timestamp_monotonicity",
+        "value": true,
+        "threshold": true,
+        "passed": true,
+        "evidence": "Verified across first/last 3 timestep trail"
+      },
+      {
+        "claim_id": "CAUSAL-SENS",
+        "claim": "sensor_fault: timestamps are monotonically non-decreasing",
+        "metric": "timestamp_monotonicity",
+        "value": true,
+        "threshold": true,
+        "passed": true,
+        "evidence": "Verified across first/last 3 timestep trail"
+      }
+    ],
+    "summary": {
+      "total_claims": 29,
+      "passed": 24,
+      "failed": 5,
+      "pass_rate": 0.8276
+    }
+  },
+  "architectural_declarations": {
+    "algorithm_freezing": "Phase 13 does not redesign, retune, replace, or modify the algorithms, thresholds, schemas, or training procedures of Phases 1-12. For runtime inference, Phase 13 deterministically bootstraps Phase 7 Isolation Forest and Phase 8 XGBoost model instances using the existing training procedures and synthetic simulator-generated data. This is synthetic bootstrap model fitting, not external-dataset training or algorithm redesign.",
+    "distinctions": {
+      "algorithm_training_procedure_freezing": "Feature schemas, classifier configurations, EWMA thresholds, Theil-Sen estimator rules, and multi-modal fusion equations from Phases 1-12 remain unmodified.",
+      "runtime_model_fitting": "Deterministic synthetic bootstrap fitting is executed on synthetic simulator data with fixed seeds during orchestrator startup.",
+      "pretrained_timesfm_weights": "Gated external model weights remain unauthenticated in the local execution environment, preserving the explicit fallback path (BLOCKED_UNAUTHENTICATED_GATED) without fabricating weights."
+    },
+    "safety_disclaimers": [
+      "All operator recommendations are decision-support aids based on SYNTHETIC simulator telemetry.",
+      "This system is NOT certified for airworthiness, safety-critical, or regulatory compliance use.",
+      "No real-engine validation, OEM calibration, or flight-test data has been used.",
+      "The engine simulator is a reduced-order physics-informed grey-box model, NOT a CFD solver or certified OEM model.",
+      "TimesFM pretrained weights are gated and NOT available in this environment. Forecasting uses deterministic Causal EWMA baseline fallback."
+    ]
+  }
+}
