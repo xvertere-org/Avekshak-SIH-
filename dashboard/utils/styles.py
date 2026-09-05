@@ -43,6 +43,11 @@ PLOT_COLORS = {
 
 AEROSPACE_CSS = """
 <style>
+    /* Hide Streamlit default multipage pages list in favor of custom UI tabs */
+    [data-testid="stSidebarNav"] {
+        display: none !important;
+    }
+
     /* Global Base */
     .stApp {
         background-color: #0b0e14;

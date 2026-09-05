@@ -5,6 +5,15 @@ Authoritative Operator Presentation & Interaction Layer.
 Consumes outputs from Phase 13 via DashboardAdapter.
 """
 
+import os
+import sys
+from pathlib import Path
+
+# Ensure repository root is in sys.path regardless of Streamlit invocation directory
+_PROJECT_ROOT = str(Path(__file__).resolve().parent.parent)
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
+
 from typing import Dict, Any, Optional
 import streamlit as st
 
