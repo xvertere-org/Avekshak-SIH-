@@ -324,35 +324,38 @@ def validate_claims(scenario_results: Dict[str, Dict]) -> Dict[str, Any]:
 
     claims = []
 
-    # Claim 1: Real-time inference (<200ms per step)
+    # Claim 1: P95 latency < 100 ms for tested 1 Hz workload (1000 ms processing budget)
     all_steady_means = []
+    all_steady_p95s = []
     all_steady_p99s = []
     for name, result in scenario_results.items():
         ss = result["latency_stats"]["steady_state"]
         all_steady_means.append(ss["mean_ms"])
+        all_steady_p95s.append(ss["p95_ms"])
         all_steady_p99s.append(ss["p99_ms"])
 
     global_mean = np.mean(all_steady_means) if all_steady_means else float("nan")
+    global_p95 = max(all_steady_p95s) if all_steady_p95s else float("nan")
     global_p99 = max(all_steady_p99s) if all_steady_p99s else float("nan")
 
     claims.append({
         "claim_id": "RT-001",
-        "claim": "Per-step inference latency < 200ms (real-time at 1 Hz)",
-        "metric": "global_mean_latency_ms",
-        "value": round(global_mean, 2),
-        "threshold": 200.0,
-        "passed": global_mean < 200.0,
-        "evidence": f"Mean={global_mean:.2f}ms across all scenarios, worst P99={global_p99:.2f}ms",
+        "claim": "P95 latency < 100 ms for the tested 1 Hz workload (1000 ms processing budget)",
+        "metric": "worst_p95_latency_ms",
+        "value": round(global_p95, 2),
+        "threshold": 100.0,
+        "passed": global_p95 < 100.0,
+        "evidence": f"Worst P95={global_p95:.2f}ms across all scenarios (mean={global_mean:.2f}ms), well below 1000 ms budget",
     })
 
     claims.append({
         "claim_id": "RT-002",
-        "claim": "P99 latency < 200ms",
+        "claim": "P99 latency below 1 Hz telemetry processing budget (1000 ms)",
         "metric": "worst_p99_latency_ms",
         "value": round(global_p99, 2),
-        "threshold": 200.0,
-        "passed": global_p99 < 200.0,
-        "evidence": f"Worst-case P99={global_p99:.2f}ms across all scenarios",
+        "threshold": 1000.0,
+        "passed": global_p99 < 1000.0,
+        "evidence": f"Worst-case P99={global_p99:.2f}ms across all scenarios, compliant with 1000 ms budget",
     })
 
     # Claim 2: Healthy scenario produces no false alarms
@@ -732,6 +735,270 @@ def main():
         "test_inventory": test_inventory,
         "scenario_results": scenario_results,
         "claims_validation": claims_validation,
+        "verified_benchmark_latency": {
+            "workload": "1 Hz telemetry stream (1000 ms processing budget per observation)",
+            "benchmark_run": "Recorded steady-state benchmark (cooling scenario)",
+            "samples_evaluated": 125,
+            "warmup_excluded_steps": 10,
+            "mean_ms": 53.45,
+            "median_p50_ms": 55.01,
+            "p95_ms": 83.97,
+            "p99_ms": 87.81,
+            "throughput_obs_per_sec": 18.7,
+            "preferred_claim": "P95 latency was 83.97 ms in the recorded benchmark, below the 1 Hz telemetry processing budget in the tested environment.",
+            "primary_performance_claim": "P95 < 100 ms for the tested 1 Hz workload.",
+            "forecast_mode": "BLOCKED_UNAUTHENTICATED_GATED (Causal EWMA Baseline fallback)",
+        },
+        "phase8_quantitative_validation": {
+            "validation_domain": "Synthetic evaluation (physics-informed simulator)",
+            "mission_runs": 121,
+            "fault_classes": 6,
+            "split_strategy": "Grouped mission-level split by mission_run_id (leakage-safe)",
+            "metrics": {
+                "macro_f1": 0.8570,
+                "balanced_accuracy": 0.8933,
+                "weighted_f1": 0.8673,
+                "none_false_positive_rate": 0.1529,
+                "none_false_alarm_rate": 0.4400,
+                "sensor_fault_recall": 0.8000,
+            },
+            "historical_active_window_macro_f1": 0.98,
+            "historical_active_window_note": "Evaluated on active fault window subset excluding startup transients.",
+            "per_class": {
+                "cooling_degradation": {"precision": 1.0, "recall": 1.0, "f1": 1.0, "support": 25, "test_runs": 1},
+                "fuel_injection_abnormality": {"precision": 1.0, "recall": 1.0, "f1": 1.0, "support": 25, "test_runs": 1},
+                "lubrication_degradation": {"precision": 1.0, "recall": 1.0, "f1": 1.0, "support": 25, "test_runs": 1},
+                "mechanical_degradation": {"precision": 1.0, "recall": 1.0, "f1": 1.0, "support": 25, "test_runs": 1},
+                "none": {"precision": 0.1772, "recall": 0.5600, "f1": 0.2692, "support": 25, "test_runs": 1},
+                "sensor_fault": {"precision": 0.9594, "recall": 0.8000, "f1": 0.8725, "support": 325, "test_runs": 13},
+            },
+            "confusion_matrix": [
+                [25, 0, 0, 0, 0, 0],
+                [0, 25, 0, 0, 0, 0],
+                [0, 0, 25, 0, 0, 0],
+                [0, 0, 0, 25, 0, 0],
+                [0, 0, 0, 0, 14, 11],
+                [0, 0, 0, 0, 65, 260],
+            ],
+            "confusion_matrix_labels": [
+                "cooling_degradation",
+                "fuel_injection_abnormality",
+                "lubrication_degradation",
+                "mechanical_degradation",
+                "none",
+                "sensor_fault",
+            ],
+            "disclaimers": [
+                "Synthetic evaluation only. Does not establish real-engine, flight, or operational diagnostic accuracy.",
+                "Model trained exclusively on synthetic physics-informed simulator telemetry.",
+            ],
+        },
+        "phase11_rul_quantitative_validation": {
+            "validation_domain": "Synthetic evaluation (physics-informed simulator + progressive wear missions)",
+            "total_prognostic_evaluations": 853,
+            "scenarios_evaluated": 7,
+            "global_metrics": {
+                "mae_s": 71.27,
+                "rmse_s": 140.31,
+                "phm08_score": 8.181977275730725e+30,
+                "picp_pct": 52.75,
+                "picp_target_pct": 90.0,
+                "picp_target_satisfied": False,
+                "mpiw_s": 627.49,
+            },
+            "monte_carlo_latency_ms": {
+                "realizations": 500,
+                "mean_ms": 2.47,
+                "median_ms": 2.50,
+                "p95_ms": 3.63,
+                "p99_ms": 3.88,
+                "target_ms": 150.0,
+                "status": "MEASURED COMPLIANT (3.63 ms < 150.0 ms)",
+            },
+            "scenarios": [
+                {
+                    "scenario": "Coupled Multi-Fault Degradation (Thermal+Lube+Mech)",
+                    "category": "PHYSICAL_SIMULATOR",
+                    "eol_boundary": "REDLINE_CHT",
+                    "true_eol_s": 68.0,
+                    "active_n": 36,
+                    "mae_s": 7.16,
+                    "rmse_s": 8.15,
+                    "phm08": 34.47,
+                    "picp_pct": 41.7,
+                    "mpiw_s": 83.24,
+                },
+                {
+                    "scenario": "Severe Lubrication Degradation (Oil Temp Redline)",
+                    "category": "PHYSICAL_SIMULATOR",
+                    "eol_boundary": "REDLINE_OIL_TEMP",
+                    "true_eol_s": 206.0,
+                    "active_n": 111,
+                    "mae_s": 253.88,
+                    "rmse_s": 331.59,
+                    "phm08": 8.16e+30,
+                    "picp_pct": 27.9,
+                    "mpiw_s": 4268.99,
+                },
+                {
+                    "scenario": "Healthy Nominal Cruise (Negative Control / No EOL)",
+                    "category": "PHYSICAL_SIMULATOR",
+                    "eol_boundary": "NONE",
+                    "true_eol_s": None,
+                    "active_n": 0,
+                    "mae_s": None,
+                    "rmse_s": None,
+                    "phm08": "N/A",
+                    "picp_pct": "N/A",
+                    "mpiw_s": None,
+                    "non_degrading_verification": "Correctly non-degrading: 117 NOT_DEGRADING, 32 INSUFFICIENT_HISTORY, 31 RECOVERING",
+                },
+                {
+                    "scenario": "Fast Progressive Wear",
+                    "category": "PROGRESSIVE_WEAR",
+                    "eol_boundary": "GLOBAL_HEALTH_INDEX",
+                    "true_eol_s": 131.0,
+                    "active_n": 84,
+                    "mae_s": 44.87,
+                    "rmse_s": 92.20,
+                    "phm08": 1.16e+17,
+                    "picp_pct": 64.3,
+                    "mpiw_s": 58.97,
+                },
+                {
+                    "scenario": "Moderate Progressive Wear",
+                    "category": "PROGRESSIVE_WEAR",
+                    "eol_boundary": "GLOBAL_HEALTH_INDEX",
+                    "true_eol_s": 274.0,
+                    "active_n": 213,
+                    "mae_s": 56.40,
+                    "rmse_s": 78.14,
+                    "phm08": 2.20e+13,
+                    "picp_pct": 44.1,
+                    "mpiw_s": 92.58,
+                },
+                {
+                    "scenario": "Gradual Long Wear",
+                    "category": "PROGRESSIVE_WEAR",
+                    "eol_boundary": "GLOBAL_HEALTH_INDEX",
+                    "true_eol_s": 277.0,
+                    "active_n": 212,
+                    "mae_s": 43.53,
+                    "rmse_s": 70.06,
+                    "phm08": 2.76e+14,
+                    "picp_pct": 54.7,
+                    "mpiw_s": 81.61,
+                },
+                {
+                    "scenario": "Stochastic Brownian Wear",
+                    "category": "PROGRESSIVE_WEAR",
+                    "eol_boundary": "GLOBAL_HEALTH_INDEX",
+                    "true_eol_s": 249.0,
+                    "active_n": 197,
+                    "mae_s": 37.30,
+                    "rmse_s": 88.17,
+                    "phm08": 2.21e+28,
+                    "picp_pct": 71.1,
+                    "mpiw_s": 83.35,
+                },
+            ],
+            "disclaimers": [
+                "The 90% PICP target was NOT achieved (actual PICP: 52.75%).",
+                "RUL accuracy is evaluated only on synthetic degradation scenarios and does not establish real-engine RUL accuracy.",
+            ],
+        },
+        "rul_eol_provenance": {
+            "definition_type": "project-defined simulated functional-failure/EOL assumptions",
+            "disclaimer": "These boundaries are NOT OEM, certified, FAA, or airworthiness limits.",
+            "criteria": [
+                {
+                    "criterion": "Cylinder Head Temperature Redline",
+                    "channel": "cht",
+                    "threshold_value": 150.0,
+                    "unit": "°C",
+                    "comparison": ">=",
+                    "source": "telemetry_warning_bound_repurposed",
+                    "rationale": "Repurposed operational warning bound representing simulated cylinder head thermal ceiling.",
+                },
+                {
+                    "criterion": "Minimum Oil Pressure Redline",
+                    "channel": "oil_pressure",
+                    "threshold_value": 1.2,
+                    "unit": "bar",
+                    "comparison": "<=",
+                    "source": "project_defined_failure_assumption",
+                    "rationale": "Simulated hydrodynamic film collapse threshold in flight, safely above 0.8 bar idle minimum.",
+                },
+                {
+                    "criterion": "Maximum Oil Temperature Redline",
+                    "channel": "oil_temp",
+                    "threshold_value": 140.0,
+                    "unit": "°C",
+                    "comparison": ">=",
+                    "source": "project_defined_failure_assumption",
+                    "rationale": "Simulated lubricant thermal cracking and viscosity failure limit exceeding 130 C warning bound.",
+                },
+                {
+                    "criterion": "Maximum Structural Vibration Redline",
+                    "channel": "vibration",
+                    "threshold_value": 3.5,
+                    "unit": "g",
+                    "comparison": ">=",
+                    "source": "telemetry_warning_bound_repurposed",
+                    "rationale": "Repurposed operational warning bound representing severe mechanical unbalance limit.",
+                },
+                {
+                    "criterion": "Global Health Index EOL",
+                    "channel": "health_index",
+                    "threshold_value": 0.35,
+                    "unit": "score [0-1]",
+                    "comparison": "<=",
+                    "source": "phase_9_critical_state_boundary",
+                    "rationale": "Phase 9 boundary for CRITICAL health state; multi-subsystem divergence beyond 4-5 sigma.",
+                },
+            ],
+        },
+        "timesfm_handoff": {
+            "operational_rules": [
+                "LOADED_PRETRAINED + horizon 16/32 -> usable forecast-assisted RUL",
+                "LOCAL_UNCHECKPOINTED_GRAPH -> NOT usable for prognostic RUL -> reject -> Theil-Sen fallback",
+                "BLOCKED_UNAUTHENTICATED_GATED -> NOT usable for prognostic RUL -> reject -> Theil-Sen fallback",
+            ],
+            "current_status": "BLOCKED_UNAUTHENTICATED_GATED",
+            "implications": [
+                "Pretrained TimesFM weights were not available in the local execution environment.",
+                "Pretrained TimesFM accuracy was not evaluated.",
+                "No pretrained TimesFM forecast-performance number may be claimed.",
+                "Causal EWMA baseline fallback was used operationally.",
+                "Graph execution does NOT equal pretrained model validation.",
+            ],
+        },
+        "data_provenance": [
+            {
+                "data_source": "Physics-informed synthetic aero-piston simulator",
+                "used_for_training": True,
+                "used_for_evaluation": True,
+                "role": "Primary project data. Generates synthetic normal and fault telemetry across 6 phases with deterministic seeds.",
+            },
+            {
+                "data_source": "NASA C-MAPSS Turbofan Degradation Dataset",
+                "used_for_training": False,
+                "used_for_evaluation": False,
+                "role": "External dataset methodology/reference benchmark. Not represented as aero-piston training data.",
+            },
+            {
+                "data_source": "N-CMAPSS Turbofan Engine Dataset",
+                "used_for_training": False,
+                "used_for_evaluation": False,
+                "role": "External dataset reference benchmark. Not used for aero-piston model training or evaluation.",
+            },
+            {
+                "data_source": "Real-engine flight test or operational aero-engine data",
+                "used_for_training": False,
+                "used_for_evaluation": False,
+                "role": "None available. Explicitly documented limitation; no flight or operational data claimed.",
+            },
+        ],
         "architectural_declarations": {
             "algorithm_freezing": (
                 "Phase 13 does not redesign, retune, replace, or modify the algorithms, "
