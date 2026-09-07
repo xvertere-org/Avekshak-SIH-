@@ -14,30 +14,32 @@ from dashboard.utils.styles import PLOT_COLORS, STATUS_COLORS, render_status_bad
 
 def render_anomaly_diagnostics(diag: DiagnosticsViewModel):
     """Render anomaly detection scores and detector decomposition."""
-    st.markdown("#### Phase 7 Hybrid Anomaly Detection")
+    st.markdown("#### Hybrid Anomaly Detection")
 
     if diag.anomaly_status == "Unavailable":
         st.info("ℹ️ Anomaly detection outputs currently unavailable.")
         return
 
-    cols = st.columns(4)
-    with cols[0]:
+    r1_col1, r1_col2 = st.columns(2)
+    with r1_col1:
         st.metric(
             label="Active Anomaly Status",
             value=diag.anomaly_status,
         )
-    with cols[1]:
+    with r1_col2:
         st.metric(
             label="Composite Anomaly Score",
             value=format_value(diag.anomaly_score, decimals=2),
         )
-    with cols[2]:
+
+    r2_col1, r2_col2 = st.columns(2)
+    with r2_col1:
         threshold_score = diag.detector_scores.get("threshold")
         st.metric(
             label="Threshold Score",
             value=format_value(threshold_score, decimals=2),
         )
-    with cols[3]:
+    with r2_col2:
         ewma_score = diag.detector_scores.get("ewma")
         st.metric(
             label="EWMA Score",
@@ -54,7 +56,7 @@ def render_anomaly_diagnostics(diag: DiagnosticsViewModel):
 
 def render_fault_classification(diag: DiagnosticsViewModel):
     """Render fault classification and class probabilities."""
-    st.markdown("#### Phase 8 Multi-Class Fault Diagnosis")
+    st.markdown("#### Multi-Class Fault Diagnosis")
 
     if diag.predicted_fault == "Unavailable":
         st.info("ℹ️ Fault diagnosis classification currently unavailable.")
@@ -63,26 +65,23 @@ def render_fault_classification(diag: DiagnosticsViewModel):
     col1, col2 = st.columns([1, 2])
 
     with col1:
-        st.markdown(
-            f"""
-            <div style="background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px;">
-                <div style="font-size: 11px; color: #8b949e; text-transform: uppercase;">Predicted Fault Class</div>
-                <div style="font-size: 20px; font-weight: 700; color: #f0f6fc; margin: 8px 0;">
-                    {format_fault_name(diag.predicted_fault_class)}
-                </div>
-                <div style="font-size: 13px; color: #8b949e; margin-bottom: 4px;">
-                    Diagnosis Probability: <b>{format_percent(diag.diagnostic_confidence)}</b>
-                </div>
-                <div style="font-size: 12px; color: #8b949e; margin-bottom: 8px;">
-                    Data Quality: <code>{diag.diagnosis_data_quality}</code>
-                </div>
-                <div style="margin-top: 10px; border-top: 1px solid #21262d; padding-top: 8px; font-size: 12px;">
-                    {"⚠️ <b>Sensor Fault Indicated:</b> Channel isolated from physical Twin" if diag.sensor_fault_indicated else "✅ Physical evidence consistent with engine state"}
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True,
+        sensor_text = (
+            "⚠️ <b>Sensor Fault Indicated:</b> Channel isolated from physical Twin"
+            if diag.sensor_fault_indicated
+            else "✅ Physical evidence consistent with engine state"
         )
+        diag_card_html = (
+            f'<div style="background-color: #11151c; border: 1px solid #21262d; '
+            f'border-radius: 4px; padding: 14px 16px;">'
+            f'<div style="font-size: 11px; font-weight: 700; color: #8b949e; text-transform: uppercase; letter-spacing: 0.5px;">PREDICTED FAULT CLASS</div>'
+            f'<div style="font-size: 18px; font-weight: 700; color: #f0f6fc; margin: 6px 0;">{format_fault_name(diag.predicted_fault_class)}</div>'
+            f'<div style="font-size: 12px; color: #8b949e; margin-bottom: 4px;">Diagnosis Probability: <b style="color: #58a6ff; font-family: monospace;">{format_percent(diag.diagnostic_confidence)}</b></div>'
+            f'<div style="font-size: 11px; color: #8b949e; margin-bottom: 8px;">Data Quality: <code style="color: #f0f6fc;">{diag.diagnosis_data_quality}</code></div>'
+            f'<div style="margin-top: 8px; border-top: 1px solid #21262d; padding-top: 8px; font-size: 11px; color: #c9d1d9;">{sensor_text}</div>'
+            f'</div>'
+        )
+        st.markdown(diag_card_html, unsafe_allow_html=True)
+
 
     with col2:
         if diag.class_probabilities:
@@ -114,7 +113,8 @@ def render_fault_classification(diag: DiagnosticsViewModel):
 
 def render_residual_table(diag: DiagnosticsViewModel):
     """Render table of digital twin expected values, residuals, and normalized excursions."""
-    st.markdown("#### Phase 6 Digital Twin Expected States & Residuals")
+    st.markdown("#### Digital Twin Expected States & Residuals")
+
 
     if not diag.residuals and not diag.expected_telemetry:
         st.info("ℹ️ Digital Twin state residuals currently unavailable.")

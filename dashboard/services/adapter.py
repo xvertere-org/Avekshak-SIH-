@@ -703,7 +703,7 @@ class DashboardAdapter:
         else:
             hi_val = "Unavailable"
             hi_status = StatusLevel.UNAVAILABLE
-            hi_subtext = "Phase 9 Health Index not supplied"
+            hi_subtext = "Health Index not supplied"
             hi_avail = AvailabilityStatus.UNAVAILABLE
 
         health_card = MetricCardModel(
@@ -736,7 +736,7 @@ class DashboardAdapter:
         else:
             rul_val = "Unavailable"
             rul_status = StatusLevel.UNAVAILABLE
-            rul_subtext = "Phase 11 Prognostics not supplied"
+            rul_subtext = "Prognostics not supplied"
             rul_avail = AvailabilityStatus.UNAVAILABLE
 
         rul_card = MetricCardModel(
@@ -757,7 +757,7 @@ class DashboardAdapter:
         else:
             anom_val = "Unavailable"
             anom_status = StatusLevel.UNAVAILABLE
-            anom_subtext = "Phase 7 Anomaly detector not supplied"
+            anom_subtext = "Anomaly detector not supplied"
             anom_avail = AvailabilityStatus.UNAVAILABLE
 
         anomaly_card = MetricCardModel(
@@ -789,7 +789,7 @@ class DashboardAdapter:
         else:
             fault_val = "Unavailable"
             fault_status = StatusLevel.UNAVAILABLE
-            fault_subtext = "Phase 8 Diagnosis not supplied"
+            fault_subtext = "Diagnosis not supplied"
             fault_avail = AvailabilityStatus.UNAVAILABLE
 
         fault_card = MetricCardModel(

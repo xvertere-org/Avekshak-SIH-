@@ -10,74 +10,57 @@ from dashboard.utils.styles import render_status_badge, STATUS_COLORS
 
 
 def render_header(overview: OverviewViewModel):
-    """Render top operational mission banner."""
+    """Render compact operational mission header bar."""
     if overview.is_synthetic_demo or overview.simulation_mode == "SYNTHETIC_SIMULATION":
         st.markdown(
-            """
-            <div class="demo-watermark">
-                ⚠️ SYNTHETIC SIMULATION / DEMONSTRATION MODE — NOT LIVE AIRCRAFT TELEMETRY
-            </div>
-            """,
+            '<div class="demo-watermark-compact">'
+            'DEMO MODE · SYNTHETIC TELEMETRY · NOT LIVE AIRCRAFT DATA'
+            '</div>',
             unsafe_allow_html=True,
         )
 
-    col1, col2 = st.columns([3, 1])
+    col_title, col_status = st.columns([3, 1])
 
-    with col1:
+    with col_title:
         st.markdown(
-            f"""
-            <div style="margin-bottom: 8px;">
-                <h2 style="margin: 0; color: #f0f6fc; font-weight: 700;">
-                    Aero-Piston Engine Digital Twin <span style="font-size: 16px; color: #58a6ff; font-weight: 500;">SIH26054</span>
-                </h2>
-                <div style="color: #8b949e; font-size: 13px; margin-top: 4px;">
-                    MALE UAV Propulsion Health Monitoring, Fault Diagnosis & Prognostics
-                </div>
-            </div>
-            """,
+            '<div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px;">'
+            '<span style="font-size: 18px; font-weight: 700; color: #f0f6fc; letter-spacing: -0.3px;">Aero-Piston Engine Digital Twin</span>'
+            '<span style="font-size: 11px; font-weight: 700; color: #58a6ff; font-family: monospace; background: #161b22; border: 1px solid #21262d; border-radius: 3px; padding: 2px 6px;">SIH26054</span>'
+            '<span style="font-size: 12px; color: #8b949e;">Rotax 912/914 MALE UAV Propulsion Health Monitoring</span>'
+            '</div>',
             unsafe_allow_html=True,
         )
 
-    with col2:
+    with col_status:
         status_html = render_status_badge(overview.overall_status, f"SYSTEM: {overview.overall_status.value}")
         st.markdown(
-            f"""
-            <div style="text-align: right; padding-top: 6px;">
-                {status_html}
-            </div>
-            """,
+            f'<div style="text-align: right; padding-top: 2px;">{status_html}</div>',
             unsafe_allow_html=True,
         )
 
-    # Operational Context Ribbon (engine_id + mission_id define execution context)
-    meta_cols = st.columns(5)
-    with meta_cols[0]:
-        st.caption("ENGINE IDENTIFIER")
-        st.markdown(f"**`{overview.engine_id}`**")
-    with meta_cols[1]:
-        st.caption("MISSION IDENTIFIER")
-        st.markdown(f"**`{overview.mission_id or 'NOT_ASSIGNED'}`**")
-    with meta_cols[2]:
-        st.caption("MISSION PHASE")
-        st.markdown(f"**`{overview.mission_phase}`**")
-    with meta_cols[3]:
-        st.caption("MISSION ELAPSED TIME")
-        st.markdown(f"**`{format_timestamp(overview.timestamp)}`**")
-    with meta_cols[4]:
-        st.caption("EXECUTION MODE")
-        st.markdown(f"**`{overview.simulation_mode}`**")
+    # Compact Single-Line Operational Context Strip
+    meta_strip = (
+        f'<div style="background-color: #11151c; border: 1px solid #21262d; border-radius: 4px; '
+        f'padding: 6px 12px; font-size: 11px; color: #8b949e; font-family: monospace; display: flex; '
+        f'flex-wrap: wrap; gap: 16px; align-items: center; margin-top: 4px; margin-bottom: 12px;">'
+        f'<div><span style="color: #6e7681;">ENGINE:</span> <b style="color: #58a6ff;">{overview.engine_id}</b></div>'
+        f'<div><span style="color: #6e7681;">MISSION:</span> <b style="color: #f0f6fc;">{overview.mission_id or "NOT_ASSIGNED"}</b></div>'
+        f'<div><span style="color: #6e7681;">REGIME:</span> <b style="color: #f0f6fc;">{overview.mission_phase}</b></div>'
+        f'<div><span style="color: #6e7681;">MET:</span> <b style="color: #f0f6fc;">{format_timestamp(overview.timestamp)}</b></div>'
+        f'<div><span style="color: #6e7681;">FEED:</span> <b style="color: #8b949e;">{overview.simulation_mode}</b></div>'
+        f'</div>'
+    )
+    st.markdown(meta_strip, unsafe_allow_html=True)
 
-    # If scenario metadata is present, render strictly as Simulation Scenario / Ground Truth
+    # If scenario metadata is present, render strictly as a small muted footnote
     if overview.scenario_metadata:
         sc_name = overview.scenario_metadata.get("scenario_name", overview.scenario_metadata.get("name", "Standard Mission"))
         st.markdown(
-            f"""
-            <div style="background-color: #161b22; border: 1px dashed #30363d; border-radius: 4px; padding: 6px 12px; margin-top: 6px; font-size: 11px; color: #8b949e;">
-                <b style="color: #d29922;">Simulation Scenario / Ground Truth:</b> <code>{sc_name}</code>
-                <span style="color: #6e7681; margin-left: 8px;">(Ground truth simulation control only — never used as an inferred system result)</span>
-            </div>
-            """,
+            f'<div style="font-size: 11px; color: #6e7681; margin-top: -8px; margin-bottom: 10px;">'
+            f'<span style="color: #d29922; font-weight: 600;">Scenario Reference:</span> <code>{sc_name}</code> '
+            f'<span style="color: #484f58;">(Simulation input parameter)</span>'
+            f'</div>',
             unsafe_allow_html=True,
         )
 
-    st.markdown("<hr style='border-color: #30363d; margin-top: 10px; margin-bottom: 20px;' />", unsafe_allow_html=True)
+

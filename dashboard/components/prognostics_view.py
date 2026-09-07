@@ -25,7 +25,7 @@ def render_health_prognostics(
     history_hi: Optional[List[float]] = None,
 ):
     """Render current health index, degradation rate, and historical trajectory."""
-    st.markdown("#### Phase 9 Health Index & Degradation Velocity")
+    st.markdown("#### Health Index & Degradation Velocity")
 
     cols = st.columns(4)
     with cols[0]:
@@ -81,8 +81,8 @@ def render_health_prognostics(
 
 
 def render_rul_panel(prog: PrognosticsViewModel):
-    """Render Phase 11 RUL estimation, confidence intervals, and EOL limiting factor."""
-    st.markdown("#### Phase 11 Remaining Useful Life (RUL) Prognostics")
+    """Render RUL estimation, confidence intervals, and EOL limiting factor."""
+    st.markdown("#### Remaining Useful Life (RUL) Prognostics")
 
     if prog.rul_state == "Unavailable" and prog.rul_status == "Unavailable":
         st.info("ℹ️ Prognostics RUL estimation currently unavailable.")
@@ -119,23 +119,24 @@ def render_rul_panel(prog: PrognosticsViewModel):
     if prog.eol_provenance:
         eol_info = f" | <b>EOL Provenance:</b> <code>{prog.eol_provenance.get('method', 'Weibull-Degradation')}</code>"
 
-    st.markdown(
-        f"""
-        <div style="background-color: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 12px; margin-top: 10px; font-size: 12px; color: #8b949e;">
-            <b>Backend RUL State:</b> <code>{prog.rul_state}</code> | 
-            <b>Limiting Factor:</b> <code>{prog.limiting_factor}</code>{eol_info}
-            <div style="margin-top: 6px; color: #f0883e;">
-                ⚠️ <b>Airworthiness Disclaimer:</b> End-of-Life (EOL) criteria and redlines are project-defined simulated criteria, NOT certified OEM or FAA flight airworthiness limits.
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
+    eol_html = (
+        f'<div style="background-color: #11151c; border: 1px solid #21262d; '
+        f'border-radius: 4px; padding: 12px 14px; margin-top: 10px; font-size: 12px; color: #8b949e;">'
+        f'<b>Backend RUL State:</b> <code style="color: #f0f6fc;">{prog.rul_state}</code> | '
+        f'<b>Limiting Factor:</b> <code style="color: #f0f6fc;">{prog.limiting_factor}</code>{eol_info}'
+        f'<div style="margin-top: 6px; color: #d29922;">'
+        f'⚠️ <b>Airworthiness Disclaimer:</b> End-of-Life (EOL) criteria and redlines are project-defined simulated criteria, NOT certified OEM or FAA flight airworthiness limits.'
+        f'</div>'
+        f'</div>'
     )
+    st.markdown(eol_html, unsafe_allow_html=True)
+
 
 
 def render_forecast_panel(prog: PrognosticsViewModel):
-    """Render Phase 10 telemetry forecasting status, source, and forecast trajectories."""
-    st.markdown("#### Phase 10 Telemetry Forecasting (TimesFM-3 / Baseline)")
+    """Render telemetry forecasting status, source, and forecast trajectories."""
+    st.markdown("#### Telemetry Forecasting (TimesFM / Baseline)")
+
 
     # Status / Source callout box distinguishing LOADED_PRETRAINED vs BLOCKED_UNAUTHENTICATED_GATED
     if prog.forecast_status == "BLOCKED_UNAUTHENTICATED_GATED":

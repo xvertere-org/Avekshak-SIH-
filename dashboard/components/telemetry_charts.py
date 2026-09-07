@@ -195,25 +195,22 @@ def render_canonical_telemetry_grid(
                 exp_str = format_value(ch_model.expected_value, decimals=1, unit=ch_model.unit)
                 res_str = format_value(ch_model.residual, decimals=2, unit=ch_model.unit)
 
-                st.markdown(
-                    f"""
-                    <div style="font-size: 13px; font-weight: 600; color: #f0f6fc;">
-                        {ch_model.display_name}
-                    </div>
-                    <div style="font-size: 11px; color: #8b949e; margin-bottom: 4px;">
-                        Observed: <b style="color: {PLOT_COLORS['observed']}">{obs_str}</b> | 
-                        DT Expected: <b style="color: {PLOT_COLORS['expected']}">{exp_str}</b> | 
-                        Residual: <b style="color: #f0f6fc">{res_str}</b>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
+                hdr_html = (
+                    f'<div style="font-size: 13px; font-weight: 700; color: #f0f6fc;">{ch_model.display_name}</div>'
+                    f'<div style="font-size: 11px; color: #8b949e; margin-bottom: 4px;">'
+                    f'Observed: <b style="color: {PLOT_COLORS["observed"]}; font-family: monospace;">{obs_str}</b> | '
+                    f'DT Expected: <b style="color: {PLOT_COLORS["expected"]}; font-family: monospace;">{exp_str}</b> | '
+                    f'Residual: <b style="color: #f0f6fc; font-family: monospace;">{res_str}</b>'
+                    f'</div>'
                 )
+                st.markdown(hdr_html, unsafe_allow_html=True)
             with hdr_col2:
                 status_text = "ISOLATED" if ch_model.is_isolated else ch_model.status.value
                 st.markdown(
                     f"<div style='text-align: right;'>{render_status_badge(ch_model.status, status_text)}</div>",
                     unsafe_allow_html=True,
                 )
+
 
             # Chart
             ch_hist = history_data.get(ch, {}) if history_data else {}

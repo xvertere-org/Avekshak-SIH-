@@ -83,26 +83,15 @@ def render_provenance_card(quality: DataQualityViewModel):
     """Render telemetry and model provenance details."""
     st.markdown("#### System & Execution Provenance")
 
-    st.markdown(
-        f"""
-        <div style="background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 14px; font-size: 13px;">
-            <div style="margin-bottom: 6px;">
-                <span style="color: #8b949e;">Data Feed Source:</span> 
-                <b style="color: #f0f6fc;">{quality.provenance_source}</b>
-            </div>
-            <div style="margin-bottom: 6px;">
-                <span style="color: #8b949e;">Pipeline Execution Latency:</span> 
-                <b style="color: #f0f6fc;">{quality.execution_latency_ms:.2f} ms</b>
-            </div>
-            <div style="margin-bottom: 6px;">
-                <span style="color: #8b949e;">Telemetry Quality Status:</span> 
-                <code>{quality.quality_status}</code>
-            </div>
-            <div>
-                <span style="color: #8b949e;">Pipeline Execution Engine:</span> 
-                <code>{quality.provenance.get('pipeline', 'SystemPipelineOrchestrator')}</code>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
+    engine_val = quality.provenance.get('pipeline', 'SystemPipelineOrchestrator')
+    prov_html = (
+        f'<div style="background-color: #11151c; border: 1px solid #21262d; '
+        f'border-radius: 4px; padding: 14px 16px; font-size: 13px;">'
+        f'<div style="margin-bottom: 8px;"><span style="color: #8b949e;">Data Feed Source:</span> <b style="color: #58a6ff; font-family: monospace;">{quality.provenance_source}</b></div>'
+        f'<div style="margin-bottom: 8px;"><span style="color: #8b949e;">Pipeline Execution Latency:</span> <b style="color: #3fb950; font-family: monospace;">{quality.execution_latency_ms:.2f} ms</b></div>'
+        f'<div style="margin-bottom: 8px;"><span style="color: #8b949e;">Telemetry Quality Status:</span> <code style="color: #f0f6fc;">{quality.quality_status}</code></div>'
+        f'<div><span style="color: #8b949e;">Pipeline Execution Engine:</span> <code style="color: #f0f6fc;">{engine_val}</code></div>'
+        f'</div>'
     )
+    st.markdown(prov_html, unsafe_allow_html=True)
+

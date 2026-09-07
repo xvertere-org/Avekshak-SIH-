@@ -19,8 +19,9 @@ class DemoScenarioProvider:
             "1. Nominal Healthy Cruise",
             "2. Thermal Degradation (Cooling Conductance Loss)",
             "3. Lubrication Pressure Loss (Hydraulic Failure)",
-            "4. CHT Sensor Dropout & Isolation (Phase 4F Fault)",
+            "4. CHT Sensor Dropout & Isolation (Instrumentation Fault)",
         ]
+
 
     @staticmethod
     def generate_scenario_payload(scenario_name: str, step: int = 15) -> Tuple[Phase13OutputContract, Dict[str, Dict[str, List[float]]]]:
@@ -524,8 +525,9 @@ class DemoScenarioProvider:
                 },
             }
             explainability = {
-                "summary_explanation": "Cylinder Head Temperature channel has dropped out (NaN) and been isolated by Phase 9. Thermally coupled oil temperature remains nominal, confirming sensor instrumentation failure without physical engine damage.",
+                "summary_explanation": "Cylinder Head Temperature channel has dropped out (NaN) and been isolated by the Health Monitor. Thermally coupled oil temperature remains nominal, confirming sensor instrumentation failure without physical engine damage.",
                 "physics_evidence": {
+
                     "status": "SUPPORTED",
                     "diagnosed_fault": "sensor_fault",
                     "consistency_reason": "Isolated thermal anomaly with zero cross-channel propagation to oil temperature.",

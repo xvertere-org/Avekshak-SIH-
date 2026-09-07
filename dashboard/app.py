@@ -164,16 +164,42 @@ def main():
     # Sidebar: Mode Selection & Navigation
     with st.sidebar:
         st.markdown(
-            """
-            <div style="text-align: center; margin-bottom: 15px;">
-                <h3 style="margin: 0; color: #58a6ff;">SIH26054</h3>
-                <div style="font-size: 11px; color: #8b949e;">MALE UAV Aero-Piston Engine Twin</div>
-            </div>
-            """,
+            '<div style="text-align: center; margin-bottom: 20px; padding: 10px 0; border-bottom: 1px solid #21262d;">'
+            '<h3 style="margin: 0; color: #58a6ff; font-weight: 700; letter-spacing: 1px;">SIH26054</h3>'
+            '<div style="font-size: 11px; color: #8b949e; margin-top: 4px;">MALE UAV Aero-Piston Engine Twin</div>'
+            '</div>',
             unsafe_allow_html=True,
         )
 
-        st.markdown("### Operational Feed")
+        # Navigation / System Views
+        st.markdown(
+            '<div style="font-size: 11px; font-weight: 700; color: #8b949e; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;">VIEWS</div>',
+            unsafe_allow_html=True,
+        )
+        active_tab = st.radio(
+            "System Views",
+            [
+                "Overview",
+                "Live Telemetry",
+                "Diagnostics",
+                "Prognostics",
+                "System Status",
+                "Mission Replay",
+                "Mission Report",
+                "What-If Comparison",
+            ],
+            index=0,
+            label_visibility="collapsed",
+        )
+
+        st.markdown('<hr style="border: none; border-top: 1px solid #21262d; margin: 16px 0;" />', unsafe_allow_html=True)
+
+        # Simulation Controls
+        st.markdown(
+            '<div style="font-size: 11px; font-weight: 700; color: #8b949e; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;">OPERATIONAL FEED</div>',
+            unsafe_allow_html=True,
+        )
+
         feed_mode = st.radio(
             "Telemetry Source",
             [
@@ -253,32 +279,19 @@ def main():
             )
             vm = adapter.adapt(contract)
 
-        st.markdown("---")
-        st.markdown("### Navigation")
-        active_tab = st.radio(
-            "System Views",
-            [
-                "1. Overview",
-                "2. Live Telemetry",
-                "3. Diagnostics",
-                "4. Prognostics",
-                "5. Data Quality / Status",
-                "6. Mission Replay",
-                "7. Mission Report",
-                "8. What-If Comparison",
-            ],
-            index=0,
-        )
+        if st.button("Reset Simulation", use_container_width=True):
+            st.session_state.sim_time = 35
+            st.session_state.scenario_idx = 0
+            st.rerun()
 
-        st.markdown("---")
+        st.markdown('<hr style="border: none; border-top: 1px solid #21262d; margin: 16px 0;" />', unsafe_allow_html=True)
         st.markdown(
-            """
-            <div style="font-size: 10px; color: #8b949e; line-height: 1.4;">
-                <b>Engineering Reference Anchor:</b><br/>
-                Rotax 912 ULS grey-box baseline.<br/>
-                Strict non-fabrication presentation layer.
-            </div>
-            """,
+            '<div style="font-size: 11px; color: #8b949e; line-height: 1.5; background: #161b22; '
+            'border: 1px solid #21262d; border-radius: 4px; padding: 8px 10px;">'
+            '<b style="color: #c9d1d9;">Engineering Reference Anchor:</b><br/>'
+            'Rotax 912 ULS grey-box baseline.<br/>'
+            '<span style="color: #6e7681;">Strict non-fabrication presentation layer.</span>'
+            '</div>',
             unsafe_allow_html=True,
         )
 
@@ -286,28 +299,27 @@ def main():
     render_header(vm.overview)
 
     # Render Active View
-    if active_tab == "1. Overview":
+    if active_tab == "Overview" or "Overview" in active_tab:
         render_overview_page(vm, history_data=history_data)
-    elif active_tab == "2. Live Telemetry":
+    elif active_tab == "Live Telemetry" or "Live Telemetry" in active_tab:
         render_telemetry_page(vm, history_data=history_data)
-    elif active_tab == "3. Diagnostics":
+    elif active_tab == "Diagnostics" or "Diagnostics" in active_tab:
         render_diagnostics_page(vm)
-    elif active_tab == "4. Prognostics":
+    elif active_tab == "Prognostics" or "Prognostics" in active_tab:
         hist_hi_ts = history_data.get("health_index", {}).get("timestamps") if history_data else None
         hist_hi = history_data.get("health_index", {}).get("hi") if history_data else None
         render_prognostics_page(vm, history_timestamps=hist_hi_ts, history_hi=hist_hi)
-    elif active_tab == "5. Data Quality / Status":
+    elif active_tab == "System Status" or "Status" in active_tab or "Data Quality" in active_tab:
         render_system_status_page(vm)
-    elif active_tab == "6. Mission Replay":
+    elif active_tab == "Mission Replay" or "Replay" in active_tab:
         render_replay_page(payloads, scenario_name=selected_scenario)
-    elif active_tab == "7. Mission Report":
+    elif active_tab == "Mission Report" or "Report" in active_tab:
         scenario_meta = {"scenario_name": selected_scenario, "feed_mode": feed_mode}
         render_report_page(payloads, scenario_metadata=scenario_meta)
-    elif active_tab == "8. What-If Comparison":
+    elif active_tab == "What-If Comparison" or "What-If" in active_tab:
         orch = get_cached_orchestrator()
         render_what_if_page(orchestrator=orch)
 
 
 if __name__ == "__main__":
     main()
-
