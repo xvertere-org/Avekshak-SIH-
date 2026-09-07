@@ -35,6 +35,9 @@ from dashboard.pages.telemetry_page import render_telemetry_page
 from dashboard.pages.diagnostics_page import render_diagnostics_page
 from dashboard.pages.prognostics_page import render_prognostics_page
 from dashboard.pages.system_status_page import render_system_status_page
+from dashboard.pages.replay_page import render_replay_page
+from dashboard.pages.report_page import render_report_page
+from dashboard.pages.what_if_page import render_what_if_page
 
 
 @st.cache_resource(show_spinner="Bootstrapping Phase 13 Pipeline Orchestrator (XGBoost + Isolation Forest)...")
@@ -182,6 +185,7 @@ def main():
         )
 
         history_data = None
+        payloads: List[DashboardStatePayload] = []
         adapter = DashboardAdapter()
 
         if feed_mode == "Phase 13 Live Pipeline Orchestrator":
@@ -259,6 +263,9 @@ def main():
                 "3. Diagnostics",
                 "4. Prognostics",
                 "5. Data Quality / Status",
+                "6. Mission Replay",
+                "7. Mission Report",
+                "8. What-If Comparison",
             ],
             index=0,
         )
@@ -291,6 +298,14 @@ def main():
         render_prognostics_page(vm, history_timestamps=hist_hi_ts, history_hi=hist_hi)
     elif active_tab == "5. Data Quality / Status":
         render_system_status_page(vm)
+    elif active_tab == "6. Mission Replay":
+        render_replay_page(payloads, scenario_name=selected_scenario)
+    elif active_tab == "7. Mission Report":
+        scenario_meta = {"scenario_name": selected_scenario, "feed_mode": feed_mode}
+        render_report_page(payloads, scenario_metadata=scenario_meta)
+    elif active_tab == "8. What-If Comparison":
+        orch = get_cached_orchestrator()
+        render_what_if_page(orchestrator=orch)
 
 
 if __name__ == "__main__":
