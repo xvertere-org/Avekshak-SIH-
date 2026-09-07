@@ -74,10 +74,10 @@ def test_what_if_comparison_payload_delta():
     assert res.whatif_advisory_assessment == "MAINTENANCE"
 
     # Narrative headline checks
-    assert "increases simulated thermal stress" in res.comparison_summary_headline
-    assert "accelerates degradation" in res.comparison_summary_headline
-    assert "reduces projected endurance" in res.comparison_summary_headline
-    assert "shifts advisory from GO to MAINTENANCE" in res.comparison_summary_headline
+    assert "changes the projected engine health state and advisory assessment" in res.comparison_summary_headline
+    assert "Health Index:" in res.simulated_projection_narrative
+    assert "Peak CHT:" in res.simulated_projection_narrative
+    assert "Advisory Shift:" in res.simulated_projection_narrative
 
 
 def test_what_if_end_to_end_pipeline_execution():

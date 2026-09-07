@@ -163,15 +163,15 @@ def render_report_page(
             unsafe_allow_html=True,
         )
     with col_p3:
-        rul_text = f"{report.final_rul_seconds:.1f} s" if report.final_rul_seconds is not None else "INSUFFICIENT_HISTORY"
+        rul_text = f"{report.final_rul_seconds:.1f} s" if report.final_rul_seconds is not None else "Unavailable"
+        rul_desc = f"<b>Limiting Factor:</b> {report.limiting_factor}<br/><b>Forecaster:</b> {report.forecast_source}" if report.final_rul_seconds is not None else "<i>RUL unavailable — insufficient continuous history for a valid prognostic estimate. Withheld to prevent extrapolation.</i>"
         st.markdown(
             f"""
             <div style="background-color: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 12px;">
                 <div style="font-size: 11px; color: #8b949e; text-transform: uppercase;">Prognostics / RUL</div>
                 <div style="font-size: 16px; font-weight: 700; color: #bc8cff; margin: 4px 0;">{rul_text}</div>
                 <div style="font-size: 11px; color: #c9d1d9;">
-                    <b>Limiting Factor:</b> {report.limiting_factor}<br/>
-                    <b>Forecaster:</b> {report.forecast_source}
+                    {rul_desc}
                 </div>
             </div>
             """,

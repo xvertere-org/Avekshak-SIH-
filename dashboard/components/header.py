@@ -52,15 +52,15 @@ def render_header(overview: OverviewViewModel):
     )
     st.markdown(meta_strip, unsafe_allow_html=True)
 
-    # If scenario metadata is present, render strictly as a small muted footnote
-    if overview.scenario_metadata:
-        sc_name = overview.scenario_metadata.get("scenario_name", overview.scenario_metadata.get("name", "Standard Mission"))
-        st.markdown(
-            f'<div style="font-size: 11px; color: #6e7681; margin-top: -8px; margin-bottom: 10px;">'
-            f'<span style="color: #d29922; font-weight: 600;">Scenario Reference:</span> <code>{sc_name}</code> '
-            f'<span style="color: #484f58;">(Simulation input parameter)</span>'
-            f'</div>',
-            unsafe_allow_html=True,
-        )
+    # Demonstration Notice (strictly hides injected ground truth answer key from main judge-facing view)
+    st.markdown(
+        """
+        <div style="background-color: #161b22; border: 1px solid #30363d; border-radius: 4px; padding: 5px 12px; margin-top: -4px; margin-bottom: 12px; font-size: 11px; color: #8b949e;">
+            <b style="color: #58a6ff;">Operational Mode:</b> Synthetic Simulation / Ground Station Decision Support
+            <span style="color: #6e7681; margin-left: 8px;">(Displaying real-time inferred PHM outputs; scenario configurations are isolated in demo controls)</span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 

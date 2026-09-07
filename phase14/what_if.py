@@ -110,40 +110,29 @@ class WhatIfAnalyzer:
         b_anom_cnt = sum(1 for p in baseline_payloads if p.anomaly_status in ("WARNING", "ANOMALY"))
         w_anom_cnt = sum(1 for p in whatif_payloads if p.anomaly_status in ("WARNING", "ANOMALY"))
 
-        # 6. Synthesize narrative headline
-        headline_parts = []
-        if not np.isnan(delta_cht) and abs(delta_cht) >= 2.0:
-            if delta_cht > 0:
-                headline_parts.append(f"increases simulated thermal stress (+{delta_cht:.1f} °C peak CHT)")
-            else:
-                headline_parts.append(f"reduces thermal stress ({delta_cht:.1f} °C peak CHT)")
+        # 6. Evidence-neutral summary and measured deltas (no unsupported causal claims)
+        has_notable_change = (
+            (not np.isnan(delta_hi) and abs(delta_hi) >= 0.01)
+            or (not np.isnan(delta_cht) and abs(delta_cht) >= 2.0)
+            or (b_adv != w_adv)
+            or (delta_rul is not None and abs(delta_rul) >= 10.0)
+        )
 
-        if not np.isnan(delta_hi) and abs(delta_hi) >= 0.02:
-            if delta_hi < 0:
-                headline_parts.append(f"accelerates degradation (HI delta {delta_hi:+.3f})")
-            else:
-                headline_parts.append(f"improves health margin (HI delta {delta_hi:+.3f})")
-
-        if delta_rul is not None and abs(delta_rul) >= 10.0:
-            if delta_rul < 0:
-                headline_parts.append(f"reduces projected endurance ({delta_rul:.0f} s RUL)")
-            else:
-                headline_parts.append(f"extends projected endurance (+{delta_rul:.0f} s RUL)")
-
-        if b_adv != w_adv:
-            headline_parts.append(f"shifts advisory from {b_adv} to {w_adv}")
-
-        if headline_parts:
-            summary_headline = "What-if mission trajectory " + ", and ".join(headline_parts) + "."
+        if has_notable_change:
+            summary_headline = "What-if scenario changes the projected engine health state and advisory assessment."
         else:
-            summary_headline = "What-if mission profile maintains parity with baseline trajectory."
+            summary_headline = "What-if scenario maintains parity with baseline projected engine health state and advisory assessment."
+
+        delta_hi_str = f"{delta_hi:+.3f}" if not np.isnan(delta_hi) else "N/A"
+        delta_cht_str = f"{delta_cht:+.1f} °C" if not np.isnan(delta_cht) else "N/A"
+        delta_rul_str = f"{delta_rul:+.0f} s" if delta_rul is not None else "Unavailable (insufficient continuous history)"
 
         narrative = (
-            f"Simulated projection: Under what-if mission conditions "
+            f"Simulated projection: Evaluated under what-if mission conditions "
             f"(Altitude: {whatif_scenario.altitude_m:.0f} m, OAT: {whatif_scenario.ambient_temp_c:.1f} °C, "
-            f"Throttle: {whatif_scenario.throttle_pct:.0f}%), the simulated digital twin reveals "
-            f"{'higher' if delta_cht > 0 else 'lower' if delta_cht < 0 else 'equivalent'} operating temperatures "
-            f"and an advisory posture of {w_adv}."
+            f"Throttle: {whatif_scenario.throttle_pct:.0f}%). "
+            f"Measured deltas: Health Index: {delta_hi_str} | Peak CHT: {delta_cht_str} | "
+            f"Projected RUL: {delta_rul_str} | Advisory Shift: {b_adv} ➔ {w_adv}."
         )
 
         # 7. Detailed Telemetry Extremes Comparison Table

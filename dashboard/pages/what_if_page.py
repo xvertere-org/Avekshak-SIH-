@@ -38,6 +38,19 @@ def render_what_if_page(
     )
 
     # Conceptually Separated Controls
+    st.markdown(
+        """
+        <div style="background-color: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 10px 14px; margin-bottom: 16px; font-size: 12px; color: #c9d1d9;">
+            <b style="color: #58a6ff;">BASELINE MISSION:</b> <code>Nominal Healthy Cruise</code> &nbsp;|&nbsp; 
+            <b style="color: #bc8cff;">WHAT-IF MISSION:</b> <code>Planned Alternative / Simulated Fault-Stress</code>
+            <div style="font-size: 11px; color: #8b949e; margin-top: 4px;">
+                Demonstration mode contrasts baseline mission conditions against alternative flight parameters and simulated stress. Inferred results only — ground truth remains hidden from inference.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
     st.markdown("#### Scenario Configuration")
     col_base, col_whatif = st.columns(2)
 
@@ -45,7 +58,7 @@ def render_what_if_page(
         st.markdown(
             """
             <div style="background-color: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 10px; margin-bottom: 10px; font-weight: 700; color: #58a6ff;">
-                1. BASELINE MISSION (Current Reference)
+                BASELINE MISSION
             </div>
             """,
             unsafe_allow_html=True,
@@ -56,10 +69,10 @@ def render_what_if_page(
         b_oat = st.slider("Outside Air Temp (°C)", -10, 45, 15, 1, key="wi_b_oat")
         b_duration = st.slider("Mission Duration (s)", 15, 60, 30, 5, key="wi_b_dur")
 
-        st.markdown("<b style='color: #8b949e;'>Simulated Fault-Stress Mode:</b>", unsafe_allow_html=True)
+        st.markdown("<b style='color: #8b949e;'>Baseline Mission Profile:</b>", unsafe_allow_html=True)
         b_fault_str = st.selectbox(
-            "Baseline Condition",
-            ["Nominal Healthy Cruise", "Cooling Degradation", "Lubrication Degradation"],
+            "Baseline Profile",
+            ["Nominal Healthy Cruise", "Cooling Degradation (Thermal Loss)", "Lubrication Degradation (Oil Loss)"],
             index=0,
             key="wi_b_fault",
         )
@@ -68,7 +81,7 @@ def render_what_if_page(
         st.markdown(
             """
             <div style="background-color: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 10px; margin-bottom: 10px; font-weight: 700; color: #bc8cff;">
-                2. WHAT-IF MISSION (Planned / Alternative Profile)
+                WHAT-IF MISSION
             </div>
             """,
             unsafe_allow_html=True,
@@ -79,9 +92,9 @@ def render_what_if_page(
         w_oat = st.slider("Outside Air Temp (°C)", -10, 45, 30, 1, key="wi_w_oat")
         w_duration = st.slider("Mission Duration (s)", 15, 60, 30, 5, key="wi_w_dur")
 
-        st.markdown("<b style='color: #8b949e;'>Simulated Fault-Stress Mode:</b>", unsafe_allow_html=True)
+        st.markdown("<b style='color: #8b949e;'>Simulated Fault-Stress Scenario:</b>", unsafe_allow_html=True)
         w_fault_str = st.selectbox(
-            "What-If Condition",
+            "Simulated Stress Condition",
             [
                 "Nominal Healthy Cruise",
                 "Cooling Degradation (Thermal Loss)",
@@ -144,12 +157,12 @@ def render_what_if_page(
 
         st.markdown("---")
 
-        # Top Comparison Summary (Required by specification)
-        st.markdown("#### Comparison Summary (Simulated Projection)")
+        # Top Comparison Summary (BASELINE vs WHAT-IF, Simulated Projection)
+        st.markdown("#### BASELINE vs WHAT-IF (Simulated Projection)")
         st.markdown(
             f"""
             <div style="background-color: #161b22; border-left: 5px solid #58a6ff; border: 1px solid #30363d; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
-                <div style="font-size: 16px; font-weight: 700; color: #f0f6fc; margin-bottom: 6px;">
+                <div style="font-size: 15px; font-weight: 700; color: #f0f6fc; margin-bottom: 6px;">
                     {res.comparison_summary_headline}
                 </div>
                 <div style="font-size: 13px; color: #c9d1d9; margin-bottom: 8px;">
@@ -176,15 +189,18 @@ def render_what_if_page(
             )
 
         with c_rul:
-            b_rul_str = f"{res.baseline_rul_seconds:.0f} s" if res.baseline_rul_seconds is not None else "N/A"
-            w_rul_str = f"{res.whatif_rul_seconds:.0f} s" if res.whatif_rul_seconds is not None else "N/A"
+            b_rul_str = f"{res.baseline_rul_seconds:.0f} s" if res.baseline_rul_seconds is not None else "Unavailable"
+            w_rul_str = f"{res.whatif_rul_seconds:.0f} s" if res.whatif_rul_seconds is not None else "Unavailable"
             d_rul_str = f"{res.delta_rul_seconds:+.0f} s" if res.delta_rul_seconds is not None else "N/A"
             st.metric(
                 label="Projected RUL",
                 value=w_rul_str,
-                delta=f"Baseline: {b_rul_str} (Δ {d_rul_str})",
+                delta=f"Baseline: {b_rul_str} (Δ {d_rul_str})" if res.delta_rul_seconds is not None else None,
                 delta_color="normal" if (res.delta_rul_seconds or 0) >= 0 else "inverse",
+                help="RUL unavailable — insufficient continuous history for a valid prognostic estimate. The system withholds RUL rather than extrapolating from insufficient evidence." if (res.whatif_rul_seconds is None or res.baseline_rul_seconds is None) else None,
             )
+            if res.whatif_rul_seconds is None or res.baseline_rul_seconds is None:
+                st.caption("ℹ️ *RUL unavailable — insufficient continuous history for a valid prognostic estimate. The system withholds RUL rather than extrapolating from insufficient evidence.*")
 
         with c_cht:
             delta_cht_str = f"{res.delta_peak_cht:+.1f} °C" if not np.isnan(res.delta_peak_cht) else "N/A"

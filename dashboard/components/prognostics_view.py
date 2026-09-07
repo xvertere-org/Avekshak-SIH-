@@ -84,9 +84,8 @@ def render_rul_panel(prog: PrognosticsViewModel):
     """Render RUL estimation, confidence intervals, and EOL limiting factor."""
     st.markdown("#### Remaining Useful Life (RUL) Prognostics")
 
-    if prog.rul_state == "Unavailable" and prog.rul_status == "Unavailable":
-        st.info("ℹ️ Prognostics RUL estimation currently unavailable.")
-        return
+    if prog.rul_hours is None:
+        st.info("ℹ️ **RUL unavailable — insufficient continuous history for a valid prognostic estimate.** The system withholds RUL rather than extrapolating from insufficient evidence.")
 
     cols = st.columns(4)
     with cols[0]:

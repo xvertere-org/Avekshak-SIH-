@@ -108,7 +108,11 @@ def render_replay_page(
         st.metric("Health Index", format_value(hi_val, decimals=3))
     with c5:
         rul_val = current_payload.point_rul_seconds
-        st.metric("Projected RUL", format_rul(rul_val))
+        st.metric(
+            "Projected RUL",
+            format_rul(rul_val),
+            help="RUL unavailable — insufficient continuous history for a valid prognostic estimate. The system withholds RUL rather than extrapolating from insufficient evidence." if rul_val is None else None,
+        )
 
     # Synchronized Advisory Banner
     if current_payload.advisory is not None:
