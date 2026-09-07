@@ -3,6 +3,12 @@ Data Quality & System Status Page for SIH26054 Dashboard.
 Renders sensor availability matrix, stream integrity, and provenance.
 """
 
+import sys
+from pathlib import Path
+_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+
 import streamlit as st
 from dashboard.schemas.view_model import DashboardViewModel
 from dashboard.components.data_quality_view import (

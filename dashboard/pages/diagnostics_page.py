@@ -4,6 +4,12 @@ Renders anomaly detection breakdown, fault diagnosis probabilities,
 digital twin state residuals, and explainability evidence.
 """
 
+import sys
+from pathlib import Path
+_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+
 import streamlit as st
 from dashboard.schemas.view_model import DashboardViewModel
 from dashboard.components.diagnostics_view import (

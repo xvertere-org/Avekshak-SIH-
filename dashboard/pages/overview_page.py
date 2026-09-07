@@ -3,6 +3,12 @@ Overview Page for SIH26054 Dashboard.
 Renders mission executive summary, high-level KPI cards, and operational snapshot.
 """
 
+import sys
+from pathlib import Path
+_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+
 from typing import Dict, Any, List, Optional
 import streamlit as st
 from dashboard.schemas.view_model import DashboardViewModel

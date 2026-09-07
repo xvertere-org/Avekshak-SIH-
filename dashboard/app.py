@@ -14,9 +14,16 @@ _PROJECT_ROOT = str(Path(__file__).resolve().parent.parent)
 if _PROJECT_ROOT not in sys.path:
     sys.path.insert(0, _PROJECT_ROOT)
 
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 import streamlit as st
 
+from orchestrator.pipeline import SystemPipelineOrchestrator
+from orchestrator.schema import (
+    OrchestratorConfig,
+    SimulationScenario,
+    ScenarioFaultType,
+    DashboardStatePayload,
+)
 from dashboard.schemas.contracts import Phase13OutputContract
 from dashboard.schemas.view_model import DashboardViewModel
 from dashboard.services.adapter import DashboardAdapter
@@ -28,6 +35,65 @@ from dashboard.pages.telemetry_page import render_telemetry_page
 from dashboard.pages.diagnostics_page import render_diagnostics_page
 from dashboard.pages.prognostics_page import render_prognostics_page
 from dashboard.pages.system_status_page import render_system_status_page
+
+
+@st.cache_resource(show_spinner="Bootstrapping Phase 13 Pipeline Orchestrator (XGBoost + Isolation Forest)...")
+def get_cached_orchestrator() -> SystemPipelineOrchestrator:
+    """Initialize singleton production orchestrator with deterministic bootstrap."""
+    cfg = OrchestratorConfig(auto_bootstrap_on_init=True, deterministic_seed=42)
+    return SystemPipelineOrchestrator(config=cfg)
+
+
+@st.cache_data(show_spinner="Executing Phase 13 End-to-End Simulation Pipeline...")
+def run_live_simulation(
+    scenario_fault_str: str,
+    duration_s: float,
+    fault_start_s: float,
+    fault_severity: float,
+    throttle_pct: float = 75.0,
+    seed: int = 42,
+) -> List[DashboardStatePayload]:
+    """Execute end-to-end mission simulation through full Phase 6-12 causal pipeline."""
+    orch = get_cached_orchestrator()
+    fault_map = {
+        "1. Nominal Healthy Cruise": ScenarioFaultType.HEALTHY,
+        "2. Cooling Degradation (Thermal Conductance Loss)": ScenarioFaultType.COOLING_DEGRADATION,
+        "3. Lubrication Degradation (Oil Pressure Loss)": ScenarioFaultType.LUBRICATION_DEGRADATION,
+        "4. Fuel Injection Abnormality": ScenarioFaultType.FUEL_ABNORMALITY,
+        "5. Mechanical Degradation (High Vibration)": ScenarioFaultType.MECHANICAL_DEGRADATION,
+        "6. Sensor Drift & Isolation": ScenarioFaultType.SENSOR_FAULT,
+    }
+    ft = fault_map.get(scenario_fault_str, ScenarioFaultType.HEALTHY)
+    sc = SimulationScenario(
+        engine_id="UAV_AERO_ROT912_01",
+        mission_id="MIS_ISR_PATROL_01",
+        duration_s=float(duration_s),
+        fault_type=ft,
+        fault_start_s=float(fault_start_s),
+        fault_severity=float(fault_severity),
+        throttle_pct=float(throttle_pct),
+        seed=int(seed),
+    )
+    return orch.run_simulation(sc)
+
+
+def extract_history_from_payloads(payloads_subset: List[DashboardStatePayload]) -> Dict[str, Any]:
+    """Extract multi-channel time series from live orchestrator payloads for charting."""
+    channels = ["rpm", "cht", "egt", "oil_temp", "oil_pressure", "fuel_flow", "vibration"]
+    history: Dict[str, Any] = {
+        "timestamps": [p.timestamp for p in payloads_subset],
+        "health_index": {
+            "timestamps": [p.timestamp for p in payloads_subset],
+            "hi": [p.smoothed_health_index if p.smoothed_health_index is not None else float("nan") for p in payloads_subset],
+        },
+    }
+    for ch in channels:
+        history[ch] = {
+            "timestamps": [p.timestamp for p in payloads_subset],
+            "observed": [p.observed_telemetry.get(ch, float("nan")) for p in payloads_subset],
+            "expected": [p.expected_telemetry.get(ch, float("nan")) for p in payloads_subset],
+        }
+    return history
 
 
 class DashboardInterface:
@@ -107,13 +173,62 @@ def main():
         st.markdown("### Operational Feed")
         feed_mode = st.radio(
             "Telemetry Source",
-            ["Demo / Synthetic Bench Simulation", "Phase 13 Ingestion Boundary"],
+            [
+                "Phase 13 Live Pipeline Orchestrator",
+                "Pre-Packaged Demo Scenarios",
+            ],
             index=0,
-            help="Select live or synthetic demonstration stream.",
+            help="Select live end-to-end backend orchestrator or pre-packaged static demo.",
         )
 
         history_data = None
-        if feed_mode == "Demo / Synthetic Bench Simulation":
+        adapter = DashboardAdapter()
+
+        if feed_mode == "Phase 13 Live Pipeline Orchestrator":
+            st.markdown("---")
+            st.markdown("#### Live Mission Scenarios")
+            live_scenarios = [
+                "1. Nominal Healthy Cruise",
+                "2. Cooling Degradation (Thermal Conductance Loss)",
+                "3. Lubrication Degradation (Oil Pressure Loss)",
+                "4. Fuel Injection Abnormality",
+                "5. Mechanical Degradation (High Vibration)",
+                "6. Sensor Drift & Isolation",
+            ]
+            selected_scenario = st.selectbox("Scenario", live_scenarios, index=1)
+
+            with st.expander("⚙️ Mission & Fault Settings", expanded=False):
+                duration = st.slider("Duration (s)", min_value=15, max_value=90, value=35, step=5)
+                fault_start = st.slider("Fault Injection Time (s)", min_value=5, max_value=max(6, duration - 5), value=15, step=1)
+                severity = st.slider("Fault Severity", min_value=0.1, max_value=1.0, value=0.7, step=0.05)
+                throttle = st.slider("Throttle (%)", min_value=50, max_value=100, value=75, step=5)
+
+            # Execute end-to-end backend pipeline
+            payloads = run_live_simulation(
+                scenario_fault_str=selected_scenario,
+                duration_s=float(duration),
+                fault_start_s=float(fault_start),
+                fault_severity=float(severity),
+                throttle_pct=float(throttle),
+            )
+
+            max_step = len(payloads) - 1
+            default_step = min(max_step, 25)
+
+            step_slider = st.slider(
+                "Mission Elapsed Time (s)",
+                min_value=0,
+                max_value=max_step,
+                value=default_step,
+                step=1,
+                help="Scrub flight time to observe causal real-time pipeline inference.",
+            )
+
+            current_payload = payloads[step_slider]
+            history_data = extract_history_from_payloads(payloads[:step_slider + 1])
+            vm = adapter.adapt(current_payload)
+
+        else:
             st.markdown("---")
             st.markdown("#### Test Scenarios")
             scenarios = DemoScenarioProvider.get_available_scenarios()
@@ -128,19 +243,11 @@ def main():
                 help="Advance flight time step to observe progressive degradation.",
             )
 
-            # Generate demo contract
             contract, history_data = DemoScenarioProvider.generate_scenario_payload(
                 scenario_name=selected_scenario,
                 step=step_slider,
             )
-        else:
-            st.info("Awaiting live Phase 13 output contract stream...")
-            contract = Phase13OutputContract(
-                timestamp=0.0,
-                engine_id="UAV_AERO_01",
-                execution_status="AWAITING_INPUT",
-                is_synthetic_demo=False,
-            )
+            vm = adapter.adapt(contract)
 
         st.markdown("---")
         st.markdown("### Navigation")
@@ -168,10 +275,6 @@ def main():
             unsafe_allow_html=True,
         )
 
-    # Adapt contract to ViewModel
-    adapter = DashboardAdapter()
-    vm = adapter.adapt(contract)
-
     # Render Header Ribbon
     render_header(vm.overview)
 
@@ -192,3 +295,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
