@@ -1,0 +1,72 @@
+[
+  {
+    "DATASET": "NUST",
+    "DOWNLOAD STATUS": "MANUAL_ACTION_REQUIRED",
+    "FILE COUNT": 0,
+    "TOTAL BYTES": 0,
+    "SHA256 VERIFIED": false,
+    "SOURCE": "https://data.mendeley.com/datasets/3fcrrdjjvk/5",
+    "LICENSE STATUS": "VERIFIED",
+    "MANUAL ACTION REQUIRED": "Navigate in browser to https://data.mendeley.com/datasets/3fcrrdjjvk/5, pass the Cloudflare verification challenge, and download 'Vibration data files (Processed).zip' (11.4 MB) or 'Raw vibration data files.zip' (243.0 MB) into data/raw/nust/."
+  },
+  {
+    "DATASET": "PADERBORN",
+    "DOWNLOAD STATUS": "MANUAL_ACTION_REQUIRED",
+    "FILE COUNT": 0,
+    "TOTAL BYTES": 0,
+    "SHA256 VERIFIED": false,
+    "SOURCE": "https://mb.uni-paderborn.de/kat/datacenter",
+    "LICENSE STATUS": "VERIFIED",
+    "MANUAL ACTION REQUIRED": "Download representative bearing archives (K001.rar, KA01.rar, KI04.rar ~490 MB, or full 31 archives 4.95 GB) directly via browser from Zenodo https://zenodo.org/records/15845309 or Paderborn KAT Data Center https://mb.uni-paderborn.de/kat/datacenter into data/raw/paderborn/."
+  },
+  {
+    "DATASET": "CWRU",
+    "DOWNLOAD STATUS": "DOWNLOADED",
+    "FILE COUNT": 3,
+    "TOTAL BYTES": 9742304,
+    "SHA256 VERIFIED": true,
+    "SOURCE": "https://engineering.case.edu/bearingdatacenter",
+    "LICENSE STATUS": "NOT_FOUND_ON_SOURCE",
+    "MANUAL ACTION REQUIRED": "None (Files verified in local directory)"
+  },
+  {
+    "DATASET": "FEMTO",
+    "DOWNLOAD STATUS": "MANUAL_ACTION_REQUIRED",
+    "FILE COUNT": 0,
+    "TOTAL BYTES": 0,
+    "SHA256 VERIFIED": false,
+    "SOURCE": "https://www.femto-st.fr/",
+    "LICENSE STATUS": "REQUIRES_REPOSITORY_CHECK",
+    "MANUAL ACTION REQUIRED": "Log into IEEE DataPort at https://ieee-dataport.org/open-access/femto-st-bearing-dataset-0 using academic/IEEE credentials, or retrieve FEMTO PRONOSTIA bearing experiment archives from FEMTO-ST / NASA PCoE mirror, and place Bearing1_1 run-to-failure files into data/raw/femto/."
+  },
+  {
+    "DATASET": "CMAPSS",
+    "DOWNLOAD STATUS": "MANUAL_ACTION_REQUIRED",
+    "FILE COUNT": 0,
+    "TOTAL BYTES": 0,
+    "SHA256 VERIFIED": false,
+    "SOURCE": "https://www.nasa.gov/intelligent-systems-division/discovery-and-systems-health/pcoe/pcoe-data-set-repository/",
+    "LICENSE STATUS": "LICENSE_NOT_SPECIFIED_ON_CURRENT_NASA_DATA_PORTAL",
+    "MANUAL ACTION REQUIRED": "Navigate in browser to NASA Prognostics Data Repository at https://www.nasa.gov/intelligent-systems-division/discovery-and-systems-health/pcoe/pcoe-data-set-repository/ (Dataset #6 Turbofan Engine Degradation Simulation Data Set) and download CMAPSSData.zip (11.8 MB compressed) into data/raw/cmapss/."
+  },
+  {
+    "DATASET": "BASIC",
+    "DOWNLOAD STATUS": "MANUAL_ACTION_REQUIRED",
+    "FILE COUNT": 0,
+    "TOTAL BYTES": 0,
+    "SHA256 VERIFIED": false,
+    "SOURCE": "https://doi.org/10.5281/zenodo.8195068",
+    "LICENSE STATUS": "VERIFIED",
+    "MANUAL ACTION REQUIRED": "Download 'DataFlash Text Logs.rar' (727.5 MB) or desired archives (up to 13.91 GB across 6 archives) via browser from Zenodo https://zenodo.org/records/8195068 into data/raw/basic/."
+  },
+  {
+    "DATASET": "NASA_BATTERY",
+    "DOWNLOAD STATUS": "MANUAL_ACTION_REQUIRED",
+    "FILE COUNT": 0,
+    "TOTAL BYTES": 0,
+    "SHA256 VERIFIED": false,
+    "SOURCE": "https://www.nasa.gov/intelligent-systems-division/discovery-and-systems-health/pcoe/pcoe-data-set-repository/",
+    "LICENSE STATUS": "LICENSE_NOT_SPECIFIED_ON_CURRENT_NASA_DATA_PORTAL",
+    "MANUAL ACTION REQUIRED": "Navigate in browser to NASA Prognostics Data Repository at https://www.nasa.gov/intelligent-systems-division/discovery-and-systems-health/pcoe/pcoe-data-set-repository/ (Dataset #5 Battery Data Set) and download battery-dataset.zip (~28.6 MB, containing B0005, B0006, B0007, B0018) into data/raw/nasa_battery/."
+  }
+]

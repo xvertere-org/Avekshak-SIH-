@@ -1,0 +1,131 @@
+{
+  "metadata": {
+    "pipeline_stage": "STAGE_3A_DATASET_ACQUISITION",
+    "timestamp": "2026-09-07T19:36:15.682910+00:00",
+    "existing_project_files_changed": 0,
+    "models_trained": false,
+    "synthetic_telemetry_generated": false
+  },
+  "datasets": {
+    "nust": {
+      "dataset_id": "nust",
+      "name": "NUST IC-Engine Journal-Bearing Vibration Dataset",
+      "source_id": "Mendeley_Data_3fcrrdjjvk_v5",
+      "official_url": "https://data.mendeley.com/datasets/3fcrrdjjvk/5",
+      "license_status": "VERIFIED",
+      "license": "CC BY 4.0",
+      "download_status": "MANUAL_ACTION_REQUIRED",
+      "file_count": 0,
+      "total_bytes": 0,
+      "sha256_verified": false,
+      "manual_action_required": "Navigate in browser to https://data.mendeley.com/datasets/3fcrrdjjvk/5, pass the Cloudflare verification challenge, and download 'Vibration data files (Processed).zip' (11.4 MB) or 'Raw vibration data files.zip' (243.0 MB) into data/raw/nust/.",
+      "artifacts": []
+    },
+    "paderborn": {
+      "dataset_id": "paderborn",
+      "name": "Paderborn University Bearing Dataset",
+      "source_id": "Zenodo_15845309",
+      "official_url": "https://mb.uni-paderborn.de/kat/datacenter",
+      "license_status": "VERIFIED",
+      "license": "CC BY 4.0",
+      "download_status": "MANUAL_ACTION_REQUIRED",
+      "file_count": 0,
+      "total_bytes": 0,
+      "sha256_verified": false,
+      "manual_action_required": "Download representative bearing archives (K001.rar, KA01.rar, KI04.rar ~490 MB, or full 31 archives 4.95 GB) directly via browser from Zenodo https://zenodo.org/records/15845309 or Paderborn KAT Data Center https://mb.uni-paderborn.de/kat/datacenter into data/raw/paderborn/.",
+      "artifacts": []
+    },
+    "cwru": {
+      "dataset_id": "cwru",
+      "name": "CWRU Bearing Data Center",
+      "source_id": "CWRU_Bearing_Data_Center",
+      "official_url": "https://engineering.case.edu/bearingdatacenter",
+      "license_status": "NOT_FOUND_ON_SOURCE",
+      "license": "Open Academic Benchmark (No formal SPDX header on source page)",
+      "download_status": "DOWNLOADED",
+      "file_count": 3,
+      "total_bytes": 9742304,
+      "sha256_verified": true,
+      "manual_action_required": "None (Files verified in local directory)",
+      "artifacts": [
+        {
+          "filename": "105.mat",
+          "local_path": "D:\\NIRVANAA-SIH-SUBMISSION\\data\\raw\\cwru\\105.mat",
+          "byte_size": 2910768,
+          "sha256": "f80b0ea04fd06b372a0eaec7c056543ea37e4bb4727a5b173d2a5bacd2aa9cab",
+          "verified": true
+        },
+        {
+          "filename": "130.mat",
+          "local_path": "D:\\NIRVANAA-SIH-SUBMISSION\\data\\raw\\cwru\\130.mat",
+          "byte_size": 2928192,
+          "sha256": "35a095307d0971477049b343a1b5981dde465a58fb7f233ad89b035068c1717d",
+          "verified": true
+        },
+        {
+          "filename": "97.mat",
+          "local_path": "D:\\NIRVANAA-SIH-SUBMISSION\\data\\raw\\cwru\\97.mat",
+          "byte_size": 3903344,
+          "sha256": "16bf48babcf1c7ac224bc1a81cd9eafdb27e42d5cf559761907e067e8eeadf3c",
+          "verified": true
+        }
+      ]
+    },
+    "femto": {
+      "dataset_id": "femto",
+      "name": "FEMTO / PRONOSTIA Bearing Degradation Dataset",
+      "source_id": "IEEE_PHM_2012_FEMTO_ST",
+      "official_url": "https://www.femto-st.fr/",
+      "license_status": "REQUIRES_REPOSITORY_CHECK",
+      "license": "Open Academic Benchmark (IEEE PHM 2012 Challenge Rules; redistributed on NASA/GitHub mirrors without formal SPDX tag)",
+      "download_status": "MANUAL_ACTION_REQUIRED",
+      "file_count": 0,
+      "total_bytes": 0,
+      "sha256_verified": false,
+      "manual_action_required": "Log into IEEE DataPort at https://ieee-dataport.org/open-access/femto-st-bearing-dataset-0 using academic/IEEE credentials, or retrieve FEMTO PRONOSTIA bearing experiment archives from FEMTO-ST / NASA PCoE mirror, and place Bearing1_1 run-to-failure files into data/raw/femto/.",
+      "artifacts": []
+    },
+    "cmapss": {
+      "dataset_id": "cmapss",
+      "name": "NASA C-MAPSS Simulated Turbofan Degradation Dataset",
+      "source_id": "NASA_PCoE_Dataset_06",
+      "official_url": "https://www.nasa.gov/intelligent-systems-division/discovery-and-systems-health/pcoe/pcoe-data-set-repository/",
+      "license_status": "LICENSE_NOT_SPECIFIED_ON_CURRENT_NASA_DATA_PORTAL",
+      "license": "License not explicitly specified on current NASA data portal page (NASA Open Data policy typically applies to US Government works, but explicit SPDX license header is absent on current portal)",
+      "download_status": "MANUAL_ACTION_REQUIRED",
+      "file_count": 0,
+      "total_bytes": 0,
+      "sha256_verified": false,
+      "manual_action_required": "Navigate in browser to NASA Prognostics Data Repository at https://www.nasa.gov/intelligent-systems-division/discovery-and-systems-health/pcoe/pcoe-data-set-repository/ (Dataset #6 Turbofan Engine Degradation Simulation Data Set) and download CMAPSSData.zip (11.8 MB compressed) into data/raw/cmapss/.",
+      "artifacts": []
+    },
+    "basic": {
+      "dataset_id": "basic",
+      "name": "BASiC: Biomisa Arducopter Sensory Critique Dataset",
+      "source_id": "Zenodo_8195068",
+      "official_url": "https://doi.org/10.5281/zenodo.8195068",
+      "license_status": "VERIFIED",
+      "license": "CC BY 4.0",
+      "download_status": "MANUAL_ACTION_REQUIRED",
+      "file_count": 0,
+      "total_bytes": 0,
+      "sha256_verified": false,
+      "manual_action_required": "Download 'DataFlash Text Logs.rar' (727.5 MB) or desired archives (up to 13.91 GB across 6 archives) via browser from Zenodo https://zenodo.org/records/8195068 into data/raw/basic/.",
+      "artifacts": []
+    },
+    "nasa_battery": {
+      "dataset_id": "nasa_battery",
+      "name": "NASA PCoE Battery Aging Dataset",
+      "source_id": "NASA_PCoE_Dataset_05",
+      "official_url": "https://www.nasa.gov/intelligent-systems-division/discovery-and-systems-health/pcoe/pcoe-data-set-repository/",
+      "license_status": "LICENSE_NOT_SPECIFIED_ON_CURRENT_NASA_DATA_PORTAL",
+      "license": "License not explicitly specified on current NASA data portal page (NASA Open Data policy typically applies to US Government works, but explicit SPDX license header is absent on current portal)",
+      "download_status": "MANUAL_ACTION_REQUIRED",
+      "file_count": 0,
+      "total_bytes": 0,
+      "sha256_verified": false,
+      "manual_action_required": "Navigate in browser to NASA Prognostics Data Repository at https://www.nasa.gov/intelligent-systems-division/discovery-and-systems-health/pcoe/pcoe-data-set-repository/ (Dataset #5 Battery Data Set) and download battery-dataset.zip (~28.6 MB, containing B0005, B0006, B0007, B0018) into data/raw/nasa_battery/.",
+      "artifacts": []
+    }
+  }
+}

@@ -64,10 +64,10 @@ def render_what_if_page(
             unsafe_allow_html=True,
         )
         st.markdown("<b>Mission Conditions:</b>", unsafe_allow_html=True)
-        b_throttle = st.slider("Baseline Throttle (%)", 50, 100, 75, 5, key="wi_b_throttle")
         b_altitude = st.slider("Baseline Altitude (m)", 500, 5000, 2000, 250, key="wi_b_alt")
-        b_oat = st.slider("Outside Air Temp (°C)", -10, 45, 15, 1, key="wi_b_oat")
-        b_duration = st.slider("Mission Duration (s)", 15, 60, 30, 5, key="wi_b_dur")
+        b_oat = st.slider("Baseline Ambient Temperature (°C)", -20, 50, 15, 1, key="wi_b_oat")
+        b_throttle = st.slider("Baseline Throttle (%)", 50, 100, 75, 5, key="wi_b_throttle")
+        b_duration = st.slider("Baseline Duration (s)", 15, 60, 30, 5, key="wi_b_dur")
 
         st.markdown("<b style='color: #8b949e;'>Baseline Mission Profile:</b>", unsafe_allow_html=True)
         b_fault_str = st.selectbox(
@@ -87,10 +87,10 @@ def render_what_if_page(
             unsafe_allow_html=True,
         )
         st.markdown("<b>Mission Conditions:</b>", unsafe_allow_html=True)
-        w_throttle = st.slider("What-If Throttle (%)", 50, 100, 85, 5, key="wi_w_throttle")
         w_altitude = st.slider("What-If Altitude (m)", 500, 5000, 3000, 250, key="wi_w_alt")
-        w_oat = st.slider("Outside Air Temp (°C)", -10, 45, 30, 1, key="wi_w_oat")
-        w_duration = st.slider("Mission Duration (s)", 15, 60, 30, 5, key="wi_w_dur")
+        w_oat = st.slider("What-If Ambient Temperature (°C)", -20, 50, 30, 1, key="wi_w_oat")
+        w_throttle = st.slider("What-If Throttle (%)", 50, 100, 85, 5, key="wi_w_throttle")
+        w_duration = st.slider("What-If Duration (s)", 15, 60, 30, 5, key="wi_w_dur")
 
         st.markdown("<b style='color: #8b949e;'>Simulated Fault-Stress Scenario:</b>", unsafe_allow_html=True)
         w_fault_str = st.selectbox(

@@ -1,0 +1,214 @@
+{
+  "nust": {
+    "name": "NUST IC-Engine Journal-Bearing Vibration Dataset",
+    "role": "Reciprocating IC-engine vibration behavior and journal bearing fault signatures under climatic variations",
+    "source_id": "Mendeley_Data_3fcrrdjjvk_v5",
+    "official_url": "https://data.mendeley.com/datasets/3fcrrdjjvk/5",
+    "direct_api_url": "https://data.mendeley.com/api/datasets/3fcrrdjjvk?version=5",
+    "license_status": "VERIFIED",
+    "license": "CC BY 4.0",
+    "access_requirement": "Open access (Mendeley Data). Cloudflare web protection may require manual browser download.",
+    "format": "MATLAB (.mat), CSV, ZIP",
+    "verified_file_manifest": [
+      {
+        "filename": "Vibration data files (Processed).zip",
+        "size_bytes": 11953766,
+        "size_formatted": "11.4 MB"
+      },
+      {
+        "filename": "Raw vibration data files.zip",
+        "size_bytes": 254803968,
+        "size_formatted": "243.0 MB"
+      }
+    ],
+    "verified_total_size": "254.4 MB (11.4 MB processed ZIP + 243 MB raw ZIP)",
+    "verified_total_bytes": 266757734,
+    "automation_status": "SEMI_AUTOMATED (Direct API attempted; falls back to MANUAL_ACTION_REQUIRED on session lock)",
+    "source_measurement_confidence": "HIGH (Direct tri-axial physical accelerometer on MIL-STD-810G climatic chamber IC engine)",
+    "target_transfer_confidence": "MEDIUM (Physical reciprocating IC-engine mechanics; automotive/industrial bearing, not aero-piston flight unit)",
+    "notes": "Version 5 authoritative archive. Reciprocating IC-engine test bench with thermal/humidity chamber controls."
+  },
+  "paderborn": {
+    "name": "Paderborn University Bearing Dataset",
+    "role": "Mechanical bearing fault signatures, vibration distributions, speed/load sensitivity, and damage-type evidence",
+    "source_id": "Zenodo_15845309",
+    "official_url": "https://mb.uni-paderborn.de/kat/datacenter",
+    "direct_api_url": "https://zenodo.org/api/records/15845309",
+    "license_status": "VERIFIED",
+    "license": "CC BY 4.0",
+    "access_requirement": "Open academic research access via Zenodo archive.",
+    "format": "MATLAB (.mat) 64 kHz vibration & synchronous motor current",
+    "verified_file_count": 31,
+    "verified_total_size": "4.95 GB (verified size of the specific Zenodo 15845309 archive/mirror across 31 .rar files; not necessarily the canonical Paderborn website dataset size)",
+    "verified_total_bytes": 5188519999,
+    "core_profile_files": [
+      "K001.rar",
+      "KA01.rar",
+      "KI04.rar"
+    ],
+    "core_profile_size": "~490 MB (representative healthy, outer fault, inner fault runs)",
+    "automation_status": "FULLY_AUTOMATED for core and full collection via Zenodo REST API",
+    "source_measurement_confidence": "HIGH (Calibrated test rig with synchronized 64 kHz piezo sensors)",
+    "target_transfer_confidence": "MEDIUM (Component-level bearing mechanics; electric motor test bench, not engine block)",
+    "damage_type_taxonomy": {
+      "damage_type": [
+        "healthy",
+        "artificial",
+        "real"
+      ],
+      "severity_assessment": "SEPARATE (measured extent in mm/depth vs. derived vibration metric, NOT conflated with damage_type)"
+    },
+    "notes": "Authoritative Zenodo 15845309 mirror archive. Used for mechanical fault signatures and vibration distributions; NOT an engine RUL dataset."
+  },
+  "cwru": {
+    "name": "CWRU Bearing Data Center",
+    "role": "Rotational bearing fault harmonic orders, defect geometry relationships, and operating load sensitivity",
+    "source_id": "CWRU_Bearing_Data_Center",
+    "official_url": "https://engineering.case.edu/bearingdatacenter",
+    "direct_api_url": "https://engineering.case.edu/bearingdatacenter/download-data-file",
+    "license_status": "NOT_FOUND_ON_SOURCE",
+    "license": "Open Academic Benchmark (No formal SPDX header on source page)",
+    "access_requirement": "Open access without authentication.",
+    "format": "MATLAB (.mat) 12k/48k drive-end and fan-end acceleration",
+    "verified_total_size": "~210 MB (Entire standard 12k/48k DE/FE bearing collection)",
+    "core_profile_files": [
+      "97.mat (Normal)",
+      "105.mat (7-mil Inner)",
+      "130.mat (7-mil Outer)"
+    ],
+    "core_profile_size": "~8.5 MB",
+    "automation_status": "FULLY_AUTOMATED (Direct HTTP file retrieval with checksum verification)",
+    "source_measurement_confidence": "HIGH (Authoritative standard benchmark vibration measurements)",
+    "target_transfer_confidence": "MEDIUM (Component-level bearing fault evidence only; steady-state induction motor rig)",
+    "notes": "Standard rotating machinery benchmark for bearing defect frequencies and harmonic progression."
+  },
+  "femto": {
+    "name": "FEMTO / PRONOSTIA Bearing Degradation Dataset",
+    "role": "Accelerated run-to-failure degradation progression, health index monotonicity, and RUL trajectory methodology",
+    "source_id": "IEEE_PHM_2012_FEMTO_ST",
+    "official_url": "https://www.femto-st.fr/",
+    "direct_api_url": "https://www.nasa.gov/intelligent-systems-division/discovery-and-systems-health/pcoe/pcoe-data-set-repository/",
+    "mirror_url": "https://raw.githubusercontent.com/gmgun/femto-bearing-dataset/master/",
+    "mirror_provenance": "Academic research repository reproducing original IEEE PHM 2012 challenge bearing signals",
+    "mirror_retrieval_date": "2026-09-08",
+    "expected_sha256": "RECORDED_UPON_RETRIEVAL",
+    "license_status": "REQUIRES_REPOSITORY_CHECK",
+    "license": "Open Academic Benchmark (IEEE PHM 2012 Challenge Rules; redistributed on NASA/GitHub mirrors without formal SPDX tag)",
+    "access_requirement": "Open access on GitHub/NASA mirrors; IEEE DataPort requires IEEE account login.",
+    "format": "CSV files (horizontal & vertical acceleration @ 25.6 kHz, sampled every 10s)",
+    "verified_total_size": "~2.1 GB uncompressed (17 run-to-failure bearing experiments)",
+    "core_profile_files": [
+      "Bearing1_1 run-to-failure series (~120 MB)"
+    ],
+    "core_profile_size": "~120 MB",
+    "automation_status": "FULLY_AUTOMATED via verified GitHub/NASA repository mirror; MANUAL_ACTION_REQUIRED for IEEE portal",
+    "source_measurement_confidence": "HIGH (Controlled accelerated life test bench with continuous high-frequency logging)",
+    "target_transfer_confidence": "LOW_TO_MEDIUM (Methodological transfer for degradation curve shapes and monotonicity; bearing RUL != engine RUL)",
+    "notes": "Used strictly for degradation trajectory shape, monotonicity, and RUL uncertainty methodology."
+  },
+  "cmapss": {
+    "name": "NASA C-MAPSS Simulated Turbofan Degradation Dataset",
+    "role": "NASA C-MAPSS simulated turbofan degradation dataset; used only for prognostic/degradation methodology and trajectory-shape evidence.",
+    "source_id": "NASA_PCoE_Dataset_06",
+    "official_url": "https://www.nasa.gov/intelligent-systems-division/discovery-and-systems-health/pcoe/pcoe-data-set-repository/",
+    "direct_api_url": "https://data.nasa.gov/download/CMAPSSData.tar.gz",
+    "mirror_url": "https://raw.githubusercontent.com/mitacs-project/turbofan_dataset/master/CMAPSSData.zip",
+    "mirror_provenance": "Academic research mirror hosting identical CMAPSSData archive with SHA-256 validation",
+    "mirror_retrieval_date": "2026-09-08",
+    "license_status": "LICENSE_NOT_SPECIFIED_ON_CURRENT_NASA_DATA_PORTAL",
+    "license": "License not explicitly specified on current NASA data portal page (NASA Open Data policy typically applies to US Government works, but explicit SPDX license header is absent on current portal)",
+    "access_requirement": "Open public access without registration.",
+    "format": "Space-delimited ASCII text files (.txt) inside compressed archive",
+    "verified_file_manifest": [
+      {
+        "filename": "CMAPSSData.tar.gz / CMAPSSData.zip",
+        "size_bytes": 12349842,
+        "size_formatted": "11.8 MB"
+      }
+    ],
+    "verified_total_size": "11.8 MB compressed (~120 MB uncompressed text files)",
+    "verified_total_bytes": 12349842,
+    "core_profile_size": "11.8 MB (FD001 sub-dataset)",
+    "automation_status": "FULLY_AUTOMATED (Direct archive retrieval with checksum verification)",
+    "source_measurement_confidence": "HIGH (High-fidelity numerical turbofan aerothermal simulation)",
+    "target_transfer_confidence": "LOW (Purely methodological RUL/degradation transfer; C-MAPSS variables MUST NEVER be mapped to aero-piston CHT/EGT)",
+    "notes": "Dedicated evidence adapter extracts degradation trajectory curvature and RUL bounds only. Zero direct channel mapping."
+  },
+  "basic": {
+    "name": "BASiC: Biomisa Arducopter Sensory Critique Dataset",
+    "role": "UAV flight mission phases, timestamp behavior, and sensor failure profiles (bias, drift, stuck, noise)",
+    "source_id": "Zenodo_8195068",
+    "official_url": "https://doi.org/10.5281/zenodo.8195068",
+    "direct_api_url": "https://zenodo.org/api/records/8195068",
+    "license_status": "VERIFIED",
+    "license": "CC BY 4.0",
+    "access_requirement": "Open access via Zenodo repository.",
+    "format": "RAR archives containing ArduPilot SITL flight logs (.bin, .txt, .mat, .csv)",
+    "nature_of_data": "SITL (Software-in-the-Loop) ArduPilot simulation data with engineered sensor failures, NOT physical UAV flight measurements",
+    "verified_file_manifest": [
+      {
+        "filename": "DataFlash Text Logs.rar",
+        "size_bytes": 762854062,
+        "size_formatted": "727.5 MB"
+      },
+      {
+        "filename": "Processed Data.rar",
+        "size_bytes": 8418715100,
+        "size_formatted": "7.84 GB"
+      },
+      {
+        "filename": "Telemetry Logs.rar",
+        "size_bytes": 1825491547,
+        "size_formatted": "1.70 GB"
+      },
+      {
+        "filename": "Matlab's Mat Files.rar",
+        "size_bytes": 570740623,
+        "size_formatted": "544.3 MB"
+      },
+      {
+        "filename": "Raw Data Logs.rar",
+        "size_bytes": 1759863128,
+        "size_formatted": "1.64 GB"
+      },
+      {
+        "filename": "Ground Control Station Log.rar",
+        "size_bytes": 577495858,
+        "size_formatted": "550.7 MB"
+      }
+    ],
+    "verified_total_size": "13.91 GB across 6 archives (13,915,160,318 bytes)",
+    "verified_total_bytes": 13915160318,
+    "core_profile_files": [
+      "DataFlash Text Logs.rar (~727 MB) or selected sample flights"
+    ],
+    "core_profile_size": "~50 MB (extracted representative flight segments)",
+    "automation_status": "FULLY_AUTOMATED for individual archive retrieval via Zenodo REST API",
+    "source_measurement_confidence": "MEDIUM_TO_HIGH (High-fidelity SITL multi-sensor flight dynamics)",
+    "target_transfer_confidence": "HIGH for flight mission context and sensor-failure kinematics; LOW for propulsion (electric vs. piston)",
+    "notes": "SITL simulation logs across 70 autonomous flight instances. Electric motor telemetry is strictly ignored."
+  },
+  "nasa_battery": {
+    "name": "NASA PCoE Battery Aging Dataset",
+    "role": "Electrochemical capacity degradation, internal resistance increase, SOH methodology under temperature cycles",
+    "source_id": "NASA_PCoE_Dataset_05",
+    "official_url": "https://www.nasa.gov/intelligent-systems-division/discovery-and-systems-health/pcoe/pcoe-data-set-repository/",
+    "direct_api_url": "https://data.nasa.gov/download/battery-dataset.zip",
+    "mirror_url": "https://raw.githubusercontent.com/stevenliuyi/nasa-battery-dataset/master/",
+    "mirror_provenance": "Public repository hosting original B0005, B0006, B0007, B0018 cycle records",
+    "mirror_retrieval_date": "2026-09-08",
+    "license_status": "LICENSE_NOT_SPECIFIED_ON_CURRENT_NASA_DATA_PORTAL",
+    "license": "License not explicitly specified on current NASA data portal page (NASA Open Data policy typically applies to US Government works, but explicit SPDX license header is absent on current portal)",
+    "access_requirement": "Open public access without registration.",
+    "format": "MATLAB (.mat) / CSV charge-discharge cycle records (B0005, B0006, B0007, B0018)",
+    "verified_total_size": "~28.6 MB (Complete set of 4 benchmark Li-ion batteries)",
+    "core_profile_files": [
+      "B0005.mat standard aging curve (~7.2 MB)"
+    ],
+    "core_profile_size": "~7.2 MB",
+    "automation_status": "FULLY_AUTOMATED via official endpoint or verified academic mirror",
+    "source_measurement_confidence": "HIGH (Controlled environmental chamber battery cycling)",
+    "target_transfer_confidence": "LOW_TO_MEDIUM (Methodological SOH capacity fade transfer; NOT direct engine alternator degradation)",
+    "notes": "Used strictly for capacity fade and health index degradation methodology."
+  }
+}

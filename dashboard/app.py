@@ -54,6 +54,8 @@ def run_live_simulation(
     fault_start_s: float,
     fault_severity: float,
     throttle_pct: float = 75.0,
+    altitude_m: float = 2000.0,
+    ambient_temp_c: float = 15.0,
     seed: int = 42,
 ) -> List[DashboardStatePayload]:
     """Execute end-to-end mission simulation through full Phase 6-12 causal pipeline."""
@@ -75,6 +77,8 @@ def run_live_simulation(
         fault_start_s=float(fault_start_s),
         fault_severity=float(fault_severity),
         throttle_pct=float(throttle_pct),
+        altitude_m=float(altitude_m),
+        ambient_temp_c=float(ambient_temp_c),
         seed=int(seed),
     )
     return orch.run_simulation(sc)
@@ -232,6 +236,8 @@ def main():
                 fault_start = st.slider("Fault Injection Time (s)", min_value=5, max_value=max(6, duration - 5), value=15, step=1)
                 severity = st.slider("Fault Severity", min_value=0.1, max_value=1.0, value=0.7, step=0.05)
                 throttle = st.slider("Throttle (%)", min_value=50, max_value=100, value=75, step=5)
+                altitude = st.slider("Altitude (m)", min_value=500, max_value=5000, value=2000, step=250, help="Operating flight altitude in meters.")
+                ambient_temp = st.slider("Ambient Temperature (°C)", min_value=-20, max_value=50, value=15, step=1, help="Operating ambient air temperature.")
 
             # Execute end-to-end backend pipeline
             payloads = run_live_simulation(
@@ -240,6 +246,8 @@ def main():
                 fault_start_s=float(fault_start),
                 fault_severity=float(severity),
                 throttle_pct=float(throttle),
+                altitude_m=float(altitude),
+                ambient_temp_c=float(ambient_temp),
             )
 
             max_step = len(payloads) - 1
@@ -278,6 +286,26 @@ def main():
                 step=step_slider,
             )
             vm = adapter.adapt(contract)
+
+            # Map pre-packaged test scenario to authoritative pipeline simulation for Mission Replay & Reporting
+            demo_to_live_map = {
+                "1. Nominal Healthy Cruise": ("1. Nominal Healthy Cruise", 15.0, 0.0),
+                "2. Thermal Degradation (Cooling Conductance Loss)": ("2. Cooling Degradation (Thermal Conductance Loss)", 15.0, 0.7),
+                "3. Lubrication Pressure Loss (Hydraulic Failure)": ("3. Lubrication Degradation (Oil Pressure Loss)", 15.0, 0.7),
+                "4. CHT Sensor Dropout & Isolation (Instrumentation Fault)": ("6. Sensor Drift & Isolation", 15.0, 0.7),
+            }
+            mapped = demo_to_live_map.get(selected_scenario, ("1. Nominal Healthy Cruise", 15.0, 0.0))
+            sim_duration = max(float(step_slider), 35.0)
+            try:
+                payloads = run_live_simulation(
+                    scenario_fault_str=mapped[0],
+                    duration_s=sim_duration,
+                    fault_start_s=mapped[1],
+                    fault_severity=mapped[2],
+                    throttle_pct=75.0,
+                )
+            except Exception:
+                payloads = []
 
         if st.button("Reset Simulation", use_container_width=True):
             st.session_state.sim_time = 35

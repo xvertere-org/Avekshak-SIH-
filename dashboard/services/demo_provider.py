@@ -360,8 +360,12 @@ class DemoScenarioProvider:
                     "expected_vibration": 0.50,
                 },
                 "residuals": {
-                    "oil_pressure_residual": -2.85,
+                    "rpm_residual": -50.0,
+                    "cht_residual": 10.0,
+                    "egt_residual": 10.0,
                     "oil_temp_residual": 41.0,
+                    "oil_pressure_residual": -2.85,
+                    "fuel_flow_residual": 0.4,
                     "vibration_residual": 0.35,
                 },
             }
@@ -480,8 +484,13 @@ class DemoScenarioProvider:
                     "expected_vibration": 0.50,
                 },
                 "residuals": {
+                    "rpm_residual": 10.0,
                     "cht_residual": float("nan"),
+                    "egt_residual": 2.0,
                     "oil_temp_residual": 0.5,
+                    "oil_pressure_residual": -0.05,
+                    "fuel_flow_residual": 0.1,
+                    "vibration_residual": 0.01,
                 },
             }
             health_index = {
