@@ -100,6 +100,9 @@ class DashboardStatePayload:
     diagnosis_probabilities: Dict[str, float] = field(default_factory=dict)
     diagnostic_confidence: float = 1.0
     diagnosis_data_quality: str = "VALID"
+    suspect_sensor: Optional[str] = None
+    suspect_sensors: List[str] = field(default_factory=list)
+    sensor_isolation_status: str = "NONE"
 
     # HEALTH (Phase 9)
     raw_health_index: float = 1.0
@@ -118,6 +121,7 @@ class DashboardStatePayload:
     forecast_timestamps: Optional[List[float]] = None
     is_pretrained: bool = False
     forecast_quality: str = "INSUFFICIENT_CONTEXT"
+    projected_health_trajectory: Optional[List[float]] = None
 
     # RUL (Phase 11)
     rul_state: str = "INSUFFICIENT_HISTORY"
@@ -126,6 +130,7 @@ class DashboardStatePayload:
     rul_uncertainty_p95: Optional[float] = None
     limiting_factor: str = "NONE"
     forecast_assisted_mode: bool = False
+    forecast_mode_status: str = "OFF"
     eol_provenance: Dict[str, Any] = field(default_factory=dict)
 
     # EXPLAINABILITY (Phase 12)
@@ -204,6 +209,10 @@ class DashboardStatePayload:
                 "class_probabilities": self.diagnosis_probabilities,
                 "confidence": self.diagnostic_confidence,
                 "data_quality": self.diagnosis_data_quality,
+                "suspect_sensor": self.suspect_sensor,
+                "suspect_channel": self.suspect_sensor,
+                "suspect_sensors": self.suspect_sensors,
+                "sensor_isolation_status": self.sensor_isolation_status,
             },
             "health": {
                 "raw_health_index": self.raw_health_index,
@@ -230,6 +239,8 @@ class DashboardStatePayload:
                 "p95": self.rul_uncertainty_p95,
                 "limiting_factor": self.limiting_factor,
                 "forecast_assisted": self.forecast_assisted_mode,
+                "forecast_assisted_mode": self.forecast_assisted_mode,
+                "forecast_mode_status": self.forecast_mode_status,
                 "eol_provenance": self.eol_provenance,
             },
             "explainability": {

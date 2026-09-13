@@ -23,6 +23,7 @@ from fault_diagnosis.features import (
     DIAGNOSTIC_FEATURES,
 )
 from fault_diagnosis.classifier import XGBoostFaultClassifier
+from fault_diagnosis.sensor_identification import SensorFaultIdentifier
 
 
 class FaultDiagnosisPipeline:
@@ -46,6 +47,7 @@ class FaultDiagnosisPipeline:
         classifier: XGBoostFaultClassifier,
         feature_extractor: FeatureExtractor,
         enable_phase7_gating: bool = True,
+        sensor_identifier: Optional[SensorFaultIdentifier] = None,
     ):
         """
         Initialize pipeline with trained classifier and fitted feature extractor.
@@ -55,10 +57,12 @@ class FaultDiagnosisPipeline:
             feature_extractor: Fitted FeatureExtractor instance.
             enable_phase7_gating: If True and anomaly_status == 'NORMAL',
                                  report 'none' without running model.
+            sensor_identifier: Optional SensorFaultIdentifier instance.
         """
         self.classifier = classifier
         self.feature_extractor = feature_extractor
         self.enable_phase7_gating = enable_phase7_gating
+        self.sensor_identifier = sensor_identifier or SensorFaultIdentifier()
 
         # Cache global model feature importance
         if classifier.is_trained:
@@ -71,6 +75,8 @@ class FaultDiagnosisPipeline:
         sample: Dict[str, Any],
         anomaly_status: Optional[str] = None,
         anomaly_score: Optional[float] = None,
+        observed_telemetry: Optional[Dict[str, Any]] = None,
+        contributing_channels: Optional[List[str]] = None,
     ) -> FaultDiagnosisResult:
         """
         Diagnose a single telemetry/residual sample.
@@ -79,13 +85,22 @@ class FaultDiagnosisPipeline:
             sample: Dict containing residual channels and operating context.
             anomaly_status: Optional Phase 7 status ('NORMAL', 'WARNING', 'ANOMALY', etc.)
             anomaly_score: Optional Phase 7 anomaly score.
+            observed_telemetry: Optional raw/cleaned telemetry dict for sensor dropout detection.
+            contributing_channels: Optional Phase 7 anomaly contributing channels.
 
         Returns:
             FaultDiagnosisResult dataclass instance.
         """
         df = pd.DataFrame([sample])
-        results = self.diagnose_batch(df, anomaly_statuses=[anomaly_status] if anomaly_status else None,
-                                      anomaly_scores=[anomaly_score] if anomaly_score is not None else None)
+        obs_list = [observed_telemetry] if observed_telemetry is not None else None
+        contrib_list = [contributing_channels] if contributing_channels is not None else None
+        results = self.diagnose_batch(
+            df,
+            anomaly_statuses=[anomaly_status] if anomaly_status else None,
+            anomaly_scores=[anomaly_score] if anomaly_score is not None else None,
+            observed_telemetries=obs_list,
+            contributing_channels_list=contrib_list,
+        )
         return results[0]
 
     def diagnose_batch(
@@ -93,6 +108,8 @@ class FaultDiagnosisPipeline:
         df: pd.DataFrame,
         anomaly_statuses: Optional[List[Optional[str]]] = None,
         anomaly_scores: Optional[List[Optional[float]]] = None,
+        observed_telemetries: Optional[List[Optional[Dict[str, Any]]]] = None,
+        contributing_channels_list: Optional[List[Optional[List[str]]]] = None,
     ) -> List[FaultDiagnosisResult]:
         """
         Diagnose a batch of samples in a DataFrame.
@@ -101,6 +118,8 @@ class FaultDiagnosisPipeline:
             df: DataFrame containing ResidualFrame columns and operating context.
             anomaly_statuses: Optional list of Phase 7 anomaly statuses per row.
             anomaly_scores: Optional list of Phase 7 anomaly scores per row.
+            observed_telemetries: Optional list of raw/cleaned telemetry per row.
+            contributing_channels_list: Optional list of contributing channels per row.
 
         Returns:
             List of FaultDiagnosisResult instances.
@@ -182,6 +201,24 @@ class FaultDiagnosisPipeline:
                 prob_dict = dict(probs[i])
                 conf = float(max(prob_dict.values()))
 
+            # Perform suspect sensor identification when fault is sensor_fault
+            if pred_fault == "sensor_fault":
+                obs_t = observed_telemetries[i] if observed_telemetries and i < len(observed_telemetries) else None
+                contrib_c = contributing_channels_list[i] if contributing_channels_list and i < len(contributing_channels_list) else None
+                ident_res = self.sensor_identifier.identify_suspect_sensors(
+                    residual_sample=row.to_dict(),
+                    observed_telemetry=obs_t,
+                    contributing_channels=contrib_c,
+                    model_confidence=conf,
+                )
+                suspect_sensor = ident_res["suspect_sensor"]
+                suspect_sensors = ident_res["suspect_sensors"]
+                sensor_isolation_status = ident_res["sensor_isolation_status"]
+            else:
+                suspect_sensor = None
+                suspect_sensors = []
+                sensor_isolation_status = "NONE"
+
             res = FaultDiagnosisResult(
                 timestamp=timestamp,
                 engine_id=engine_id,
@@ -194,6 +231,9 @@ class FaultDiagnosisPipeline:
                 model_feature_importance=model_importance,
                 anomaly_status=a_status,
                 anomaly_score=a_score,
+                suspect_sensor=suspect_sensor,
+                suspect_sensors=suspect_sensors,
+                sensor_isolation_status=sensor_isolation_status,
             )
             results.append(res)
 

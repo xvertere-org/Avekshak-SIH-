@@ -11,6 +11,8 @@ and NEVER executes ML models or computes PHM metrics.
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Dict, Any, Optional, Union, TYPE_CHECKING
+import math
+import pandas as pd
 
 if TYPE_CHECKING:
     from telemetry.schema import TelemetryRecord, DigitalTwinState
@@ -49,6 +51,8 @@ class Phase13OutputContract:
     forecast: Optional[Union[ForecastResult, Dict[str, Any]]] = None
     prognostics: Optional[Union[RULResult, Dict[str, Any]]] = None
     explainability: Optional[Union[ExplainabilityResult, Dict[str, Any]]] = None
+    forecast_assisted_mode: bool = False
+    forecast_mode_status: str = "OFF"
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> Phase13OutputContract:
@@ -73,6 +77,26 @@ class Phase13OutputContract:
         prognostics = data.get("prognostics") or data.get("rul") or data.get("rul_result") or data.get("_rul_result")
         explainability = data.get("explainability") or data.get("xai") or data.get("explainability_result") or data.get("_explainability_result")
 
+        # Authoritative forecast-assisted mode and status extraction
+        forecast_assisted_mode = bool(
+            data.get("forecast_assisted_mode")
+            if "forecast_assisted_mode" in data
+            else (
+                data.get("forecast_assisted")
+                if "forecast_assisted" in data
+                else (
+                    prognostics.get("forecast_assisted_mode", prognostics.get("forecast_assisted", False))
+                    if isinstance(prognostics, dict)
+                    else getattr(prognostics, "forecast_assisted_mode", getattr(prognostics, "forecast_assisted", False))
+                )
+            )
+        )
+        forecast_mode_status = str(
+            data.get("forecast_mode_status")
+            or (prognostics.get("forecast_mode_status") if isinstance(prognostics, dict) else getattr(prognostics, "forecast_mode_status", None))
+            or ("ACTIVE" if forecast_assisted_mode else "OFF")
+        )
+
         return cls(
             timestamp=float(timestamp) if timestamp is not None else 0.0,
             engine_id=str(engine_id),
@@ -89,6 +113,8 @@ class Phase13OutputContract:
             forecast=forecast,
             prognostics=prognostics,
             explainability=explainability,
+            forecast_assisted_mode=forecast_assisted_mode,
+            forecast_mode_status=forecast_mode_status,
         )
 
     @classmethod
@@ -127,11 +153,16 @@ class Phase13OutputContract:
 
         anomaly = getattr(obj, "anomaly", getattr(obj, "anomaly_record", None))
         if anomaly is None and hasattr(obj, "anomaly_status"):
+            raw_score = getattr(obj, "anomaly_score", None)
+            try:
+                score_val = float("nan") if raw_score is None or math.isnan(float(raw_score)) else float(raw_score)
+            except (ValueError, TypeError):
+                score_val = float("nan")
             anomaly = {
-                "anomaly_status": getattr(obj, "anomaly_status", "NORMAL"),
-                "status": getattr(obj, "anomaly_status", "NORMAL"),
-                "anomaly_score": getattr(obj, "anomaly_score", 0.0),
-                "score": getattr(obj, "anomaly_score", 0.0),
+                "anomaly_status": getattr(obj, "anomaly_status", "INSUFFICIENT_DATA"),
+                "status": getattr(obj, "anomaly_status", "INSUFFICIENT_DATA"),
+                "anomaly_score": score_val,
+                "score": score_val,
                 "contributing_channels": getattr(obj, "anomaly_contributing_channels", []),
                 "persistence_count": getattr(obj, "persistence_count", 0),
                 "evidence": getattr(obj, "anomaly_evidence", {}),
@@ -144,13 +175,17 @@ class Phase13OutputContract:
             or getattr(obj, "_diagnosis_result", None)
         )
         if fault_diagnosis is None and hasattr(obj, "predicted_fault_class"):
+            raw_conf = getattr(obj, "diagnostic_confidence", None)
+            conf_val = 0.0 if raw_conf is None or pd.isna(raw_conf) else float(raw_conf)
+            raw_dq = getattr(obj, "diagnosis_data_quality", None)
+            dq_val = "INSUFFICIENT_DATA" if raw_dq is None else str(raw_dq)
             fault_diagnosis = {
                 "predicted_fault_type": getattr(obj, "predicted_fault_class", "none"),
                 "predicted_fault_class": getattr(obj, "predicted_fault_class", "none"),
-                "diagnostic_confidence": getattr(obj, "diagnostic_confidence", 1.0),
-                "confidence": getattr(obj, "diagnostic_confidence", 1.0),
+                "diagnostic_confidence": conf_val,
+                "confidence": conf_val,
                 "class_probabilities": getattr(obj, "diagnosis_probabilities", {}),
-                "data_quality": getattr(obj, "diagnosis_data_quality", "VALID"),
+                "data_quality": dq_val,
             }
 
         health_index = (
@@ -203,6 +238,26 @@ class Phase13OutputContract:
                 "limiting_factor": getattr(obj, "limiting_factor", "NONE"),
             }
 
+        # Authoritative forecast-assisted mode and status extraction
+        forecast_assisted_mode = bool(
+            getattr(obj, "forecast_assisted_mode", None)
+            if getattr(obj, "forecast_assisted_mode", None) is not None
+            else (
+                getattr(obj, "forecast_assisted", None)
+                if getattr(obj, "forecast_assisted", None) is not None
+                else (
+                    getattr(prognostics, "forecast_assisted_mode", getattr(prognostics, "forecast_assisted", False))
+                    if not isinstance(prognostics, dict)
+                    else prognostics.get("forecast_assisted_mode", prognostics.get("forecast_assisted", False))
+                )
+            )
+        )
+        forecast_mode_status = str(
+            getattr(obj, "forecast_mode_status", None)
+            or (getattr(prognostics, "forecast_mode_status", None) if not isinstance(prognostics, dict) else prognostics.get("forecast_mode_status", None))
+            or ("ACTIVE" if forecast_assisted_mode else "OFF")
+        )
+
         explainability = (
             getattr(obj, "explainability", None)
             or getattr(obj, "explainability_result", None)
@@ -235,4 +290,6 @@ class Phase13OutputContract:
             forecast=forecast,
             prognostics=prognostics,
             explainability=explainability,
+            forecast_assisted_mode=forecast_assisted_mode,
+            forecast_mode_status=forecast_mode_status,
         )

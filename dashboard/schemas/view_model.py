@@ -170,6 +170,9 @@ class DiagnosticsViewModel:
     diagnosis_data_quality: str = "VALID"
     sensor_fault_indicated: bool = False
     isolated_channels: List[str] = field(default_factory=list)
+    suspect_sensor: Optional[str] = None
+    suspect_sensors: List[str] = field(default_factory=list)
+    sensor_isolation_status: str = "NONE"
 
     # Explainability (Phase 12)
     summary_explanation: Optional[str] = None
@@ -212,6 +215,7 @@ class PrognosticsViewModel:
     rul_p95_hours: Optional[float] = None
     limiting_factor: Optional[str] = None
     forecast_assisted_mode: bool = False
+    forecast_mode_status: str = "OFF"
     eol_provenance: Dict[str, Any] = field(default_factory=dict)
     prognostic_confidence: Optional[float] = None
 
