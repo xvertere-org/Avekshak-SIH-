@@ -44,6 +44,8 @@ class EngineConfig:
     """
     engine_id: str = "ENGINE_UAV_01"
     model_template_name: str = "GENERIC_MALE_UAV_PISTON_4CYL"
+    reference_engine: Optional[str] = None
+    reference_spec_path: Optional[str] = None
     displacement_cc: Optional[float] = None
     compression_ratio: Optional[float] = None
     max_rpm: Optional[float] = None
@@ -129,6 +131,21 @@ class TelemetryRecord:
     source: str = "simulator_v1"
     source_type: str = "simulated"
     simulation_version: str = "0.2.0-phase2b-physics"
+    # Phase 2 Optional Channels (Strictly nullable to avoid fabricating missing physical measurements)
+    map_bar: Optional[float] = None                 # Manifold Absolute Pressure (bar)
+    charge_air_temp: Optional[float] = None         # Airbox / charge-air temperature (°C)
+    engine_rpm: Optional[float] = None              # Crankshaft rotational speed (RPM)
+    propeller_rpm: Optional[float] = None           # Propeller shaft rotational speed (RPM)
+    cht_cyl1: Optional[float] = None                # Cylinder 1 head temperature (°C)
+    cht_cyl2: Optional[float] = None                # Cylinder 2 head temperature (°C)
+    cht_cyl3: Optional[float] = None                # Cylinder 3 head temperature (°C)
+    cht_cyl4: Optional[float] = None                # Cylinder 4 head temperature (°C)
+    egt_cyl1: Optional[float] = None                # Cylinder 1 exhaust gas temperature (°C)
+    egt_cyl2: Optional[float] = None                # Cylinder 2 exhaust gas temperature (°C)
+    egt_cyl3: Optional[float] = None                # Cylinder 3 exhaust gas temperature (°C)
+    egt_cyl4: Optional[float] = None                # Cylinder 4 exhaust gas temperature (°C)
+    coolant_temp: Optional[float] = None            # Liquid coolant loop temperature (°C)
+    tcu_wastegate_position: Optional[float] = None  # TCU wastegate position (0.0=closed, 1.0=open bypass)
     metadata: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:

@@ -317,7 +317,7 @@ def test_12_causal_execution(shared_orchestrator):
     orch.reset(sc.engine_id, sc.mission_id)
     payloads_partial = orch.run_simulation(sc, duration_s=10.0)
 
-    # Output at index 9 (t=9) must match exactly
+    # Output at index 9 (t=9) must match strictly identically
     assert payloads_full[9].smoothed_health_index == payloads_partial[9].smoothed_health_index
     assert payloads_full[9].anomaly_score == payloads_partial[9].anomaly_score
     assert payloads_full[9].predicted_fault_class == payloads_partial[9].predicted_fault_class

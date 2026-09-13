@@ -21,6 +21,10 @@ from telemetry.ingestion import CanonicalTelemetryFrame
 from digital_twin.residuals import ResidualGenerator, ResidualFrame, SUPPORTED_RESIDUAL_CHANNELS
 from simulator.config import SimulatorConfig, TierAParameters, TierCParameters, TierDParameters
 from simulator.subsystems.atmosphere import Atmosphere
+from simulator.subsystems.turbocharger import TurbochargerSubsystem
+
+
+from simulator.subsystems.dynamics import EngineDynamics, OperatingPoint
 
 
 class DigitalTwinModel:
@@ -44,20 +48,36 @@ class DigitalTwinModel:
         self.tier_d = self.sim_config.tier_d
 
         self.atmosphere = Atmosphere(tier_a=self.tier_a)
+        self.turbocharger = TurbochargerSubsystem(
+            tier_a=self.tier_a,
+            config=self.sim_config.tier_c_turbo,
+        )
 
         # Internal state variables (initialized to healthy nominal baseline)
         self.expected_rpm = self.tier_c.rpm_idle
-        self.omega = 2.0 * math.pi * self.expected_rpm / 60.0
         self.expected_cht = 85.0
         self.expected_egt = 580.0
         self.expected_oil_temp = 65.0
         self.last_timestamp: Optional[float] = None
+        self._last_m_air = 0.045
+        self._last_m_fuel = 0.003
 
-        # Precalculate idle assist torque balance
-        omega_idle = 2.0 * math.pi * self.tier_c.rpm_idle / 60.0
-        t_load_idle = self.tier_c.k_load * (omega_idle ** 2)
-        t_fric_idle = self.tier_c.k_fric_linear * omega_idle + self.tier_c.torque_fric_static
-        self._idle_torque_balance = t_load_idle + t_fric_idle
+        # Rotational dynamics model
+        self.dynamics = EngineDynamics(
+            tier_a=self.tier_a,
+            tier_c=self.tier_c,
+            tier_d=self.tier_d,
+            config=self.sim_config,
+            initial_rpm=self.expected_rpm,
+        )
+        self.omega = self.dynamics.omega
+
+        # Expose kinematics parameters
+        self.ratio = self.dynamics.ratio
+        self.eta_gb = self.dynamics.eta_gb
+        self.j_eq = self.dynamics.j_eq
+        self.k_prop = self.dynamics.k_prop
+        self._idle_torque_balance = self.dynamics._idle_torque_balance
 
     def reset(
         self,
@@ -68,42 +88,34 @@ class DigitalTwinModel:
     ) -> None:
         """Reset internal nominal state estimates to baseline initial conditions."""
         self.expected_rpm = initial_rpm if initial_rpm is not None else self.tier_c.rpm_idle
-        self.omega = 2.0 * math.pi * self.expected_rpm / 60.0
+        self.dynamics.reset(initial_rpm=self.expected_rpm)
+        self.omega = self.dynamics.omega
         self.expected_cht = initial_cht
         self.expected_egt = initial_egt
         self.expected_oil_temp = initial_oil_temp
+        self.turbocharger.reset(1.013)
+        self._last_m_air = 0.045
+        self._last_m_fuel = 0.003
         self.last_timestamp = None
 
     def _compute_rpm_efficiency(self, rpm: float) -> float:
         """Tier D polynomial efficiency curve peaking near continuous rated speed (5500 RPM)."""
-        norm_rpm = rpm / self.tier_a.rpm_max_continuous
-        a, b, c = self.tier_d.rpm_eff_poly
-        eff = a * (norm_rpm ** 2) + b * norm_rpm + c
-        return max(0.35, min(1.05, eff))
+        return self.dynamics.compute_rpm_efficiency(rpm)
 
     def _torque_derivatives(
         self,
         omega: float,
         throttle_pct: float,
         density_factor: float,
+        boost_ratio: float = 1.0,
     ) -> Tuple[float, float, float, float, float, float]:
-        """Compute torque balance derivatives for expected rotational dynamics."""
-        rpm = max(0.0, omega * 60.0 / (2.0 * math.pi))
-        throttle_norm = max(0.0, min(100.0, throttle_pct)) / 100.0
-        eff = self._compute_rpm_efficiency(rpm)
-
-        p_combustion = self.tier_a.power_max_continuous_w * throttle_norm * density_factor * eff
-        omega_safe = max(omega, 10.0)
-        t_combustion = p_combustion / omega_safe
-        t_idle_assist = self._idle_torque_balance * max(0.0, (1.0 - throttle_norm * 2.0))
-        torque_engine = t_combustion + t_idle_assist
-
-        torque_load = self.tier_c.k_load * (omega ** 2)
-        torque_friction = self.tier_c.k_fric_linear * omega + self.tier_c.torque_fric_static
-
-        net_torque = torque_engine - torque_load - torque_friction
-        domega_dt = net_torque / self.tier_c.inertia_kg_m2
-        return p_combustion, torque_engine, torque_load, torque_friction, net_torque, domega_dt
+        """Compute torque balance derivatives for expected rotational dynamics with reduction gearbox."""
+        res = self.dynamics._torque_derivatives(
+            omega=omega,
+            throttle_pct=throttle_pct,
+            density_factor=density_factor,
+        )
+        return (res[0], res[1], res[2], res[3], res[4], res[5])
 
     def step_expected(
         self,
@@ -148,29 +160,39 @@ class DigitalTwinModel:
             else:  # CRUISE default
                 v_air = self.tier_d.airspeed_proxy_cruise_ms
 
-        # 1. Atmosphere density factor
+        # 1. Atmosphere density factor & turbocharger expected boost
         atmo = self.atmosphere.compute(altitude_m=alt_safe)
         density_factor = atmo.density_factor
+        p_amb_bar = atmo.pressure_bar
 
-        # 2. Rotational Dynamics (RK4 step for expected RPM)
-        omega_0 = self.omega
-        p_target, _, _, _, _, k1 = self._torque_derivatives(omega_0, throttle_safe, density_factor)
+        turbo_state = self.turbocharger.step(
+            throttle_pct=throttle_safe,
+            altitude_m=alt_safe,
+            p_amb_pa=atmo.pressure_pa,
+            t_amb_c=amb_safe,
+            m_dot_air_kg_s=self._last_m_air,
+            m_dot_fuel_kg_s=self._last_m_fuel,
+            t_exh_c=self.expected_egt,
+            dt=dt_safe,
+        )
 
-        omega_k2 = max(0.0, omega_0 + 0.5 * dt_safe * k1)
-        _, _, _, _, _, k2 = self._torque_derivatives(omega_k2, throttle_safe, density_factor)
+        # 2. Rotational Dynamics (expected RPM and power chain)
+        op_point = self.dynamics.step(
+            throttle_pct=throttle_safe,
+            density_factor=density_factor,
+            dt=dt_safe,
+            combustion_efficiency_factor=1.0,
+            friction_factor=1.0,
+            map_bar=turbo_state.map_bar,
+            charge_air_temp_c=turbo_state.charge_air_temp_c,
+        )
+        self.expected_rpm = op_point.rpm
+        self.omega = op_point.omega_rad_s
+        self._last_m_air = op_point.air_mass_flow_kg_s
+        self._last_m_fuel = op_point.fuel_mass_flow_kg_s
 
-        omega_k3 = max(0.0, omega_0 + 0.5 * dt_safe * k2)
-        _, _, _, _, _, k3 = self._torque_derivatives(omega_k3, throttle_safe, density_factor)
-
-        omega_k4 = max(0.0, omega_0 + dt_safe * k3)
-        _, _, _, _, _, k4 = self._torque_derivatives(omega_k4, throttle_safe, density_factor)
-
-        self.omega = max(0.0, omega_0 + (dt_safe / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4))
-        self.expected_rpm = self.omega * 60.0 / (2.0 * math.pi)
-
-        # Expected engine load percentage proxy based on power output relative to density-adjusted max continuous
-        max_available_p = max(100.0, self.tier_a.power_max_continuous_w * density_factor)
-        load_pct = min(100.0, max(0.0, (p_target / max_available_p) * 100.0))
+        p_target = op_point.power_target_w
+        load_pct = op_point.engine_load_pct
         load_norm = load_pct / 100.0
 
         # 3. Expected Fuel Flow (Willans-line power model matching simulator contract)

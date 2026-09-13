@@ -316,9 +316,10 @@ def main():
         st.markdown(
             '<div style="font-size: 11px; color: #8b949e; line-height: 1.5; background: #161b22; '
             'border: 1px solid #21262d; border-radius: 4px; padding: 8px 10px;">'
-            '<b style="color: #c9d1d9;">Engineering Reference Anchor:</b><br/>'
-            'Rotax 912 ULS grey-box baseline.<br/>'
+            '<b style="color: #c9d1d9;">Engineering Reference Architecture:</b><br/>'
+            'Rotax 914 UL/F (Reduced-Order Grey-Box Prototype).<br/>'
             '<span style="color: #6e7681;">Strict non-fabrication presentation layer.</span>'
+
             '</div>',
             unsafe_allow_html=True,
         )

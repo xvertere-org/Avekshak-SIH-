@@ -4,10 +4,13 @@ Physics-Informed Aero Piston Engine Simulator Orchestrator for SIH26054.
 Coordinates atmosphere, mission, rotational dynamics, fuel, thermal, lubrication,
 and vibration subsystems to produce physically correlated telemetry streams.
 
-DISCLAIMER:
-Uses the Rotax 912 ULS ONLY as a publicly documented engineering reference anchor.
-This simulator is a reduced-order lumped-parameter grey-box model and does NOT represent
-a certified OEM engine model or actual classified MALE-UAV propulsion system.
+DISCLAIMER & FIDELITY CONTRACT:
+Reference Engine Architecture: Rotax 914 UL/F (configs/engine_reference/rotax_914_ul_f.json).
+Governing Physics Contract: docs/physics_contract.md.
+This simulator is a reduced-order grey-box propulsion model featuring a coupled reduced-order
+turbocharger surrogate loop, spur reduction gearbox (2.42857:1), 4 discrete cylinder thermal channels,
+and lumped liquid cooling loop surrogate. It does NOT represent a certified OEM engine model,
+a full CFD/combustion simulation, or actual classified MALE-UAV propulsion hardware.
 """
 
 import numpy as np
@@ -23,6 +26,8 @@ from simulator.subsystems.fuel import FuelSystem
 from simulator.subsystems.thermal import ThermalSystem
 from simulator.subsystems.lubrication import LubricationSystem
 from simulator.subsystems.vibration import VibrationSystem
+from simulator.subsystems.turbocharger import TurbochargerSubsystem
+from simulator.subsystems.cooling import CoolingSubsystem
 from simulator.telemetry_generator import TelemetryGenerator
 from telemetry.schema import MissionConfig, EngineConfig, TelemetryRecord, FaultCategory
 
@@ -50,18 +55,33 @@ class EngineSimulator(BaseEngineSimulator):
         self.rng = np.random.default_rng(self.sim_config.random_seed)
         self.current_time_s = 0.0
 
+        # Mass flow history for causal turbocharger iteration loop
+        self._last_m_air: float = 0.045
+        self._last_m_fuel: float = 0.003
+
         # Instantiate physical subsystems
         self.atmosphere = Atmosphere(tier_a=self.sim_config.tier_a)
+        self.turbocharger = TurbochargerSubsystem(
+            tier_a=self.sim_config.tier_a,
+            config=self.sim_config.tier_c_turbo,
+        )
+        self.cooling = CoolingSubsystem(
+            tier_a=self.sim_config.tier_a,
+            config=self.sim_config.tier_c_cooling,
+        )
         self.dynamics = RotationalDynamics(
             tier_a=self.sim_config.tier_a,
             tier_c=self.sim_config.tier_c,
             tier_d=self.sim_config.tier_d,
+            tier_c_gearbox=self.sim_config.tier_c_gearbox,
+            tier_c_turbo=self.sim_config.tier_c_turbo,
             initial_rpm=self.sim_config.tier_c.rpm_idle,
         )
         self.fuel = FuelSystem(tier_c=self.sim_config.tier_c)
         self.thermal = ThermalSystem(
             tier_a=self.sim_config.tier_a,
             tier_c=self.sim_config.tier_c,
+            tier_c_cylinder=self.sim_config.tier_c_cylinder,
         )
         self.lubrication = LubricationSystem(
             tier_a=self.sim_config.tier_a,
@@ -84,7 +104,11 @@ class EngineSimulator(BaseEngineSimulator):
             self.sim_config.random_seed = seed
         self.rng = np.random.default_rng(self.sim_config.random_seed)
         self.current_time_s = 0.0
+        self._last_m_air = 0.045
+        self._last_m_fuel = 0.003
 
+        self.turbocharger.reset(1.013)
+        self.cooling.set_temperature(75.0)
         self.dynamics.set_rpm(self.sim_config.tier_c.rpm_idle)
         self.thermal.set_states(cht_c=85.0, egt_c=580.0)
         self.lubrication.set_oil_temp(65.0)
@@ -94,6 +118,7 @@ class EngineSimulator(BaseEngineSimulator):
 
         # Re-point telemetry generator RNG and clear sensor fault stateful tracking
         self.telemetry_gen.reset(rng=self.rng)
+
 
     def step(
         self,
@@ -238,10 +263,24 @@ class EngineSimulator(BaseEngineSimulator):
                     elif f_obj.fault_type == FaultType.MECHANICAL_DEGRADATION:
                         mechanical_severity = fault_sev_val
 
-        # 1. Atmosphere
+        # 1. Atmosphere & Ram-Air Dynamic Pressure Recovery
         atmo_state = self.atmosphere.compute(altitude_m=altitude_m, temp_offset_k=temp_offset_k)
+        ram_pa = self.atmosphere.compute_ram_recovery_pa(atmo_state.density_kg_m3, airspeed_ms)
 
-        # 2. Rotational Dynamics (RK4) with combustion efficiency factor and friction factor
+        # 2. Turbocharger & Boost Intake (Coupled Reduced-Order Loop)
+        turbo_state = self.turbocharger.step(
+            throttle_pct=throttle_pct,
+            altitude_m=altitude_m,
+            p_amb_pa=atmo_state.pressure_pa,
+            t_amb_c=atmo_state.temperature_c,
+            m_dot_air_kg_s=self._last_m_air,
+            m_dot_fuel_kg_s=self._last_m_fuel,
+            t_exh_c=self.thermal.egt_c,
+            dt=dt,
+            ram_pressure_recovery_pa=ram_pa,
+        )
+
+        # 3. Rotational Dynamics (RK4) with reduction gearbox (2.4286:1) and causal power chain
         comb_eff = 1.0
         if fuel_severity > 0.0:
             if "rich" in mixture_mode.lower():
@@ -258,16 +297,20 @@ class EngineSimulator(BaseEngineSimulator):
             dt=dt,
             combustion_efficiency_factor=comb_eff,
             friction_factor=friction_factor,
+            map_bar=turbo_state.map_bar,
+            charge_air_temp_c=turbo_state.charge_air_temp_c,
         )
+        self._last_m_air = op_point.air_mass_flow_kg_s
+        self._last_m_fuel = op_point.fuel_mass_flow_kg_s
 
-        # 3. Fuel System (Willans-line with abnormality scaling)
+        # 4. Fuel System (Willans-line with abnormality scaling)
         fuel_state = self.fuel.compute(
             power_target_w=op_point.power_target_w,
             fuel_severity=fuel_severity,
             mixture_mode=mixture_mode,
         )
 
-        # 4. Thermal System (EGT + CHT with mixture shift)
+        # 5. Multi-Cylinder Thermal System (4 discrete cylinders, 1-4-3-2 firing order)
         thermal_state = self.thermal.step(
             rpm=op_point.rpm,
             load_pct=op_point.engine_load_pct,
@@ -279,9 +322,19 @@ class EngineSimulator(BaseEngineSimulator):
             cooling_severity=cooling_severity,
             fuel_severity=fuel_severity,
             mixture_mode=mixture_mode,
+            coolant_temp_c=self.cooling.coolant_temp_c,
         )
 
-        # 5. Lubrication System (Oil temp + pressure)
+        # 6. Liquid Cooling Loop (REDUCED_ORDER_COOLING_SURROGATE)
+        cooling_state = self.cooling.step(
+            cylinder_cht_temps_c=self.thermal.cht_cyl,
+            ambient_temp_c=atmo_state.temperature_c,
+            airspeed_ms=airspeed_ms,
+            dt=dt,
+            cooling_fault_severity=cooling_severity,
+        )
+
+        # 7. Lubrication System (Oil temp + pressure)
         lub_state = self.lubrication.step(
             rpm=op_point.rpm,
             cht_c=thermal_state.cht_c,
@@ -291,7 +344,7 @@ class EngineSimulator(BaseEngineSimulator):
             lubrication_severity=lubrication_severity,
         )
 
-        # 6. Vibration System (1x, 2x orders + noise) with mechanical degradation
+        # 8. Vibration System (1x, 2x orders + noise) with mechanical degradation
         # Phase 4E: mechanical_condition amplifies 1×/2× harmonics,
         #           mechanical_noise_factor amplifies broadband process noise only.
         mechanical_condition = 1.0 + self.sim_config.tier_c.k_mech_vib_gain * mechanical_severity
@@ -305,7 +358,7 @@ class EngineSimulator(BaseEngineSimulator):
             mechanical_noise_factor=mechanical_noise_factor,
         )
 
-        # 7. Synthesize TelemetryRecord
+        # 9. Synthesize TelemetryRecord
         m_step_proxy = MissionStep(
             timestamp_s=step_time,
             phase=mission_phase_val,
@@ -328,7 +381,9 @@ class EngineSimulator(BaseEngineSimulator):
             mission_id=mission_id_val,
             fault_type=fault_type_val,
             fault_severity=fault_sev_val,
-            sensor_faults=sensor_fault_list if sensor_fault_list else None,
+            sensor_faults=sensor_fault_list,
+            turbo_state=turbo_state,
+            cooling_state=cooling_state,
         )
         return record
 

@@ -205,12 +205,13 @@ def test_f_natural_recovery():
     # Pressure must recover to within 0.15 bar of nominal
     assert abs(p_rec_t150 - p_nom_t150) < 0.15
 
-    # Oil temperature also cools back down
+    # Oil temperature excess above nominal baseline recovers toward zero
     t_oil_peak = df_f.loc[df_f["timestamp"] == 60.0, "oil_temp"].values[0]
+    t_oil_nom_60 = df_h.loc[df_h["timestamp"] == 60.0, "oil_temp"].values[0]
     t_oil_rec = df_f.loc[df_f["timestamp"] == 150.0, "oil_temp"].values[0]
     t_oil_nom = df_h.loc[df_h["timestamp"] == 150.0, "oil_temp"].values[0]
 
-    assert t_oil_rec < t_oil_peak
+    assert (t_oil_rec - t_oil_nom) < (t_oil_peak - t_oil_nom_60)
     assert abs(t_oil_rec - t_oil_nom) < 3.0
 
 

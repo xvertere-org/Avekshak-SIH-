@@ -1,44 +1,113 @@
 """
-Thermal System Model for SIH26054.
+Multi-Cylinder Thermal System Model for SIH26054 (Phase 2).
 
-Implements:
-1. Exhaust Gas Temperature (EGT) steady-state mapping and thermocouple dynamic lag.
-2. Cylinder Head Temperature (CHT) lumped thermal capacitance heat-balance model.
+GOVERNING ARCHITECTURE:
+Reference: BRP-Rotax 914 UL/F Engine Series.
+Layout: 4-cylinder horizontally opposed boxer (1-4-3-2 firing order).
+Cooling: Hybrid liquid cylinder heads (REDUCED_ORDER_COOLING_SURROGATE)
+and ram-air cooled cylinder barrels.
+
+INVARIANCE CONTRACT:
+1. Exactly 4 discrete cylinder head temperatures (CHT 1-4) and runner temperatures (EGT 1-4).
+2. Deterministic bank variation based on boxer geometry and ram-air ducting (MODEL_ASSUMPTION).
+3. LOCAL CYLINDER-STATE INDEPENDENCE WITH SHARED-SYSTEM COUPLING: Direct local perturbation
+   to cylinder 1 alters cylinder 1 state directly at that instant; cylinders 2-4 remain
+   instantaneously decoupled, while shared crankshaft torque, exhaust enthalpy, and liquid
+   coolant loops couple them dynamically over time.
+4. Backward compatibility: Scalar cht and egt are exact arithmetic means of cylinders 1-4.
 """
 
 import math
-from typing import NamedTuple, Optional
-from simulator.config import TierAParameters, TierCParameters
+from typing import NamedTuple, Optional, List, Tuple
+from simulator.config import TierAParameters, TierCParameters, TierCCylinderParameters
 
 
 class ThermalState(NamedTuple):
-    """Calculated thermal state."""
-    cht_c: float
-    egt_c: float
-    egt_steady_state_c: float
-    q_gen_w: float
-    h_cool_w_k: float
-    dcht_dt: float
+    """Calculated multi-cylinder thermal state."""
+    cht_c: float                           # Aggregate arithmetic mean CHT (°C)
+    egt_c: float                           # Aggregate arithmetic mean EGT (°C)
+    egt_steady_state_c: float              # Steady-state aggregate target (°C)
+    q_gen_w: float                         # Total thermal heat generation (W)
+    h_cool_w_k: float                      # Total convective cooling conductance (W/K)
+    dcht_dt: float                         # Aggregate CHT derivative (°C/s)
+    # Phase 2 Discrete Cylinder Channels
+    cht_cyl1: float = 85.0                 # Cylinder 1 head temperature (°C)
+    cht_cyl2: float = 85.0                 # Cylinder 2 head temperature (°C)
+    cht_cyl3: float = 85.0                 # Cylinder 3 head temperature (°C)
+    cht_cyl4: float = 85.0                 # Cylinder 4 head temperature (°C)
+    egt_cyl1: float = 580.0                # Cylinder 1 runner exhaust gas temperature (°C)
+    egt_cyl2: float = 580.0                # Cylinder 2 runner exhaust gas temperature (°C)
+    egt_cyl3: float = 580.0                # Cylinder 3 runner exhaust gas temperature (°C)
+    egt_cyl4: float = 580.0                # Cylinder 4 runner exhaust gas temperature (°C)
 
 
 class ThermalSystem:
     """
-    Thermal dynamics manager for CHT and EGT.
+    Four-Cylinder Thermal System Simulator.
+    Integrates 4 independent cylinder CHT ODEs with 1-4-3-2 firing order,
+    deterministic layout variations, and thermocouple lag filters for EGT.
     """
 
     def __init__(
         self,
         tier_a: TierAParameters = TierAParameters(),
         tier_c: TierCParameters = TierCParameters(),
+        tier_c_cylinder: TierCCylinderParameters = TierCCylinderParameters(),
         initial_cht_c: Optional[float] = None,
         initial_egt_c: Optional[float] = None,
     ):
         self.tier_a = tier_a
         self.tier_c = tier_c
+        self.cyl_cfg = tier_c_cylinder
 
-        # State variables
-        self.cht_c = initial_cht_c if initial_cht_c is not None else 85.0
-        self.egt_c = initial_egt_c if initial_egt_c is not None else 580.0
+        init_cht = initial_cht_c if initial_cht_c is not None else 85.0
+        init_egt = initial_egt_c if initial_egt_c is not None else 580.0
+
+        # Deterministic bank variation factors: front cylinders (1, 2) run slightly cooler
+        # due to direct ram air, rear cylinders (3, 4) run slightly warmer.
+        # Firing sequence: 1 - 4 - 3 - 2
+        # Variations: Cyl 1 = 0.98, Cyl 2 = 1.00, Cyl 3 = 1.03, Cyl 4 = 1.01
+        self.variation_factors = list(self.cyl_cfg.bank_variation_factors)
+
+        # 4 discrete cylinder head temperature states (°C)
+        self.cht_cyl: List[float] = [
+            init_cht * self.variation_factors[0],
+            init_cht * self.variation_factors[1],
+            init_cht * self.variation_factors[2],
+            init_cht * self.variation_factors[3],
+        ]
+
+        # 4 discrete exhaust gas temperature states (°C)
+        self.egt_cyl: List[float] = [
+            init_egt * self.variation_factors[0],
+            init_egt * self.variation_factors[1],
+            init_egt * self.variation_factors[2],
+            init_egt * self.variation_factors[3],
+        ]
+
+        # Individual cylinder thermal capacitance (J/K)
+        self.c_th_cyl = self.cyl_cfg.c_th_cylinder  # ~230 J/K per cylinder
+
+        # External perturbation offset for cylinder isolation testing
+        self.cylinder_perturbation_offsets = [0.0, 0.0, 0.0, 0.0]
+
+    @property
+    def cht_c(self) -> float:
+        """Exact arithmetic mean of 4 cylinder head temperatures."""
+        return sum(self.cht_cyl) / 4.0
+
+    @property
+    def egt_c(self) -> float:
+        """Exact arithmetic mean of 4 cylinder exhaust gas temperatures."""
+        return sum(self.egt_cyl) / 4.0
+
+    def perturb_cylinder(self, cylinder_index: int, delta_cht_c: float) -> None:
+        """
+        Perturb a specific cylinder state directly (for local cylinder-state independence testing).
+        cylinder_index: 0 to 3 for cylinders 1 to 4.
+        """
+        if 0 <= cylinder_index < 4:
+            self.cht_cyl[cylinder_index] += float(delta_cht_c)
 
     def step(
         self,
@@ -52,16 +121,16 @@ class ThermalSystem:
         cooling_severity: float = 0.0,
         fuel_severity: float = 0.0,
         mixture_mode: str = "lean",
+        coolant_temp_c: Optional[float] = None,
     ) -> ThermalState:
         """
-        Advance CHT and EGT states by time step dt.
-        Supports Phase 4B cooling degradation and Phase 4D fuel/injection abnormality physics.
+        Advance all 4 cylinder CHT ODEs and EGT thermocouple lag states by time step dt.
         """
         dt_safe = max(1e-4, float(dt))
         load_norm = max(0.0, min(100.0, load_pct)) / 100.0
+        t_coolant = coolant_temp_c if coolant_temp_c is not None else 80.0
 
-        # --- 1. EGT Calculation ---
-        # Steady-state target
+        # --- 1. Total & Per-Cylinder EGT Calculation ---
         rpm_offset = max(0.0, rpm - self.tier_c.rpm_idle)
         egt_ss_base = (
             self.tier_c.t_egt_base_c
@@ -70,7 +139,6 @@ class ThermalSystem:
             - self.tier_c.k_egt_density * density_factor
         )
 
-        # Phase 4D: Mixture shift on exhaust enthalpy / burn timing
         sev_fuel = max(0.0, min(1.0, float(fuel_severity)))
         mode_str = str(mixture_mode).lower().strip()
         delta_egt_mixture = 0.0
@@ -80,18 +148,20 @@ class ThermalSystem:
             else:  # lean
                 delta_egt_mixture = getattr(self.tier_c, "k_egt_lean_gain_c", 95.0) * sev_fuel
 
-        egt_ss = max(100.0, egt_ss_base + delta_egt_mixture)
-
-        # Unconditionally stable exponential decay update for first-order lag
+        egt_ss_mean = max(100.0, egt_ss_base + delta_egt_mixture)
         tau_egt = max(0.1, self.tier_c.tau_egt_s)
         decay_egt = 1.0 - math.exp(-dt_safe / tau_egt)
-        self.egt_c += (egt_ss - self.egt_c) * decay_egt
 
-        # --- 2. CHT Lumped Capacitance Heat Balance ---
-        # Heat generation from combustion: fuel energy rate * thermal fraction
-        q_gen = max(0.0, fuel_mass_flow_kg_s * self.tier_c.fuel_lhv_j_per_kg * self.tier_c.q_gen_fraction)
+        # Update 4 discrete EGT runners independently with deterministic runner variances
+        for i in range(4):
+            egt_target_i = egt_ss_mean * self.variation_factors[i]
+            self.egt_cyl[i] += (egt_target_i - self.egt_cyl[i]) * decay_egt
 
-        # Total nominal convective cooling conductance (W/K)
+        # --- 2. Per-Cylinder CHT Heat Balance ODEs ---
+        # Total heat generation from combustion: fuel energy rate * thermal fraction
+        q_gen_total = max(0.0, fuel_mass_flow_kg_s * self.tier_c.fuel_lhv_j_per_kg * self.tier_c.q_gen_fraction)
+
+        # Total nominal convective cooling conductance (fins to ambient air)
         h_cool_nominal = (
             self.tier_c.h_cool_base
             + self.tier_c.h_cool_rpm * rpm
@@ -99,30 +169,62 @@ class ThermalSystem:
         )
         h_cool_nominal = max(1.0, h_cool_nominal)
 
-        # Phase 4B: Apply cooling degradation fault physics
-        # h_cool_effective = h_cool_nominal * (1 - k_cooling_max_loss * severity)
         sev_clamped = max(0.0, min(1.0, float(cooling_severity)))
         degradation_factor = getattr(self.tier_c, "k_cooling_max_loss", 0.55) * sev_clamped
-        h_cool = max(1.0, h_cool_nominal * (1.0 - degradation_factor))
+        h_cool_total = max(1.0, h_cool_nominal * (1.0 - degradation_factor))
 
-        # Differential: C_th * dT_cht/dt = Q_gen - h_cool * (T_cht - T_ambient)
-        cht_target_ss = ambient_temp_c + (q_gen / h_cool)
-        tau_cht = max(1.0, self.tier_c.c_th_cht / h_cool)
-        decay_cht = 1.0 - math.exp(-dt_safe / tau_cht)
+        # Conductance and heat generation distributed to 4 individual heads
+        h_cool_cyl = h_cool_total / 4.0
+        q_gen_per_cyl = q_gen_total / 4.0
+        h_head_to_coolant = 12.0  # W/K per cylinder head to liquid jacket
 
-        dcht_dt = (q_gen - h_cool * (self.cht_c - ambient_temp_c)) / self.tier_c.c_th_cht
-        self.cht_c += (cht_target_ss - self.cht_c) * decay_cht
+        dcht_dt_sum = 0.0
+        for i in range(4):
+            # Geometric/bank variation on cylinder heat generation
+            q_gen_i = q_gen_per_cyl * self.variation_factors[i]
+
+            # Cylinder head energy balance:
+            # C_th,i * dT_cht,i/dt = Q_gen,i - h_cool_i * (T_cht,i - T_amb) - h_coolant * (T_cht,i - T_coolant)
+            q_fin_loss = h_cool_cyl * (self.cht_cyl[i] - ambient_temp_c)
+            q_coolant_loss = h_head_to_coolant * (self.cht_cyl[i] - t_coolant)
+
+            dcht_dt_i = (q_gen_i - q_fin_loss - q_coolant_loss) / self.c_th_cyl
+            dcht_dt_sum += dcht_dt_i
+
+            # Exponential decay integration
+            h_eff_i = h_cool_cyl + h_head_to_coolant
+            cht_ss_i = (q_gen_i + h_cool_cyl * ambient_temp_c + h_head_to_coolant * t_coolant) / max(0.1, h_eff_i)
+            tau_cht_i = max(1.0, self.c_th_cyl / h_eff_i)
+            decay_cht_i = 1.0 - math.exp(-dt_safe / tau_cht_i)
+
+            self.cht_cyl[i] += (cht_ss_i - self.cht_cyl[i]) * decay_cht_i
+
+        dcht_dt_mean = dcht_dt_sum / 4.0
 
         return ThermalState(
             cht_c=self.cht_c,
             egt_c=self.egt_c,
-            egt_steady_state_c=egt_ss,
-            q_gen_w=q_gen,
-            h_cool_w_k=h_cool,
-            dcht_dt=dcht_dt,
+            egt_steady_state_c=egt_ss_mean,
+            q_gen_w=q_gen_total,
+            h_cool_w_k=h_cool_total,
+            dcht_dt=dcht_dt_mean,
+            cht_cyl1=self.cht_cyl[0],
+            cht_cyl2=self.cht_cyl[1],
+            cht_cyl3=self.cht_cyl[2],
+            cht_cyl4=self.cht_cyl[3],
+            egt_cyl1=self.egt_cyl[0],
+            egt_cyl2=self.egt_cyl[1],
+            egt_cyl3=self.egt_cyl[2],
+            egt_cyl4=self.egt_cyl[3],
         )
 
     def set_states(self, cht_c: float, egt_c: float) -> None:
-        """Directly set thermal state values."""
-        self.cht_c = cht_c
-        self.egt_c = egt_c
+        """Directly set thermal state values uniformly across all 4 cylinders."""
+        for i in range(4):
+            self.cht_cyl[i] = cht_c * self.variation_factors[i]
+            self.egt_cyl[i] = egt_c * self.variation_factors[i]
+
+
+# Alias for subsystem naming convention
+MultiCylinderThermalSubsystem = ThermalSystem
+
