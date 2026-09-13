@@ -19,6 +19,19 @@ import pandas as pd
 from telemetry.schema import TelemetryRecord, DigitalTwinState, EngineConfig
 from telemetry.ingestion import CanonicalTelemetryFrame
 from digital_twin.residuals import ResidualGenerator, ResidualFrame, SUPPORTED_RESIDUAL_CHANNELS
+from digital_twin.state import (
+    CanonicalTwinState,
+    QuantityStatus,
+    EngineOperatingRegime,
+    SynchronizationStatus,
+)
+from digital_twin.quality import (
+    DataQualityStatus,
+    TelemetryQualityValidator,
+    TelemetryQualityReport,
+)
+from digital_twin.observability import ObservabilityRegistry, ObservabilityType
+from digital_twin.synchronizer import StateEstimator, EstimatorConfig
 from simulator.config import SimulatorConfig, TierAParameters, TierCParameters, TierDParameters
 from simulator.subsystems.atmosphere import Atmosphere
 from simulator.subsystems.turbocharger import TurbochargerSubsystem
@@ -281,26 +294,61 @@ class DigitalTwin:
         self,
         engine_config: Optional[EngineConfig] = None,
         sim_config: Optional[SimulatorConfig] = None,
+        estimator_config: Optional[EstimatorConfig] = None,
     ):
         self.engine_config = engine_config or EngineConfig()
         self.sim_config = sim_config or SimulatorConfig()
+        self.estimator_config = estimator_config or EstimatorConfig()
 
         self.model = DigitalTwinModel(sim_config=self.sim_config, engine_config=self.engine_config)
         self.residual_generator = ResidualGenerator()
+        self.estimator = StateEstimator(
+            config=self.estimator_config,
+            sim_config=self.sim_config,
+            model=self.model,
+        )
         self.history: List[DigitalTwinState] = []
+        self.canonical_history: List[CanonicalTwinState] = []
+        self.canonical_state: Optional[CanonicalTwinState] = None
         self.last_timestamp: Optional[float] = None
 
     def reset(self) -> None:
         """Reset Digital Twin internal dynamic states."""
         self.model.reset()
+        self.estimator.reset()
         self.history.clear()
+        self.canonical_history.clear()
+        self.canonical_state = None
         self.last_timestamp = None
 
     def update(self, telemetry: TelemetryRecord) -> DigitalTwinState:
         """
         Process a single streaming TelemetryRecord, estimate nominal states, and compute residuals.
-        Maintains strict backward compatibility with Phase 1 schemas.
+        Maintains strict backward compatibility with Phase 1 schemas while providing
+        Phase 3 canonical state synchronization and deterministic confidence.
         """
+        # Step the Phase 3 state estimator
+        canonical_state = self.estimator.step(telemetry)
+        self.canonical_state = canonical_state
+        self.canonical_history.append(canonical_state)
+
+        # Retrieve physics predictions and expected values
+        expected = canonical_state.metadata.get("expected", {})
+        if not expected:
+            expected = {
+                "rpm_expected": self.sim_config.tier_c.rpm_idle,
+                "cht_expected": 85.0,
+                "egt_expected": 580.0,
+                "oil_temp_expected": 65.0,
+                "oil_pressure_expected": 3.0,
+                "fuel_flow_expected": 14.0,
+                "vibration_expected": 0.3,
+                "load_expected": 0.0,
+                "power_expected_kw": 0.0,
+                "order_1x_freq_hz": 25.0,
+                "order_2x_freq_hz": 50.0,
+            }
+
         # Calculate dynamic time increment dt
         if self.last_timestamp is not None and telemetry.timestamp > self.last_timestamp:
             dt = telemetry.timestamp - self.last_timestamp
@@ -308,17 +356,8 @@ class DigitalTwin:
             dt = self.sim_config.default_dt
         self.last_timestamp = telemetry.timestamp
 
-        # Predict expected nominal states (observable conditions only)
-        expected = self.model.step_expected(
-            throttle_pct=telemetry.throttle,
-            altitude_m=telemetry.altitude,
-            ambient_temp_c=telemetry.ambient_temp,
-            dt=dt,
-            mission_phase=telemetry.mission_phase,
-        )
-
         # Compute raw residuals (observed - expected)
-        # Note: If observed is NaN (Phase 4F sensor dropout), residual is float('nan')
+        # Note: If observed is NaN (sensor dropout), residual is float('nan')
         cht_res = telemetry.cht - expected["cht_expected"] if not math.isnan(telemetry.cht) else float("nan")
         egt_res = telemetry.egt - expected["egt_expected"] if not math.isnan(telemetry.egt) else float("nan")
         oil_p_res = telemetry.oil_pressure - expected["oil_pressure_expected"] if not math.isnan(telemetry.oil_pressure) else float("nan")
@@ -363,11 +402,14 @@ class DigitalTwin:
             observed_telemetry=telemetry,
             nominal_estimates=nominal_estimates,
             residuals=residuals,
-            state_confidence=0.98,
+            state_confidence=round(canonical_state.heuristic_confidence, 4),
             metadata={
-                "power_expected_kw": expected["power_expected_kw"],
-                "order_1x_freq_hz": expected["order_1x_freq_hz"],
-                "order_2x_freq_hz": expected["order_2x_freq_hz"],
+                "power_expected_kw": expected.get("power_expected_kw", 0.0),
+                "order_1x_freq_hz": expected.get("order_1x_freq_hz", 25.0),
+                "order_2x_freq_hz": expected.get("order_2x_freq_hz", 50.0),
+                "canonical_state": canonical_state,
+                "sync_status": canonical_state.sync_status.value,
+                "quality_report": canonical_state.metadata.get("quality_report"),
             },
         )
         self.history.append(twin_state)
