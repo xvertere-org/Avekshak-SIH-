@@ -329,14 +329,28 @@ The repository codebase and configuration schema strictly enforce unambiguous pa
 
 ### 11.6 Evidence Reproducibility Metadata
 The operating matrix generator (`scripts/generate_phase2_operating_matrix.py`) records reproducible provenance metadata:
-- `generated_at`: ISO UTC timestamp
-- `source_commit`: Exact git commit hash
-- `working_tree_dirty`: Boolean flag reflecting uncommitted working tree state
-- `simulator_version`: Version string (`0.2.0-phase2b-physics`)
+- `generated_at`: `2026-09-13T19:02:52.113504+00:00`
+- `source_commit`: `c218c88e085a18dd5b9513c54497e8fd0b773abf` (evidence commit: `a82987a17aa8f1ab818ea9ddad52037f761b13da`)
+- `working_tree_dirty`: `false` (generated from clean working tree)
+- `simulator_version`: `0.2.0-phase2b-physics`
 - `random_seed`: 42
 - `simulation_dt_s`: 0.2
 
-### 11.7 Final Decision
+### 11.7 Final Regression Verification Suite Results
+Executed post-commit on clean working tree:
+- **Full Test Suite (`pytest tests/ -q`)**:
+  - Total: 375
+  - Passed: 373
+  - Skipped: 2 (`tests/test_forecasting.py` TimesFM optional dependency)
+  - Failed: 0
+  - Duration: 114.66s
+- **Phase 2 Physics Suite (`pytest tests/test_physics_validation_phase2.py -v`)**: 25/25 PASSED (0.72s)
+- **Reference Contract Suite (`pytest tests/test_engine_reference_contract.py -v`)**: 10/10 PASSED (0.68s)
+- **Schema & Telemetry Suite (`pytest tests/test_schemas.py -v`)**: 4/4 PASSED (0.54s)
+- **Digital Twin Suite (`pytest tests/test_digital_twin.py -v`)**: 15/15 PASSED (1.47s)
+
+### 11.8 Final Decision
 
 **PASS — PHASE 2 CLOSED; READY FOR PHASE 3**
+
 
