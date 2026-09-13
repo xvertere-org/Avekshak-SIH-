@@ -1,9 +1,10 @@
 {
   "title": "SIH26054 Phase 2 Operating Matrix Numerical Verification Evidence",
-  "generated_at": "2026-09-13T18:42:01.532581+00:00",
+  "generated_at": "2026-09-13T19:02:52.113504+00:00",
   "random_seed": 42,
   "simulation_dt_s": 0.2,
-  "source_commit": "57adc3db9111bc08318aad9453ccbf1a2d983408",
+  "source_commit": "c218c88e085a18dd5b9513c54497e8fd0b773abf",
+  "working_tree_dirty": false,
   "simulator_version": "0.2.0-phase2b-physics",
   "engine_architecture": "BRP-Rotax 914 UL/F Series",
   "simulation_fidelity": "Tier C / Tier D Coupled Grey-Box Aero-Piston Propulsion Model",
