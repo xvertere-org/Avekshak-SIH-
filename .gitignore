@@ -65,3 +65,9 @@ data/external/*
 # OS specific
 .DS_Store
 Thumbs.db
+
+# Reports & audits
+audit_report.html
+AUDIT_REPORT.md
+graphify-out/
+

@@ -52,7 +52,13 @@ class TimesFM3ModelAdapter:
         self.runtime_status: str = ModelStatus.BLOCKED_UNAUTHENTICATED_GATED.value
         self.status_detail: str = ""
         self.forecaster: Any = None
-        self.device = self.config.device or ("cuda" if torch.cuda.is_available() else "cpu")
+
+        try:
+            import torch
+            default_device = "cuda" if torch.cuda.is_available() else "cpu"
+        except ImportError:
+            default_device = "cpu"
+        self.device = self.config.device or default_device
 
         self._initialize_model(force_local_graph=force_local_graph)
 

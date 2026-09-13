@@ -10,7 +10,7 @@ Rules:
 - Configurable reference scales for normalized residuals without whole-dataset standardization.
 """
 
-from typing import Dict, Any, List, Optional, Union, Set
+from typing import Dict, Any, List, Optional, Union, Set, Tuple
 import numpy as np
 import pandas as pd
 
@@ -53,6 +53,7 @@ class ResidualFrame:
     ):
         self._data = data.copy()
         self._metadata = dict(metadata) if metadata is not None else {}
+        self._cached_row_dict: Optional[Dict[str, Any]] = None
 
     @property
     def data(self) -> pd.DataFrame:
@@ -75,7 +76,15 @@ class ResidualFrame:
 
     def to_records(self) -> List[Dict[str, Any]]:
         """Return frame rows as a list of dictionaries."""
+        if getattr(self, "_cached_row_dict", None) is not None and len(self._data) == 1:
+            return [dict(self._cached_row_dict)]
         return self._data.to_dict(orient="records")
+
+    def get_first_record(self) -> Dict[str, Any]:
+        """Return first row dictionary efficiently without full DataFrame copy."""
+        if getattr(self, "_cached_row_dict", None) is not None:
+            return dict(self._cached_row_dict)
+        return self._data.iloc[0].to_dict()
 
     def copy(self) -> "ResidualFrame":
         """Return a deep copy."""
@@ -126,6 +135,82 @@ class ResidualGenerator:
         """
         self.scale_factors = scale_factors or DEFAULT_RESIDUAL_SCALES
         self.epsilon = epsilon
+
+    def compute_residuals_sample(
+        self,
+        obs_dict: Dict[str, Any],
+        exp_dict: Dict[str, Any],
+    ) -> Tuple[ResidualFrame, Dict[str, float], Dict[str, float], Dict[str, float]]:
+        """
+        High-throughput single-sample residual computation bypassing intermediate DataFrame churn.
+        """
+        result_row: Dict[str, Any] = {}
+
+        # 1. Preserve identifiers & metadata
+        id_cols = (
+            "timestamp", "engine_id", "mission_id", "mission_phase",
+            "altitude", "ambient_temp", "throttle", "load",
+            "fault_type", "fault_severity", "source", "source_type",
+            "simulation_version", "quality_status", "missing_mask",
+        )
+        for col in id_cols:
+            if col in obs_dict:
+                result_row[col] = obs_dict[col]
+
+        expected_dict: Dict[str, float] = {}
+        raw_res_dict: Dict[str, float] = {}
+        norm_res_dict: Dict[str, float] = {}
+
+        # 2. Compute channel residuals
+        for ch in SUPPORTED_RESIDUAL_CHANNELS:
+            if ch not in obs_dict:
+                continue
+
+            obs_raw = obs_dict[ch]
+            try:
+                obs_val = float(obs_raw)
+            except (ValueError, TypeError):
+                obs_val = float("nan")
+            result_row[ch] = obs_val
+
+            if f"{ch}_expected" in exp_dict:
+                exp_raw = exp_dict[f"{ch}_expected"]
+            elif ch in exp_dict:
+                exp_raw = exp_dict[ch]
+            else:
+                continue
+
+            try:
+                exp_val = float(exp_raw)
+            except (ValueError, TypeError):
+                exp_val = float("nan")
+
+            result_row[f"{ch}_expected"] = exp_val
+            expected_dict[ch] = exp_val
+
+            if np.isnan(obs_val) or np.isnan(exp_val):
+                raw_res = float("nan")
+                norm_res = float("nan")
+            else:
+                raw_res = round(obs_val - exp_val, 4)
+                scale = max(self.epsilon, self.scale_factors.get(ch, 1.0))
+                norm_res = round(raw_res / scale, 4)
+
+            result_row[f"{ch}_residual"] = raw_res
+            result_row[f"{ch}_norm_residual"] = norm_res
+            raw_res_dict[ch] = raw_res
+            norm_res_dict[ch] = norm_res
+
+        if "order_1x_freq_hz" in exp_dict:
+            result_row["order_1x_freq_hz_expected"] = exp_dict["order_1x_freq_hz"]
+        if "order_2x_freq_hz" in exp_dict:
+            result_row["order_2x_freq_hz_expected"] = exp_dict["order_2x_freq_hz"]
+
+        res_df = pd.DataFrame([result_row])
+        meta = {"residual_scales": dict(self.scale_factors)}
+        rf = ResidualFrame(res_df, metadata=meta)
+        rf._cached_row_dict = result_row
+        return rf, expected_dict, raw_res_dict, norm_res_dict
 
     def compute_residuals(
         self,

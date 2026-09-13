@@ -23,56 +23,6 @@ from orchestrator import (
 )
 
 
-def run_legacy_phase1_pipeline(dry_run: bool = True) -> int:
-    """
-    Executes the legacy modular Phase 1 interface connectivity pipeline.
-    Preserved for historical reference and backward compatibility.
-    """
-    from configs.config_loader import load_mission_config, load_engine_config
-    from simulator.engine_simulator import EngineSimulator
-    from telemetry.streamer import TelemetryStreamer
-    from digital_twin.twin_model import DigitalTwin
-    from phm.detector import HealthDetector
-    from forecasting.rul_predictor import RULPredictor
-    from explainability.explainer import ExplainabilityEngine
-    from dashboard.app import DashboardInterface
-
-    print("=" * 70)
-    print("SIH26054: Aero Piston Engine Digital Twin - Legacy Phase 1 Runner")
-    print("=" * 70)
-
-    mission_cfg = load_mission_config()
-    engine_cfg = load_engine_config()
-    simulator = EngineSimulator(engine_config=engine_cfg)
-    telemetry_record = simulator.step(mission_config=mission_cfg, time_step=1.0)
-
-    streamer = TelemetryStreamer(buffer_size=100)
-    streamer.push(telemetry_record)
-    buffered = streamer.get_latest()
-
-    digital_twin = DigitalTwin(engine_config=engine_cfg)
-    twin_state = digital_twin.update(buffered)
-
-    phm = HealthDetector()
-    health = phm.assess(twin_state)
-
-    forecaster = RULPredictor(nominal_life_hours=1500.0)
-    rul = forecaster.predict(health)
-
-    xai = ExplainabilityEngine()
-    explanation = xai.explain(twin_state, health)
-
-    dashboard = DashboardInterface()
-    dashboard_payload = dashboard.render_state(
-        telemetry=buffered,
-        twin_state=twin_state,
-        health=health,
-        rul=rul,
-        explanation=explanation,
-    )
-    pprint(dashboard_payload)
-    print("\n[SUCCESS] Legacy Phase 1 interface connectivity verified successfully.")
-    return 0
 
 
 def run_production_pipeline(
@@ -202,32 +152,17 @@ def main():
         default=False,
         help="Run end-to-end latency profiling",
     )
-    parser.add_argument(
-        "--legacy-phase1",
-        action="store_true",
-        default=False,
-        help="Execute legacy Phase 1 dry-run stub instead of Phase 13 production pipeline",
-    )
-    parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        default=False,
-        help="Alias for running dry-run execution",
-    )
     args = parser.parse_args()
 
-    if args.legacy_phase1:
-        sys.exit(run_legacy_phase1_pipeline(dry_run=True))
-    else:
-        sys.exit(
-            run_production_pipeline(
-                scenario_name=args.scenario,
-                duration_s=args.duration,
-                fault_start_s=args.fault_start,
-                fault_severity=args.severity,
-                benchmark_mode=args.benchmark,
-            )
+    sys.exit(
+        run_production_pipeline(
+            scenario_name=args.scenario,
+            duration_s=args.duration,
+            fault_start_s=args.fault_start,
+            fault_severity=args.severity,
+            benchmark_mode=args.benchmark,
         )
+    )
 
 
 if __name__ == "__main__":
