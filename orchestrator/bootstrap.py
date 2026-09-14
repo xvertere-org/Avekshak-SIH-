@@ -104,6 +104,7 @@ class SyntheticBootstrapManager:
             dt=1.0,
             fault_onset_time=0.0,
             mission_profile=fast_profile,
+            dynamic_temporal_degradation=False,
         )
         # Generate canonical 6-class dataset using Phase 8 simulator matrix
         training_dataset = generate_fault_diagnosis_dataset(config=dataset_cfg, verbose=False)
