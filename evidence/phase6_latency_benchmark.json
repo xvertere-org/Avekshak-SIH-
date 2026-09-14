@@ -1,0 +1,11 @@
+{
+  "steps": 1000,
+  "mean_ms": 0.3822,
+  "median_ms": 0.3239,
+  "p95_ms": 0.5182,
+  "max_ms": 29.9367,
+  "min_ms": 0.2921,
+  "budget_ms": 20.0,
+  "frequency_hz": 2616.2,
+  "passed_budget": true
+}

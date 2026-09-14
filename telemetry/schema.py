@@ -169,7 +169,13 @@ class DigitalTwinState:
     state_confidence: float = 1.0
     health_assessment: Optional[Any] = None
     residual_vector: Optional[Any] = None
+    detection_result: Optional[Any] = None
+    diagnosis_result: Optional[Any] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
+
+    @property
+    def quality_report(self) -> Optional[Any]:
+        return self.metadata.get("quality_report")
 
 
 @dataclass

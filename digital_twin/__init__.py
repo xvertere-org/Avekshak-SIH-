@@ -54,6 +54,24 @@ from digital_twin.replay import (
     DigitalTwinReplay,
     ReplayStepRecord,
 )
+from digital_twin.health import (
+    HealthState,
+    HealthIndicatorConfig,
+    HealthEvaluator,
+    ModelObservationHealthAssessment,
+)
+from digital_twin.detection import (
+    TemporalFaultDetector,
+    DetectionConfig,
+    DetectionResult,
+    DetectionStatus,
+)
+from digital_twin.diagnosis import (
+    PhysicsInformedDiagnoser,
+    DiagnosisResult,
+    HypothesisRanking,
+    CanonicalFaultType,
+)
 
 __all__ = [
     "DigitalTwin",
@@ -88,4 +106,16 @@ __all__ = [
     "DEFAULT_MODEL_RESIDUAL_SCALES",
     "DigitalTwinReplay",
     "ReplayStepRecord",
+    "HealthState",
+    "HealthIndicatorConfig",
+    "HealthEvaluator",
+    "ModelObservationHealthAssessment",
+    "TemporalFaultDetector",
+    "DetectionConfig",
+    "DetectionResult",
+    "DetectionStatus",
+    "PhysicsInformedDiagnoser",
+    "DiagnosisResult",
+    "HypothesisRanking",
+    "CanonicalFaultType",
 ]

@@ -1,0 +1,138 @@
+{
+  "phase": 6,
+  "title": "Fault Detection & Physics-Informed Diagnosis Evidence Matrix",
+  "baseline_commit": "fdebd3f1172504fd0326070e5893f90660af2cdb",
+  "branch": "rotax-914-greybox-engine",
+  "provenance": "ENGINEERING_HEURISTIC",
+  "verification_summary": {
+    "total_tests_executed": 452,
+    "tests_passed": 452,
+    "tests_skipped": 2,
+    "tests_failed": 0,
+    "regression_count_phase5_baseline": 436,
+    "new_phase6_tests": 16,
+    "net_pass_rate": 1.0
+  },
+  "latency_benchmark": {
+    "steps": 1000,
+    "mean_ms": 0.3822,
+    "median_ms": 0.3239,
+    "p95_ms": 0.5182,
+    "max_ms": 29.9367,
+    "budget_ms": 20.0,
+    "effective_frequency_hz": 2616.2,
+    "budget_verdict": "PASS"
+  },
+  "canonical_fault_matrix": [
+    {
+      "fault_id": "F1",
+      "canonical_name": "INJECTOR_DELIVERY_ABNORMALITY",
+      "subsystem": "FUEL",
+      "primary_channels": ["fuel_flow", "egt"],
+      "observed_directional_residuals": {
+        "fuel_flow": "NEGATIVE",
+        "egt": "POSITIVE",
+        "runner_egt_spread": "POSITIVE (>50 C)"
+      },
+      "typical_compatibility_score": 0.85,
+      "localization_capable": true,
+      "test_reference": "tests/test_fault_detection_diagnosis_phase6.py::test_f1_lean_injector_abnormality_e2e",
+      "status": "VERIFIED_E2E"
+    },
+    {
+      "fault_id": "F2",
+      "canonical_name": "LUBRICATION_DEGRADATION",
+      "subsystem": "LUBRICATION",
+      "primary_channels": ["oil_pressure", "oil_temp"],
+      "observed_directional_residuals": {
+        "oil_pressure": "NEGATIVE (large z < -2.0)",
+        "oil_temp": "POSITIVE (>+0.8 C)",
+        "coolant_temp": "NOMINAL",
+        "fuel_flow": "NOMINAL"
+      },
+      "typical_compatibility_score": 1.0,
+      "localization_capable": false,
+      "test_reference": "tests/test_fault_detection_diagnosis_phase6.py::test_f2_lubrication_degradation_e2e",
+      "status": "VERIFIED_E2E"
+    },
+    {
+      "fault_id": "F3",
+      "canonical_name": "COOLING_DEGRADATION",
+      "subsystem": "COOLING",
+      "primary_channels": ["cht", "coolant_temp"],
+      "observed_directional_residuals": {
+        "cht": "POSITIVE (>+5 C)",
+        "coolant_temp": "POSITIVE (>+0.8 C)",
+        "oil_pressure": "NOMINAL"
+      },
+      "typical_compatibility_score": 0.80,
+      "localization_capable": false,
+      "test_reference": "tests/test_fault_detection_diagnosis_phase6.py::test_f3_cooling_degradation_e2e",
+      "status": "VERIFIED_E2E"
+    },
+    {
+      "fault_id": "F4",
+      "canonical_name": "COMBUSTION_MISFIRE",
+      "subsystem": "COMBUSTION",
+      "primary_channels": ["egt", "rpm", "cht"],
+      "observed_directional_residuals": {
+        "egt": "SEVERE_NEGATIVE (<-50 C, z < -2.0)",
+        "rpm": "NEGATIVE",
+        "cht": "NEGATIVE"
+      },
+      "typical_compatibility_score": 1.0,
+      "localization_capable": true,
+      "test_reference": "tests/test_fault_detection_diagnosis_phase6.py::test_f4_combustion_misfire_e2e",
+      "status": "VERIFIED_E2E"
+    },
+    {
+      "fault_id": "F5",
+      "canonical_name": "MECHANICAL_DEGRADATION",
+      "subsystem": "MECHANICAL",
+      "primary_channels": ["vibration"],
+      "observed_directional_residuals": {
+        "vibration": "POSITIVE (large z > +3.0)",
+        "thermal_channels": "NOMINAL",
+        "combustion_channels": "NOMINAL"
+      },
+      "typical_compatibility_score": 1.0,
+      "localization_capable": false,
+      "test_reference": "tests/test_fault_detection_diagnosis_phase6.py::test_f5_mechanical_degradation_e2e",
+      "status": "VERIFIED_E2E"
+    },
+    {
+      "fault_id": "F6",
+      "canonical_name": "SENSOR_BIAS",
+      "subsystem": "OBSERVATION",
+      "primary_channels": ["cht"],
+      "observed_directional_residuals": {
+        "cht": "POSITIVE (>+20 C)",
+        "coolant_temp": "NOMINAL (abs residual < 0.5 C)",
+        "oil_temp": "NOMINAL (abs residual < 0.5 C)"
+      },
+      "typical_compatibility_score": 0.90,
+      "localization_capable": false,
+      "test_reference": "tests/test_fault_detection_diagnosis_phase6.py::test_f6_sensor_bias_isolation_vs_physical_fault",
+      "status": "VERIFIED_E2E"
+    },
+    {
+      "fault_id": "F7",
+      "canonical_name": "SENSOR_DROPOUT_STUCK",
+      "subsystem": "OBSERVATION",
+      "primary_channels": ["cht"],
+      "observed_directional_residuals": {
+        "quality_report": "STALE / MISSING / ZERO_VARIANCE"
+      },
+      "typical_compatibility_score": 0.95,
+      "localization_capable": false,
+      "test_reference": "tests/test_fault_detection_diagnosis_phase6.py::test_f7_sensor_dropout_stuck_diagnosis",
+      "status": "VERIFIED_E2E"
+    }
+  ],
+  "quarantine_audit": {
+    "legacy_xgboost_path": "fault_diagnosis/",
+    "digital_twin_imports_xgboost": false,
+    "runtime_leakage_detected": false,
+    "production_path_authoritative": "digital_twin.diagnosis.PhysicsInformedDiagnoser"
+  }
+}

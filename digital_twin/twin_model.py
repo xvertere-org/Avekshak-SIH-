@@ -32,6 +32,17 @@ from digital_twin.health import (
     ModelObservationHealthAssessment,
     HealthState,
 )
+from digital_twin.detection import (
+    TemporalFaultDetector,
+    DetectionConfig,
+    DetectionResult,
+    DetectionStatus,
+)
+from digital_twin.diagnosis import (
+    PhysicsInformedDiagnoser,
+    DiagnosisResult,
+    CanonicalFaultType,
+)
 from digital_twin.state import (
     CanonicalTwinState,
     QuantityStatus,
@@ -333,18 +344,22 @@ class DigitalTwin:
         sim_config: Optional[SimulatorConfig] = None,
         estimator_config: Optional[EstimatorConfig] = None,
         health_config: Optional[HealthIndicatorConfig] = None,
+        detection_config: Optional[DetectionConfig] = None,
         calibration: Optional[FrozenScaleCalibration] = None,
     ):
         self.engine_config = engine_config or EngineConfig()
         self.sim_config = sim_config or SimulatorConfig()
         self.estimator_config = estimator_config or EstimatorConfig()
         self.health_config = health_config or HealthIndicatorConfig()
+        self.detection_config = detection_config or DetectionConfig()
         self.calibration = calibration
 
         self.model = DigitalTwinModel(sim_config=self.sim_config, engine_config=self.engine_config)
         self.residual_generator = ResidualGenerator()
         self.quality_residual_generator = QualityAwareResidualGenerator(calibration=self.calibration)
         self.health_evaluator = HealthEvaluator(config=self.health_config)
+        self.fault_detector = TemporalFaultDetector(config=self.detection_config)
+        self.fault_diagnoser = PhysicsInformedDiagnoser()
         self.estimator = StateEstimator(
             config=self.estimator_config,
             sim_config=self.sim_config,
@@ -360,6 +375,8 @@ class DigitalTwin:
         self.model.reset()
         self.estimator.reset()
         self.health_evaluator.reset()
+        self.fault_detector.reset()
+        self.fault_diagnoser.reset()
         self.history.clear()
         self.canonical_history.clear()
         self.canonical_state = None
@@ -444,6 +461,19 @@ class DigitalTwin:
             dt=dt,
             engine_id=telemetry.engine_id,
         )
+        detection_result = self.fault_detector.detect(
+            residual_vector=residual_vector,
+            health_assessment=health_assessment,
+            dt=dt,
+            engine_id=telemetry.engine_id,
+        )
+        diagnosis_result = self.fault_diagnoser.diagnose(
+            detection_result=detection_result,
+            residual_vector=residual_vector,
+            health_assessment=health_assessment,
+            dt=dt,
+            engine_id=telemetry.engine_id,
+        )
 
         nominal_estimates = {
             # Tier A reference anchor for audit compatibility (test_audit_cleanup.py)
@@ -474,6 +504,8 @@ class DigitalTwin:
             state_confidence=round(canonical_state.heuristic_confidence, 4),
             health_assessment=health_assessment,
             residual_vector=residual_vector,
+            detection_result=detection_result,
+            diagnosis_result=diagnosis_result,
             metadata={
                 "power_expected_kw": expected.get("power_expected_kw", 0.0),
                 "order_1x_freq_hz": expected.get("order_1x_freq_hz", 25.0),
@@ -483,6 +515,8 @@ class DigitalTwin:
                 "quality_report": q_report,
                 "residual_vector": residual_vector,
                 "health_assessment": health_assessment,
+                "detection_result": detection_result,
+                "diagnosis_result": diagnosis_result,
             },
         )
         self.history.append(twin_state)
