@@ -1009,3 +1009,324 @@ def test_deterministic_replay_and_clean_reset():
         assert h1.HI_raw == pytest.approx(h2.HI_raw, rel=1e-6)
         assert h1.HI_smooth == pytest.approx(h2.HI_smooth, rel=1e-6)
         assert h1.C_obs == pytest.approx(h2.C_obs, rel=1e-6)
+
+
+# =====================================================================
+# 13. Subsystem & Engine-Level Health Aggregation Invariants (Plan Conformity)
+# =====================================================================
+
+def test_subsystem_aggregation_arithmetic_mean():
+    """
+    Approved Plan Invariant:
+    H_sub(S_k) = arithmetic mean of valid primary channels in S_k.
+    A subsystem with channel scores [1.0, 0.8, 0.6] produces H_sub = 0.8, NOT 0.6.
+    Worst-channel score (0.6) is preserved as a separate diagnostic metric.
+    """
+    evaluator = HealthEvaluator()
+    # Construct ResidualVector where THERMAL has 3 primary channels:
+    # coolant_temp score = 1.0 (z = 0.0)
+    # oil_temp score = 0.8     (z = 2.2, penalty = (2.2 - 1.5)/3.5 = 0.2 -> score = 0.8)
+    # cht score = 0.6          (z = 2.9, penalty = (2.9 - 1.5)/3.5 = 0.4 -> score = 0.6)
+    residuals = {}
+    for ch in PRIMARY_RESIDUAL_CHANNELS:
+        sub = PRIMARY_SUBSYSTEM_MAP[ch]
+        if ch == "coolant_temp":
+            z = 0.0
+        elif ch == "oil_temp":
+            z = 2.2
+        elif ch == "cht":
+            z = 2.9
+        else:
+            z = 0.0
+
+        residuals[ch] = PhysicalResidual(
+            channel=ch,
+            timestamp=100.0,
+            observed_value=100.0 + z * 10.0,
+            predicted_value=100.0,
+            raw_residual=z * 10.0,
+            normalized_residual=z,
+            units="",
+            quality_status="VALID",
+            observability_status="DIRECTLY_OBSERVED",
+            valid=True,
+            reason="",
+            scale_source="ENG",
+            scale_value=10.0,
+            primary_subsystem=sub,
+            is_primary_engine_vote=True,
+        )
+
+    vec = ResidualVector(
+        timestamp=100.0,
+        residuals=residuals,
+        cylinder_residuals=None,
+        primary_channel_count=9,
+        valid_primary_count=9,
+        coverage_fraction=1.0,
+    )
+
+    res = evaluator.evaluate(vec)
+    thermal = res.subsystems["THERMAL"]
+
+    # Invariant: Channel scores are 1.0, 0.8, 0.6
+    assert thermal.channel_scores["coolant_temp"] == pytest.approx(1.0, abs=1e-3)
+    assert thermal.channel_scores["oil_temp"] == pytest.approx(0.8, abs=1e-3)
+    assert thermal.channel_scores["cht"] == pytest.approx(0.6, abs=1e-3)
+
+    # Invariant: Subsystem score is the arithmetic mean = (1.0 + 0.8 + 0.6) / 3 = 0.8
+    assert thermal.score == pytest.approx(0.8, abs=1e-3)
+    # Must NOT be the bottleneck/min score 0.6!
+    assert thermal.score != pytest.approx(0.6, abs=1e-3)
+
+    # Separate diagnostic metric worst_channel_score must be 0.6
+    assert thermal.worst_channel_score == pytest.approx(0.6, abs=1e-3)
+
+
+def test_engine_composite_equal_subsystem_average():
+    """
+    Approved Plan Invariant:
+    H_phys = mean(H_sub(S_k)) over active subsystems with equal weighting.
+    Multiple active subsystem scores are averaged for H_phys, NOT minimized.
+    """
+    evaluator = HealthEvaluator()
+    # Let THERMAL have score 0.8, while other 5 active subsystems have score 1.0
+    residuals = {}
+    for ch in PRIMARY_RESIDUAL_CHANNELS:
+        sub = PRIMARY_SUBSYSTEM_MAP[ch]
+        if ch == "coolant_temp":
+            z = 0.0
+        elif ch == "oil_temp":
+            z = 2.2
+        elif ch == "cht":
+            z = 2.9
+        else:
+            z = 0.0
+
+        residuals[ch] = PhysicalResidual(
+            channel=ch,
+            timestamp=105.0,
+            observed_value=100.0 + z * 10.0,
+            predicted_value=100.0,
+            raw_residual=z * 10.0,
+            normalized_residual=z,
+            units="",
+            quality_status="VALID",
+            observability_status="DIRECTLY_OBSERVED",
+            valid=True,
+            reason="",
+            scale_source="ENG",
+            scale_value=10.0,
+            primary_subsystem=sub,
+            is_primary_engine_vote=True,
+        )
+
+    vec = ResidualVector(
+        timestamp=105.0,
+        residuals=residuals,
+        cylinder_residuals=None,
+        primary_channel_count=9,
+        valid_primary_count=9,
+        coverage_fraction=1.0,
+    )
+
+    res = evaluator.evaluate(vec)
+
+    # 6 active subsystems:
+    # THERMAL: 0.8
+    # LUBRICATION: 1.0
+    # FUEL: 1.0
+    # COMBUSTION: 1.0
+    # MECHANICAL: 1.0
+    # ROTATIONAL: 1.0
+    # H_phys = (0.8 + 1.0 + 1.0 + 1.0 + 1.0 + 1.0) / 6 = 5.8 / 6 approx 0.9667
+    expected_h_phys = 5.8 / 6.0
+    assert res.HI_raw == pytest.approx(expected_h_phys, abs=1e-3)
+    # Must NOT be minimized to 0.8
+    assert res.HI_raw != pytest.approx(0.8, abs=1e-3)
+    # Diagnostic metric records minimum subsystem score
+    assert res.min_subsystem_score == pytest.approx(0.8, abs=1e-3)
+
+
+def test_secondary_contextual_cannot_alter_h_phys():
+    """
+    Approved Plan Invariant:
+    Adding a valid secondary contextual reference (e.g. charge_air_temp) CANNOT change H_phys.
+    Secondary channels have zero engine-level vote weight.
+    """
+    evaluator = HealthEvaluator()
+
+    def build_vec(include_cat: bool, cat_z: float = 0.0):
+        residuals = {}
+        for ch in PRIMARY_RESIDUAL_CHANNELS:
+            sub = PRIMARY_SUBSYSTEM_MAP[ch]
+            residuals[ch] = PhysicalResidual(
+                channel=ch,
+                timestamp=110.0,
+                observed_value=100.0,
+                predicted_value=100.0,
+                raw_residual=0.0,
+                normalized_residual=0.0,
+                units="",
+                quality_status="VALID",
+                observability_status="DIRECTLY_OBSERVED",
+                valid=True,
+                reason="",
+                scale_source="ENG",
+                scale_value=1.0,
+                primary_subsystem=sub,
+                is_primary_engine_vote=True,
+            )
+        if include_cat:
+            residuals["charge_air_temp"] = PhysicalResidual(
+                channel="charge_air_temp",
+                timestamp=110.0,
+                observed_value=100.0 + cat_z * 5.0,
+                predicted_value=100.0,
+                raw_residual=cat_z * 5.0,
+                normalized_residual=cat_z,
+                units="°C",
+                quality_status="VALID",
+                observability_status="DIRECTLY_OBSERVED",
+                valid=True,
+                reason="",
+                scale_source="ENG",
+                scale_value=5.0,
+                primary_subsystem="AIR_INDUCTION",
+                is_primary_engine_vote=False,
+            )
+        return ResidualVector(
+            timestamp=110.0,
+            residuals=residuals,
+            cylinder_residuals=None,
+            primary_channel_count=9,
+            valid_primary_count=9,
+            coverage_fraction=1.0,
+        )
+
+    evaluator.reset()
+    res_no_cat = evaluator.evaluate(build_vec(include_cat=False))
+
+    evaluator.reset()
+    # Severely degraded secondary charge_air_temp (z = 4.5)
+    res_with_cat = evaluator.evaluate(build_vec(include_cat=True, cat_z=4.5))
+
+    # HI_raw must be completely identical
+    assert res_with_cat.HI_raw == pytest.approx(res_no_cat.HI_raw, abs=1e-6)
+    # Secondary evidence is present in subsystem diagnostics
+    assert "charge_air_temp_residual" in res_with_cat.subsystems["THERMAL"].secondary_evidence
+
+
+def test_cylinder_channels_do_not_create_engine_votes():
+    """
+    Approved Plan Invariant:
+    Per-cylinder runner channels provide localized diagnostic spread metrics
+    but do NOT create additional engine-level votes in HI_raw.
+    """
+    evaluator = HealthEvaluator()
+
+    def make_vec(cyl_z_outlier: float = 0.0):
+        residuals = {}
+        for ch in PRIMARY_RESIDUAL_CHANNELS:
+            sub = PRIMARY_SUBSYSTEM_MAP[ch]
+            residuals[ch] = PhysicalResidual(
+                channel=ch,
+                timestamp=120.0,
+                observed_value=100.0,
+                predicted_value=100.0,
+                raw_residual=0.0,
+                normalized_residual=0.0,
+                units="",
+                quality_status="VALID",
+                observability_status="DIRECTLY_OBSERVED",
+                valid=True,
+                reason="",
+                scale_source="ENG",
+                scale_value=1.0,
+                primary_subsystem=sub,
+                is_primary_engine_vote=True,
+            )
+        cyl = CylinderResiduals(
+            cht_runner_residuals=[0.0, cyl_z_outlier * 10.0, 0.0, 0.0],
+            egt_runner_residuals=[0.0, cyl_z_outlier * 25.0, 0.0, 0.0],
+            cht_spread_c=abs(cyl_z_outlier * 10.0),
+            egt_spread_c=abs(cyl_z_outlier * 25.0),
+            cht_imbalance_max_c=abs(cyl_z_outlier * 10.0),
+            egt_imbalance_max_c=abs(cyl_z_outlier * 25.0),
+            valid_cylinder_count=4,
+        )
+        return ResidualVector(
+            timestamp=120.0,
+            residuals=residuals,
+            cylinder_residuals=cyl,
+            primary_channel_count=9,
+            valid_primary_count=9,
+            coverage_fraction=1.0,
+        )
+
+    evaluator.reset()
+    res_nominal_cyl = evaluator.evaluate(make_vec(0.0))
+    evaluator.reset()
+    res_faulty_cyl = evaluator.evaluate(make_vec(5.0))
+
+    # Engine-level HI_raw remains 1.0 because runner channels do NOT vote at engine level
+    assert res_faulty_cyl.HI_raw == pytest.approx(res_nominal_cyl.HI_raw, abs=1e-6)
+    # Runner spread is properly captured in diagnostics
+    assert res_faulty_cyl.cylinder_assessment["cht_spread_c"] == pytest.approx(50.0, abs=1e-3)
+    assert res_faulty_cyl.cylinder_assessment["egt_spread_c"] == pytest.approx(125.0, abs=1e-3)
+
+
+def test_missing_channels_affect_coverage_without_health_penalty():
+    """
+    Approved Plan Invariant:
+    Missing channels reduce coverage C_obs without being converted into physical degradation penalties in HI_raw.
+    """
+    evaluator = HealthEvaluator()
+
+    # Drop 3 primary channels (6 of 9 remain valid >= 5 min coverage gate)
+    # Dropped: oil_pressure, egt, vibration
+    # Remaining 6 channels: rpm, map_bar, fuel_flow, cht, coolant_temp, oil_temp (all healthy z = 0)
+    residuals = {}
+    for ch in PRIMARY_RESIDUAL_CHANNELS:
+        sub = PRIMARY_SUBSYSTEM_MAP[ch]
+        is_valid = ch not in ("oil_pressure", "egt", "vibration")
+        residuals[ch] = PhysicalResidual(
+            channel=ch,
+            timestamp=130.0,
+            observed_value=100.0 if is_valid else None,
+            predicted_value=100.0,
+            raw_residual=0.0 if is_valid else float("nan"),
+            normalized_residual=0.0 if is_valid else float("nan"),
+            units="",
+            quality_status="VALID" if is_valid else "MISSING",
+            observability_status="DIRECTLY_OBSERVED",
+            valid=is_valid,
+            reason="" if is_valid else "SENSOR_DROPOUT",
+            scale_source="ENG",
+            scale_value=1.0,
+            primary_subsystem=sub,
+            is_primary_engine_vote=True,
+        )
+
+    vec = ResidualVector(
+        timestamp=130.0,
+        residuals=residuals,
+        cylinder_residuals=None,
+        primary_channel_count=9,
+        valid_primary_count=6,
+        coverage_fraction=6.0 / 9.0,
+    )
+
+    res = evaluator.evaluate(vec)
+
+    # Coverage is 6/9 approx 0.6667
+    assert res.C_obs == pytest.approx(6.0 / 9.0, abs=1e-3)
+    # Active subsystems: ROTATIONAL (rpm, map_bar), FUEL (fuel_flow), THERMAL (cht, coolant, oil_temp)
+    # Each active subsystem is perfectly healthy (1.0)
+    # HI_raw MUST be 1.0 (missing channels do NOT penalize physical health!)
+    assert res.HI_raw == pytest.approx(1.0, abs=1e-4)
+    # State is HEALTHY
+    assert res.state == HealthState.HEALTHY
+    # Coverage-adjusted HI reflects coverage: 1.0 * (6/9)
+    assert res.HI_cov_adj == pytest.approx(6.0 / 9.0, abs=1e-3)
+

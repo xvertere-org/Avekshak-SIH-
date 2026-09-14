@@ -74,11 +74,17 @@ $$h_k(t) = \begin{cases} 0.0, & |z_k(t)| \le \tau_{nom} \\ \frac{|z_k(t)| - \tau
 $$H_k(t) = 1.0 - h_k(t)$$
 where $H_k \in [0, 1]$.
 
-### 3.4 Subsystem and Engine Physical Health
-Each subsystem aggregates its primary channels via the worst-case bottleneck (weakest link):
-$$H_{sub}(t) = \min_{k \in \mathcal{K}_{sub}^{primary}} H_k(t)$$
-Engine physical health is:
-$$H_{phys}(t) = \min_{sub} H_{sub}(t) = \min_{k \in \mathcal{P}_{valid}} H_k(t)$$
+### 3.4 Subsystem and Engine Physical Health Aggregation
+Each subsystem aggregates its valid primary channels strictly via the **arithmetic mean**:
+$$H_{sub}(S_k) = \frac{1}{|\mathcal{K}_{sub}^{valid}|} \sum_{k \in \mathcal{K}_{sub}^{valid}} H_k(t)$$
+Engine physical health ($H_{phys}$ / $HI_{raw}$) is the **equal-weighted arithmetic mean** over all active subsystems ($\mathcal{S}_{active}$):
+$$H_{phys}(t) = \frac{1}{|\mathcal{S}_{active}|} \sum_{S_k \in \mathcal{S}_{active}} H_{sub}(S_k)$$
+
+#### Separate Explicit Diagnostic Metrics
+To support localized inspection without corrupting the physics-consistency index $HI_{raw}$:
+- `worst_channel_score = min_{k} H_k`: Tracked per subsystem and at the engine level as a diagnostic alerting indicator.
+- `min_subsystem_score = min_{S_k} H_{sub}(S_k)`: Tracked at the engine level to identify the primary degraded subsystem.
+These metrics do **not** affect $HI_{raw}$ or $H_{phys}$.
 
 ### 3.5 Observability Coverage & Gating
 With 9 primary channels:

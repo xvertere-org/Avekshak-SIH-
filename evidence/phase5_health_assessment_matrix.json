@@ -184,8 +184,8 @@
     "cpu_utilization_ratio": 0.0157
   },
   "test_suite_summary": {
-    "targeted_phase5_tests": 20,
-    "total_regression_tests_passed": 431,
+    "targeted_phase5_tests": 25,
+    "total_regression_tests_passed": 436,
     "total_regression_tests_skipped": 2,
     "total_regression_tests_failed": 0
   }

@@ -119,15 +119,16 @@ class ChannelHealthIndicator:
 class SubsystemHealthAssessment:
     """
     Health assessment for a single physical subsystem.
-    Calculated exclusively from primary channels owned by this subsystem.
+    Calculated exclusively as the arithmetic mean of primary channels owned by this subsystem.
     """
     subsystem: str
-    score: float                        # Subsystem health score in [0.0, 1.0] (or NaN if no valid channels)
+    score: float                        # Arithmetic mean of valid primary channels in [0.0, 1.0] (or NaN)
     state: HealthState
     primary_channels: List[str]
     valid_channels: List[str]
     channel_scores: Dict[str, float]
     secondary_evidence: Dict[str, Any] = field(default_factory=dict)
+    worst_channel_score: Optional[float] = None  # Explicitly named separate diagnostic metric (does NOT affect score)
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -138,6 +139,7 @@ class SubsystemHealthAssessment:
             "valid_channels": self.valid_channels,
             "channel_scores": {k: round(v, 4) for k, v in self.channel_scores.items()},
             "secondary_evidence": self.secondary_evidence,
+            "worst_channel_score": round(self.worst_channel_score, 4) if self.worst_channel_score is not None and not math.isnan(self.worst_channel_score) else None,
         }
 
 
@@ -146,17 +148,20 @@ class ModelObservationHealthAssessment:
     """
     Complete engine health assessment evaluated at a single time step.
     Strictly separates physics consistency (HI_raw), coverage (C_obs), and data quality (C_data).
+    HI_raw is the arithmetic mean of active subsystem scores.
     """
     timestamp: float
     engine_id: str
     state: HealthState
-    HI_raw: float                       # Physics consistency health index in [0.0, 1.0] (NaN if UNAVAILABLE)
+    HI_raw: float                       # Arithmetic mean of active subsystem scores in [0.0, 1.0] (NaN if UNAVAILABLE)
     HI_smooth: float                    # Causal EWMA smoothed health index (NaN if UNAVAILABLE)
     HI_cov_adj: Optional[float]         # Optional coverage-adjusted index: HI_raw * C_obs
     C_obs: float                        # Observability coverage: valid_primary / 9.0
     C_data: float                       # Data quality/confidence from Phase 3 CanonicalTwinState
     subsystems: Dict[str, SubsystemHealthAssessment]
     channel_indicators: Dict[str, ChannelHealthIndicator]
+    min_subsystem_score: Optional[float] = None  # Explicitly named separate diagnostic metric (does NOT affect HI_raw)
+    worst_channel_score: Optional[float] = None  # Explicitly named separate diagnostic metric (does NOT affect HI_raw)
     cylinder_assessment: Optional[Dict[str, Any]] = None
     active_anomalies: List[str] = field(default_factory=list)
     config_provenance: str = "ENGINEERING_HEURISTIC"
@@ -175,6 +180,8 @@ class ModelObservationHealthAssessment:
             "C_data": round(self.C_data, 4),
             "subsystems": {k: v.to_dict() for k, v in self.subsystems.items()},
             "channel_indicators": {k: v.to_dict() for k, v in self.channel_indicators.items()},
+            "min_subsystem_score": round(self.min_subsystem_score, 4) if self.min_subsystem_score is not None and not math.isnan(self.min_subsystem_score) else None,
+            "worst_channel_score": round(self.worst_channel_score, 4) if self.worst_channel_score is not None and not math.isnan(self.worst_channel_score) else None,
             "cylinder_assessment": self.cylinder_assessment,
             "active_anomalies": self.active_anomalies,
             "config_provenance": self.config_provenance,
@@ -382,6 +389,7 @@ class HealthEvaluator:
             if valid_ch_in_sub:
                 sub_score = sum(ch_scores.values()) / len(valid_ch_in_sub)
                 subsystem_scores[sub_name] = sub_score
+                worst_ch = min(ch_scores.values())
 
                 # Determine subsystem categorical state from confirmed channel states
                 sub_states = [channel_indicators[ch].state for ch in valid_ch_in_sub]
@@ -395,6 +403,7 @@ class HealthEvaluator:
                     sub_state = HealthState.HEALTHY
             else:
                 sub_score = float("nan")
+                worst_ch = None
                 sub_state = HealthState.UNAVAILABLE
 
             subsystem_assessments[sub_name] = SubsystemHealthAssessment(
@@ -405,6 +414,7 @@ class HealthEvaluator:
                 valid_channels=valid_ch_in_sub,
                 channel_scores=ch_scores,
                 secondary_evidence=secondary_ev,
+                worst_channel_score=worst_ch,
             )
 
         # 3. Evaluate Engine-Level Health Index and Coverage Gate
@@ -414,19 +424,24 @@ class HealthEvaluator:
             hi_raw = float("nan")
             hi_smooth = float("nan")
             hi_cov_adj = None
+            min_sub_score = None
+            worst_ch_score = None
         else:
-            # Calculate weighted composite HI_raw across subsystems with valid channels
-            valid_subsystems = [s for s, sc in subsystem_scores.items() if not math.isnan(sc)]
-            if valid_subsystems:
-                weights = self.config.primary_subsystem_weights
-                total_weight = sum(weights.get(s, 0.1) for s in valid_subsystems)
-                if total_weight > 0:
-                    hi_raw = sum(subsystem_scores[s] * weights.get(s, 0.1) for s in valid_subsystems) / total_weight
-                else:
-                    hi_raw = sum(subsystem_scores[s] for s in valid_subsystems) / len(valid_subsystems)
+            # H_phys = arithmetic mean of active subsystem scores (equal weighting across active subsystems)
+            active_subsystems = [s for s, sc in subsystem_scores.items() if not math.isnan(sc)]
+            if active_subsystems:
+                hi_raw = sum(subsystem_scores[s] for s in active_subsystems) / len(active_subsystems)
                 hi_raw = max(0.0, min(1.0, float(hi_raw)))
+                min_sub_score = min(subsystem_scores[s] for s in active_subsystems)
+                valid_ch_scores = [
+                    ind.channel_score for ind in channel_indicators.values()
+                    if ind.valid and not math.isnan(ind.channel_score) and ind.is_primary
+                ]
+                worst_ch_score = min(valid_ch_scores) if valid_ch_scores else None
             else:
                 hi_raw = float("nan")
+                min_sub_score = None
+                worst_ch_score = None
 
             # Coverage-adjusted HI (explicitly independent from HI_raw)
             hi_cov_adj = hi_raw * c_obs if not math.isnan(hi_raw) else None
@@ -442,13 +457,13 @@ class HealthEvaluator:
             else:
                 hi_smooth = float("nan")
 
-            # Determine overall engine health state from subsystem states
+            # Determine overall engine health state from subsystem states and smoothed health index
             all_sub_states = [s.state for s in subsystem_assessments.values() if s.state != HealthState.UNAVAILABLE]
-            if HealthState.CRITICAL in all_sub_states:
+            if HealthState.CRITICAL in all_sub_states or (not math.isnan(hi_smooth) and hi_smooth < 0.45):
                 overall_state = HealthState.CRITICAL
-            elif HealthState.DEGRADED in all_sub_states:
+            elif HealthState.DEGRADED in all_sub_states or (not math.isnan(hi_smooth) and hi_smooth < 0.70):
                 overall_state = HealthState.DEGRADED
-            elif HealthState.WATCH in all_sub_states:
+            elif HealthState.WATCH in all_sub_states or (not math.isnan(hi_smooth) and hi_smooth < 0.85):
                 overall_state = HealthState.WATCH
             else:
                 overall_state = HealthState.HEALTHY
@@ -478,6 +493,8 @@ class HealthEvaluator:
             C_data=c_data,
             subsystems=subsystem_assessments,
             channel_indicators=channel_indicators,
+            min_subsystem_score=min_sub_score,
+            worst_channel_score=worst_ch_score,
             cylinder_assessment=cyl_assessment,
             active_anomalies=active_anomalies,
             config_provenance=self.config.provenance,
