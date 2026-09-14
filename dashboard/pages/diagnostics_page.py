@@ -22,7 +22,7 @@ from dashboard.components.xai_view import render_xai_evidence
 
 def render_diagnostics_page(vm: DashboardViewModel):
     """Render 3. DIAGNOSTICS section."""
-    st.markdown("### Diagnostics and anomaly assessment")
+    st.markdown("### Engine Diagnostics")
 
     col1, col2 = st.columns([1, 1])
     with col1:

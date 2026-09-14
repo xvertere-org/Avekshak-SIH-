@@ -23,7 +23,7 @@ def render_operating_context_cards(telemetry_vm: TelemetryViewModel):
     cols = st.columns(4)
     with cols[0]:
         st.metric(
-            label="Commanded Throttle",
+            label="Throttle",
             value=format_value(telemetry_vm.throttle, decimals=1, unit="%"),
         )
     with cols[1]:
@@ -33,12 +33,12 @@ def render_operating_context_cards(telemetry_vm: TelemetryViewModel):
         )
     with cols[2]:
         st.metric(
-            label="Flight Altitude",
+            label="Altitude",
             value=format_value(telemetry_vm.altitude, decimals=0, unit="m"),
         )
     with cols[3]:
         st.metric(
-            label="Outside Air Temp",
+            label="Ambient Temperature",
             value=format_value(telemetry_vm.ambient_temp, decimals=1, unit="°C"),
         )
 
@@ -177,7 +177,7 @@ def render_canonical_telemetry_grid(
     """
     Render 7 canonical telemetry channels with comparison metrics and charts.
     """
-    st.markdown("#### Canonical Telemetry Channels")
+    st.markdown("#### Engine Sensor Channels")
 
     # Grid layout: 2 columns for the first 6, then full-width for the 7th or 3-column layout
     cols = st.columns(2)
@@ -198,9 +198,9 @@ def render_canonical_telemetry_grid(
                 hdr_html = (
                     f'<div style="font-size: 13px; font-weight: 700; color: #f0f6fc;">{ch_model.display_name}</div>'
                     f'<div style="font-size: 11px; color: #8b949e; margin-bottom: 4px;">'
-                    f'Observed: <b style="color: {PLOT_COLORS["observed"]}; font-family: monospace;">{obs_str}</b> | '
+                    f'Measured: <b style="color: {PLOT_COLORS["observed"]}; font-family: monospace;">{obs_str}</b> | '
                     f'DT Expected: <b style="color: {PLOT_COLORS["expected"]}; font-family: monospace;">{exp_str}</b> | '
-                    f'Residual: <b style="color: #f0f6fc; font-family: monospace;">{res_str}</b>'
+                    f'Deviation: <b style="color: #f0f6fc; font-family: monospace;">{res_str}</b>'
                     f'</div>'
                 )
                 st.markdown(hdr_html, unsafe_allow_html=True)

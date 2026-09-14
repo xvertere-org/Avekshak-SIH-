@@ -56,19 +56,19 @@ def render_overview_page(
         f'<span style="font-size: 26px; font-weight: 800; color: {overall_color}; letter-spacing: -0.5px;">{vm.overview.overall_status.value}</span>'
         f'<span style="font-size: 13px; color: #8b949e; font-family: monospace;">(Health Index: <b style="color: #f0f6fc;">{hi_card.value}</b>)</span>'
         f'</div>'
-        f'<div style="font-size: 12px; color: #8b949e;">Current state: <b style="color: #e6edf3;">{hi_card.subtext or "Nominal"}</b></div>'
+        f'<div style="font-size: 12px; color: #8b949e;">Operational State: <b style="color: #e6edf3;">{hi_card.subtext or "Nominal"}</b></div>'
         f'</div>'
         # Right side: Current Findings (Anomaly & Fault)
         f'<div style="flex: 1 1 380px; display: flex; gap: 24px; border-left: 1px solid #1e2430; padding-left: 20px;">'
         f'<div>'
-        f'<div style="font-size: 11px; font-weight: 700; color: #8b949e; text-transform: uppercase; letter-spacing: 0.6px;">ACTIVE ANOMALY</div>'
+        f'<div style="font-size: 11px; font-weight: 700; color: #8b949e; text-transform: uppercase; letter-spacing: 0.6px;">ANOMALY DETECTION</div>'
         f'<div style="font-size: 16px; font-weight: 700; font-family: monospace; color: #f0f6fc; margin: 4px 0;">{anom_card.value}</div>'
         f'<div style="font-size: 11px; color: #8b949e;">{anom_card.subtext or "Persistence: 0"}</div>'
         f'</div>'
         f'<div>'
-        f'<div style="font-size: 11px; font-weight: 700; color: #8b949e; text-transform: uppercase; letter-spacing: 0.6px;">DIAGNOSED FAULT</div>'
+        f'<div style="font-size: 11px; font-weight: 700; color: #8b949e; text-transform: uppercase; letter-spacing: 0.6px;">FAULT DIAGNOSIS</div>'
         f'<div style="font-size: 16px; font-weight: 700; color: #f0f6fc; margin: 4px 0;">{fault_card.value}</div>'
-        f'<div style="font-size: 11px; color: #8b949e;">Diagnosis confidence: <b style="color: #58a6ff; font-family: monospace;">{diag_prob_str}</b></div>'
+        f'<div style="font-size: 11px; color: #8b949e;">Diagnosis Probability: <b style="color: #58a6ff; font-family: monospace;">{diag_prob_str}</b></div>'
         f'</div>'
         f'</div>'
         f'</div>'
@@ -100,7 +100,7 @@ def render_overview_page(
             f'border-radius: 6px; padding: 12px 16px; margin-bottom: 16px;">'
             f'<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">'
             f'<div style="font-size: 11px; font-weight: 700; color: #8b949e; text-transform: uppercase; letter-spacing: 0.5px;">'
-            f'DECISION-SUPPORT ADVISORY · ACTION CODE: <code style="color: #58a6ff;">{adv.action_code}</code>'
+            f'DECISION ADVISORY · ACTION: <code style="color: #58a6ff;">{adv.action_code}</code>'
             f'{subsystem_line}'
             f'</div>'
             f'<span style="background-color: {urg_color}1a; color: {urg_color}; border: 1px solid {urg_color}44; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 700;">'
@@ -108,7 +108,7 @@ def render_overview_page(
             f'</span>'
             f'</div>'
             f'<div style="font-size: 14px; font-weight: 700; color: #f0f6fc; margin-bottom: 4px;">{adv.headline}</div>'
-            f'<div style="font-size: 13px; color: #c9d1d9;"><b>Suggested action:</b> {adv.recommended_action}</div>'
+            f'<div style="font-size: 13px; color: #c9d1d9;"><b>Recommended Action:</b> {adv.recommended_action}</div>'
             f'<div style="font-size: 10px; color: #6e7681; margin-top: 6px;">ℹ️ <i>{adv.disclaimer}</i></div>'
             f'</div>'
         )
@@ -117,7 +117,7 @@ def render_overview_page(
     # =========================================================================
     # 3. KEY TELEMETRY (Compact Canonical 7 Engineering Table)
     # =========================================================================
-    st.markdown('<div class="section-label">PRIMARY PROPULSION TELEMETRY</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-label">PRIMARY ENGINE TELEMETRY</div>', unsafe_allow_html=True)
 
     rows_html = []
     for ch in CANONICAL_CHANNELS:
@@ -141,10 +141,10 @@ def render_overview_page(
     table_html = (
         f'<table class="eng-table">'
         f'<thead><tr>'
-        f'<th>Channel</th>'
+        f'<th>Sensor</th>'
         f'<th>Measured</th>'
-        f'<th>Model expected</th>'
-        f'<th>Difference</th>'
+        f'<th>Digital Twin Expected</th>'
+        f'<th>Twin Deviation</th>'
         f'<th style="text-align: right;">Status</th>'
         f'</tr></thead>'
         f'<tbody>'
@@ -161,30 +161,30 @@ def render_overview_page(
     ctx_col, prog_col = st.columns([1, 1])
 
     with ctx_col:
-        st.markdown('<div class="section-label">OPERATING CONDITIONS</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-label">FLIGHT CONDITIONS</div>', unsafe_allow_html=True)
         ctx_html = (
             f'<div class="console-panel" style="padding: 10px 14px; margin-bottom: 0;">'
             f'<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px;">'
             f'<div><span style="font-size: 11px; color: #8b949e;">THROTTLE:</span> <b class="eng-num" style="color: #f0f6fc; margin-left: 6px;">{format_value(vm.telemetry.throttle, decimals=1, unit="%")}</b></div>'
             f'<div><span style="font-size: 11px; color: #8b949e;">LOAD:</span> <b class="eng-num" style="color: #f0f6fc; margin-left: 6px;">{format_value(vm.telemetry.load, decimals=1, unit="%")}</b></div>'
             f'<div><span style="font-size: 11px; color: #8b949e;">ALTITUDE:</span> <b class="eng-num" style="color: #f0f6fc; margin-left: 6px;">{format_value(vm.telemetry.altitude, decimals=0, unit="m")}</b></div>'
-            f'<div><span style="font-size: 11px; color: #8b949e;">OAT:</span> <b class="eng-num" style="color: #f0f6fc; margin-left: 6px;">{format_value(vm.telemetry.ambient_temp, decimals=1, unit="°C")}</b></div>'
+            f'<div><span style="font-size: 11px; color: #8b949e;">AMBIENT TEMP:</span> <b class="eng-num" style="color: #f0f6fc; margin-left: 6px;">{format_value(vm.telemetry.ambient_temp, decimals=1, unit="°C")}</b></div>'
             f'</div>'
             f'</div>'
         )
         st.markdown(ctx_html, unsafe_allow_html=True)
 
     with prog_col:
-        st.markdown('<div class="section-label">LIFE PREDICTION</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-label">HEALTH & PROGNOSTICS</div>', unsafe_allow_html=True)
         rul_card = vm.overview.rul_card
-        rul_detail = rul_card.subtext or f"State: {vm.prognostics.rul_state}"
+        rul_detail = rul_card.subtext or f"Life Prediction Status: {vm.prognostics.rul_state}"
         prog_html = (
             f'<div class="console-panel" style="padding: 10px 14px; margin-bottom: 0;">'
             f'<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px;">'
             f'<div><span style="font-size: 11px; color: #8b949e;">MEDIAN RUL:</span> <b class="eng-num" style="color: #f0f6fc; margin-left: 6px;">{rul_card.value}</b></div>'
             f'<div><span style="font-size: 11px; color: #8b949e;">LIMITING:</span> <code style="color: #58a6ff; margin-left: 6px;">{vm.prognostics.limiting_factor or "NONE"}</code></div>'
             f'</div>'
-            f'<div style="font-size: 11px; color: #6e7681; margin-top: 6px; font-family: monospace;">Status: {rul_detail}</div>'
+            f'<div style="font-size: 11px; color: #6e7681; margin-top: 6px; font-family: monospace;">Life Prediction Status: {rul_detail}</div>'
             f'</div>'
         )
         st.markdown(prog_html, unsafe_allow_html=True)
@@ -228,10 +228,8 @@ def render_overview_page(
     # Footer navigation hints
     st.markdown(
         '<div style="font-size: 11px; color: #6e7681; border-top: 1px solid #21262d; padding-top: 8px; margin-top: 4px; display: flex; justify-content: space-between;">'
-        '<span>View <b>Live Telemetry</b> for all seven channels and subsystem groupings.</span>'
-        '<span>View <b>Diagnostics</b> for model evidence and physics checks.</span>'
+        '<span>👉 Open <b>Live Engine</b> in the sidebar to see all 7 sensor channels.</span>'
+        '<span>👉 Open <b>Diagnostics</b> to review fault evidence and prediction detail.</span>'
         '</div>',
         unsafe_allow_html=True,
     )
-
-

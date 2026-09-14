@@ -2,25 +2,24 @@
 Telemetry stream handling and buffering interfaces.
 """
 
-from typing import Iterator, List, Optional
+from collections import deque
+from typing import Deque, Iterator, List, Optional
 from telemetry.schema import TelemetryRecord
 
 
 class TelemetryStreamer:
     """
     Interface for handling telemetry ingestion, buffering, and validation.
-    Phase 1: Stub/Interface definition.
+    Optimized: O(1) circular ring buffer using collections.deque.
     """
 
     def __init__(self, buffer_size: int = 1000):
         self.buffer_size = buffer_size
-        self._buffer: List[TelemetryRecord] = []
+        self._buffer: Deque[TelemetryRecord] = deque(maxlen=buffer_size)
 
     def push(self, record: TelemetryRecord) -> None:
-        """Add a telemetry record to the buffer."""
+        """Add a telemetry record to the circular buffer in O(1) time."""
         self._buffer.append(record)
-        if len(self._buffer) > self.buffer_size:
-            self._buffer.pop(0)
 
     def get_latest(self) -> Optional[TelemetryRecord]:
         """Retrieve the most recent telemetry record."""

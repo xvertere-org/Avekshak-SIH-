@@ -23,18 +23,18 @@ def render_report_page(
     scenario_metadata: Optional[Dict[str, Any]] = None,
 ):
     """Render 7. MISSION REPORT section."""
-    st.markdown("### Mission report")
+    st.markdown("### Mission Report")
     st.markdown(
         """
         <div style="font-size: 13px; color: #8b949e; margin-bottom: 16px;">
-            Generate a post-mission summary of telemetry, diagnostics, health trends, and suggested actions.
+            Review the complete mission health assessment, key events, degradation trends, and recommended actions.
         </div>
         """,
         unsafe_allow_html=True,
     )
 
     if not payloads:
-        st.warning("No mission data is available yet. Run a scenario from the sidebar to create a report.")
+        st.warning("No mission data available to generate a report. Run a mission from the sidebar first.")
         return
 
     # Generate Report
@@ -43,27 +43,27 @@ def render_report_page(
             payloads, scenario_metadata=scenario_metadata
         )
     except Exception as e:
-        st.error(f"Unable to create the mission report: {e}")
+        st.error(f"Mission report could not be compiled. Try resetting and re-running the mission.")
         return
 
     # Download Buttons Bar
     col_dl1, col_dl2, col_meta = st.columns([1.5, 1.5, 3])
     with col_dl1:
         st.download_button(
-            label="📥 Download report (.md)",
+            label="📥 Download Mission Report",
             data=report.to_markdown(),
             file_name=f"mission_report_{report.mission_id}.md",
             mime="text/markdown",
-            help="Download the complete report in Markdown format.",
+            help="Download the full mission report as a Markdown document.",
             use_container_width=True,
         )
     with col_dl2:
         st.download_button(
-            label="📥 Download data (.json)",
+            label="📥 Download Mission Data (.JSON)",
             data=report.to_json(),
             file_name=f"mission_report_{report.mission_id}.json",
             mime="application/json",
-            help="Download the report data in JSON format.",
+            help="Download structured JSON mission data.",
             use_container_width=True,
         )
     with col_meta:
@@ -92,7 +92,7 @@ def render_report_page(
         <div style="background-color: #161b22; border-left: 5px solid {adv_col}; border: 1px solid #30363d; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                 <div style="font-size: 11px; font-weight: 700; color: #8b949e; text-transform: uppercase;">
-                    POST-MISSION ADVISORY ASSESSMENT — ACTION CODE: <code>{report.advisory_action_code}</code>
+                    POST-MISSION ASSESSMENT — ACTION: <code>{report.advisory_action_code}</code>
                 </div>
                 <span style="background-color: {adv_col}22; color: {adv_col}; border: 1px solid {adv_col}; padding: 2px 10px; border-radius: 4px; font-size: 12px; font-weight: 700;">
                     {report.advisory_assessment} (Urgency: {report.advisory_urgency})
@@ -102,7 +102,7 @@ def render_report_page(
                 {report.advisory_headline}
             </div>
             <div style="font-size: 13px; color: #c9d1d9;">
-                <b>Suggested action:</b> {report.recommended_operator_action}
+                <b>Recommended Action:</b> {report.recommended_operator_action}
             </div>
             <div style="font-size: 10px; color: #8b949e; border-top: 1px solid #21262d; padding-top: 8px; margin-top: 8px;">
                 ℹ️ <i>{report.disclaimer}</i>
@@ -113,7 +113,7 @@ def render_report_page(
     )
 
     # Telemetry Peaks Summary
-    st.markdown("#### 1. Telemetry Statistics & Operational Extremes")
+    st.markdown("#### 1. Engine Telemetry Summary")
     cols_t1, cols_t2, cols_t3, cols_t4 = st.columns(4)
     with cols_t1:
         st.metric("Peak CHT", f"{report.cht_peak:.1f} °C", help="Cylinder Head Temperature maximum")
@@ -131,13 +131,13 @@ def render_report_page(
     st.markdown("---")
 
     # PHM & Prognostics Summary
-    st.markdown("#### 2. PHM Health & Prognostics Summary")
+    st.markdown("#### 2. Health & Prognostics")
     col_p1, col_p2, col_p3 = st.columns(3)
     with col_p1:
         st.markdown(
             f"""
             <div style="background-color: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 12px;">
-                <div style="font-size: 11px; color: #8b949e; text-transform: uppercase;">Diagnosis Result</div>
+                <div style="font-size: 11px; color: #8b949e; text-transform: uppercase;">Fault Diagnosis</div>
                 <div style="font-size: 16px; font-weight: 700; color: #58a6ff; margin: 4px 0;"><code>{report.final_diagnosis}</code></div>
                 <div style="font-size: 11px; color: #c9d1d9;">
                     <b>Probability:</b> {report.final_diagnosis_probability:.3f}<br/>
@@ -151,7 +151,7 @@ def render_report_page(
         st.markdown(
             f"""
             <div style="background-color: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 12px;">
-                <div style="font-size: 11px; color: #8b949e; text-transform: uppercase;">Health & Degradation</div>
+                <div style="font-size: 11px; color: #8b949e; text-transform: uppercase;">Engine Health & Degradation</div>
                 <div style="font-size: 16px; font-weight: 700; color: #3fb950; margin: 4px 0;">HI: {report.final_health_index:.3f}</div>
                 <div style="font-size: 11px; color: #c9d1d9;">
                     <b>Min HI:</b> {report.min_health_index:.3f}<br/>
@@ -167,7 +167,7 @@ def render_report_page(
         st.markdown(
             f"""
             <div style="background-color: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 12px;">
-                <div style="font-size: 11px; color: #8b949e; text-transform: uppercase;">Prognostics / RUL</div>
+                <div style="font-size: 11px; color: #8b949e; text-transform: uppercase;">Life Prediction (RUL)</div>
                 <div style="font-size: 16px; font-weight: 700; color: #bc8cff; margin: 4px 0;">{rul_text}</div>
                 <div style="font-size: 11px; color: #c9d1d9;">
                     {rul_desc}
@@ -180,7 +180,7 @@ def render_report_page(
     st.markdown("---")
 
     # Multi-source Explainability Preview
-    st.markdown("#### 3. Explainability & Physics Synthesis")
+    st.markdown("#### 3. Evidence & Explainability")
     st.markdown(
         f"""
         <div style="background-color: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 12px; font-size: 12px; color: #c9d1d9; line-height: 1.6;">

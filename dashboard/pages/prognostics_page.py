@@ -26,7 +26,7 @@ def render_prognostics_page(
     history_hi: Optional[List[float]] = None,
 ):
     """Render 4. PROGNOSTICS section."""
-    st.markdown("### Health and life prediction")
+    st.markdown("### Engine Health & Prognostics")
 
     render_health_prognostics(
         vm.prognostics,

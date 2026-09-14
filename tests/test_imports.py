@@ -36,25 +36,20 @@ def test_import_digital_twin():
     assert DigitalTwin is not None
 
 
-def test_import_phm():
-    import phm
-    from phm.detector import HealthDetector
-    assert phm is not None
-    assert HealthDetector is not None
-
-
 def test_import_forecasting():
     import forecasting
-    from forecasting.rul_predictor import RULPredictor
+    from forecasting.pipeline import ForecastingPipeline
     assert forecasting is not None
-    assert RULPredictor is not None
+    assert ForecastingPipeline is not None
 
 
 def test_import_explainability():
     import explainability
-    from explainability.explainer import ExplainabilityEngine
+    from explainability.shap_explainer import SHAPExplainer
+    from explainability.pipeline import ExplainabilityPipeline
     assert explainability is not None
-    assert ExplainabilityEngine is not None
+    assert SHAPExplainer is not None
+    assert ExplainabilityPipeline is not None
 
 
 def test_import_dashboard():

@@ -25,12 +25,11 @@ def render_what_if_page(
     orchestrator: SystemPipelineOrchestrator,
 ):
     """Render 8. WHAT-IF ANALYSIS section."""
-    st.markdown("### Mission comparison")
+    st.markdown("### Mission What-If Analysis")
     st.markdown(
         """
         <div style="font-size: 13px; color: #8b949e; margin-bottom: 16px;">
-            Compare alternative mission conditions or simulated fault scenarios with a baseline mission.
-            Results are inferred from the digital-twin and life-prediction pipeline; fault labels are not exposed to the model.
+            Explore how different operating conditions or fault scenarios could affect engine health and remaining life.
         </div>
         """,
         unsafe_allow_html=True,
@@ -40,35 +39,35 @@ def render_what_if_page(
     st.markdown(
         """
         <div style="background-color: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 10px 14px; margin-bottom: 16px; font-size: 12px; color: #c9d1d9;">
-            <b style="color: #58a6ff;">BASELINE MISSION:</b> <code>Nominal Healthy Cruise</code> &nbsp;|&nbsp; 
-            <b style="color: #bc8cff;">WHAT-IF MISSION:</b> <code>Planned Alternative / Simulated Fault-Stress</code>
+            <b style="color: #58a6ff;">BASELINE:</b> <code>Nominal Healthy Cruise</code> &nbsp;|&nbsp;
+            <b style="color: #bc8cff;">ALTERNATIVE:</b> <code>Modified Conditions / Fault Scenario</code>
             <div style="font-size: 11px; color: #8b949e; margin-top: 4px;">
-                Demonstration mode compares a baseline mission with alternative conditions or simulated stress. Results are inferred; fault labels remain hidden from the model.
+                Compare how changes in altitude, temperature, throttle, or fault conditions affect engine health and projected life.
             </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    st.markdown("#### Compare mission conditions")
+    st.markdown("#### Scenario Configuration")
     col_base, col_whatif = st.columns(2)
 
     with col_base:
         st.markdown(
             """
             <div style="background-color: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 10px; margin-bottom: 10px; font-weight: 700; color: #58a6ff;">
-                BASELINE MISSION
+                BASELINE
             </div>
             """,
             unsafe_allow_html=True,
         )
-        st.markdown("<b>Conditions:</b>", unsafe_allow_html=True)
+        st.markdown("<b>Mission Conditions:</b>", unsafe_allow_html=True)
         b_altitude = st.slider("Baseline Altitude (m)", 500, 5000, 2000, 250, key="wi_b_alt")
         b_oat = st.slider("Baseline Ambient Temperature (°C)", -20, 50, 15, 1, key="wi_b_oat")
         b_throttle = st.slider("Baseline Throttle (%)", 50, 100, 75, 5, key="wi_b_throttle")
         b_duration = st.slider("Baseline Duration (s)", 15, 60, 30, 5, key="wi_b_dur")
 
-        st.markdown("<b style='color: #8b949e;'>Mission profile:</b>", unsafe_allow_html=True)
+        st.markdown("<b style='color: #8b949e;'>Baseline Mission Profile:</b>", unsafe_allow_html=True)
         b_fault_str = st.selectbox(
             "Baseline Profile",
             ["Nominal Healthy Cruise", "Cooling Degradation (Thermal Loss)", "Lubrication Degradation (Oil Loss)"],
@@ -80,18 +79,18 @@ def render_what_if_page(
         st.markdown(
             """
             <div style="background-color: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 10px; margin-bottom: 10px; font-weight: 700; color: #bc8cff;">
-                WHAT-IF MISSION
+                ALTERNATIVE
             </div>
             """,
             unsafe_allow_html=True,
         )
-        st.markdown("<b>Conditions:</b>", unsafe_allow_html=True)
+        st.markdown("<b>Mission Conditions:</b>", unsafe_allow_html=True)
         w_altitude = st.slider("What-If Altitude (m)", 500, 5000, 3000, 250, key="wi_w_alt")
         w_oat = st.slider("What-If Ambient Temperature (°C)", -20, 50, 30, 1, key="wi_w_oat")
         w_throttle = st.slider("What-If Throttle (%)", 50, 100, 85, 5, key="wi_w_throttle")
         w_duration = st.slider("What-If Duration (s)", 15, 60, 30, 5, key="wi_w_dur")
 
-        st.markdown("<b style='color: #8b949e;'>Simulated condition:</b>", unsafe_allow_html=True)
+        st.markdown("<b style='color: #8b949e;'>Simulated Fault-Stress Scenario:</b>", unsafe_allow_html=True)
         w_fault_str = st.selectbox(
             "Simulated Stress Condition",
             [
@@ -103,7 +102,7 @@ def render_what_if_page(
             ],
             index=1,
             key="wi_w_fault",
-            help="Select a simulated condition for comparison. Fault labels are not available to the inference system.",
+            help="Simulated stress scenario for decision support. Ground truth is not visible to inference.",
         )
 
     # Fault mapping helper
@@ -118,11 +117,11 @@ def render_what_if_page(
     }
 
     st.markdown("")
-    btn_run = st.button("Run mission comparison", type="primary", use_container_width=True)
+    btn_run = st.button("🚀 Run Comparison", type="primary", use_container_width=True)
 
     if btn_run or "last_whatif_result" in st.session_state:
         if btn_run:
-            with st.spinner("Running the simulated mission comparison..."):
+            with st.spinner("Running both missions through the analysis pipeline..."):
                 b_sc = SimulationScenario(
                     name="baseline_mission",
                     duration_s=float(b_duration),
@@ -156,8 +155,8 @@ def render_what_if_page(
 
         st.markdown("---")
 
-        # Top Comparison Summary (baseline versus what-if simulated projection)
-        st.markdown("#### Comparison summary")
+        # Top Comparison Summary (BASELINE vs WHAT-IF, Simulated Projection)
+        st.markdown("#### Baseline vs Alternative: Results Summary")
         st.markdown(
             f"""
             <div style="background-color: #161b22; border-left: 5px solid #58a6ff; border: 1px solid #30363d; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
@@ -214,7 +213,7 @@ def render_what_if_page(
             st.markdown(
                 f"""
                 <div style="background-color: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 10px; text-align: center;">
-                    <div style="font-size: 11px; color: #8b949e; text-transform: uppercase;">Advisory Shift</div>
+                    <div style="font-size: 11px; color: #8b949e; text-transform: uppercase;">Advisory Change</div>
                     <div style="font-size: 14px; font-weight: 700; color: #f0f6fc; margin: 4px 0;">
                         <code>{res.baseline_advisory_assessment}</code> ➔ <code>{res.whatif_advisory_assessment}</code>
                     </div>
@@ -225,7 +224,7 @@ def render_what_if_page(
             )
 
         # Comparative Trajectory Overlay Plots
-        st.markdown("#### Trajectory comparison")
+        st.markdown("#### Health & Temperature Trajectory Comparison")
         b_ts = [p.timestamp for p in res.baseline_payloads]
         w_ts = [p.timestamp for p in res.whatif_payloads]
 

@@ -96,27 +96,31 @@ class PipelineHandoffAdapter:
             mission_phase=phase,
         )
 
-        # Construct single-row DataFrames to build authoritative ResidualFrame
-        obs_df = pd.DataFrame([telemetry_dict])
-        exp_df = pd.DataFrame([expected])
-        residual_frame = twin.residual_generator.compute_residuals(obs_df, exp_df)
+        # Fast-path single-sample residual generation bypassing DataFrame churn
+        if hasattr(twin.residual_generator, "compute_residuals_sample"):
+            residual_frame, expected_dict, raw_res_dict, norm_res_dict = (
+                twin.residual_generator.compute_residuals_sample(telemetry_dict, expected)
+            )
+        else:
+            obs_df = pd.DataFrame([telemetry_dict])
+            exp_df = pd.DataFrame([expected])
+            residual_frame = twin.residual_generator.compute_residuals(obs_df, exp_df)
 
-        # Extract expected, raw, and normalized residual dictionaries
-        res_row = residual_frame.to_dataframe().iloc[0]
-        expected_dict = {}
-        raw_res_dict = {}
-        norm_res_dict = {}
+            res_row = residual_frame.to_dataframe().iloc[0]
+            expected_dict = {}
+            raw_res_dict = {}
+            norm_res_dict = {}
 
-        for ch in SUPPORTED_RESIDUAL_CHANNELS:
-            if f"{ch}_expected" in res_row:
-                val = res_row[f"{ch}_expected"]
-                expected_dict[ch] = float(val) if pd.notna(val) else float("nan")
-            if f"{ch}_residual" in res_row:
-                val = res_row[f"{ch}_residual"]
-                raw_res_dict[ch] = float(val) if pd.notna(val) else float("nan")
-            if f"{ch}_norm_residual" in res_row:
-                val = res_row[f"{ch}_norm_residual"]
-                norm_res_dict[ch] = float(val) if pd.notna(val) else float("nan")
+            for ch in SUPPORTED_RESIDUAL_CHANNELS:
+                if f"{ch}_expected" in res_row:
+                    val = res_row[f"{ch}_expected"]
+                    expected_dict[ch] = float(val) if pd.notna(val) else float("nan")
+                if f"{ch}_residual" in res_row:
+                    val = res_row[f"{ch}_residual"]
+                    raw_res_dict[ch] = float(val) if pd.notna(val) else float("nan")
+                if f"{ch}_norm_residual" in res_row:
+                    val = res_row[f"{ch}_norm_residual"]
+                    norm_res_dict[ch] = float(val) if pd.notna(val) else float("nan")
 
         return residual_frame, expected_dict, raw_res_dict, norm_res_dict
 
@@ -171,8 +175,12 @@ class PipelineHandoffAdapter:
         """
         Execute Phase 8 diagnosis on current residual frame with Phase 7 context.
         """
-        df = residual_frame.to_dataframe()
-        row_dict = df.iloc[0].to_dict()
+        if hasattr(residual_frame, "get_first_record"):
+            row_dict = residual_frame.get_first_record()
+        else:
+            df = residual_frame.to_dataframe()
+            row_dict = df.iloc[0].to_dict()
+
         return pipeline.diagnose_sample(
             sample=row_dict,
             anomaly_status=anomaly_status,
@@ -192,8 +200,11 @@ class PipelineHandoffAdapter:
         """
         Execute Phase 9 Health Index calculation and degradation tracking.
         """
-        df = residual_frame.to_dataframe()
-        row_dict = df.iloc[0].to_dict()
+        if hasattr(residual_frame, "get_first_record"):
+            row_dict = residual_frame.get_first_record()
+        else:
+            df = residual_frame.to_dataframe()
+            row_dict = df.iloc[0].to_dict()
 
         optional_context = {}
         if diagnosis_result is not None:
