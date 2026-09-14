@@ -4,19 +4,15 @@ Renders Health Index, degradation rate/trend, Remaining Useful Life (RUL),
 engineering uncertainty bounds, and future trajectory forecasts.
 """
 
-from typing import Dict, Any, List, Optional
+from typing import List, Optional
 import streamlit as st
 import plotly.graph_objects as go
-from dashboard.schemas.view_model import PrognosticsViewModel, StatusLevel, AvailabilityStatus
+from dashboard.schemas.view_model import PrognosticsViewModel
 from dashboard.utils.formatters import (
     format_value,
     format_health_index,
-    format_rul,
-    format_percent,
-    map_health_to_status,
-    map_rul_status_to_status,
 )
-from dashboard.utils.styles import PLOT_COLORS, render_status_badge
+from dashboard.utils.styles import PLOT_COLORS
 
 
 def render_health_prognostics(
@@ -96,7 +92,7 @@ def render_health_prognostics(
 
 
 def render_rul_panel(prog: PrognosticsViewModel):
-    """Render RUL estimation, confidence intervals, and EOL limiting factor."""
+    """Render the conditional RUL estimate and engineering uncertainty range."""
     st.markdown("#### Life Prediction (Remaining Useful Life)")
 
     if prog.rul_hours is None or prog.rul_state == "UNAVAILABLE":
@@ -105,24 +101,25 @@ def render_rul_panel(prog: PrognosticsViewModel):
 
     cols = st.columns(4)
     with cols[0]:
-        rul_display = f"{prog.rul_hours:.1f} hrs ({prog.point_rul_seconds:.0f}s)" if prog.rul_hours is not None else prog.rul_state
+        rul_display = f"{prog.rul_hours:.1f} hrs ({prog.point_rul_seconds:.0f}s)" if prog.rul_hours is not None else "RUL unavailable"
         st.metric(
-            label="Median RUL Estimate",
+            label="Conditional RUL estimate",
             value=rul_display,
+            help="Shown only when there is sufficient degradation history and valid telemetry evidence.",
         )
     with cols[1]:
         bounds_str = "Unavailable"
         if prog.rul_p05_hours is not None and prog.rul_p95_hours is not None:
             bounds_str = f"[{prog.rul_p05_hours:.1f}h - {prog.rul_p95_hours:.1f}h]"
         st.metric(
-            label="Prediction Range",
+            label="Engineering uncertainty interval",
             value=bounds_str,
             help="Engineering uncertainty estimate covering 90% of simulated outcomes (P05–P95).",
         )
     with cols[2]:
         st.metric(
-            label="Life Prediction Status",
-            value=f"{prog.rul_state} / {prog.limiting_factor or 'NONE'}",
+            label="Life prediction status",
+            value="Available" if prog.rul_hours is not None else "RUL unavailable",
         )
     with cols[3]:
         st.metric(
@@ -138,7 +135,7 @@ def render_rul_panel(prog: PrognosticsViewModel):
     eol_html = (
         f'<div style="background-color: #11151c; border: 1px solid #21262d; '
         f'border-radius: 4px; padding: 12px 14px; margin-top: 10px; font-size: 12px; color: #8b949e;">'
-        f'<b>Life Prediction Status:</b> <code style="color: #f0f6fc;">{prog.rul_state}</code> | '
+        f'<b>Life prediction status:</b> <span style="color: #f0f6fc;">{"Available" if prog.rul_hours is not None else "RUL unavailable"}</span> | '
         f'<b>Limiting Factor:</b> <code style="color: #f0f6fc;">{prog.limiting_factor}</code>{eol_info}'
         f'<div style="margin-top: 6px; color: #d29922;">'
         f'⚠️ <b>Simulation Disclaimer:</b> Time-to-threshold calculations are engineering demonstrations on simulated degradation scenarios. These are not certified OEM or regulatory airworthiness limits.'
@@ -169,7 +166,7 @@ def render_forecast_panel(prog: PrognosticsViewModel):
         )
     elif prog.forecast_status == "BUFFERING":
         st.info(
-            f"ℹ️ **Collecting data for forecast.** Accumulating {prog.forecast_horizon} timesteps before generating a prediction."
+            f"ℹ️ **Insufficient history for a reliable forecast.** Collecting the required context before generating a prediction."
         )
     else:
         st.info(f"Forecast method: `{prog.forecast_source}` (Status: `{prog.forecast_status}`)")
@@ -179,13 +176,13 @@ def render_forecast_panel(prog: PrognosticsViewModel):
         st.caption("FORECAST METHOD")
         st.markdown(f"**`{prog.forecast_source}`**")
     with f_cols[1]:
-        st.caption("FORECAST STATUS")
-        st.markdown(f"**`{prog.forecast_status}`**")
+        st.caption("FORECAST AVAILABILITY")
+        st.markdown("**Available**" if prog.predicted_telemetry else "**Insufficient history**")
     with f_cols[2]:
         st.caption("PREDICTION WINDOW")
         st.markdown(f"**`{prog.forecast_horizon} steps`**")
     with f_cols[3]:
-        st.caption("FORECAST CONFIDENCE")
+        st.caption("FORECAST QUALITY")
         st.markdown(f"**`{prog.forecast_quality}`**")
 
     # Render multi-channel predicted curves if predicted_telemetry is present

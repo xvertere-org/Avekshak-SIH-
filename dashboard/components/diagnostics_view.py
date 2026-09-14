@@ -4,12 +4,11 @@ Renders anomaly breakdown, fault diagnosis probabilities, digital twin residuals
 and sensor fault isolation status.
 """
 
-from typing import Dict, Any, List
 import streamlit as st
 import plotly.graph_objects as go
-from dashboard.schemas.view_model import DiagnosticsViewModel, StatusLevel, AvailabilityStatus
+from dashboard.schemas.view_model import DiagnosticsViewModel
 from dashboard.utils.formatters import format_value, format_fault_name, format_percent
-from dashboard.utils.styles import PLOT_COLORS, STATUS_COLORS, render_status_badge
+from dashboard.utils.styles import PLOT_COLORS
 
 
 def render_anomaly_diagnostics(diag: DiagnosticsViewModel):

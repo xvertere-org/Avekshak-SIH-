@@ -1,3 +1,4 @@
+
 """
 Interface adapter layer for Phase 13 Unified System Pipeline Orchestrator.
 Performs clean, non-mutating data transformations and orchestrates handoffs
