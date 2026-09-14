@@ -20,6 +20,7 @@ The XGBoost target for all sensor-fault runs is "sensor_fault".
 
 from dataclasses import dataclass, field
 from typing import List, Dict, Any, Optional, Tuple
+# pyrefly: ignore [missing-import]
 import numpy as np
 import pandas as pd
 
@@ -88,6 +89,12 @@ class DatasetConfig:
     binary_sensor_seeds: List[int] = field(
         default_factory=lambda: list(BINARY_SENSOR_SEEDS)
     )
+    dynamic_temporal_degradation: bool = True
+    start_time_min: float = 100.0
+    start_time_max: float = 600.0
+    ramp_duration_min: float = 10.0
+    ramp_duration_max: float = 800.0
+    severity_jitter: float = 0.1
     mission_profile: Optional[Any] = None
 
 
@@ -141,6 +148,14 @@ def generate_fault_diagnosis_dataset(
     must NEVER be used as classifier features.
     """
     config = config or DatasetConfig()
+    
+    total_dur = 1720.0
+    if config.mission_profile is not None:
+        if hasattr(config.mission_profile, "total_duration_s"):
+            # Check if it's callable (method) or a property/attribute
+            attr = getattr(config.mission_profile, "total_duration_s")
+            total_dur = attr() if callable(attr) else attr
+            
     all_runs: List[pd.DataFrame] = []
     run_count = 0
 
@@ -172,10 +187,22 @@ def generate_fault_diagnosis_dataset(
                 if verbose:
                     print(f"  Generating {run_id}...")
 
+                if config.dynamic_temporal_degradation:
+                    rng = np.random.default_rng(seed)
+                    start_time = float(rng.uniform(0.1 * total_dur, 0.4 * total_dur))
+                    ramp_duration = float(rng.uniform(0.2 * total_dur, 0.5 * total_dur))
+                    jitter = config.severity_jitter
+                    target_severity = float(rng.uniform(max(0.1, severity - jitter), min(1.0, severity + jitter)))
+                else:
+                    start_time = config.fault_onset_time
+                    ramp_duration = 0.0
+                    target_severity = severity
+
                 fs = FaultState(
                     fault_type=ft,
-                    severity=severity,
-                    start_time=config.fault_onset_time,
+                    severity=target_severity,
+                    start_time=start_time,
+                    parameters={"ramp_duration": ramp_duration}
                 )
                 # Fuel injection: add mode parameter
                 if ft == FaultType.FUEL_INJECTION_ABNORMALITY:
@@ -183,8 +210,13 @@ def generate_fault_diagnosis_dataset(
 
                 df = _run_mission(seed=seed, fault_state=fs, dt=config.dt, mission_profile=config.mission_profile)
                 df["mission_run_id"] = run_id
-                df["fault_type"] = ft.value
-                df["generation_severity"] = severity
+                
+                if config.dynamic_temporal_degradation:
+                    df["fault_type"] = np.where(df["timestamp"] >= start_time, ft.value, "none")
+                else:
+                    df["fault_type"] = ft.value
+                    
+                df["generation_severity"] = target_severity
                 df["generation_sensor_channel"] = ""
                 df["generation_sensor_mode"] = ""
                 all_runs.append(df)
@@ -201,19 +233,36 @@ def generate_fault_diagnosis_dataset(
                 if verbose:
                     print(f"  Generating {run_id}...")
 
+                if config.dynamic_temporal_degradation:
+                    rng = np.random.default_rng(seed)
+                    start_time = float(rng.uniform(0.1 * total_dur, 0.4 * total_dur))
+                    ramp_duration = float(rng.uniform(0.05 * total_dur, 0.2 * total_dur))
+                    jitter = config.severity_jitter
+                    target_severity = float(rng.uniform(max(0.1, severity - jitter), min(1.0, severity + jitter)))
+                else:
+                    start_time = config.fault_onset_time
+                    ramp_duration = 0.0
+                    target_severity = severity
+
                 fs = FaultState(
                     fault_type=FaultType.SENSOR_FAULT,
-                    severity=severity,
-                    start_time=config.fault_onset_time,
+                    severity=target_severity,
+                    start_time=start_time,
                     parameters={
                         "sensor_channel": channel,
                         "sensor_mode": mode,
+                        "ramp_duration": ramp_duration,
                     },
                 )
                 df = _run_mission(seed=seed, fault_state=fs, dt=config.dt, mission_profile=config.mission_profile)
                 df["mission_run_id"] = run_id
-                df["fault_type"] = "sensor_fault"
-                df["generation_severity"] = severity
+                
+                if config.dynamic_temporal_degradation:
+                    df["fault_type"] = np.where(df["timestamp"] >= start_time, "sensor_fault", "none")
+                else:
+                    df["fault_type"] = "sensor_fault"
+                    
+                df["generation_severity"] = target_severity
                 df["generation_sensor_channel"] = channel
                 df["generation_sensor_mode"] = mode
                 all_runs.append(df)
@@ -228,10 +277,16 @@ def generate_fault_diagnosis_dataset(
                 if verbose:
                     print(f"  Generating {run_id}...")
 
+                if config.dynamic_temporal_degradation:
+                    rng = np.random.default_rng(seed)
+                    start_time = float(rng.uniform(0.1 * total_dur, 0.4 * total_dur))
+                else:
+                    start_time = config.fault_onset_time
+
                 fs = FaultState(
                     fault_type=FaultType.SENSOR_FAULT,
                     severity=config.sensor_fault_severity_default,
-                    start_time=config.fault_onset_time,
+                    start_time=start_time,
                     parameters={
                         "sensor_channel": channel,
                         "sensor_mode": mode,
@@ -239,7 +294,12 @@ def generate_fault_diagnosis_dataset(
                 )
                 df = _run_mission(seed=seed, fault_state=fs, dt=config.dt, mission_profile=config.mission_profile)
                 df["mission_run_id"] = run_id
-                df["fault_type"] = "sensor_fault"
+                
+                if config.dynamic_temporal_degradation:
+                    df["fault_type"] = np.where(df["timestamp"] >= start_time, "sensor_fault", "none")
+                else:
+                    df["fault_type"] = "sensor_fault"
+                    
                 df["generation_severity"] = config.sensor_fault_severity_default
                 df["generation_sensor_channel"] = channel
                 df["generation_sensor_mode"] = mode

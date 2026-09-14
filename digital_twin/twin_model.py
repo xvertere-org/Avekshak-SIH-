@@ -18,9 +18,52 @@ import pandas as pd
 
 from telemetry.schema import TelemetryRecord, DigitalTwinState, EngineConfig
 from telemetry.ingestion import CanonicalTelemetryFrame
-from digital_twin.residuals import ResidualGenerator, ResidualFrame, SUPPORTED_RESIDUAL_CHANNELS
-from simulator.config import SimulatorConfig, TierAParameters, TierCParameters, TierDParameters
+from digital_twin.residuals import (
+    ResidualGenerator,
+    ResidualFrame,
+    SUPPORTED_RESIDUAL_CHANNELS,
+    QualityAwareResidualGenerator,
+    ResidualVector,
+    FrozenScaleCalibration,
+)
+from digital_twin.health import (
+    HealthEvaluator,
+    HealthIndicatorConfig,
+    ModelObservationHealthAssessment,
+    HealthState,
+)
+from digital_twin.detection import (
+    TemporalFaultDetector,
+    DetectionConfig,
+    DetectionResult,
+    DetectionStatus,
+)
+from digital_twin.diagnosis import (
+    PhysicsInformedDiagnoser,
+    DiagnosisResult,
+    CanonicalFaultType,
+)
+from digital_twin.degradation import DegradationEstimator, DegradationEstimatorConfig
+from digital_twin.rul import RULEstimator, RULEstimatorConfig
+from digital_twin.degradation_types import RULScenario
+from digital_twin.state import (
+    CanonicalTwinState,
+    QuantityStatus,
+    EngineOperatingRegime,
+    SynchronizationStatus,
+)
+from digital_twin.quality import (
+    DataQualityStatus,
+    TelemetryQualityValidator,
+    TelemetryQualityReport,
+)
+from digital_twin.observability import ObservabilityRegistry, ObservabilityType
+from digital_twin.synchronizer import StateEstimator, EstimatorConfig
+from simulator.config import SimulatorConfig
 from simulator.subsystems.atmosphere import Atmosphere
+from simulator.subsystems.turbocharger import TurbochargerSubsystem
+from simulator.subsystems.cooling import CoolingSubsystem
+from simulator.subsystems.dynamics import EngineDynamics, OperatingPoint
 
 
 class DigitalTwinModel:
@@ -44,20 +87,40 @@ class DigitalTwinModel:
         self.tier_d = self.sim_config.tier_d
 
         self.atmosphere = Atmosphere(tier_a=self.tier_a)
+        self.turbocharger = TurbochargerSubsystem(
+            tier_a=self.tier_a,
+            config=self.sim_config.tier_c_turbo,
+        )
+        self.cooling = CoolingSubsystem(
+            tier_a=self.tier_a,
+            config=self.sim_config.tier_c_cooling,
+        )
 
         # Internal state variables (initialized to healthy nominal baseline)
         self.expected_rpm = self.tier_c.rpm_idle
-        self.omega = 2.0 * math.pi * self.expected_rpm / 60.0
         self.expected_cht = 85.0
         self.expected_egt = 580.0
         self.expected_oil_temp = 65.0
         self.last_timestamp: Optional[float] = None
+        self._last_m_air = 0.045
+        self._last_m_fuel = 0.003
 
-        # Precalculate idle assist torque balance
-        omega_idle = 2.0 * math.pi * self.tier_c.rpm_idle / 60.0
-        t_load_idle = self.tier_c.k_load * (omega_idle ** 2)
-        t_fric_idle = self.tier_c.k_fric_linear * omega_idle + self.tier_c.torque_fric_static
-        self._idle_torque_balance = t_load_idle + t_fric_idle
+        # Rotational dynamics model
+        self.dynamics = EngineDynamics(
+            tier_a=self.tier_a,
+            tier_c=self.tier_c,
+            tier_d=self.tier_d,
+            config=self.sim_config,
+            initial_rpm=self.expected_rpm,
+        )
+        self.omega = self.dynamics.omega
+
+        # Expose kinematics parameters
+        self.ratio = self.dynamics.ratio
+        self.eta_gb = self.dynamics.eta_gb
+        self.j_eq = self.dynamics.j_eq
+        self.k_prop = self.dynamics.k_prop
+        self._idle_torque_balance = self.dynamics._idle_torque_balance
 
     def reset(
         self,
@@ -68,42 +131,35 @@ class DigitalTwinModel:
     ) -> None:
         """Reset internal nominal state estimates to baseline initial conditions."""
         self.expected_rpm = initial_rpm if initial_rpm is not None else self.tier_c.rpm_idle
-        self.omega = 2.0 * math.pi * self.expected_rpm / 60.0
+        self.dynamics.reset(initial_rpm=self.expected_rpm)
+        self.omega = self.dynamics.omega
         self.expected_cht = initial_cht
         self.expected_egt = initial_egt
         self.expected_oil_temp = initial_oil_temp
+        self.turbocharger.reset(1.013)
+        self.cooling.set_temperature(75.0)
+        self._last_m_air = 0.045
+        self._last_m_fuel = 0.003
         self.last_timestamp = None
 
     def _compute_rpm_efficiency(self, rpm: float) -> float:
         """Tier D polynomial efficiency curve peaking near continuous rated speed (5500 RPM)."""
-        norm_rpm = rpm / self.tier_a.rpm_max_continuous
-        a, b, c = self.tier_d.rpm_eff_poly
-        eff = a * (norm_rpm ** 2) + b * norm_rpm + c
-        return max(0.35, min(1.05, eff))
+        return self.dynamics.compute_rpm_efficiency(rpm)
 
     def _torque_derivatives(
         self,
         omega: float,
         throttle_pct: float,
         density_factor: float,
+        boost_ratio: float = 1.0,
     ) -> Tuple[float, float, float, float, float, float]:
-        """Compute torque balance derivatives for expected rotational dynamics."""
-        rpm = max(0.0, omega * 60.0 / (2.0 * math.pi))
-        throttle_norm = max(0.0, min(100.0, throttle_pct)) / 100.0
-        eff = self._compute_rpm_efficiency(rpm)
-
-        p_combustion = self.tier_a.power_max_continuous_w * throttle_norm * density_factor * eff
-        omega_safe = max(omega, 10.0)
-        t_combustion = p_combustion / omega_safe
-        t_idle_assist = self._idle_torque_balance * max(0.0, (1.0 - throttle_norm * 2.0))
-        torque_engine = t_combustion + t_idle_assist
-
-        torque_load = self.tier_c.k_load * (omega ** 2)
-        torque_friction = self.tier_c.k_fric_linear * omega + self.tier_c.torque_fric_static
-
-        net_torque = torque_engine - torque_load - torque_friction
-        domega_dt = net_torque / self.tier_c.inertia_kg_m2
-        return p_combustion, torque_engine, torque_load, torque_friction, net_torque, domega_dt
+        """Compute torque balance derivatives for expected rotational dynamics with reduction gearbox."""
+        res = self.dynamics._torque_derivatives(
+            omega=omega,
+            throttle_pct=throttle_pct,
+            density_factor=density_factor,
+        )
+        return (res[0], res[1], res[2], res[3], res[4], res[5])
 
     def step_expected(
         self,
@@ -148,29 +204,39 @@ class DigitalTwinModel:
             else:  # CRUISE default
                 v_air = self.tier_d.airspeed_proxy_cruise_ms
 
-        # 1. Atmosphere density factor
+        # 1. Atmosphere density factor & turbocharger expected boost
         atmo = self.atmosphere.compute(altitude_m=alt_safe)
         density_factor = atmo.density_factor
+        p_amb_bar = atmo.pressure_bar
 
-        # 2. Rotational Dynamics (RK4 step for expected RPM)
-        omega_0 = self.omega
-        p_target, _, _, _, _, k1 = self._torque_derivatives(omega_0, throttle_safe, density_factor)
+        turbo_state = self.turbocharger.step(
+            throttle_pct=throttle_safe,
+            altitude_m=alt_safe,
+            p_amb_pa=atmo.pressure_pa,
+            t_amb_c=amb_safe,
+            m_dot_air_kg_s=self._last_m_air,
+            m_dot_fuel_kg_s=self._last_m_fuel,
+            t_exh_c=self.expected_egt,
+            dt=dt_safe,
+        )
 
-        omega_k2 = max(0.0, omega_0 + 0.5 * dt_safe * k1)
-        _, _, _, _, _, k2 = self._torque_derivatives(omega_k2, throttle_safe, density_factor)
+        # 2. Rotational Dynamics (expected RPM and power chain)
+        op_point = self.dynamics.step(
+            throttle_pct=throttle_safe,
+            density_factor=density_factor,
+            dt=dt_safe,
+            combustion_efficiency_factor=1.0,
+            friction_factor=1.0,
+            map_bar=turbo_state.map_bar,
+            charge_air_temp_c=turbo_state.charge_air_temp_c,
+        )
+        self.expected_rpm = op_point.rpm
+        self.omega = op_point.omega_rad_s
+        self._last_m_air = op_point.air_mass_flow_kg_s
+        self._last_m_fuel = op_point.fuel_mass_flow_kg_s
 
-        omega_k3 = max(0.0, omega_0 + 0.5 * dt_safe * k2)
-        _, _, _, _, _, k3 = self._torque_derivatives(omega_k3, throttle_safe, density_factor)
-
-        omega_k4 = max(0.0, omega_0 + dt_safe * k3)
-        _, _, _, _, _, k4 = self._torque_derivatives(omega_k4, throttle_safe, density_factor)
-
-        self.omega = max(0.0, omega_0 + (dt_safe / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4))
-        self.expected_rpm = self.omega * 60.0 / (2.0 * math.pi)
-
-        # Expected engine load percentage proxy based on power output relative to density-adjusted max continuous
-        max_available_p = max(100.0, self.tier_a.power_max_continuous_w * density_factor)
-        load_pct = min(100.0, max(0.0, (p_target / max_available_p) * 100.0))
+        p_target = op_point.power_target_w
+        load_pct = op_point.engine_load_pct
         load_norm = load_pct / 100.0
 
         # 3. Expected Fuel Flow (Willans-line power model matching simulator contract)
@@ -232,6 +298,15 @@ class DigitalTwinModel:
         f_order1 = self.expected_rpm / 60.0
         f_order2 = 2.0 * f_order1
 
+        # 7. Expected Cooling (liquid coolant loop)
+        cooling_state = self.cooling.step(
+            cylinder_cht_temps_c=[self.expected_cht] * 4,
+            ambient_temp_c=amb_safe,
+            airspeed_ms=v_air,
+            dt=dt_safe,
+            cooling_fault_severity=0.0,
+        )
+
         return {
             "rpm_expected": round(self.expected_rpm, 1),
             "cht_expected": round(self.expected_cht, 2),
@@ -244,6 +319,17 @@ class DigitalTwinModel:
             "power_expected_kw": round(p_target / 1000.0, 2),
             "order_1x_freq_hz": round(f_order1, 2),
             "order_2x_freq_hz": round(f_order2, 2),
+            "map_bar_expected": round(turbo_state.map_bar, 3),
+            "charge_air_temp_expected": round(turbo_state.charge_air_temp_c, 2),
+            "coolant_temp_expected": round(cooling_state.coolant_temp_c, 2),
+            "cht_cyl1_expected": round(self.expected_cht, 2),
+            "cht_cyl2_expected": round(self.expected_cht, 2),
+            "cht_cyl3_expected": round(self.expected_cht, 2),
+            "cht_cyl4_expected": round(self.expected_cht, 2),
+            "egt_cyl1_expected": round(self.expected_egt, 2),
+            "egt_cyl2_expected": round(self.expected_egt, 2),
+            "egt_cyl3_expected": round(self.expected_egt, 2),
+            "egt_cyl4_expected": round(self.expected_egt, 2),
         }
 
 
@@ -259,44 +345,106 @@ class DigitalTwin:
         self,
         engine_config: Optional[EngineConfig] = None,
         sim_config: Optional[SimulatorConfig] = None,
+        estimator_config: Optional[EstimatorConfig] = None,
+        health_config: Optional[HealthIndicatorConfig] = None,
+        detection_config: Optional[DetectionConfig] = None,
+        degradation_config: Optional[DegradationEstimatorConfig] = None,
+        rul_config: Optional[RULEstimatorConfig] = None,
+        calibration: Optional[FrozenScaleCalibration] = None,
     ):
         self.engine_config = engine_config or EngineConfig()
         self.sim_config = sim_config or SimulatorConfig()
+        self.estimator_config = estimator_config or EstimatorConfig()
+        self.health_config = health_config or HealthIndicatorConfig()
+        self.detection_config = detection_config or DetectionConfig()
+        self.degradation_config = degradation_config or DegradationEstimatorConfig()
+        self.rul_config = rul_config or RULEstimatorConfig()
+        self.calibration = calibration
 
         self.model = DigitalTwinModel(sim_config=self.sim_config, engine_config=self.engine_config)
         self.residual_generator = ResidualGenerator()
+        self.quality_residual_generator = QualityAwareResidualGenerator(calibration=self.calibration)
+        self.health_evaluator = HealthEvaluator(config=self.health_config)
+        self.fault_detector = TemporalFaultDetector(config=self.detection_config)
+        self.fault_diagnoser = PhysicsInformedDiagnoser()
+        self.degradation_estimator = DegradationEstimator(config=self.degradation_config)
+        self.rul_estimator = RULEstimator(config=self.rul_config)
+        self.estimator = StateEstimator(
+            config=self.estimator_config,
+            sim_config=self.sim_config,
+            model=self.model,
+        )
         self.history: List[DigitalTwinState] = []
+        self.canonical_history: List[CanonicalTwinState] = []
+        self.canonical_state: Optional[CanonicalTwinState] = None
         self.last_timestamp: Optional[float] = None
 
     def reset(self) -> None:
         """Reset Digital Twin internal dynamic states."""
         self.model.reset()
+        self.estimator.reset()
+        self.health_evaluator.reset()
+        self.fault_detector.reset()
+        self.fault_diagnoser.reset()
+        self.degradation_estimator.reset()
         self.history.clear()
+        self.canonical_history.clear()
+        self.canonical_state = None
         self.last_timestamp = None
 
     def update(self, telemetry: TelemetryRecord) -> DigitalTwinState:
         """
         Process a single streaming TelemetryRecord, estimate nominal states, and compute residuals.
-        Maintains strict backward compatibility with Phase 1 schemas.
+        Maintains strict backward compatibility with Phase 1 schemas while providing
+        Phase 3 canonical state synchronization and deterministic confidence.
         """
+        # Step the Phase 3 state estimator
+        canonical_state = self.estimator.step(telemetry)
+        self.canonical_state = canonical_state
+        self.canonical_history.append(canonical_state)
+
+        # Retrieve physics predictions and expected values
+        expected = canonical_state.metadata.get("expected", {})
+        if not expected:
+            expected = {
+                "rpm_expected": self.sim_config.tier_c.rpm_idle,
+                "cht_expected": 85.0,
+                "egt_expected": 580.0,
+                "oil_temp_expected": 65.0,
+                "oil_pressure_expected": 3.0,
+                "fuel_flow_expected": 14.0,
+                "vibration_expected": 0.3,
+                "load_expected": 0.0,
+                "power_expected_kw": 0.0,
+                "order_1x_freq_hz": 25.0,
+                "order_2x_freq_hz": 50.0,
+                "map_bar_expected": 1.013,
+                "charge_air_temp_expected": 30.0,
+                "coolant_temp_expected": 75.0,
+                "cht_cyl1_expected": 85.0,
+                "cht_cyl2_expected": 85.0,
+                "cht_cyl3_expected": 85.0,
+                "cht_cyl4_expected": 85.0,
+                "egt_cyl1_expected": 580.0,
+                "egt_cyl2_expected": 580.0,
+                "egt_cyl3_expected": 580.0,
+                "egt_cyl4_expected": 580.0,
+            }
+
         # Calculate dynamic time increment dt
-        if self.last_timestamp is not None and telemetry.timestamp > self.last_timestamp:
-            dt = telemetry.timestamp - self.last_timestamp
+        if self.last_timestamp is not None:
+            if telemetry.timestamp > self.last_timestamp:
+                dt = telemetry.timestamp - self.last_timestamp
+                self.last_timestamp = telemetry.timestamp
+            else:
+                # Non-positive dt (duplicate or out-of-order): do not advance internal states
+                dt = 0.0
         else:
             dt = self.sim_config.default_dt
-        self.last_timestamp = telemetry.timestamp
-
-        # Predict expected nominal states (observable conditions only)
-        expected = self.model.step_expected(
-            throttle_pct=telemetry.throttle,
-            altitude_m=telemetry.altitude,
-            ambient_temp_c=telemetry.ambient_temp,
-            dt=dt,
-            mission_phase=telemetry.mission_phase,
-        )
+            self.last_timestamp = telemetry.timestamp
 
         # Compute raw residuals (observed - expected)
-        # Note: If observed is NaN (Phase 4F sensor dropout), residual is float('nan')
+        # Note: If observed is NaN (sensor dropout), residual is float('nan')
         cht_res = telemetry.cht - expected["cht_expected"] if not math.isnan(telemetry.cht) else float("nan")
         egt_res = telemetry.egt - expected["egt_expected"] if not math.isnan(telemetry.egt) else float("nan")
         oil_p_res = telemetry.oil_pressure - expected["oil_pressure_expected"] if not math.isnan(telemetry.oil_pressure) else float("nan")
@@ -314,6 +462,45 @@ class DigitalTwin:
             "fuel_flow_residual": round(fuel_res, 4) if not math.isnan(fuel_res) else float("nan"),
             "vibration_residual": round(vib_res, 4) if not math.isnan(vib_res) else float("nan"),
         }
+
+        # Quality-aware residual generation and physics health assessment
+        q_report = canonical_state.metadata.get("quality_report")
+        residual_vector = self.quality_residual_generator.generate(
+            telemetry=telemetry,
+            expected=expected,
+            quality_report=q_report,
+        )
+        health_assessment = self.health_evaluator.evaluate(
+            residual_vector=residual_vector,
+            data_confidence=canonical_state.heuristic_confidence,
+            dt=dt,
+            engine_id=telemetry.engine_id,
+        )
+        detection_result = self.fault_detector.detect(
+            residual_vector=residual_vector,
+            health_assessment=health_assessment,
+            dt=dt,
+            engine_id=telemetry.engine_id,
+        )
+        diagnosis_result = self.fault_diagnoser.diagnose(
+            detection_result=detection_result,
+            residual_vector=residual_vector,
+            health_assessment=health_assessment,
+            dt=dt,
+            engine_id=telemetry.engine_id,
+        )
+
+        # Phase 8: Degradation estimation and robust Theil-Sen trend extraction
+        degradation_assessment = self.degradation_estimator.estimate(
+            health_assessment=health_assessment,
+            dt=dt,
+        )
+
+        # Phase 8: Uncertainty-aware Remaining Useful Life (RUL) estimation
+        rul_assessment = self.rul_estimator.estimate(
+            degradation_assessment=degradation_assessment,
+            scenario=RULScenario.CURRENT_PROFILE,
+        )
 
         nominal_estimates = {
             # Tier A reference anchor for audit compatibility (test_audit_cleanup.py)
@@ -341,13 +528,29 @@ class DigitalTwin:
             observed_telemetry=telemetry,
             nominal_estimates=nominal_estimates,
             residuals=residuals,
-            state_confidence=0.98,
+            state_confidence=round(canonical_state.heuristic_confidence, 4),
+            health_assessment=health_assessment,
+            residual_vector=residual_vector,
+            detection_result=detection_result,
+            diagnosis_result=diagnosis_result,
+            degradation_assessment=degradation_assessment,
+            rul_assessment=rul_assessment,
             metadata={
-                "power_expected_kw": expected["power_expected_kw"],
-                "order_1x_freq_hz": expected["order_1x_freq_hz"],
-                "order_2x_freq_hz": expected["order_2x_freq_hz"],
+                "power_expected_kw": expected.get("power_expected_kw", 0.0),
+                "order_1x_freq_hz": expected.get("order_1x_freq_hz", 25.0),
+                "order_2x_freq_hz": expected.get("order_2x_freq_hz", 50.0),
+                "canonical_state": canonical_state,
+                "sync_status": canonical_state.sync_status.value,
+                "quality_report": q_report,
+                "residual_vector": residual_vector,
+                "health_assessment": health_assessment,
+                "detection_result": detection_result,
+                "diagnosis_result": diagnosis_result,
+                "degradation_assessment": degradation_assessment,
+                "rul_assessment": rul_assessment,
             },
         )
+
         self.history.append(twin_state)
         return twin_state
 

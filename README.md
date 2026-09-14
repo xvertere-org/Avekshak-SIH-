@@ -8,7 +8,9 @@
 
 Medium Altitude Long Endurance (MALE) Unmanned Aerial Vehicles (UAVs) rely heavily on aero piston propulsion systems for extended ISR (Intelligence, Surveillance, and Reconnaissance) missions. Engine health degradation during critical mission phases (e.g., thermal runaway, oil pressure drop, injector clogging) can jeopardize mission success and asset survivability.
 
-This project delivers a modular, real-time Digital Twin and Prognostics & Health Management (PHM) system that combines reduced-order physics modeling with machine learning to provide real-time state estimation, early fault detection, Remaining Useful Life (RUL) estimation, and human-interpretable diagnostic explanations.
+This project delivers a modular Digital Twin and Prognostics & Health Management (PHM) system for **controlled physics-based simulation**. It combines reduced-order physics modelling with machine learning to provide engineering health indicators, anomaly assessment, conditional RUL estimates, and interpretable diagnostic evidence.
+
+> **Validation boundary:** The simulator and its outputs are engineering demonstrations based on synthetic telemetry. They are not a complete Rotax 914 UL/F validation, OEM calibration, airworthiness assessment, or real-flight validation.
 
 ---
 
@@ -17,7 +19,7 @@ This project delivers a modular, real-time Digital Twin and Prognostics & Health
 | Phase | Component | Status |
 | :--- | :--- | :--- |
 | **Phase 1** | Project Setup & Architecture | ✅ Complete |
-| **Phase 2B** | Physics-Informed Engine Simulator (Rotax 914 F Grey-Box) | ✅ Complete |
+| **Phase 2B** | Physics-Informed Engine Simulator (Reduced-Order Grey-Box Prototype; Rotax 914 UL/F Reference) | ✅ Complete |
 | **Phase 3** | Simulator Calibration & Validation (8 suites, golden baseline) | ✅ Complete |
 | **Phase 4A** | Fault & Degradation Interface (typed contracts) | ✅ Complete |
 | **Phase 4B** | Cooling Degradation Physics (conductance degradation) | ✅ Complete |
@@ -35,7 +37,7 @@ This project delivers a modular, real-time Digital Twin and Prognostics & Health
 | **Phase 12** | Explainability & Multi-Modal Evidence Fusion (SHAP + Physics + Temporal) | ✅ Complete |
 | **Phase 13** | Unified System Pipeline Orchestrator | ✅ Complete |
 
-**Total Automated Tests: 340 passed (100% green)**
+Test totals evolve with the active branch. Use the commands below to collect and run the current suite; do not rely on historical test-count claims.
 
 ---
 
@@ -44,7 +46,7 @@ This project delivers a modular, real-time Digital Twin and Prognostics & Health
 ```
 Mission Configuration & Fault Scenario
                   ↓
-Physics-Informed Engine Simulator (Tier-D Rotax 914 F)
+Physics-Informed Engine Simulator (Reduced-Order Grey-Box Prototype; Rotax 914 UL/F Reference)
                   ↓
 Canonical Telemetry Ingestion (with quality & dropout handling)
                   ↓
@@ -138,9 +140,14 @@ pip install -r requirements.txt
 
 ## 8. Running the System
 
-### Run Full Test Suite (340 tests)
+### Run the test suite
 ```bash
-pytest -v
+python -m pytest tests/ -q
+```
+
+### Run the dashboard
+```bash
+python -m streamlit run dashboard/app.py
 ```
 
 ### Run Production Pipeline (Phase 13)
@@ -158,6 +165,11 @@ python main.py --legacy-phase1
 ### Generate Evidence Package
 ```bash
 python scripts/generate_evidence_package.py
+```
+
+### Generate Phase 4 health and prognostics reports
+```bash
+python scripts/generate_phase4_health_prognostics_results.py
 ```
 
 ### Generate Interactive Validation Plots
@@ -180,10 +192,20 @@ Phase 13 does not redesign, retune, replace, or modify the algorithms, threshold
 ### Preserved Distinctions
 - **Algorithm & Training Procedure Freezing**: Feature schemas, classifier configurations, EWMA thresholds, Theil–Sen estimator rules, and multi-modal fusion equations from Phases 1–12 remain unmodified.
 - **Runtime Model Fitting**: Deterministic synthetic bootstrap fitting is executed on synthetic simulator data with fixed seeds during orchestrator startup.
-- **Pretrained TimesFM Weights**: Gated external model weights remain unauthenticated in the local execution environment, preserving the explicit fallback path (`BLOCKED_UNAUTHENTICATED_GATED`) without fabricating weights.
+- **Pretrained TimesFM Weights**: The TimesFM integration requires an accessible gated checkpoint and compatible local runtime. When unavailable, the application reports the condition and uses its labelled baseline forecast path; it does not fabricate pretrained weights.
 
-### Engineering Reference Anchor & Disclaimer
-The engine simulator uses the **Rotax 912 ULS / 914 F** strictly as a publicly documented engineering anchor. It is a **reduced-order physics-informed / grey-box model**, **NOT** a CFD solver, certified OEM engine model, or actual classified UAV engine. Synthetic telemetry is never represented as actual UAV flight data. All operator recommendations are decision-support aids — explicitly NOT airworthiness limits, FAA/DRDO safety directives, or certified OEM failure criteria.
+### Engineering Reference Anchor & Fidelity Boundary
+- **Authoritative Reference Engine**: **Rotax 914 UL/F** (4-cylinder, 1211.2 cc, turbocharged, 84.5 kW takeoff / 73.5 kW continuous rating, 2.4286:1 reduction gearbox). Specification and parameter provenance are maintained in [`configs/engine_reference/rotax_914_ul_f.json`](file:///d:/SIH%20Drone/configs/engine_reference/rotax_914_ul_f.json).
+- **Current Simulator Fidelity**: Reduced-order lumped-parameter 0D/1D grey-box prototype. The simulator uses naturally aspirated density derating, a 1:1 direct propeller load simplification ($J=0.28\text{ kg}\cdot\text{m}^2$), and lumped thermal nodes.
+- **Missing Physics**: Exhaust gas turbocharger, compressor map, turbine expansion, wastegate actuator, electronic Turbo Control Unit (TCU), manifold absolute pressure (MAP), charge-air heating, 2.43:1 reduction gearbox dynamics, 4-cylinder individual thermal/exhaust runner networks, and electrical/ignition systems. Detailed in [`docs/physics_contract.md`](file:///d:/SIH%20Drone/docs/physics_contract.md).
+- **Prohibited Claims**: The system does **NOT** claim to be a "full Rotax 914 F digital twin", "production-ready", "airworthiness validated", or "experimentally validated on real UAV flight recordings".
+
+### Claim Taxonomy
+The project adheres to a four-tier verification and validation taxonomy:
+1. **`IMPLEMENTED`**: Executable functionality exists in the repository codebase.
+2. **`VERIFIED`**: Executable tests/evidence demonstrate that the implementation behaves as mathematically intended. (Reference specifications are verified against official OEM manuals; simulator equations are verified against internal unit tests).
+3. **`VALIDATED`**: Compared against an independent authoritative model, certified simulator, or regulatory reference dataset (NOT claimed for the simulator dynamics).
+4. **`EXPERIMENTALLY VALIDATED`**: Validated against physical engine test-cell dynamometer recordings or operational flight data (**STRICTLY NOT CLAIMED**; all telemetry is synthetic).
 
 ---
 
@@ -191,6 +213,8 @@ The engine simulator uses the **Rotax 912 ULS / 914 F** strictly as a publicly d
 
 | Document | Description |
 | :--- | :--- |
+| `docs/physics_contract.md` | System-wide Physics Contract, fidelity boundary & claim taxonomy |
+| `configs/engine_reference/rotax_914_ul_f.json` | Authoritative Rotax 914 UL/F reference spec with source provenance |
 | `docs/architecture.md` | System architecture specification |
 | `docs/simulator_physics.md` | Physics subsystem equations & parameters |
 | `docs/simulator_validation.md` | Calibration & validation report |
@@ -205,3 +229,4 @@ The engine simulator uses the **Rotax 912 ULS / 914 F** strictly as a publicly d
 | `docs/lubrication_degradation.md` | Lubrication fault physics |
 | `docs/fuel_injection_abnormality.md` | Fuel injection fault physics |
 | `docs/fault_interface.md` | Fault interface contracts |
+

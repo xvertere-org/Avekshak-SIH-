@@ -31,6 +31,17 @@ DEFAULT_NRMSE_DENOMINATORS: Dict[str, float] = {
     "vibration": 3.45,       # 0.05 to 3.5 g
 }
 
+# Canonical nominal expected baseline values for healthy cruise physics (Tier A / Digital Twin)
+DEFAULT_NOMINAL_EXPECTED: Dict[str, float] = {
+    "rpm": 5000.0,
+    "cht": 100.0,
+    "egt": 680.0,
+    "oil_temp": 85.0,
+    "oil_pressure": 4.5,
+    "fuel_flow": 18.0,
+    "vibration": 0.5,
+}
+
 # Physical bounds for sanity clamping where physically non-negative
 PHYSICAL_LOWER_BOUNDS: Dict[str, float] = {
     "rpm": 0.0,
@@ -73,7 +84,7 @@ class ForecastingConfig:
     checkpoint_path: str = "google/timesfm-3.0-pytorch"
     device: Optional[str] = None
     clamp_to_physical_limits: bool = True
-    enable_projected_health: bool = False
+    enable_projected_health: bool = True
 
     def __post_init__(self):
         if self.context_length <= 0:

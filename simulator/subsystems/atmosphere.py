@@ -78,3 +78,14 @@ class Atmosphere:
     def density_factor(self, altitude_m: float, temp_offset_k: float = 0.0) -> float:
         """Convenience method returning density factor sigma."""
         return self.compute(altitude_m, temp_offset_k).density_factor
+
+    def compute_ram_recovery_pa(self, density_kg_m3: float, airspeed_ms: float, duct_efficiency: float = 0.85) -> float:
+        """
+        Compute dynamic ram-air pressure rise at engine intake duct.
+        Delta_P_ram = 0.5 * rho * V^2 * eta_duct (MODEL_ASSUMPTION)
+        """
+        v = max(0.0, float(airspeed_ms))
+        rho = max(0.1, float(density_kg_m3))
+        q_dyn = 0.5 * rho * (v ** 2)
+        return q_dyn * max(0.0, min(1.0, float(duct_efficiency)))
+

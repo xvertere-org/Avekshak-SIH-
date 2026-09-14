@@ -4,6 +4,7 @@ Integrates Phase 9 Health Index, Phase 10 Telemetry Forecasting, Weakest-Link EO
 and Monte Carlo trajectory uncertainty propagation under strict state machine exhaustiveness.
 """
 
+import math
 from collections import deque
 from typing import Dict, List, Optional, Tuple, Set, Any
 import numpy as np
@@ -67,6 +68,28 @@ class RULPipeline:
         excluded_channels = set(getattr(health_result, "excluded_channels", []))
         valid_channels = getattr(health_result, "valid_channels", [])
 
+        # Valid channel sufficiency & NaN health index guard:
+        # Check BEFORE appending to historical state so that blackout or NaN values never corrupt history
+        active_valid_count = len([ch for ch in valid_channels if ch not in excluded_channels])
+        if math.isnan(hi_smooth) or active_valid_count < 4:
+            return RULResult(
+                engine_id=engine_id,
+                mission_id=mission_id,
+                timestamp=timestamp,
+                status=RULStatus.INSUFFICIENT_DATA,
+                rul_seconds_median=None,
+                rul_seconds_p05=None,
+                rul_seconds_p95=None,
+                limiting_factor="INSUFFICIENT_DATA",
+                confidence_score=0.0,
+                active_flight_phase=flight_phase,
+                handoff_horizon_s=0.0,
+                trajectory_type="NONE",
+                forecast_assisted=False,
+                forecast_mode_status="UNAVAILABLE",
+                provenance={"reason": "sensor_blackout_or_insufficient_health", "valid_channels": active_valid_count},
+            )
+
         # Update historical state
         hist = self._get_history(engine_id, mission_id)
         if hist["first_timestamp"] is None:
@@ -106,26 +129,9 @@ class RULPipeline:
                 active_flight_phase=flight_phase,
                 handoff_horizon_s=0.0,
                 trajectory_type="NONE",
+                forecast_assisted=False,
+                forecast_mode_status=self._evaluate_forecast_status(forecast),
                 provenance={"reason": "warmup_duration_lockout", "elapsed_s": elapsed_time},
-            )
-
-        # Valid channel sufficiency (at least 4 valid unisolated physical channels)
-        active_valid_count = len([ch for ch in valid_channels if ch not in excluded_channels])
-        if active_valid_count < 4:
-            return RULResult(
-                engine_id=engine_id,
-                mission_id=mission_id,
-                timestamp=timestamp,
-                status=RULStatus.INSUFFICIENT_DATA,
-                rul_seconds_median=None,
-                rul_seconds_p05=None,
-                rul_seconds_p95=None,
-                limiting_factor="INSUFFICIENT_DATA",
-                confidence_score=0.0,
-                active_flight_phase=flight_phase,
-                handoff_horizon_s=0.0,
-                trajectory_type="NONE",
-                provenance={"reason": "active_valid_channels_below_minimum", "count": active_valid_count},
             )
 
         # -------------------------------------------------------------
@@ -150,6 +156,8 @@ class RULPipeline:
                 active_flight_phase=flight_phase,
                 handoff_horizon_s=0.0,
                 trajectory_type="IMMEDIATE_BREACH",
+                forecast_assisted=False,
+                forecast_mode_status=self._evaluate_forecast_status(forecast),
                 provenance={"reason": "immediate_eol_breached", "limiting_factor": limiting_factor},
             )
 
@@ -171,6 +179,8 @@ class RULPipeline:
                 active_flight_phase=flight_phase,
                 handoff_horizon_s=0.0,
                 trajectory_type="NONE",
+                forecast_assisted=False,
+                forecast_mode_status=self._evaluate_forecast_status(forecast),
                 provenance={"reason": "insufficient_history_for_theil_sen"},
             )
 
@@ -178,16 +188,82 @@ class RULPipeline:
         # STEP 4: MATHEMATICALLY EXHAUSTIVE STATE MACHINE
         # Partition finite (HI, dHI_dt) with zero gaps and zero overlaps
         # -------------------------------------------------------------
+        hi_eol_bound = self.config.eol_criteria.hi_eol.threshold_value + getattr(
+            self.config.eol_criteria.hi_eol, "tolerance", 1e-5
+        )
+        if hi_smooth <= hi_eol_bound:
+            return RULResult(
+                engine_id=engine_id,
+                mission_id=mission_id,
+                timestamp=timestamp,
+                status=RULStatus.CRITICAL_EOL_REACHED,
+                rul_seconds_median=0.0,
+                rul_seconds_p05=0.0,
+                rul_seconds_p95=0.0,
+                limiting_factor="GLOBAL_HEALTH_INDEX",
+                confidence_score=1.0,
+                active_flight_phase=flight_phase,
+                handoff_horizon_s=0.0,
+                trajectory_type="IMMEDIATE_BREACH",
+                forecast_assisted=False,
+                forecast_mode_status=self._evaluate_forecast_status(forecast),
+                provenance={"reason": "health_index_at_or_below_eol_threshold", "hi_smooth": hi_smooth},
+            )
+
+        # Check if usable Phase 10 forecast predicts an acute short-horizon redline breach
+        H, traj_type = self.dual_horizon.evaluate_phase10_handoff(forecast)
+        if forecast is not None and H > 0.0 and forecast.predicted_telemetry:
+            future_ts = np.array(forecast.forecast_timestamps, dtype=np.float64)
+            future_telemetry = {
+                k: np.array(v, dtype=np.float64) for k, v in forecast.predicted_telemetry.items()
+            }
+            proj_hi = getattr(forecast, "projected_health_trajectory", None) or getattr(forecast, "projected_health_index", None)
+            if proj_hi and len(proj_hi) == len(future_ts):
+                future_hi = np.array(proj_hi, dtype=np.float64)
+            else:
+                slp = slope if np.isfinite(slope) else 0.0
+                dt_array = future_ts - timestamp
+                future_hi = np.clip(hi_smooth + slp * dt_array, 0.0, 1.0)
+
+            redline_rul, redline_factor = self.weakest_link.find_earliest_trajectory_crossing(
+                future_timestamps=future_ts,
+                future_health_index=future_hi,
+                future_telemetry_dict=future_telemetry,
+                excluded_channels=excluded_channels,
+                current_time=timestamp,
+            )
+            if redline_rul is not None and redline_rul <= H:
+                status = RULStatus.CRITICAL_EOL_REACHED if redline_rul <= 0.0 else RULStatus.ACTIVE_DEGRADATION
+                return RULResult(
+                    engine_id=engine_id,
+                    mission_id=mission_id,
+                    timestamp=timestamp,
+                    status=status,
+                    rul_seconds_median=max(0.0, redline_rul),
+                    rul_seconds_p05=max(0.0, redline_rul * 0.9),
+                    rul_seconds_p95=max(0.0, redline_rul * 1.1),
+                    limiting_factor=redline_factor,
+                    confidence_score=0.9,
+                    active_flight_phase=flight_phase,
+                    handoff_horizon_s=H,
+                    trajectory_type=traj_type,
+                    forecast_assisted=True,
+                    forecast_mode_status="ACTIVE",
+                    provenance={"reason": "forecast_redline_breach_detected", "limiting_factor": redline_factor},
+                )
+
         if hi_smooth >= 0.85:
             if slope > 0.0005:
                 return self._build_non_degrading_result(
                     engine_id, mission_id, timestamp, flight_phase,
-                    RULStatus.RECOVERING, slope, slope_se, "thermal_or_dynamic_recovery"
+                    RULStatus.RECOVERING, slope, slope_se, "thermal_or_dynamic_recovery",
+                    forecast=forecast,
                 )
             elif -0.001 <= slope <= 0.0005:
                 return self._build_non_degrading_result(
                     engine_id, mission_id, timestamp, flight_phase,
-                    RULStatus.NOT_DEGRADING, slope, slope_se, "nominal_cruise_stability"
+                    RULStatus.NOT_DEGRADING, slope, slope_se, "nominal_cruise_stability",
+                    forecast=forecast,
                 )
             else:
                 # slope < -0.001: Acute degradation from healthy state
@@ -201,12 +277,14 @@ class RULPipeline:
             if slope > 0.0005:
                 return self._build_non_degrading_result(
                     engine_id, mission_id, timestamp, flight_phase,
-                    RULStatus.RECOVERING, slope, slope_se, "thermal_or_dynamic_recovery"
+                    RULStatus.RECOVERING, slope, slope_se, "thermal_or_dynamic_recovery",
+                    forecast=forecast,
                 )
             elif -0.0005 <= slope <= 0.0005:
                 return self._build_non_degrading_result(
                     engine_id, mission_id, timestamp, flight_phase,
-                    RULStatus.INDETERMINATE_TREND, slope, slope_se, "stationary_degraded_health"
+                    RULStatus.INDETERMINATE_TREND, slope, slope_se, "stationary_degraded_health",
+                    forecast=forecast,
                 )
             else:
                 # slope < -0.0005: Active progressive degradation
@@ -215,6 +293,17 @@ class RULPipeline:
                     hi_smooth, history_ts, history_hi, slope, slope_se,
                     excluded_channels, forecast
                 )
+
+    @staticmethod
+    def _evaluate_forecast_status(forecast: Optional[ForecastResult]) -> str:
+        if forecast is None:
+            return "OFF"
+        st = getattr(forecast, "model_status", "")
+        if st in ("BLOCKED_UNAUTHENTICATED_GATED", "LOCAL_UNCHECKPOINTED_GRAPH"):
+            return "BLOCKED"
+        if st in ("INSUFFICIENT_DATA", "INSUFFICIENT_CONTEXT", "MISSING", "Unavailable", ""):
+            return "UNAVAILABLE"
+        return "OFF"
 
     def _build_non_degrading_result(
         self,
@@ -226,7 +315,9 @@ class RULPipeline:
         slope: float,
         slope_se: float,
         reason: str,
+        forecast: Optional[ForecastResult] = None,
     ) -> RULResult:
+        mode_status = self._evaluate_forecast_status(forecast)
         return RULResult(
             engine_id=engine_id,
             mission_id=mission_id,
@@ -240,6 +331,8 @@ class RULPipeline:
             active_flight_phase=flight_phase,
             handoff_horizon_s=0.0,
             trajectory_type="STATIONARY_OR_RECOVERING",
+            forecast_assisted=False,
+            forecast_mode_status=mode_status,
             provenance={
                 "reason": reason,
                 "theil_sen_slope": slope,
@@ -327,6 +420,9 @@ class RULPipeline:
         if len(excluded_channels) > 0:
             base_confidence *= (1.0 - self.config.confidence_discount_sensor_fault)
 
+        forecast_assisted = (H > 0.0)
+        forecast_mode_status = "ACTIVE" if forecast_assisted else self._evaluate_forecast_status(forecast)
+
         return RULResult(
             engine_id=engine_id,
             mission_id=mission_id,
@@ -340,6 +436,8 @@ class RULPipeline:
             active_flight_phase=flight_phase,
             handoff_horizon_s=H,
             trajectory_type=traj_type,
+            forecast_assisted=forecast_assisted,
+            forecast_mode_status=forecast_mode_status,
             provenance={
                 "theil_sen_slope": slope,
                 "slope_se": slope_se,

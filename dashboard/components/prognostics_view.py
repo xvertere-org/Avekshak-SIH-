@@ -1,14 +1,10 @@
 """
 Prognostics View Component for SIH26054 Dashboard.
 Renders Health Index, degradation rate/trend, Remaining Useful Life (RUL),
-uncertainty bounds, and future trajectory forecasts.
+engineering uncertainty bounds, and future trajectory forecasts.
 """
 
-from typing import Dict, Any, List, Optional
-import streamlit as st
-import plotly.graph_objects as go
-from dashboard.schemas.view_model import PrognosticsViewModel, StatusLevel, AvailabilityStatus
-from typing import Dict, Any, List, Optional
+from typing import List, Optional
 import streamlit as st
 import plotly.graph_objects as go
 from dashboard.schemas.view_model import PrognosticsViewModel, StatusLevel, AvailabilityStatus
@@ -27,7 +23,7 @@ from dashboard.utils.formatters import (
     map_health_to_status,
     map_rul_status_to_status,
 )
-from dashboard.utils.styles import PLOT_COLORS, render_status_badge
+from dashboard.utils.styles import PLOT_COLORS
 
 
 def render_health_prognostics(
@@ -36,14 +32,17 @@ def render_health_prognostics(
     history_hi: Optional[List[float]] = None,
 ):
     """Render current health index, degradation rate, and historical trajectory."""
-    st.markdown("#### Health Index & Degradation")
+    st.markdown("#### Engine Health & Degradation")
+
+    hi_val = prog.engine_health_score if prog.engine_health_score is not None else prog.health_index
+    trend_display = prog.trend_state if prog.trend_state != "Unavailable" else prog.degradation_trend
 
     cols = st.columns(4)
     with cols[0]:
         st.metric(
-            label="Health Index",
-            value=format_health_index(prog.health_index),
-            help="Engine health on a 0–1 scale. 1.0 = fully healthy, 0.0 = end of life.",
+            label="Engine Health",
+            value=format_health_index(hi_val),
+            help="Bounded engineering health indicator on [0.0, 1.0]. 1.0 = nominal baseline, 0.0 = functional failure threshold (HI <= 0.35).",
         )
     with cols[1]:
         st.metric(
@@ -53,15 +52,26 @@ def render_health_prognostics(
     with cols[2]:
         rate_str = f"{prog.degradation_rate * 6000.0:.2f} %/min" if prog.degradation_rate is not None else "Steady"
         st.metric(
-            label="Health Decline Rate",
+            label="Decline Rate",
             value=rate_str,
-            help="Estimated rate of health decline per minute of mission operation.",
+            help="Rate at which the Health Indicator is decreasing. Positive slope indicates degradation.",
         )
     with cols[3]:
         st.metric(
             label="Degradation Trend",
-            value=format_health_trend(prog.degradation_trend),
+            value=format_health_trend(prog.degradation_trend) or trend_display,
         )
+
+    # Subsystem Health Breakdown if present
+    if prog.subsystem_scores:
+        st.markdown("<div style='font-size: 11px; font-weight: 600; color: #8b949e; margin-top: 10px; margin-bottom: 4px; text-transform: uppercase;'>Subsystem Health Indicators</div>", unsafe_allow_html=True)
+        sub_cols = st.columns(len(prog.subsystem_scores))
+        for idx, (sub_name, sub_score) in enumerate(prog.subsystem_scores.items()):
+            with sub_cols[idx]:
+                st.metric(
+                    label=sub_name.capitalize(),
+                    value=f"{sub_score:.2f}",
+                )
 
     # Health Index history chart
     if history_timestamps and history_hi:
@@ -93,31 +103,33 @@ def render_health_prognostics(
 
 
 def render_rul_panel(prog: PrognosticsViewModel):
-    """Render RUL estimation, confidence intervals, and EOL limiting factor."""
+    """Render the conditional RUL estimate and engineering uncertainty range."""
     st.markdown("#### Life Prediction (Remaining Useful Life)")
 
-    if prog.rul_hours is None:
-        st.info("ℹ️ **RUL unavailable — insufficient continuous history for a valid prognostic estimate.** The system withholds RUL rather than extrapolating from insufficient evidence.")
+    if prog.rul_hours is None or prog.rul_state == "UNAVAILABLE":
+        reason_text = prog.prognostics_reason or "Insufficient continuous monotonic degradation history for a valid prognostic estimate."
+        st.info(f"ℹ️ **RUL unavailable — {reason_text}** The system withholds RUL rather than extrapolating unsupported estimates.")
 
     cols = st.columns(4)
     with cols[0]:
         rul_display = f"{prog.rul_hours:.1f} hrs ({prog.point_rul_seconds / 60.0:.0f} min)" if prog.rul_hours is not None else format_rul_state(prog.rul_state)
         st.metric(
-            label="Median RUL Estimate",
+            label="Conditional RUL estimate",
             value=rul_display,
+            help="Shown only when there is sufficient degradation history and valid telemetry evidence.",
         )
     with cols[1]:
         bounds_str = "Unavailable"
         if prog.rul_p05_hours is not None and prog.rul_p95_hours is not None:
             bounds_str = f"[{prog.rul_p05_hours:.1f}h - {prog.rul_p95_hours:.1f}h]"
         st.metric(
-            label="Prediction Range",
+            label="Engineering uncertainty interval",
             value=bounds_str,
-            help="Statistical range covering 90% of simulated outcomes (P05–P95).",
+            help="Engineering uncertainty estimate covering 90% of simulated outcomes (P05–P95).",
         )
     with cols[2]:
         st.metric(
-            label="Life Prediction Status",
+            label="Life prediction status",
             value=format_rul_state(prog.rul_state),
         )
     with cols[3]:
@@ -134,20 +146,19 @@ def render_rul_panel(prog: PrognosticsViewModel):
     eol_html = (
         f'<div style="background-color: #11151c; border: 1px solid #21262d; '
         f'border-radius: 4px; padding: 12px 14px; margin-top: 10px; font-size: 12px; color: #8b949e;">'
-        f'<b>Prognostic Condition:</b> <b style="color: #f0f6fc;">{format_rul_state(prog.rul_state)}</b> | '
-        f'<b>Limiting Threshold:</b> <b style="color: #58a6ff;">{format_limiting_factor(prog.limiting_factor)}</b>{eol_info}'
+        f'<b>Life prediction status:</b> <span style="color: #f0f6fc;">{format_rul_state(prog.rul_state)}</span> | '
+        f'<b>Limiting Factor:</b> <code style="color: #f0f6fc;">{format_limiting_factor(prog.limiting_factor)}</code>{eol_info}'
         f'<div style="margin-top: 6px; color: #d29922;">'
-        f'⚠️ <b>Simulation Disclaimer:</b> RUL estimates are based on project-defined simulated failure criteria. These are not certified OEM or regulatory airworthiness limits.'
+        f'⚠️ <b>Simulation Disclaimer:</b> Time-to-threshold calculations are engineering demonstrations on simulated degradation scenarios. These are not certified OEM or regulatory airworthiness limits.'
         f'</div>'
         f'</div>'
     )
     st.markdown(eol_html, unsafe_allow_html=True)
 
 
-
 def render_forecast_panel(prog: PrognosticsViewModel):
     """Render telemetry forecasting status, source, and forecast trajectories."""
-    st.markdown("#### Telemetry Forecast")
+    st.markdown("#### Telemetry Forecast (TimesFM / Baseline)")
 
     # Status / Source callout box distinguishing LOADED_PRETRAINED vs BLOCKED_UNAUTHENTICATED_GATED
     if prog.forecast_status == "BLOCKED_UNAUTHENTICATED_GATED":
@@ -165,8 +176,10 @@ def render_forecast_panel(prog: PrognosticsViewModel):
         )
     elif prog.forecast_status == "BUFFERING":
         st.info(
-            f"ℹ️ **Preparing forecast.** Accumulating {prog.forecast_horizon} timesteps before generating trajectory predictions."
+            f"ℹ️ **Insufficient history for a reliable forecast.** Collecting the required context before generating a prediction."
         )
+    else:
+        st.info(f"Forecast method: `{prog.forecast_source}` (Status: `{format_forecast_status(prog.forecast_status)}`)")
 
     f_cols = st.columns(4)
     with f_cols[0]:

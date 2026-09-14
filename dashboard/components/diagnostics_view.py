@@ -4,7 +4,6 @@ Renders anomaly breakdown, fault diagnosis probabilities, digital twin residuals
 and sensor fault isolation status.
 """
 
-from typing import Dict, Any, List
 import streamlit as st
 import plotly.graph_objects as go
 from dashboard.schemas.view_model import DiagnosticsViewModel, StatusLevel, AvailabilityStatus
@@ -21,23 +20,32 @@ from dashboard.utils.styles import PLOT_COLORS, STATUS_COLORS, render_status_bad
 
 def render_anomaly_diagnostics(diag: DiagnosticsViewModel):
     """Render anomaly detection scores and detector decomposition."""
-    st.markdown("#### Anomaly Detection")
+    st.markdown("#### Health Monitoring & Anomaly Detection")
 
-    if diag.anomaly_status == "Unavailable":
-        st.info("ℹ️ Anomaly detection outputs currently unavailable.")
+    if diag.anomaly_status == "Unavailable" and diag.alert_classification == "Nominal":
+        st.info("ℹ️ Health monitoring and anomaly detection outputs currently unavailable.")
         return
 
-    r1_col1, r1_col2 = st.columns(2)
+    r1_col1, r1_col2, r1_col3 = st.columns(3)
     with r1_col1:
         anom_disp = diag.anomaly_status.title() if diag.anomaly_status else "Normal"
         st.metric(
-            label="Anomaly Status",
-            value=anom_disp,
+            label="Alert Classification",
+            value=diag.alert_classification or anom_disp,
+            help="Categorical discrimination between possible physical degradation, sensor anomaly, or model disagreement.",
         )
     with r1_col2:
         st.metric(
-            label="Anomaly Severity",
-            value=format_value(diag.anomaly_score, decimals=2),
+            label="Degradation Severity",
+            value=format_value(diag.degradation_severity if diag.degradation_severity is not None else diag.anomaly_score, decimals=2),
+            help="Engineering estimate of degradation intensity bounded to [0.0, 1.0].",
+        )
+    with r1_col3:
+        aff_sys_str = ", ".join(diag.affected_subsystems) if diag.affected_subsystems else "None"
+        st.metric(
+            label="Affected Subsystem",
+            value=aff_sys_str,
+            help="Subsystems exhibiting statistically elevated residual excursions.",
         )
 
     r2_col1, r2_col2 = st.columns(2)
@@ -54,10 +62,32 @@ def render_anomaly_diagnostics(diag: DiagnosticsViewModel):
             value=format_value(ewma_score, decimals=2),
         )
 
+    # Operator Alert Breakdown Box
+    if diag.alert_classification != "Nominal" or diag.contributing_channels:
+        ev_summary = diag.evidence.get("summary", "Residual deviation observed across telemetry channels.") if isinstance(diag.evidence, dict) else "Residual deviation observed."
+        alert_bg = "#1f1a14" if "Physical" in diag.alert_classification else "#161b22"
+        alert_border = "#d29922" if "Physical" in diag.alert_classification else "#58a6ff"
+        alert_box_html = (
+            f'<div style="background-color: {alert_bg}; border: 1px solid {alert_border}; '
+            f'border-radius: 4px; padding: 12px 14px; margin: 10px 0; font-size: 12px; color: #c9d1d9;">'
+            f'<div style="font-weight: 600; color: #f0f6fc; margin-bottom: 4px;">'
+            f'Detected Deviation: <span style="color: {alert_border};">{diag.alert_classification}</span>'
+            f'</div>'
+            f'<div><b>Evidence:</b> {ev_summary}</div>'
+            f'<div style="margin-top: 4px; font-size: 11px; color: #8b949e;">'
+            f'<b>Basis:</b> Rolling residual dispersion engineering estimate. Single noisy samples filtered via persistence counters.'
+            f'</div>'
+            f'<div style="margin-top: 6px; color: #8b949e; font-style: italic;">'
+            f'Recommended inspection: inspect affected subsystem instrumentation during next scheduled servicing (demonstration aid only; not a certified maintenance directive).'
+            f'</div>'
+            f'</div>'
+        )
+        st.markdown(alert_box_html, unsafe_allow_html=True)
+
     if diag.contributing_channels:
         channels_clean = [format_channel(c) for c in diag.contributing_channels]
         st.markdown(
-            f"**Contributing Degradation Channels:** {', '.join(channels_clean)}"
+            f"**Contributing Channels:** {', '.join(channels_clean)}"
         )
 
 

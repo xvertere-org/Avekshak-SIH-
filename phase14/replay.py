@@ -131,18 +131,25 @@ class MissionReplayManager:
     @staticmethod
     def validate_chronological_ordering(payloads: List[DashboardStatePayload]) -> None:
         """
-        Ensure timestamps strictly increase monotonically.
-        Rejects out-of-order or duplicate time data.
+        Ensure valid telemetry timestamps strictly increase monotonically.
+        Observations explicitly marked as REJECTED by causal sequence guards are excluded.
         """
         if not payloads:
             return
 
-        last_ts = payloads[0].timestamp
-        for idx in range(1, len(payloads)):
-            curr_ts = payloads[idx].timestamp
+        valid_payloads = [
+            p for p in payloads
+            if "REJECTED" not in (getattr(p, "quality_status", None) or "")
+        ]
+        if not valid_payloads:
+            return
+
+        last_ts = valid_payloads[0].timestamp
+        for idx in range(1, len(valid_payloads)):
+            curr_ts = valid_payloads[idx].timestamp
             if curr_ts <= last_ts:
                 raise ValueError(
-                    f"Chronological ordering violation at index {idx}: "
+                    f"Chronological ordering violation at valid index {idx}: "
                     f"timestamp {curr_ts} <= preceding {last_ts}."
                 )
             last_ts = curr_ts

@@ -177,7 +177,7 @@ class SensorFaultProcessor:
     def _get_channel(self, fault_state: Any) -> Optional[str]:
         """Extract the sensor channel from a FaultState's parameters."""
         params = fault_state.parameters if fault_state.parameters else {}
-        channel = params.get("sensor_channel", None)
+        channel = params.get("sensor_channel", params.get("target_sensor", params.get("channel", None)))
         if channel is None:
             return None
         # Normalize to string value
@@ -186,7 +186,18 @@ class SensorFaultProcessor:
         return str(channel).lower()
 
     def _get_mode(self, fault_state: Any) -> Optional[SensorFaultMode]:
-        """Extract the sensor fault mode from a FaultState's parameters."""
+        """Extract the sensor fault mode from a FaultState's parameters or fault_type."""
+        ft = getattr(fault_state, "fault_type", None)
+        ft_val = ft.value if hasattr(ft, "value") else str(ft).lower()
+        if ft_val in ("sensor_bias", "bias"):
+            return SensorFaultMode.BIAS
+        elif ft_val in ("sensor_drift", "drift"):
+            return SensorFaultMode.DRIFT
+        elif ft_val in ("sensor_dropout", "dropout"):
+            return SensorFaultMode.DROPOUT
+        elif ft_val in ("sensor_stuck", "stuck"):
+            return SensorFaultMode.STUCK
+
         params = fault_state.parameters if fault_state.parameters else {}
         mode = params.get("sensor_mode", None)
         if mode is None:

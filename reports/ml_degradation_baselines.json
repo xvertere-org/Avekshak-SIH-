@@ -1,0 +1,702 @@
+{
+  "femto": {
+    "dataset_id": "femto",
+    "task_name": "DEGRADATION_RUL_REGRESSION",
+    "status": "completed",
+    "target_column": "rul_label",
+    "group_column": "bearing_id",
+    "time_column": "file_index",
+    "split_type": "entity_held_out",
+    "feature_count": 16,
+    "feature_names": [
+      "h_rms",
+      "h_std",
+      "h_peak",
+      "h_peak_to_peak",
+      "h_crest_factor",
+      "h_kurtosis",
+      "h_skewness",
+      "h_energy",
+      "v_rms",
+      "v_std",
+      "v_peak",
+      "v_peak_to_peak",
+      "v_crest_factor",
+      "v_kurtosis",
+      "v_skewness",
+      "v_energy"
+    ],
+    "num_total_entities": 6,
+    "num_train_entities": 4,
+    "num_test_entities": 2,
+    "train_entities": [
+      "Bearing2_1",
+      "Bearing2_2",
+      "Bearing3_1",
+      "Bearing3_2"
+    ],
+    "test_entities": [
+      "Bearing1_1",
+      "Bearing1_2"
+    ],
+    "num_train_samples": 3860,
+    "num_test_samples": 3674,
+    "per_entity_test_metrics": {
+      "Bearing1_1": {
+        "sample_count": 2803,
+        "mae": 867.5116160707379,
+        "rmse": 1081.6771231251228
+      },
+      "Bearing1_2": {
+        "sample_count": 871,
+        "mae": 204.1435459064681,
+        "rmse": 260.1933600951624
+      }
+    },
+    "models": {
+      "dummy_mean": {
+        "model_name": "dummy_mean",
+        "model_type": "DummyRegressor",
+        "hyperparameters": {
+          "strategy": "mean"
+        },
+        "metrics": {
+          "mae": 778.8764769095816,
+          "rmse": 1022.1342744498123,
+          "r2_score": -0.5290307554915417,
+          "max_error": 2231.240414507772,
+          "target_range": [
+            0.0,
+            2802.0
+          ],
+          "near_eol_metrics": {
+            "threshold": 200.0,
+            "sample_count": 402,
+            "mae": 470.75958549222804,
+            "rmse": 474.3218885941076
+          }
+        }
+      },
+      "ridge_regression": {
+        "model_name": "ridge_regression",
+        "model_type": "Ridge",
+        "hyperparameters": {
+          "alpha": 1.0,
+          "random_state": 42
+        },
+        "metrics": {
+          "mae": 823.3765492797525,
+          "rmse": 1175.8886887011006,
+          "r2_score": -1.0236376167285544,
+          "max_error": 13574.895666254115,
+          "target_range": [
+            0.0,
+            2802.0
+          ],
+          "near_eol_metrics": {
+            "threshold": 200.0,
+            "sample_count": 402,
+            "mae": 955.2694346793885,
+            "rmse": 1993.8049778928985
+          }
+        }
+      },
+      "random_forest": {
+        "model_name": "random_forest",
+        "model_type": "RandomForestRegressor",
+        "hyperparameters": {
+          "n_estimators": 50,
+          "max_depth": 10,
+          "random_state": 42
+        },
+        "metrics": {
+          "mae": 710.2460773899869,
+          "rmse": 953.2553744199738,
+          "r2_score": -0.3298995627935517,
+          "max_error": 2295.136464262918,
+          "target_range": [
+            0.0,
+            2802.0
+          ],
+          "near_eol_metrics": {
+            "threshold": 200.0,
+            "sample_count": 402,
+            "mae": 124.85714191214979,
+            "rmse": 188.3312322070052
+          }
+        }
+      }
+    },
+    "limitations": [
+      "FEMTO evaluation uses 6 total bearings from the processed training inventory: 4 train, 2 test.",
+      "Zero validation split is created at entity level to avoid starving training variance.",
+      "Test set consists of complete run-to-failure bearing trajectories with preserved temporal ordering."
+    ],
+    "seed": 42
+  },
+  "nasa_battery": {
+    "dataset_id": "nasa_battery",
+    "task_name": "DEGRADATION_RUL_REGRESSION",
+    "status": "completed",
+    "target_column": "soh",
+    "group_column": "battery_id",
+    "time_column": "cycle",
+    "split_type": "entity_held_out",
+    "feature_count": 10,
+    "feature_names": [
+      "ambient_temperature",
+      "voltage_mean",
+      "voltage_min",
+      "voltage_max",
+      "current_mean",
+      "current_min",
+      "current_max",
+      "temperature_mean",
+      "temperature_min",
+      "temperature_max"
+    ],
+    "num_total_entities": 34,
+    "num_train_entities": 24,
+    "num_test_entities": 10,
+    "train_entities": [
+      "B0005",
+      "B0018",
+      "B0026",
+      "B0027",
+      "B0028",
+      "B0030",
+      "B0031",
+      "B0033",
+      "B0038",
+      "B0039",
+      "B0040",
+      "B0041",
+      "B0042",
+      "B0043",
+      "B0045",
+      "B0046",
+      "B0047",
+      "B0048",
+      "B0049",
+      "B0050",
+      "B0051",
+      "B0052",
+      "B0053",
+      "B0056"
+    ],
+    "test_entities": [
+      "B0006",
+      "B0007",
+      "B0025",
+      "B0029",
+      "B0032",
+      "B0034",
+      "B0036",
+      "B0044",
+      "B0054",
+      "B0055"
+    ],
+    "num_train_samples": 1597,
+    "num_test_samples": 1153,
+    "per_entity_test_metrics": {
+      "B0006": {
+        "sample_count": 168,
+        "mae": 0.09303373505337542,
+        "rmse": 0.10845792712611564
+      },
+      "B0007": {
+        "sample_count": 168,
+        "mae": 0.030515642117408433,
+        "rmse": 0.039617279133012946
+      },
+      "B0025": {
+        "sample_count": 28,
+        "mae": 0.0466183638885435,
+        "rmse": 0.06951519961337461
+      },
+      "B0029": {
+        "sample_count": 40,
+        "mae": 0.0263753937165462,
+        "rmse": 0.03175497861232786
+      },
+      "B0032": {
+        "sample_count": 40,
+        "mae": 0.17084010184579504,
+        "rmse": 0.17510226136270785
+      },
+      "B0034": {
+        "sample_count": 197,
+        "mae": 0.03189626601052438,
+        "rmse": 0.04273870824674117
+      },
+      "B0036": {
+        "sample_count": 197,
+        "mae": 0.08776749829136687,
+        "rmse": 0.11592698721942599
+      },
+      "B0044": {
+        "sample_count": 111,
+        "mae": 0.03563723568145102,
+        "rmse": 0.07069054034303678
+      },
+      "B0054": {
+        "sample_count": 102,
+        "mae": 0.05812716503046685,
+        "rmse": 0.07229616096193112
+      },
+      "B0055": {
+        "sample_count": 102,
+        "mae": 0.05971382408476158,
+        "rmse": 0.07218586828248509
+      }
+    },
+    "models": {
+      "dummy_mean": {
+        "model_name": "dummy_mean",
+        "model_type": "DummyRegressor",
+        "hyperparameters": {
+          "strategy": "mean"
+        },
+        "metrics": {
+          "mae": 0.1706481152398747,
+          "rmse": 0.21101926611903124,
+          "r2_score": -0.1387174110735625,
+          "max_error": 0.6094158452332024,
+          "target_range": [
+            0.027558456669893587,
+            1.2220312160393278
+          ],
+          "near_eol_metrics": {
+            "threshold": 0.75,
+            "sample_count": 597,
+            "mae": 0.12404282627148422,
+            "rmse": 0.1935221676039367
+          }
+        }
+      },
+      "ridge_regression": {
+        "model_name": "ridge_regression",
+        "model_type": "Ridge",
+        "hyperparameters": {
+          "alpha": 1.0,
+          "random_state": 42
+        },
+        "metrics": {
+          "mae": 0.09341603537067454,
+          "rmse": 0.12093360621276944,
+          "r2_score": 0.6260050382073519,
+          "max_error": 0.39901962285809567,
+          "target_range": [
+            0.027558456669893587,
+            1.2220312160393278
+          ],
+          "near_eol_metrics": {
+            "threshold": 0.75,
+            "sample_count": 597,
+            "mae": 0.07412563498417966,
+            "rmse": 0.09273471912468566
+          }
+        }
+      },
+      "random_forest": {
+        "model_name": "random_forest",
+        "model_type": "RandomForestRegressor",
+        "hyperparameters": {
+          "n_estimators": 50,
+          "max_depth": 10,
+          "random_state": 42
+        },
+        "metrics": {
+          "mae": 0.06027710754027016,
+          "rmse": 0.08468403022958239,
+          "r2_score": 0.8166103669642835,
+          "max_error": 0.37830833727003976,
+          "target_range": [
+            0.027558456669893587,
+            1.2220312160393278
+          ],
+          "near_eol_metrics": {
+            "threshold": 0.75,
+            "sample_count": 597,
+            "mae": 0.05118193594097535,
+            "rmse": 0.07160080760786511
+          }
+        }
+      }
+    },
+    "limitations": [
+      "NASA Battery aging benchmark: evaluated on 34 lithium-ion cells.",
+      "Filtered strictly to discharge cycles where SOH is physically defined.",
+      "SOH is an electrochemical benchmark and must never be treated as Rotax telemetry."
+    ],
+    "seed": 42
+  },
+  "cmapss": {
+    "dataset_id": "cmapss",
+    "task_name": "DEGRADATION_RUL_REGRESSION",
+    "status": "completed",
+    "target_column": "rul_label",
+    "group_column": "unit_number",
+    "time_column": "time_cycles",
+    "split_type": "entity_held_out",
+    "feature_count": 15,
+    "feature_names": [
+      "cmapss_s_2",
+      "cmapss_s_3",
+      "cmapss_s_4",
+      "cmapss_s_6",
+      "cmapss_s_7",
+      "cmapss_s_8",
+      "cmapss_s_9",
+      "cmapss_s_11",
+      "cmapss_s_12",
+      "cmapss_s_13",
+      "cmapss_s_14",
+      "cmapss_s_15",
+      "cmapss_s_17",
+      "cmapss_s_20",
+      "cmapss_s_21"
+    ],
+    "num_total_entities": 100,
+    "num_train_entities": 70,
+    "num_test_entities": 30,
+    "train_entities": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      8,
+      10,
+      11,
+      16,
+      17,
+      18,
+      19,
+      21,
+      22,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      32,
+      33,
+      34,
+      38,
+      39,
+      40,
+      41,
+      43,
+      44,
+      46,
+      47,
+      49,
+      51,
+      52,
+      53,
+      56,
+      57,
+      58,
+      60,
+      61,
+      62,
+      63,
+      64,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      76,
+      77,
+      79,
+      80,
+      81,
+      82,
+      84,
+      85,
+      87,
+      88,
+      90,
+      92,
+      93,
+      94,
+      95,
+      96,
+      97,
+      98,
+      100
+    ],
+    "test_entities": [
+      7,
+      9,
+      12,
+      13,
+      14,
+      15,
+      20,
+      23,
+      31,
+      35,
+      36,
+      37,
+      42,
+      45,
+      48,
+      50,
+      54,
+      55,
+      59,
+      65,
+      66,
+      67,
+      68,
+      75,
+      78,
+      83,
+      86,
+      89,
+      91,
+      99
+    ],
+    "num_train_samples": 14407,
+    "num_test_samples": 6224,
+    "per_entity_test_metrics": {
+      "7": {
+        "sample_count": 259,
+        "mae": 9.720807768656439,
+        "rmse": 12.210935002261332
+      },
+      "9": {
+        "sample_count": 201,
+        "mae": 4.73801943383186,
+        "rmse": 6.612877696098867
+      },
+      "12": {
+        "sample_count": 170,
+        "mae": 12.520490312900368,
+        "rmse": 15.960434058087145
+      },
+      "13": {
+        "sample_count": 163,
+        "mae": 10.283907030470822,
+        "rmse": 12.11555924828643
+      },
+      "14": {
+        "sample_count": 180,
+        "mae": 11.717684193302494,
+        "rmse": 14.471103085228696
+      },
+      "15": {
+        "sample_count": 207,
+        "mae": 18.27533907221391,
+        "rmse": 26.711418830452732
+      },
+      "20": {
+        "sample_count": 234,
+        "mae": 14.127661368310667,
+        "rmse": 16.70417590581878
+      },
+      "23": {
+        "sample_count": 168,
+        "mae": 13.854196842362956,
+        "rmse": 17.877912357737962
+      },
+      "31": {
+        "sample_count": 234,
+        "mae": 14.316040537461113,
+        "rmse": 21.697965949051003
+      },
+      "35": {
+        "sample_count": 181,
+        "mae": 12.429194438536646,
+        "rmse": 14.800655544997147
+      },
+      "36": {
+        "sample_count": 158,
+        "mae": 13.846250788008042,
+        "rmse": 17.219215379786203
+      },
+      "37": {
+        "sample_count": 170,
+        "mae": 14.54607834410887,
+        "rmse": 19.60706342950729
+      },
+      "42": {
+        "sample_count": 196,
+        "mae": 14.707079329281624,
+        "rmse": 18.421130393357686
+      },
+      "45": {
+        "sample_count": 158,
+        "mae": 18.050663257998536,
+        "rmse": 22.357703195982122
+      },
+      "48": {
+        "sample_count": 231,
+        "mae": 6.4926216425871655,
+        "rmse": 7.976012680660698
+      },
+      "50": {
+        "sample_count": 198,
+        "mae": 11.2882704403294,
+        "rmse": 13.923356646650342
+      },
+      "54": {
+        "sample_count": 257,
+        "mae": 5.233881899858617,
+        "rmse": 6.847395157289363
+      },
+      "55": {
+        "sample_count": 193,
+        "mae": 8.074334835841583,
+        "rmse": 9.814185784769451
+      },
+      "59": {
+        "sample_count": 231,
+        "mae": 14.43626536769814,
+        "rmse": 21.478349060938182
+      },
+      "65": {
+        "sample_count": 153,
+        "mae": 29.76536501948904,
+        "rmse": 38.660949685678794
+      },
+      "66": {
+        "sample_count": 202,
+        "mae": 19.362822568812213,
+        "rmse": 23.473287788856062
+      },
+      "67": {
+        "sample_count": 313,
+        "mae": 20.89716577322626,
+        "rmse": 23.9768078551956
+      },
+      "68": {
+        "sample_count": 199,
+        "mae": 15.16041941870667,
+        "rmse": 19.3140240026227
+      },
+      "75": {
+        "sample_count": 229,
+        "mae": 10.510810693431386,
+        "rmse": 12.136355982519559
+      },
+      "78": {
+        "sample_count": 231,
+        "mae": 10.82331972855804,
+        "rmse": 15.31897310489594
+      },
+      "83": {
+        "sample_count": 293,
+        "mae": 10.598203859471038,
+        "rmse": 16.99624524394685
+      },
+      "86": {
+        "sample_count": 278,
+        "mae": 16.124867696834432,
+        "rmse": 18.841427564061174
+      },
+      "89": {
+        "sample_count": 217,
+        "mae": 14.72151762243446,
+        "rmse": 20.637671913988424
+      },
+      "91": {
+        "sample_count": 135,
+        "mae": 10.144603713275568,
+        "rmse": 13.3633637962529
+      },
+      "99": {
+        "sample_count": 185,
+        "mae": 19.221580483405948,
+        "rmse": 26.319177851548865
+      }
+    },
+    "models": {
+      "dummy_mean": {
+        "model_name": "dummy_mean",
+        "model_type": "DummyRegressor",
+        "hyperparameters": {
+          "strategy": "mean"
+        },
+        "metrics": {
+          "mae": 36.98677710492417,
+          "rmse": 41.654551993284244,
+          "r2_score": -5.352690150894901e-05,
+          "max_error": 86.73734989935448,
+          "target_range": [
+            0.0,
+            125.0
+          ],
+          "near_eol_metrics": {
+            "threshold": 30.0,
+            "sample_count": 930,
+            "mae": 71.73734989935448,
+            "rmse": 72.29278920184512
+          }
+        }
+      },
+      "ridge_regression": {
+        "model_name": "ridge_regression",
+        "model_type": "Ridge",
+        "hyperparameters": {
+          "alpha": 1.0,
+          "random_state": 42
+        },
+        "metrics": {
+          "mae": 17.13718359887385,
+          "rmse": 20.831168201128808,
+          "r2_score": 0.7498931644659657,
+          "max_error": 77.8587801784702,
+          "target_range": [
+            0.0,
+            125.0
+          ],
+          "near_eol_metrics": {
+            "threshold": 30.0,
+            "sample_count": 930,
+            "mae": 17.723467733884423,
+            "rmse": 21.353203016309365
+          }
+        }
+      },
+      "random_forest": {
+        "model_name": "random_forest",
+        "model_type": "RandomForestRegressor",
+        "hyperparameters": {
+          "n_estimators": 50,
+          "max_depth": 10,
+          "random_state": 42
+        },
+        "metrics": {
+          "mae": 13.400800643176256,
+          "rmse": 18.485893859142664,
+          "r2_score": 0.8030394627126793,
+          "max_error": 79.09239628735689,
+          "target_range": [
+            0.0,
+            125.0
+          ],
+          "near_eol_metrics": {
+            "threshold": 30.0,
+            "sample_count": 930,
+            "mae": 7.112778816508754,
+            "rmse": 11.277176775969034
+          }
+        }
+      }
+    },
+    "limitations": [
+      "C-MAPSS FD001 turbofan degradation benchmark: evaluated on 100 engine units.",
+      "Entity-held-out split guarantees zero engine unit leakage.",
+      "Target is piecewise linear RUL (capped at 125 cycles)."
+    ],
+    "seed": 42
+  }
+}

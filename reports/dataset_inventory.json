@@ -1,0 +1,366 @@
+{
+  "cmapss": {
+    "path": "data/raw/cmapss",
+    "total_files": 16,
+    "total_size_bytes": 15805793295,
+    "file_count_by_extension": {
+      "": 1,
+      ".zip": 1,
+      ".pdf": 1,
+      ".txt": 13
+    },
+    "archives": [
+      {
+        "path": "cmapss/17.+Turbofan+Engine+Degradation+Simulation+Data+Set+2.zip",
+        "size_bytes": 15760443389
+      }
+    ],
+    "empty_files": [],
+    "partial_downloads": [],
+    "directories": 3,
+    "sample_files": [
+      "cmapss/.gitkeep",
+      "cmapss/17.+Turbofan+Engine+Degradation+Simulation+Data+Set+2.zip",
+      "cmapss/6.+Turbofan+Engine+Degradation+Simulation+Data+Set/6. Turbofan Engine Degradation Simulation Data Set/CMAPSSData/Damage Propagation Modeling.pdf",
+      "cmapss/6.+Turbofan+Engine+Degradation+Simulation+Data+Set/6. Turbofan Engine Degradation Simulation Data Set/CMAPSSData/readme.txt",
+      "cmapss/6.+Turbofan+Engine+Degradation+Simulation+Data+Set/6. Turbofan Engine Degradation Simulation Data Set/CMAPSSData/RUL_FD001.txt",
+      "cmapss/6.+Turbofan+Engine+Degradation+Simulation+Data+Set/6. Turbofan Engine Degradation Simulation Data Set/CMAPSSData/RUL_FD002.txt",
+      "cmapss/6.+Turbofan+Engine+Degradation+Simulation+Data+Set/6. Turbofan Engine Degradation Simulation Data Set/CMAPSSData/RUL_FD003.txt",
+      "cmapss/6.+Turbofan+Engine+Degradation+Simulation+Data+Set/6. Turbofan Engine Degradation Simulation Data Set/CMAPSSData/RUL_FD004.txt",
+      "cmapss/6.+Turbofan+Engine+Degradation+Simulation+Data+Set/6. Turbofan Engine Degradation Simulation Data Set/CMAPSSData/test_FD001.txt",
+      "cmapss/6.+Turbofan+Engine+Degradation+Simulation+Data+Set/6. Turbofan Engine Degradation Simulation Data Set/CMAPSSData/test_FD002.txt",
+      "cmapss/6.+Turbofan+Engine+Degradation+Simulation+Data+Set/6. Turbofan Engine Degradation Simulation Data Set/CMAPSSData/test_FD003.txt",
+      "cmapss/6.+Turbofan+Engine+Degradation+Simulation+Data+Set/6. Turbofan Engine Degradation Simulation Data Set/CMAPSSData/test_FD004.txt",
+      "cmapss/6.+Turbofan+Engine+Degradation+Simulation+Data+Set/6. Turbofan Engine Degradation Simulation Data Set/CMAPSSData/train_FD001.txt",
+      "cmapss/6.+Turbofan+Engine+Degradation+Simulation+Data+Set/6. Turbofan Engine Degradation Simulation Data Set/CMAPSSData/train_FD002.txt",
+      "cmapss/6.+Turbofan+Engine+Degradation+Simulation+Data+Set/6. Turbofan Engine Degradation Simulation Data Set/CMAPSSData/train_FD003.txt",
+      "cmapss/6.+Turbofan+Engine+Degradation+Simulation+Data+Set/6. Turbofan Engine Degradation Simulation Data Set/CMAPSSData/train_FD004.txt"
+    ],
+    "status": "PRESENT"
+  },
+  "cwru": {
+    "path": "data/raw/cwru",
+    "total_files": 3,
+    "total_size_bytes": 9742304,
+    "file_count_by_extension": {
+      ".mat": 3
+    },
+    "archives": [],
+    "empty_files": [],
+    "partial_downloads": [],
+    "directories": 0,
+    "sample_files": [
+      "cwru/105.mat",
+      "cwru/130.mat",
+      "cwru/97.mat"
+    ],
+    "status": "AUDITED_AND_PROCESSED",
+    "total_raw_files_discovered": 3,
+    "supported_files_discovered": 3,
+    "files_successfully_parsed": 3,
+    "files_skipped": 0,
+    "total_vibration_windows": 1179,
+    "output_parquet": "data/processed/cwru/cwru_features.parquet"
+  },
+  "femto": {
+    "path": "data/raw/femto",
+    "total_files": 24074,
+    "total_size_bytes": 2668379631,
+    "file_count_by_extension": {
+      "": 1,
+      ".zip": 4,
+      ".csv": 24069
+    },
+    "archives": [
+      {
+        "path": "femto/10.+FEMTO+Bearing/10. FEMTO Bearing/FEMTOBearingDataSet/Training_set.zip",
+        "size_bytes": 140424205
+      },
+      {
+        "path": "femto/10.+FEMTO+Bearing/10. FEMTO Bearing/FEMTOBearingDataSet/Validation_Set.zip",
+        "size_bytes": 316744982
+      },
+      {
+        "path": "femto/10.+FEMTO+Bearing/10. FEMTO Bearing/FEMTOBearingDataSet/Test_set/Training_set.zip",
+        "size_bytes": 140424205
+      },
+      {
+        "path": "femto/10.+FEMTO+Bearing/10. FEMTO Bearing/FEMTOBearingDataSet/Test_set/Validation_Set.zip",
+        "size_bytes": 316744982
+      }
+    ],
+    "empty_files": [],
+    "partial_downloads": [],
+    "directories": 24,
+    "sample_files": [
+      "femto/.gitkeep",
+      "femto/10.+FEMTO+Bearing/10. FEMTO Bearing/FEMTOBearingDataSet/Training_set.zip",
+      "femto/10.+FEMTO+Bearing/10. FEMTO Bearing/FEMTOBearingDataSet/Validation_Set.zip",
+      "femto/10.+FEMTO+Bearing/10. FEMTO Bearing/FEMTOBearingDataSet/Test_set/Training_set.zip",
+      "femto/10.+FEMTO+Bearing/10. FEMTO Bearing/FEMTOBearingDataSet/Test_set/Validation_Set.zip",
+      "femto/10.+FEMTO+Bearing/10. FEMTO Bearing/FEMTOBearingDataSet/Test_set/Test_set/Bearing1_3/acc_00001.csv",
+      "femto/10.+FEMTO+Bearing/10. FEMTO Bearing/FEMTOBearingDataSet/Test_set/Test_set/Bearing1_3/acc_00002.csv",
+      "femto/10.+FEMTO+Bearing/10. FEMTO Bearing/FEMTOBearingDataSet/Test_set/Test_set/Bearing1_3/acc_00003.csv",
+      "femto/10.+FEMTO+Bearing/10. FEMTO Bearing/FEMTOBearingDataSet/Test_set/Test_set/Bearing1_3/acc_00004.csv",
+      "femto/10.+FEMTO+Bearing/10. FEMTO Bearing/FEMTOBearingDataSet/Test_set/Test_set/Bearing1_3/acc_00005.csv",
+      "femto/10.+FEMTO+Bearing/10. FEMTO Bearing/FEMTOBearingDataSet/Test_set/Test_set/Bearing1_3/acc_00006.csv",
+      "femto/10.+FEMTO+Bearing/10. FEMTO Bearing/FEMTOBearingDataSet/Test_set/Test_set/Bearing1_3/acc_00007.csv",
+      "femto/10.+FEMTO+Bearing/10. FEMTO Bearing/FEMTOBearingDataSet/Test_set/Test_set/Bearing1_3/acc_00008.csv",
+      "femto/10.+FEMTO+Bearing/10. FEMTO Bearing/FEMTOBearingDataSet/Test_set/Test_set/Bearing1_3/acc_00009.csv",
+      "femto/10.+FEMTO+Bearing/10. FEMTO Bearing/FEMTOBearingDataSet/Test_set/Test_set/Bearing1_3/acc_00010.csv",
+      "femto/10.+FEMTO+Bearing/10. FEMTO Bearing/FEMTOBearingDataSet/Test_set/Test_set/Bearing1_3/acc_00011.csv",
+      "femto/10.+FEMTO+Bearing/10. FEMTO Bearing/FEMTOBearingDataSet/Test_set/Test_set/Bearing1_3/acc_00012.csv",
+      "femto/10.+FEMTO+Bearing/10. FEMTO Bearing/FEMTOBearingDataSet/Test_set/Test_set/Bearing1_3/acc_00013.csv",
+      "femto/10.+FEMTO+Bearing/10. FEMTO Bearing/FEMTOBearingDataSet/Test_set/Test_set/Bearing1_3/acc_00014.csv",
+      "femto/10.+FEMTO+Bearing/10. FEMTO Bearing/FEMTOBearingDataSet/Test_set/Test_set/Bearing1_3/acc_00015.csv"
+    ],
+    "status": "PRESENT"
+  },
+  "nasa_battery": {
+    "path": "data/raw/nasa_battery",
+    "total_files": 3,
+    "total_size_bytes": 1275529765,
+    "file_count_by_extension": {
+      "": 1,
+      ".zip": 2
+    },
+    "archives": [
+      {
+        "path": "nasa_battery/11.+Randomized+Battery+Usage+Data+Set.zip",
+        "size_bytes": 1065821095
+      },
+      {
+        "path": "nasa_battery/5.+Battery+Data+Set.zip",
+        "size_bytes": 209708670
+      }
+    ],
+    "empty_files": [],
+    "partial_downloads": [],
+    "directories": 0,
+    "sample_files": [
+      "nasa_battery/.gitkeep",
+      "nasa_battery/11.+Randomized+Battery+Usage+Data+Set.zip",
+      "nasa_battery/5.+Battery+Data+Set.zip"
+    ],
+    "status": "PRESENT"
+  },
+  "nust": {
+    "path": "data/raw/nust",
+    "total_files": 683,
+    "total_size_bytes": 1250791830,
+    "file_count_by_extension": {
+      "": 1,
+      ".docx": 202,
+      ".rtf": 346,
+      ".csv": 134
+    },
+    "archives": [],
+    "empty_files": [],
+    "partial_downloads": [],
+    "directories": 367,
+    "sample_files": [
+      "nust/.gitkeep",
+      "nust/Engine Journal Bearings Dataset/Additional Datasets/30% Humidity/Faulty Bearings/1000 RPM/-10 deg Celsius/3th Auto engine at -10C2022May22-2335-0019.docx",
+      "nust/Engine Journal Bearings Dataset/Additional Datasets/30% Humidity/Faulty Bearings/1000 RPM/-15 deg Celsius/2nd Auto engine at -15C 2022May22-2335-0021.docx",
+      "nust/Engine Journal Bearings Dataset/Additional Datasets/30% Humidity/Faulty Bearings/1000 RPM/-20 deg Celsius/1st Auto engine at -20C 2022May22-2335-0024.docx",
+      "nust/Engine Journal Bearings Dataset/Additional Datasets/30% Humidity/Faulty Bearings/1000 RPM/-5 deg Celsius/4th Auto engine at -5C2022May22-2335-0016.docx",
+      "nust/Engine Journal Bearings Dataset/Additional Datasets/30% Humidity/Faulty Bearings/1000 RPM/0 deg Celsius/5th Auto engine at 0C 2022May22-2335-0012.docx",
+      "nust/Engine Journal Bearings Dataset/Additional Datasets/30% Humidity/Faulty Bearings/1000 RPM/10 deg Celsius/7th Auto engine at+10C 2022May22-2335-0007.docx",
+      "nust/Engine Journal Bearings Dataset/Additional Datasets/30% Humidity/Faulty Bearings/1000 RPM/15 deg Celsius/8th Auto engine at+15C 2022May22-2335-0005.docx",
+      "nust/Engine Journal Bearings Dataset/Additional Datasets/30% Humidity/Faulty Bearings/1000 RPM/20 deg Celsius/9th Auto engine at+20C 2022May22-2312-0005.docx",
+      "nust/Engine Journal Bearings Dataset/Additional Datasets/30% Humidity/Faulty Bearings/1000 RPM/25 deg Celsius/10th Auto engine at+25C 2022May22-2253-0019.docx",
+      "nust/Engine Journal Bearings Dataset/Additional Datasets/30% Humidity/Faulty Bearings/1000 RPM/30 deg Celsius/11th Auto engine at+30C2022May22-2253-0016.docx",
+      "nust/Engine Journal Bearings Dataset/Additional Datasets/30% Humidity/Faulty Bearings/1000 RPM/35 deg Celsius/12th Auto engine at+35C 2022May22-2253-0014.docx",
+      "nust/Engine Journal Bearings Dataset/Additional Datasets/30% Humidity/Faulty Bearings/1000 RPM/40 deg Celsius/13th Auto engine at+40C 2022May22-2253-0012.docx",
+      "nust/Engine Journal Bearings Dataset/Additional Datasets/30% Humidity/Faulty Bearings/1000 RPM/45 deg Celsius/14th Auto engine at+45C 2022May22-2253-0010.docx",
+      "nust/Engine Journal Bearings Dataset/Additional Datasets/30% Humidity/Faulty Bearings/1000 RPM/5 deg Celsius/6th Auto engine at+5C 2022May22-2335-0009.docx",
+      "nust/Engine Journal Bearings Dataset/Additional Datasets/30% Humidity/Faulty Bearings/1000 RPM/50 deg Celsius/15th Auto engine at+50C 2022May22-2253-0008.docx",
+      "nust/Engine Journal Bearings Dataset/Additional Datasets/30% Humidity/Faulty Bearings/1500 RPM/-10 deg Celsius/3RD  Auto engine at -10c 2022May23-0248-0041.docx",
+      "nust/Engine Journal Bearings Dataset/Additional Datasets/30% Humidity/Faulty Bearings/1500 RPM/-10 deg Celsius/3rd Auto engine at -10C 2022May21-2340-0003.rtf",
+      "nust/Engine Journal Bearings Dataset/Additional Datasets/30% Humidity/Faulty Bearings/1500 RPM/-15 deg Celsius/2ND  Auto engine at -15c 2022May23-0248-0043.docx",
+      "nust/Engine Journal Bearings Dataset/Additional Datasets/30% Humidity/Faulty Bearings/1500 RPM/-15 deg Celsius/2nd Auto engine at -15C 2022May21-2342-0003.rtf"
+    ],
+    "status": "PRESENT"
+  },
+  "paderborn": {
+    "path": "data/raw/paderborn",
+    "total_files": 33,
+    "total_size_bytes": 5357708539,
+    "file_count_by_extension": {
+      "": 1,
+      ".rar": 32
+    },
+    "archives": [
+      {
+        "path": "paderborn/K001.rar",
+        "size_bytes": 173881721
+      },
+      {
+        "path": "paderborn/K002.rar",
+        "size_bytes": 161981588
+      },
+      {
+        "path": "paderborn/K003.rar",
+        "size_bytes": 173194389
+      },
+      {
+        "path": "paderborn/K004.rar",
+        "size_bytes": 163337851
+      },
+      {
+        "path": "paderborn/K005.rar",
+        "size_bytes": 167366765
+      },
+      {
+        "path": "paderborn/K006.rar",
+        "size_bytes": 175997605
+      },
+      {
+        "path": "paderborn/KA01.rar",
+        "size_bytes": 166571438
+      },
+      {
+        "path": "paderborn/KA03.rar",
+        "size_bytes": 176196084
+      },
+      {
+        "path": "paderborn/KA04.rar",
+        "size_bytes": 180920703
+      },
+      {
+        "path": "paderborn/KA05.rar",
+        "size_bytes": 163644977
+      },
+      {
+        "path": "paderborn/KA06.rar",
+        "size_bytes": 164139086
+      },
+      {
+        "path": "paderborn/KA07.rar",
+        "size_bytes": 160346192
+      },
+      {
+        "path": "paderborn/KA08.rar",
+        "size_bytes": 169188540
+      },
+      {
+        "path": "paderborn/KA09.rar",
+        "size_bytes": 171467156
+      },
+      {
+        "path": "paderborn/KA15.rar",
+        "size_bytes": 164268273
+      },
+      {
+        "path": "paderborn/KA16.rar",
+        "size_bytes": 167165704
+      },
+      {
+        "path": "paderborn/KA22.rar",
+        "size_bytes": 159054470
+      },
+      {
+        "path": "paderborn/KA30.rar",
+        "size_bytes": 163625195
+      },
+      {
+        "path": "paderborn/KB23.rar",
+        "size_bytes": 170933916
+      },
+      {
+        "path": "paderborn/KB24.rar",
+        "size_bytes": 186677308
+      },
+      {
+        "path": "paderborn/KB27.rar",
+        "size_bytes": 162452979
+      },
+      {
+        "path": "paderborn/KI01.rar",
+        "size_bytes": 175265779
+      },
+      {
+        "path": "paderborn/KI03.rar",
+        "size_bytes": 159217524
+      },
+      {
+        "path": "paderborn/KI04.rar",
+        "size_bytes": 172644279
+      },
+      {
+        "path": "paderborn/KI05.rar",
+        "size_bytes": 160359281
+      },
+      {
+        "path": "paderborn/KI07.rar",
+        "size_bytes": 160646876
+      },
+      {
+        "path": "paderborn/KI08.rar",
+        "size_bytes": 163760131
+      },
+      {
+        "path": "paderborn/KI14.rar",
+        "size_bytes": 163581312
+      },
+      {
+        "path": "paderborn/KI16.rar",
+        "size_bytes": 166348305
+      },
+      {
+        "path": "paderborn/KI17.rar",
+        "size_bytes": 167363476
+      },
+      {
+        "path": "paderborn/KI18.rar",
+        "size_bytes": 161226797
+      },
+      {
+        "path": "paderborn/KI21.rar",
+        "size_bytes": 164882839
+      }
+    ],
+    "empty_files": [],
+    "partial_downloads": [],
+    "directories": 0,
+    "sample_files": [
+      "paderborn/.gitkeep",
+      "paderborn/K001.rar",
+      "paderborn/K002.rar",
+      "paderborn/K003.rar",
+      "paderborn/K004.rar",
+      "paderborn/K005.rar",
+      "paderborn/K006.rar",
+      "paderborn/KA01.rar",
+      "paderborn/KA03.rar",
+      "paderborn/KA04.rar",
+      "paderborn/KA05.rar",
+      "paderborn/KA06.rar",
+      "paderborn/KA07.rar",
+      "paderborn/KA08.rar",
+      "paderborn/KA09.rar",
+      "paderborn/KA15.rar",
+      "paderborn/KA16.rar",
+      "paderborn/KA22.rar",
+      "paderborn/KA30.rar",
+      "paderborn/KB23.rar"
+    ],
+    "status": "PRESENT"
+  },
+  "basic": {
+    "path": "data/raw/basic",
+    "total_files": 1,
+    "total_size_bytes": 0,
+    "file_count_by_extension": {
+      "": 1
+    },
+    "archives": [],
+    "empty_files": [],
+    "partial_downloads": [],
+    "directories": 0,
+    "sample_files": [
+      "basic/.gitkeep"
+    ],
+    "status": "PRESENT"
+  }
+}

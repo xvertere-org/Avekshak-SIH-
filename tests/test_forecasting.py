@@ -27,24 +27,47 @@ from forecasting.evaluator import (
 )
 
 
+try:
+    import timesfm
+    HAS_TIMESFM = True
+except ImportError:
+    HAS_TIMESFM = False
+
+
 # =====================================================================
 # Test 1: TimesFM-3 Adapter Interface & Status Reporting
 # =====================================================================
 def test_timesfm_adapter_interface():
-    """Adapter implements standard interface and reports honest runtime status."""
+    """
+    Adapter implements standard interface and reports honest runtime status:
+    - AVAILABLE_AND_TESTED if timesfm runtime and weights/graph are present.
+    - INTERFACE_TESTED_ONLY / UNAVAILABLE_EXTERNAL_DEPENDENCY if timesfm is not installed.
+    Never fabricates model inference when external dependency is unavailable.
+    """
     adapter = TimesFM3ModelAdapter(force_local_graph=True)
     assert adapter.name == "timesfm-3.0"
-    assert adapter.runtime_status in [
-        ModelStatus.LOADED_PRETRAINED.value,
-        ModelStatus.LOCAL_UNCHECKPOINTED_GRAPH.value,
-        ModelStatus.BLOCKED_UNAUTHENTICATED_GATED.value,
-    ]
-    assert adapter.is_available()
+
+    if HAS_TIMESFM:
+        assert adapter.runtime_status in [
+            ModelStatus.LOADED_PRETRAINED.value,
+            ModelStatus.LOCAL_UNCHECKPOINTED_GRAPH.value,
+        ]
+        assert adapter.is_available()
+    else:
+        # Honest reporting when external dependency is unavailable:
+        # INTERFACE_TESTED_ONLY; does NOT claim model verified
+        assert adapter.runtime_status == ModelStatus.BLOCKED_UNAUTHENTICATED_GATED.value
+        assert not adapter.is_available()
+        assert "timesfm package not importable" in adapter.status_detail
 
 
 # =====================================================================
 # Test 2: Multichannel Semantics 2D vs 1D
 # =====================================================================
+@pytest.mark.skipif(
+    not HAS_TIMESFM,
+    reason="UNAVAILABLE_EXTERNAL_DEPENDENCY: timesfm package not installed; inference cannot be verified",
+)
 def test_multichannel_semantics_2d_vs_1d():
     """
     2D input shape (7, N) activates joint multivariate output (7, H),
@@ -72,6 +95,10 @@ def test_multichannel_semantics_2d_vs_1d():
 # =====================================================================
 # Test 3: Multivariate Behavioral Measurement Test
 # =====================================================================
+@pytest.mark.skipif(
+    not HAS_TIMESFM,
+    reason="UNAVAILABLE_EXTERNAL_DEPENDENCY: timesfm package not installed; multivariate inference cannot be verified",
+)
 def test_multivariate_cross_channel_influence():
     """
     Behavioral measurement test (Change 1 requirement):

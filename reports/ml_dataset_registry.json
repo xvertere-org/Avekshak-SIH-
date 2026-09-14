@@ -1,0 +1,518 @@
+{
+  "report_title": "SIH26054 ML Dataset Registry Report",
+  "generated_timestamp": "2026-09-14T19:46:55.228093",
+  "summary": {
+    "total_registered_datasets": 7,
+    "available_datasets": 6,
+    "unavailable_datasets": 1,
+    "total_processed_parquet_files": 14,
+    "total_processed_records": 715548
+  },
+  "datasets": {
+    "cmapss": {
+      "dataset_id": "cmapss",
+      "name": "C-MAPSS Turbofan Degradation Dataset",
+      "display_name": "NASA C-MAPSS",
+      "availability": "AVAILABLE",
+      "integration_role": "RUL_METHODOLOGY_BENCHMARK",
+      "target_tasks": [
+        "DEGRADATION_TREND_BENCHMARK",
+        "RUL_BENCHMARK"
+      ],
+      "file_count": 8,
+      "files": [
+        {
+          "dataset_name": "C-MAPSS Turbofan Degradation Dataset",
+          "file_path": "data/processed/cmapss/cmapss_FD001_test.parquet",
+          "num_rows": 13096,
+          "num_features": 25,
+          "available_labels": [
+            "rul_label"
+          ],
+          "grouping_column": "unit_number",
+          "target_task": [
+            "DEGRADATION_TREND_BENCHMARK",
+            "RUL_BENCHMARK"
+          ],
+          "missing_value_count": 0,
+          "infinite_value_count": 0,
+          "dataset_limitations": [
+            "Simulated turbofan engine (gas turbine) physics, not spark-ignition aero-piston engine.",
+            "Must not be used as direct Rotax 914 engine telemetry.",
+            "Sensor channels (cmapss_s_1..21) are normalized gas turbine parameters; must never be mapped to piston channels (e.g. CHT, EGT, MAP)."
+          ]
+        },
+        {
+          "dataset_name": "C-MAPSS Turbofan Degradation Dataset",
+          "file_path": "data/processed/cmapss/cmapss_FD001_train.parquet",
+          "num_rows": 20631,
+          "num_features": 25,
+          "available_labels": [
+            "rul_label"
+          ],
+          "grouping_column": "unit_number",
+          "target_task": [
+            "DEGRADATION_TREND_BENCHMARK",
+            "RUL_BENCHMARK"
+          ],
+          "missing_value_count": 0,
+          "infinite_value_count": 0,
+          "dataset_limitations": [
+            "Simulated turbofan engine (gas turbine) physics, not spark-ignition aero-piston engine.",
+            "Must not be used as direct Rotax 914 engine telemetry.",
+            "Sensor channels (cmapss_s_1..21) are normalized gas turbine parameters; must never be mapped to piston channels (e.g. CHT, EGT, MAP)."
+          ]
+        },
+        {
+          "dataset_name": "C-MAPSS Turbofan Degradation Dataset",
+          "file_path": "data/processed/cmapss/cmapss_FD002_test.parquet",
+          "num_rows": 33991,
+          "num_features": 31,
+          "available_labels": [
+            "rul_label"
+          ],
+          "grouping_column": "unit_number",
+          "target_task": [
+            "DEGRADATION_TREND_BENCHMARK",
+            "RUL_BENCHMARK"
+          ],
+          "missing_value_count": 0,
+          "infinite_value_count": 0,
+          "dataset_limitations": [
+            "Simulated turbofan engine (gas turbine) physics, not spark-ignition aero-piston engine.",
+            "Must not be used as direct Rotax 914 engine telemetry.",
+            "Sensor channels (cmapss_s_1..21) are normalized gas turbine parameters; must never be mapped to piston channels (e.g. CHT, EGT, MAP)."
+          ]
+        },
+        {
+          "dataset_name": "C-MAPSS Turbofan Degradation Dataset",
+          "file_path": "data/processed/cmapss/cmapss_FD002_train.parquet",
+          "num_rows": 53759,
+          "num_features": 31,
+          "available_labels": [
+            "rul_label"
+          ],
+          "grouping_column": "unit_number",
+          "target_task": [
+            "DEGRADATION_TREND_BENCHMARK",
+            "RUL_BENCHMARK"
+          ],
+          "missing_value_count": 0,
+          "infinite_value_count": 0,
+          "dataset_limitations": [
+            "Simulated turbofan engine (gas turbine) physics, not spark-ignition aero-piston engine.",
+            "Must not be used as direct Rotax 914 engine telemetry.",
+            "Sensor channels (cmapss_s_1..21) are normalized gas turbine parameters; must never be mapped to piston channels (e.g. CHT, EGT, MAP)."
+          ]
+        },
+        {
+          "dataset_name": "C-MAPSS Turbofan Degradation Dataset",
+          "file_path": "data/processed/cmapss/cmapss_FD003_test.parquet",
+          "num_rows": 16596,
+          "num_features": 25,
+          "available_labels": [
+            "rul_label"
+          ],
+          "grouping_column": "unit_number",
+          "target_task": [
+            "DEGRADATION_TREND_BENCHMARK",
+            "RUL_BENCHMARK"
+          ],
+          "missing_value_count": 0,
+          "infinite_value_count": 0,
+          "dataset_limitations": [
+            "Simulated turbofan engine (gas turbine) physics, not spark-ignition aero-piston engine.",
+            "Must not be used as direct Rotax 914 engine telemetry.",
+            "Sensor channels (cmapss_s_1..21) are normalized gas turbine parameters; must never be mapped to piston channels (e.g. CHT, EGT, MAP)."
+          ]
+        },
+        {
+          "dataset_name": "C-MAPSS Turbofan Degradation Dataset",
+          "file_path": "data/processed/cmapss/cmapss_FD003_train.parquet",
+          "num_rows": 24720,
+          "num_features": 25,
+          "available_labels": [
+            "rul_label"
+          ],
+          "grouping_column": "unit_number",
+          "target_task": [
+            "DEGRADATION_TREND_BENCHMARK",
+            "RUL_BENCHMARK"
+          ],
+          "missing_value_count": 0,
+          "infinite_value_count": 0,
+          "dataset_limitations": [
+            "Simulated turbofan engine (gas turbine) physics, not spark-ignition aero-piston engine.",
+            "Must not be used as direct Rotax 914 engine telemetry.",
+            "Sensor channels (cmapss_s_1..21) are normalized gas turbine parameters; must never be mapped to piston channels (e.g. CHT, EGT, MAP)."
+          ]
+        },
+        {
+          "dataset_name": "C-MAPSS Turbofan Degradation Dataset",
+          "file_path": "data/processed/cmapss/cmapss_FD004_test.parquet",
+          "num_rows": 41214,
+          "num_features": 31,
+          "available_labels": [
+            "rul_label"
+          ],
+          "grouping_column": "unit_number",
+          "target_task": [
+            "DEGRADATION_TREND_BENCHMARK",
+            "RUL_BENCHMARK"
+          ],
+          "missing_value_count": 0,
+          "infinite_value_count": 0,
+          "dataset_limitations": [
+            "Simulated turbofan engine (gas turbine) physics, not spark-ignition aero-piston engine.",
+            "Must not be used as direct Rotax 914 engine telemetry.",
+            "Sensor channels (cmapss_s_1..21) are normalized gas turbine parameters; must never be mapped to piston channels (e.g. CHT, EGT, MAP)."
+          ]
+        },
+        {
+          "dataset_name": "C-MAPSS Turbofan Degradation Dataset",
+          "file_path": "data/processed/cmapss/cmapss_FD004_train.parquet",
+          "num_rows": 61249,
+          "num_features": 31,
+          "available_labels": [
+            "rul_label"
+          ],
+          "grouping_column": "unit_number",
+          "target_task": [
+            "DEGRADATION_TREND_BENCHMARK",
+            "RUL_BENCHMARK"
+          ],
+          "missing_value_count": 0,
+          "infinite_value_count": 0,
+          "dataset_limitations": [
+            "Simulated turbofan engine (gas turbine) physics, not spark-ignition aero-piston engine.",
+            "Must not be used as direct Rotax 914 engine telemetry.",
+            "Sensor channels (cmapss_s_1..21) are normalized gas turbine parameters; must never be mapped to piston channels (e.g. CHT, EGT, MAP)."
+          ]
+        }
+      ],
+      "total_rows": 265256,
+      "grouping_column": "unit_number",
+      "unique_groups": 260,
+      "sample_groups": [
+        "1",
+        "10",
+        "100",
+        "101",
+        "102",
+        "103",
+        "104",
+        "105",
+        "106",
+        "107"
+      ],
+      "limitations": [
+        "Simulated turbofan engine (gas turbine) physics, not spark-ignition aero-piston engine.",
+        "Must not be used as direct Rotax 914 engine telemetry.",
+        "Sensor channels (cmapss_s_1..21) are normalized gas turbine parameters; must never be mapped to piston channels (e.g. CHT, EGT, MAP)."
+      ]
+    },
+    "femto": {
+      "dataset_id": "femto",
+      "name": "FEMTO / PRONOSTIA Bearing Degradation Dataset",
+      "display_name": "FEMTO Bearing",
+      "availability": "AVAILABLE",
+      "integration_role": "BEARING_DEGRADATION_RUL",
+      "target_tasks": [
+        "BEARING_DEGRADATION_MODELING",
+        "RUL_MODELING"
+      ],
+      "file_count": 2,
+      "files": [
+        {
+          "dataset_name": "FEMTO / PRONOSTIA Bearing Degradation Dataset",
+          "file_path": "data/processed/femto/femto_test_features.parquet",
+          "num_rows": 13959,
+          "num_features": 29,
+          "available_labels": [
+            "rul_label"
+          ],
+          "grouping_column": "bearing_id",
+          "target_task": [
+            "BEARING_DEGRADATION_MODELING",
+            "RUL_MODELING"
+          ],
+          "missing_value_count": 13959,
+          "infinite_value_count": 0,
+          "dataset_limitations": [
+            "Run-to-failure bearing test bench under constant operating loads (artificial accelerated wear).",
+            "Test set does not include ground-truth RUL targets in feature table.",
+            "Must not be confused with complete aero-engine mechanical assembly."
+          ]
+        },
+        {
+          "dataset_name": "FEMTO / PRONOSTIA Bearing Degradation Dataset",
+          "file_path": "data/processed/femto/femto_train_features.parquet",
+          "num_rows": 7534,
+          "num_features": 29,
+          "available_labels": [
+            "rul_label"
+          ],
+          "grouping_column": "bearing_id",
+          "target_task": [
+            "BEARING_DEGRADATION_MODELING",
+            "RUL_MODELING"
+          ],
+          "missing_value_count": 0,
+          "infinite_value_count": 0,
+          "dataset_limitations": [
+            "Run-to-failure bearing test bench under constant operating loads (artificial accelerated wear).",
+            "Test set does not include ground-truth RUL targets in feature table.",
+            "Must not be confused with complete aero-engine mechanical assembly."
+          ]
+        }
+      ],
+      "total_rows": 21493,
+      "grouping_column": "bearing_id",
+      "unique_groups": 17,
+      "sample_groups": [
+        "Bearing1_1",
+        "Bearing1_2",
+        "Bearing1_3",
+        "Bearing1_4",
+        "Bearing1_5",
+        "Bearing1_6",
+        "Bearing1_7",
+        "Bearing2_1",
+        "Bearing2_2",
+        "Bearing2_3"
+      ],
+      "limitations": [
+        "Run-to-failure bearing test bench under constant operating loads (artificial accelerated wear).",
+        "Test set does not include ground-truth RUL targets in feature table.",
+        "Must not be confused with complete aero-engine mechanical assembly."
+      ]
+    },
+    "cwru": {
+      "dataset_id": "cwru",
+      "name": "Case Western Reserve University Bearing Dataset",
+      "display_name": "CWRU Bearing",
+      "availability": "AVAILABLE",
+      "integration_role": "BEARING_FAULT_CLASSIFICATION",
+      "target_tasks": [
+        "BEARING_FAULT_CLASSIFICATION",
+        "FEATURE_VALIDATION",
+        "CONTROLLED_DEMONSTRATION"
+      ],
+      "file_count": 1,
+      "files": [
+        {
+          "dataset_name": "Case Western Reserve University Bearing Dataset",
+          "file_path": "data/processed/cwru/cwru_features.parquet",
+          "num_rows": 1179,
+          "num_features": 47,
+          "available_labels": [
+            "fault_label"
+          ],
+          "grouping_column": "source_file",
+          "target_task": [
+            "BEARING_FAULT_CLASSIFICATION",
+            "FEATURE_VALIDATION",
+            "CONTROLLED_DEMONSTRATION"
+          ],
+          "missing_value_count": 0,
+          "infinite_value_count": 0,
+          "dataset_limitations": [
+            "CRITICAL LIMITATION: Current processed dataset contains only 3 independent source files (105.mat, 130.mat, 97.mat).",
+            "Conventional random train/validation/test splitting across records from the same file creates catastrophic data leakage.",
+            "Must be used primarily for vibration feature validation, baseline feature extraction verification, and controlled fault-pattern demonstrations until more independent source files are acquired.",
+            "Not representative of piston engine reciprocating dynamics."
+          ]
+        }
+      ],
+      "total_rows": 1179,
+      "grouping_column": "source_file",
+      "unique_groups": 3,
+      "sample_groups": [
+        "105.mat",
+        "130.mat",
+        "97.mat"
+      ],
+      "limitations": [
+        "CRITICAL LIMITATION: Current processed dataset contains only 3 independent source files (105.mat, 130.mat, 97.mat).",
+        "Conventional random train/validation/test splitting across records from the same file creates catastrophic data leakage.",
+        "Must be used primarily for vibration feature validation, baseline feature extraction verification, and controlled fault-pattern demonstrations until more independent source files are acquired.",
+        "Not representative of piston engine reciprocating dynamics."
+      ]
+    },
+    "paderborn": {
+      "dataset_id": "paderborn",
+      "name": "Paderborn University Bearing Dataset",
+      "display_name": "Paderborn Bearing",
+      "availability": "AVAILABLE",
+      "integration_role": "BEARING_FAULT_DIAGNOSIS",
+      "target_tasks": [
+        "BEARING_FAULT_DIAGNOSIS",
+        "VIBRATION_FEATURE_VALIDATION"
+      ],
+      "file_count": 1,
+      "files": [
+        {
+          "dataset_name": "Paderborn University Bearing Dataset",
+          "file_path": "data/processed/paderborn/paderborn_features.parquet",
+          "num_rows": 29792,
+          "num_features": 30,
+          "available_labels": [
+            "fault_label"
+          ],
+          "grouping_column": "bearing_id",
+          "target_task": [
+            "BEARING_FAULT_DIAGNOSIS",
+            "VIBRATION_FEATURE_VALIDATION"
+          ],
+          "missing_value_count": 0,
+          "infinite_value_count": 0,
+          "dataset_limitations": [
+            "Laboratory motor-bearing test rig under controlled speed/torque/radial force conditions.",
+            "Artificially damaged and accelerated fatigue bearings; not a whole-engine vibroacoustic profile."
+          ]
+        }
+      ],
+      "total_rows": 29792,
+      "grouping_column": "bearing_id",
+      "unique_groups": 3,
+      "sample_groups": [
+        "K001",
+        "KA01",
+        "KI04"
+      ],
+      "limitations": [
+        "Laboratory motor-bearing test rig under controlled speed/torque/radial force conditions.",
+        "Artificially damaged and accelerated fatigue bearings; not a whole-engine vibroacoustic profile."
+      ]
+    },
+    "nasa_battery": {
+      "dataset_id": "nasa_battery",
+      "name": "NASA PCoE Battery Aging Dataset",
+      "display_name": "NASA Battery",
+      "availability": "AVAILABLE",
+      "integration_role": "SOH_RUL_BENCHMARK",
+      "target_tasks": [
+        "SOH_BENCHMARK",
+        "RUL_BENCHMARK"
+      ],
+      "file_count": 1,
+      "files": [
+        {
+          "dataset_name": "NASA PCoE Battery Aging Dataset",
+          "file_path": "data/processed/nasa_battery/battery_cycles.parquet",
+          "num_rows": 7565,
+          "num_features": 25,
+          "available_labels": [
+            "soh",
+            "capacity_loss",
+            "discharge_capacity"
+          ],
+          "grouping_column": "battery_id",
+          "target_task": [
+            "SOH_BENCHMARK",
+            "RUL_BENCHMARK"
+          ],
+          "missing_value_count": 50056,
+          "infinite_value_count": 0,
+          "dataset_limitations": [
+            "Electrochemical lithium-ion cell degradation benchmark, not thermo-mechanical piston engine data.",
+            "Used strictly for testing SOH and RUL methodology and filtering algorithms.",
+            "Must never be treated as Rotax engine electrical system telemetry."
+          ]
+        }
+      ],
+      "total_rows": 7565,
+      "grouping_column": "battery_id",
+      "unique_groups": 34,
+      "sample_groups": [
+        "B0005",
+        "B0006",
+        "B0007",
+        "B0018",
+        "B0025",
+        "B0026",
+        "B0027",
+        "B0028",
+        "B0029",
+        "B0030"
+      ],
+      "limitations": [
+        "Electrochemical lithium-ion cell degradation benchmark, not thermo-mechanical piston engine data.",
+        "Used strictly for testing SOH and RUL methodology and filtering algorithms.",
+        "Must never be treated as Rotax engine electrical system telemetry."
+      ]
+    },
+    "nust": {
+      "dataset_id": "nust",
+      "name": "NUST Bearing and Fault Dataset",
+      "display_name": "NUST Vibration",
+      "availability": "AVAILABLE",
+      "integration_role": "VIBRATION_FAULT_FEATURE_LEARNING",
+      "target_tasks": [
+        "VIBRATION_FAULT_FEATURE_LEARNING",
+        "ANOMALY_DETECTION_VALIDATION"
+      ],
+      "file_count": 1,
+      "files": [
+        {
+          "dataset_name": "NUST Bearing and Fault Dataset",
+          "file_path": "data/processed/nust/nust_processed.parquet",
+          "num_rows": 390263,
+          "num_features": 30,
+          "available_labels": [
+            "bearing_condition"
+          ],
+          "grouping_column": "source_file",
+          "target_task": [
+            "VIBRATION_FAULT_FEATURE_LEARNING",
+            "ANOMALY_DETECTION_VALIDATION"
+          ],
+          "missing_value_count": 390263,
+          "infinite_value_count": 0,
+          "dataset_limitations": [
+            "Multi-channel industrial test rig with variable temperature and humidity conditions.",
+            "Used for vibration feature representation learning across diverse environmental conditions."
+          ]
+        }
+      ],
+      "total_rows": 390263,
+      "grouping_column": "source_file",
+      "unique_groups": 134,
+      "sample_groups": [
+        "1ST AT -10 c 2022May27-0325-0011.csv",
+        "1st at -10 2022Jun04-2239-0005.csv",
+        "1st at -10c 2022May26-2336-0006.csv",
+        "1st at -10c 2022May26-2336-0014.csv",
+        "1st at -10c 2022May27-0007-0024.csv",
+        "1st at -10c 2022May27-0007-0030.csv",
+        "1st at -10c 2022May27-0109-0039.csv",
+        "1st at -10c 2022May27-0109-0049.csv",
+        "1st at -10c 2022May27-0219-0013.csv",
+        "1st at -10c 2022May27-0219-0014.csv"
+      ],
+      "limitations": [
+        "Multi-channel industrial test rig with variable temperature and humidity conditions.",
+        "Used for vibration feature representation learning across diverse environmental conditions."
+      ]
+    },
+    "basic": {
+      "dataset_id": "basic",
+      "name": "BASiC: Biomisa Arducopter Sensory Critique Dataset",
+      "display_name": "BASiC UAV Telemetry",
+      "availability": "UNAVAILABLE",
+      "integration_role": "UNAVAILABLE",
+      "target_tasks": [
+        "UNAVAILABLE"
+      ],
+      "file_count": 0,
+      "files": [],
+      "total_rows": 0,
+      "grouping_column": "NONE",
+      "unique_groups": 0,
+      "limitations": [
+        "DATASET UNAVAILABLE: Requires manual download of DataFlash Text Logs (Zenodo DOI 10.5281/zenodo.8195068) into data/raw/basic/.",
+        "No processed parquet files currently exist in data/processed/basic/."
+      ]
+    }
+  }
+}

@@ -4,6 +4,11 @@ Digital Twin module for SIH26054 Aero Piston Engine Digital Twin.
 Includes:
 - Physics-informed nominal state estimation (twin_model.py)
 - Dynamic residual generation and schema (residuals.py)
+- Canonical state representation (state.py)
+- Telemetry data quality and sensor validity (quality.py)
+- Authoritative observability taxonomy and registry (observability.py)
+- State estimation and deterministic synchronization (synchronizer.py)
+- Deterministic historical replay (replay.py)
 """
 
 from digital_twin.twin_model import DigitalTwin, DigitalTwinModel
@@ -13,6 +18,81 @@ from digital_twin.residuals import (
     DEFAULT_RESIDUAL_SCALES,
     SUPPORTED_RESIDUAL_CHANNELS,
 )
+from digital_twin.state import (
+    CanonicalTwinState,
+    PhysicalQuantity,
+    QuantityStatus,
+    EngineOperatingRegime,
+    SynchronizationStatus,
+    RotationalState,
+    AirBoostState,
+    CombustionState,
+    ThermalState,
+    LubricationState,
+    VibrationState,
+    ElectricalState,
+)
+from digital_twin.quality import (
+    DataQualityStatus,
+    ChannelQuality,
+    TelemetryQualityReport,
+    TelemetryQualityValidator,
+    PHYSICAL_INSTRUMENT_LIMITS,
+)
+from digital_twin.observability import (
+    ObservabilityType,
+    ObservabilityEntry,
+    ObservabilityRegistry,
+    CANONICAL_OBSERVABILITY_CATALOG,
+)
+from digital_twin.synchronizer import (
+    StateEstimator,
+    EstimatorConfig,
+    DEFAULT_MODEL_RESIDUAL_SCALES,
+)
+from digital_twin.replay import (
+    DigitalTwinReplay,
+    ReplayStepRecord,
+)
+from digital_twin.health import (
+    HealthState,
+    HealthIndicatorConfig,
+    HealthEvaluator,
+    ModelObservationHealthAssessment,
+)
+from digital_twin.detection import (
+    TemporalFaultDetector,
+    DetectionConfig,
+    DetectionResult,
+    DetectionStatus,
+)
+from digital_twin.diagnosis import (
+    PhysicsInformedDiagnoser,
+    DiagnosisResult,
+    HypothesisRanking,
+    CanonicalFaultType,
+)
+from digital_twin.degradation_types import (
+    DegradationSubsystem,
+    DegradationRegime,
+    RULStatus,
+    RULScenario,
+    ProvenanceTag,
+    SubsystemDegradationState,
+    DegradationAssessment,
+    RULAssessment,
+    DEFAULT_SCENARIO_STRESS_FACTORS,
+)
+from digital_twin.degradation import (
+    TheilSenResult,
+    TheilSenEstimator,
+    DegradationEstimatorConfig,
+    DegradationEstimator,
+)
+from digital_twin.rul import (
+    RULEstimatorConfig,
+    RULEstimator,
+)
 
 __all__ = [
     "DigitalTwin",
@@ -21,4 +101,58 @@ __all__ = [
     "ResidualGenerator",
     "DEFAULT_RESIDUAL_SCALES",
     "SUPPORTED_RESIDUAL_CHANNELS",
+    "CanonicalTwinState",
+    "PhysicalQuantity",
+    "QuantityStatus",
+    "EngineOperatingRegime",
+    "SynchronizationStatus",
+    "RotationalState",
+    "AirBoostState",
+    "CombustionState",
+    "ThermalState",
+    "LubricationState",
+    "VibrationState",
+    "ElectricalState",
+    "DataQualityStatus",
+    "ChannelQuality",
+    "TelemetryQualityReport",
+    "TelemetryQualityValidator",
+    "PHYSICAL_INSTRUMENT_LIMITS",
+    "ObservabilityType",
+    "ObservabilityEntry",
+    "ObservabilityRegistry",
+    "CANONICAL_OBSERVABILITY_CATALOG",
+    "StateEstimator",
+    "EstimatorConfig",
+    "DEFAULT_MODEL_RESIDUAL_SCALES",
+    "DigitalTwinReplay",
+    "ReplayStepRecord",
+    "HealthState",
+    "HealthIndicatorConfig",
+    "HealthEvaluator",
+    "ModelObservationHealthAssessment",
+    "TemporalFaultDetector",
+    "DetectionConfig",
+    "DetectionResult",
+    "DetectionStatus",
+    "PhysicsInformedDiagnoser",
+    "DiagnosisResult",
+    "HypothesisRanking",
+    "CanonicalFaultType",
+    "DegradationSubsystem",
+    "DegradationRegime",
+    "RULStatus",
+    "RULScenario",
+    "ProvenanceTag",
+    "SubsystemDegradationState",
+    "DegradationAssessment",
+    "RULAssessment",
+    "DEFAULT_SCENARIO_STRESS_FACTORS",
+    "TheilSenResult",
+    "TheilSenEstimator",
+    "DegradationEstimatorConfig",
+    "DegradationEstimator",
+    "RULEstimatorConfig",
+    "RULEstimator",
 ]
+

@@ -398,3 +398,26 @@ def map_rul_status_to_status(status: Optional[str]) -> StatusLevel:
         return StatusLevel.UNAVAILABLE
     return StatusLevel.UNKNOWN
 
+
+def format_forecast_assisted_mode(
+    assisted: Optional[bool] = None,
+    status: Optional[str] = None,
+) -> str:
+    """
+    Format forecast-assisted status for dashboard UI.
+    Accurately indicates whether forecast was actively used, blocked, unavailable, or off.
+    """
+    if assisted:
+        return "ACTIVE"
+
+    if status is not None:
+        norm = str(status).upper()
+        if "BLOCK" in norm or "GATED" in norm or "GRAPH" in norm:
+            return "BLOCKED"
+        if norm in ("UNAVAILABLE", "INSUFFICIENT_DATA", "INSUFFICIENT_CONTEXT", "MISSING"):
+            return "UNAVAILABLE"
+        if norm in ("OFF", "NOT_USED", "CAUSAL_TREND"):
+            return "OFF (Causal Trend)"
+
+    return "OFF (Causal Trend)"
+

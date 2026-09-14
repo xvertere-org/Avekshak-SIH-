@@ -128,6 +128,20 @@ class CausalTelemetryBuffer:
         window = history[-ctx_len:]
         timestamps = np.array([row["timestamp"] for row in window], dtype=np.float64)
 
+        # Audit latest observation: if all target channels are missing (blackout), do not forecast
+        latest_obs = window[-1]
+        valid_latest = sum(
+            1 for ch in self.config.target_channels
+            if ch in latest_obs and latest_obs[ch] is not None and not math.isnan(float(latest_obs[ch]))
+        )
+        if valid_latest == 0:
+            return (
+                None,
+                None,
+                ForecastQuality.INSUFFICIENT_CONTEXT.value,
+                {"reason": "Sensor blackout at forecast origin: all target channels are missing in latest observation."},
+            )
+
         # Audit channels and perform strictly causal forward-fill
         imputed_channels: List[str] = []
         channel_arrays: List[np.ndarray] = []

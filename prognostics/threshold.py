@@ -86,7 +86,8 @@ class WeakestLinkEOLEvaluator:
         limiting_factor = "NONE"
 
         # Check Global Health Index crossing
-        hi_breach_indices = np.where(future_health_index <= self.config.hi_eol.threshold_value)[0]
+        hi_threshold = self.config.hi_eol.threshold_value + self.config.hi_eol.tolerance
+        hi_breach_indices = np.where(future_health_index <= hi_threshold)[0]
         if len(hi_breach_indices) > 0:
             idx = hi_breach_indices[0]
             earliest_time = float(future_timestamps[idx])

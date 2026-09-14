@@ -64,6 +64,7 @@ class HealthIndexConfig:
     healthy_threshold: float = 0.85     # Lower bound for HEALTHY state
     degraded_threshold: float = 0.60    # Lower bound for DEGRADED state
     severely_degraded_threshold: float = 0.35  # Lower bound for SEVERELY_DEGRADED state
+    tolerance: float = 1e-5             # Numerical tolerance for state boundary checks
 
     # Deterministic observation-quality heuristic parameters
     sensor_isolation_persist_s: float = 5.0      # Continuous duration required for heuristic isolation
@@ -115,7 +116,8 @@ class HealthIndexResult:
     missing_channels: List[str]                   # Channels with NaN residual
     excluded_channels: List[str]                  # Isolated sensor-fault channels
     effective_channel_weights: Dict[str, float]   # Dynamically renormalized weights w'_i
-    data_quality: str                             # HealthDataQuality enum value
+    data_quality: str = "VALID"                      # HealthDataQuality enum value; default=VALID for backward compat
+
 
     # Optional Upstream Context (Passthrough only, NOT computed by Phase 9)
     diagnosed_fault: Optional[str] = None         # Phase 8 fault label if passed
