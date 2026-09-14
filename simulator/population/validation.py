@@ -191,12 +191,21 @@ def validate_engine_profile(profile: EngineProfile) -> ValidationResult:
     )
 
 
-def validate_telemetry_stream(telemetry: List[TelemetryRecord]) -> ValidationResult:
+def validate_telemetry_stream(
+    telemetry: List[TelemetryRecord],
+    check_cross_channel: bool = True,
+) -> ValidationResult:
     """
-    Validate physical sanity and numerical integrity of a generated telemetry stream.
+    Validate physical sanity, numerical integrity, and cross-channel consistency of telemetry.
+
+    Audits:
+    1. Scalar validity (non-negative timestamp, physical channel ranges, bounded temperatures)
+    2. Cross-channel physical consistency (thermodynamic hierarchy, mechanical coupling, pump action)
     """
     errors: List[str] = []
     warnings: List[str] = []
+    cross_channel_passed = 0
+    cross_channel_checked = 0
 
     if not telemetry:
         errors.append("Telemetry stream is empty.")
@@ -233,6 +242,44 @@ def validate_telemetry_stream(telemetry: List[TelemetryRecord]) -> ValidationRes
         if not math.isnan(rec.oil_temp) and (rec.oil_temp < -50.0 or rec.oil_temp > 250.0):
             errors.append(f"Step {i}: Oil temp out of physical range: {rec.oil_temp} °C")
 
+        # 2. Cross-Channel Physical Consistency Audits
+        if check_cross_channel:
+            # Audit A: Running engine must develop positive lubrication pressure
+            if not math.isnan(rec.rpm) and not math.isnan(rec.oil_pressure):
+                if rec.rpm > 1200.0:
+                    cross_channel_checked += 1
+                    if rec.oil_pressure < 0.2:
+                        errors.append(f"Step {i}: cross-channel inconsistency: running RPM ({rec.rpm:.0f}) with zero/insufficient oil pressure ({rec.oil_pressure:.2f} bar)")
+                    else:
+                        cross_channel_passed += 1
+
+            # Audit B: Active combustion hierarchy: EGT must exceed CHT
+            if not math.isnan(rec.rpm) and not math.isnan(rec.egt) and not math.isnan(rec.cht) and not math.isnan(rec.fuel_flow):
+                if rec.rpm > 1500.0 and rec.fuel_flow > 2.0:
+                    cross_channel_checked += 1
+                    if rec.egt <= rec.cht:
+                        errors.append(f"Step {i}: thermodynamic inversion: EGT ({rec.egt:.1f} °C) <= CHT ({rec.cht:.1f} °C) during active combustion")
+                    else:
+                        cross_channel_passed += 1
+
+            # Audit C: High power demand requires positive fuel consumption
+            if not math.isnan(rec.throttle) and not math.isnan(rec.fuel_flow) and not math.isnan(rec.rpm):
+                if rec.throttle > 60.0 and rec.rpm > 2500.0:
+                    cross_channel_checked += 1
+                    if rec.fuel_flow < 2.0:
+                        errors.append(f"Step {i}: power/fuel inconsistency: throttle {rec.throttle:.1f}% at {rec.rpm:.0f} RPM with fuel flow {rec.fuel_flow:.2f} kg/h")
+                    else:
+                        cross_channel_passed += 1
+
+            # Audit D: Running mechanical vibration
+            if not math.isnan(rec.rpm) and not math.isnan(rec.vibration):
+                if rec.rpm > 1500.0:
+                    cross_channel_checked += 1
+                    if rec.vibration < 0.01:
+                        errors.append(f"Step {i}: running engine with negligible vibration: {rec.vibration:.3f} mm/s")
+                    else:
+                        cross_channel_passed += 1
+
         if len(errors) > 25:
             errors.append("Too many errors, truncating validation.")
             break
@@ -241,7 +288,11 @@ def validate_telemetry_stream(telemetry: List[TelemetryRecord]) -> ValidationRes
         is_valid=(len(errors) == 0),
         errors=errors,
         warnings=warnings,
-        metrics={"total_records": len(telemetry)},
+        metrics={
+            "total_records": len(telemetry),
+            "cross_channel_checked": cross_channel_checked,
+            "cross_channel_passed": cross_channel_passed,
+        },
     )
 
 

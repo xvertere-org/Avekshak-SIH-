@@ -102,7 +102,7 @@ Parameters are not randomized as independent white noise. Physically justified c
 ### Cylinder-to-Cylinder Imbalance
 Discrete cylinders 1–4 are varied independently within bounded $\pm 2.5\%$ tolerances while enforcing strict engine-level conservation:
 $$\frac{1}{4} \sum_{i=1}^4 k_{bank, i} = 1.0 \quad \text{and} \quad \frac{1}{4} \sum_{i=1}^4 \eta_{comb, i} = 1.0$$
-This preserves total engine power, displacement, and heat rejection while introducing realistic runner-to-runner thermal and exhaust spreads.
+This preserves total engine power, displacement, and heat rejection while introducing controlled synthetic runner-to-runner thermal and exhaust spreads.
 
 ---
 
@@ -111,7 +111,7 @@ Eight canonical mission trajectories cover the full flight envelope:
 1. `GROUND_IDLE`: 120s, throttle 0–10%, sea level, warmup.
 2. `TAKEOFF_CLIMB`: 240s, throttle 100% $\to$ 90%, altitude 0 $\to$ 2500m.
 3. `CRUISE`: 240s, throttle 75%, altitude 2500m steady.
-4. `HIGH_ALTITUDE_CRUISE`: 240s, throttle 82%, altitude 4500m (near Rotax 914 critical altitude 4572m).
+4. `HIGH_ALTITUDE_CRUISE`: 240s, throttle 82%, altitude 4500m (high-altitude synthetic operating point near the Rotax 914 OM §2.1 continuous operating ceiling of 4572m / 15,000 ft, and below EASA TCDS E.122 critical altitude of 4875m / 16,000 ft).
 5. `DESCENT`: 200s, throttle 40%, altitude 3000m $\to$ 300m.
 6. `RAPID_THROTTLE_TRANSITION`: 150s, throttle steps (25% $\to$ 90% $\to$ 40% $\to$ 95% $\to$ 50%).
 7. `ENDURANCE`: 400s, throttle 65%, altitude 2000m steady loiter.

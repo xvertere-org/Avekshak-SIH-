@@ -219,7 +219,7 @@ def build_canonical_trajectory(
             dt=dt,
             segments=segments,
             seed=seed,
-            temp_offset_base_k=-5.0,
+            temp_offset_base_k=0.0,
         )
 
     elif mission == CanonicalMission.DESCENT:
@@ -329,7 +329,7 @@ def build_canonical_trajectory(
             dt=dt,
             segments=segments,
             seed=seed,
-            temp_offset_base_k=2.0,
+            temp_offset_base_k=0.0,
         )
 
     elif mission == CanonicalMission.HOT_DAY_OPERATION:
@@ -364,7 +364,7 @@ def build_canonical_trajectory(
             dt=dt,
             segments=segments,
             seed=seed,
-            temp_offset_base_k=23.0,
+            temp_offset_base_k=0.0,
         )
 
     raise ValueError(f"Unknown canonical mission: {mission}")

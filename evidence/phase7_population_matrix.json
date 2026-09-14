@@ -1,9 +1,15 @@
 {
   "phase": "PHASE_7_PHYSICS_CONSTRAINED_SYNTHETIC_ENGINE_POPULATION",
   "evidence_status": "SYNTHETICALLY_VALIDATED",
-  "timestamp_iso": "2026-09-14T10:59:55Z",
+  "timestamp_iso": "2026-09-14T11:20:30Z",
   "population_size": 15,
   "master_seed": 101,
+  "benchmark_seed": 101,
+  "generation_seed": 101,
+  "timestep_s": 0.5,
+  "mission_count": 8,
+  "evaluation_split": "train_val_test_ensemble",
+  "simulator_version": "phase7-rotax914-greybox",
   "parameters_varied_count": 27,
   "missions_tested": [
     "GROUND_IDLE",
@@ -17,76 +23,116 @@
   ],
   "healthy_population_metrics": {
     "total_evaluated_steps": 1800,
-    "false_anomaly_rate": 0.01611111111111111,
-    "mean_health_index": 0.9965195502645503,
-    "hi_p05": 0.9647190476190477,
+    "overall_per_step_far": 0.011111111111111112,
+    "steady_state_per_step_far": 0.0,
+    "per_mission_far": 0.8,
+    "steady_per_mission_far": 0.0,
+    "false_anomaly_rate": 0.011111111111111112,
+    "mean_health_index": 0.9968779444444444,
+    "hi_p05": 0.9720516666666666,
     "hi_median": 1.0,
     "hi_p95": 1.0,
-    "mean_anomaly_score": 0.003480449735449735
+    "mean_anomaly_score": 0.003122055555555555
   },
   "fault_population_metrics": {
     "F1_injector": {
       "detection_rate": 0.0,
       "avg_latency_s": NaN,
-      "top1_accuracy": 0.6,
-      "top2_coverage": 0.6,
-      "unknown_rate": 0.0
+      "gated_top1_accuracy": 0.8,
+      "gated_top2_coverage": 0.8,
+      "active_top1_accuracy": 0.8,
+      "active_top2_coverage": 0.8,
+      "top1_accuracy": 0.8,
+      "top2_coverage": 0.8,
+      "unknown_rate": 0.2
     },
     "F2_lubrication": {
       "detection_rate": 1.0,
       "avg_latency_s": 2.5,
+      "gated_top1_accuracy": 1.0,
+      "gated_top2_coverage": 1.0,
+      "active_top1_accuracy": 1.0,
+      "active_top2_coverage": 1.0,
       "top1_accuracy": 1.0,
       "top2_coverage": 1.0,
       "unknown_rate": 0.0
     },
     "F3_cooling": {
       "detection_rate": 0.2,
-      "avg_latency_s": 37.0,
-      "top1_accuracy": 0.2,
-      "top2_coverage": 0.2,
-      "unknown_rate": 0.0
+      "avg_latency_s": 28.0,
+      "gated_top1_accuracy": 0.2,
+      "gated_top2_coverage": 0.2,
+      "active_top1_accuracy": 0.8,
+      "active_top2_coverage": 0.8,
+      "top1_accuracy": 0.8,
+      "top2_coverage": 0.8,
+      "unknown_rate": 0.2
     },
     "F4_misfire": {
       "detection_rate": 1.0,
-      "avg_latency_s": 3.4,
-      "top1_accuracy": 0.4,
-      "top2_coverage": 0.4,
+      "avg_latency_s": 3.2,
+      "gated_top1_accuracy": 0.6,
+      "gated_top2_coverage": 0.6,
+      "active_top1_accuracy": 1.0,
+      "active_top2_coverage": 1.0,
+      "top1_accuracy": 1.0,
+      "top2_coverage": 1.0,
       "unknown_rate": 0.2
     },
     "F5_mechanical": {
       "detection_rate": 1.0,
       "avg_latency_s": 2.5,
-      "top1_accuracy": 0.6,
+      "gated_top1_accuracy": 0.6,
+      "gated_top2_coverage": 1.0,
+      "active_top1_accuracy": 0.8,
+      "active_top2_coverage": 1.0,
+      "top1_accuracy": 0.8,
       "top2_coverage": 1.0,
       "unknown_rate": 0.0
     },
     "F6_sensor_bias": {
       "detection_rate": 0.0,
       "avg_latency_s": NaN,
+      "gated_top1_accuracy": 0.0,
+      "gated_top2_coverage": 0.0,
+      "active_top1_accuracy": 0.0,
+      "active_top2_coverage": 0.0,
       "top1_accuracy": 0.0,
       "top2_coverage": 0.0,
-      "unknown_rate": 0.0
+      "unknown_rate": 0.2
     },
     "F6_sensor_drift": {
       "detection_rate": 0.0,
       "avg_latency_s": NaN,
+      "gated_top1_accuracy": 0.0,
+      "gated_top2_coverage": 0.0,
+      "active_top1_accuracy": 0.0,
+      "active_top2_coverage": 0.0,
       "top1_accuracy": 0.0,
       "top2_coverage": 0.0,
-      "unknown_rate": 0.0
+      "unknown_rate": 0.2
     },
     "F7_sensor_dropout": {
       "detection_rate": 0.0,
       "avg_latency_s": NaN,
-      "top1_accuracy": 0.0,
-      "top2_coverage": 0.0,
-      "unknown_rate": 0.0
+      "gated_top1_accuracy": 0.0,
+      "gated_top2_coverage": 0.0,
+      "active_top1_accuracy": 0.8,
+      "active_top2_coverage": 1.0,
+      "top1_accuracy": 0.8,
+      "top2_coverage": 1.0,
+      "unknown_rate": 0.2
     },
     "F7_sensor_stuck": {
       "detection_rate": 0.0,
       "avg_latency_s": NaN,
+      "gated_top1_accuracy": 0.0,
+      "gated_top2_coverage": 0.0,
+      "active_top1_accuracy": 0.0,
+      "active_top2_coverage": 0.0,
       "top1_accuracy": 0.0,
       "top2_coverage": 0.0,
-      "unknown_rate": 0.0
+      "unknown_rate": 0.2
     }
   },
   "sensor_variation_isolation": {
@@ -100,33 +146,33 @@
     },
     "3_varied_eng_nominal_sensor": {
       "anomaly_detected": false,
-      "top1_diagnosis": "HEALTHY"
+      "top1_diagnosis": "COOLING_DEGRADATION"
     },
     "4_varied_eng_varied_sensor": {
       "anomaly_detected": false,
-      "top1_diagnosis": "HEALTHY"
+      "top1_diagnosis": "COOLING_DEGRADATION"
     },
     "5_varied_eng_sensor_bias": {
       "anomaly_detected": false,
-      "top1_diagnosis": "HEALTHY"
+      "top1_diagnosis": "COOLING_DEGRADATION"
     },
     "6_varied_eng_sensor_drift": {
       "anomaly_detected": false,
-      "top1_diagnosis": "HEALTHY"
+      "top1_diagnosis": "COOLING_DEGRADATION"
     },
     "7_varied_eng_sensor_dropout": {
       "anomaly_detected": false,
-      "top1_diagnosis": "HEALTHY"
+      "top1_diagnosis": "COOLING_DEGRADATION"
     },
     "8_varied_eng_sensor_stuck": {
       "anomaly_detected": false,
-      "top1_diagnosis": "HEALTHY"
+      "top1_diagnosis": "COOLING_DEGRADATION"
     }
   },
   "performance": {
-    "profile_gen_ms_per_engine": 0.27776000012333196,
-    "simulator_step_ms": 0.34137427784217933,
-    "digital_twin_step_ms": 0.7040314444909906,
-    "throughput_steps_per_sec": 956.5664111424301
+    "profile_gen_ms_per_engine": 0.17506666481494904,
+    "simulator_step_ms": 0.3218882777663465,
+    "digital_twin_step_ms": 0.681989000036588,
+    "throughput_steps_per_sec": 996.1376974171382
   }
 }

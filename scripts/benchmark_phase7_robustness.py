@@ -74,6 +74,10 @@ def main():
     healthy_anomaly_scores = []
     healthy_anomalies_detected = 0
     total_healthy_steps = 0
+    steady_healthy_steps = 0
+    steady_false_alarms = 0
+    engines_with_alarms = 0
+    steady_engines_with_alarms = 0
     sim_step_times = []
     twin_step_times = []
 
@@ -96,16 +100,34 @@ def main():
         states = run_twin_on_records(twin, records)
         twin_step_times.append((time.perf_counter() - t_twin_0) / len(records))
 
+        eng_had_alarm = False
+        steady_had_alarm = False
         for st in states:
             total_healthy_steps += 1
+            is_steady = (st.timestamp >= 5.0)
+            if is_steady:
+                steady_healthy_steps += 1
             if st.health_assessment is not None:
                 healthy_his.append(st.health_assessment.HI_raw)
             if st.detection_result is not None:
                 healthy_anomaly_scores.append(st.detection_result.anomaly_score)
                 if st.detection_result.status == DetectionStatus.ANOMALOUS:
                     healthy_anomalies_detected += 1
+                    eng_had_alarm = True
+                    if is_steady:
+                        steady_false_alarms += 1
+                        steady_had_alarm = True
+
+        if eng_had_alarm:
+            engines_with_alarms += 1
+        if steady_had_alarm:
+            steady_engines_with_alarms += 1
 
     healthy_false_alarm_rate = healthy_anomalies_detected / max(1, total_healthy_steps)
+    steady_false_alarm_rate = steady_false_alarms / max(1, steady_healthy_steps)
+    per_mission_far = engines_with_alarms / max(1, len(profiles))
+    steady_per_mission_far = steady_engines_with_alarms / max(1, len(profiles))
+
     mean_healthy_hi = float(np.mean(healthy_his)) if healthy_his else 1.0
     hi_p05 = float(np.percentile(healthy_his, 5)) if healthy_his else 1.0
     hi_p50 = float(np.percentile(healthy_his, 50)) if healthy_his else 1.0
@@ -113,7 +135,9 @@ def main():
     mean_anom_score = float(np.mean(healthy_anomaly_scores)) if healthy_anomaly_scores else 0.0
 
     print(f"  Total healthy simulation steps: {total_healthy_steps}")
-    print(f"  False anomaly count / rate   : {healthy_anomalies_detected} / {total_healthy_steps} ({healthy_false_alarm_rate:.2%})")
+    print(f"  Overall per-step FAR          : {healthy_anomalies_detected} / {total_healthy_steps} ({healthy_false_alarm_rate:.2%})")
+    print(f"  Steady-state per-step FAR(t>=5s): {steady_false_alarms} / {steady_healthy_steps} ({steady_false_alarm_rate:.2%})")
+    print(f"  Per-mission FAR (overall/steady): {per_mission_far:.1%} / {steady_per_mission_far:.1%}")
     print(f"  Healthy HI distribution       : mean={mean_healthy_hi:.4f}, p05={hi_p05:.4f}, median={hi_p50:.4f}, p95={hi_p95:.4f}")
     print(f"  Mean Anomaly Score (1-HI_raw) : {mean_anom_score:.4f}")
 
@@ -137,8 +161,10 @@ def main():
     for f_label, f_type, f_sub, f_extra in fault_scenarios:
         detected_count = 0
         latencies = []
-        top1_correct = 0
-        top2_coverage = 0
+        gated_top1_correct = 0
+        gated_top2_coverage = 0
+        active_top1_correct = 0
+        active_top2_coverage = 0
         unknown_count = 0
         total_runs = len(eval_engines)
 
@@ -178,6 +204,7 @@ def main():
             fault_detected = False
             first_det_time = None
             final_diag = None
+            active_diag = None
 
             for st in states:
                 if st.detection_result and st.detection_result.status == DetectionStatus.ANOMALOUS:
@@ -185,52 +212,70 @@ def main():
                         fault_detected = True
                         first_det_time = st.timestamp
                     final_diag = st.diagnosis_result
+                if st.timestamp >= 35.0 and active_diag is None and st.diagnosis_result is not None:
+                    active_diag = st.diagnosis_result
 
             if fault_detected:
                 detected_count += 1
                 if first_det_time is not None:
                     latencies.append(first_det_time - 15.0)
 
-            # Diagnosis accuracy
-            if final_diag is not None and final_diag.ranked_hypotheses:
-                def get_hyp_str(h):
-                    return h.fault_type.value if hasattr(h.fault_type, "value") else str(h.fault_type)
-                top1_hyp = get_hyp_str(final_diag.ranked_hypotheses[0])
-                top2_hyps = [get_hyp_str(h) for h in final_diag.ranked_hypotheses[:2]]
+            # Map target fault to canonical family keywords
+            family_map = {
+                "F1": ["INJECTOR", "FUEL"],
+                "F2": ["LUBRICATION"],
+                "F3": ["COOLING"],
+                "F4": ["COMBUSTION", "MISFIRE"],
+                "F5": ["MECHANICAL"],
+                "F6": ["SENSOR_BIAS", "SENSOR_DRIFT", "SENSOR"],
+                "F7": ["SENSOR_DROPOUT", "SENSOR_STUCK", "SENSOR"],
+            }
+            f_prefix = f_label.split("_")[0]
+            kw_list = family_map.get(f_prefix, [f_prefix])
 
-                # Map target fault to canonical family keywords
-                family_map = {
-                    "F1": ["INJECTOR", "FUEL"],
-                    "F2": ["LUBRICATION"],
-                    "F3": ["COOLING"],
-                    "F4": ["COMBUSTION", "MISFIRE"],
-                    "F5": ["MECHANICAL"],
-                    "F6": ["SENSOR_BIAS", "SENSOR_DRIFT", "SENSOR"],
-                    "F7": ["SENSOR_DROPOUT", "SENSOR_STUCK", "SENSOR"],
-                }
-                f_prefix = f_label.split("_")[0]
-                kw_list = family_map.get(f_prefix, [f_prefix])
+            def get_hyp_str(h):
+                return h.fault_type.value if hasattr(h.fault_type, "value") else str(h.fault_type)
 
-                if any(kw in top1_hyp for kw in kw_list):
-                    top1_correct += 1
-                if any(any(kw in h for kw in kw_list) for h in top2_hyps):
-                    top2_coverage += 1
-                if "UNKNOWN" in top1_hyp or "INSUFFICIENT" in top1_hyp:
-                    unknown_count += 1
+            def score_diag(diag):
+                if diag is None or not diag.ranked_hypotheses:
+                    return False, False, True
+                top1_hyp = get_hyp_str(diag.ranked_hypotheses[0])
+                top2_hyps = [get_hyp_str(h) for h in diag.ranked_hypotheses[:2]]
+                is_top1 = any(kw in top1_hyp for kw in kw_list)
+                is_top2 = any(any(kw in h for kw in kw_list) for h in top2_hyps)
+                is_unk = "UNKNOWN" in top1_hyp or "INSUFFICIENT" in top1_hyp
+                return is_top1, is_top2, is_unk
+
+            # Gated diagnosis (only when generic anomaly triggered)
+            g_t1, g_t2, g_unk = score_diag(final_diag)
+            if g_t1: gated_top1_correct += 1
+            if g_t2: gated_top2_coverage += 1
+            if g_unk: unknown_count += 1
+
+            # Active-window diagnosis (measured during sustained fault injection window t=35s)
+            a_t1, a_t2, _ = score_diag(active_diag)
+            if a_t1: active_top1_correct += 1
+            if a_t2: active_top2_coverage += 1
 
         det_rate = detected_count / total_runs
         avg_lat = float(np.mean(latencies)) if latencies else float("nan")
-        t1_rate = top1_correct / total_runs
-        t2_rate = top2_coverage / total_runs
+        g_t1_rate = gated_top1_correct / total_runs
+        g_t2_rate = gated_top2_coverage / total_runs
+        a_t1_rate = active_top1_correct / total_runs
+        a_t2_rate = active_top2_coverage / total_runs
 
         fault_results[f_label] = {
             "detection_rate": det_rate,
             "avg_latency_s": avg_lat,
-            "top1_accuracy": t1_rate,
-            "top2_coverage": t2_rate,
+            "gated_top1_accuracy": g_t1_rate,
+            "gated_top2_coverage": g_t2_rate,
+            "active_top1_accuracy": a_t1_rate,
+            "active_top2_coverage": a_t2_rate,
+            "top1_accuracy": a_t1_rate,
+            "top2_coverage": a_t2_rate,
             "unknown_rate": unknown_count / total_runs,
         }
-        print(f"  {f_label:<20}: Detection={det_rate:.1%}, Latency={avg_lat:.2f}s, Top-1={t1_rate:.1%}, Top-2={t2_rate:.1%}")
+        print(f"  {f_label:<20}: Det={det_rate:.1%}, Lat={avg_lat:.2f}s, Active Top-1={a_t1_rate:.1%}, Gated Top-1={g_t1_rate:.1%}")
 
     # 4. Sensor Variation Isolation Tests (8 Cases)
     print("\n[Evaluation 3/4] Testing Sensor Variation vs Engine Variation Isolation...")
@@ -311,10 +356,20 @@ def main():
         "timestamp_iso": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "population_size": args.engines,
         "master_seed": config.seed,
+        "benchmark_seed": config.seed,
+        "generation_seed": config.seed,
+        "timestep_s": 0.5,
+        "mission_count": len(CanonicalMission),
+        "evaluation_split": "train_val_test_ensemble",
+        "simulator_version": "phase7-rotax914-greybox",
         "parameters_varied_count": 27,
         "missions_tested": [m.value for m in CanonicalMission],
         "healthy_population_metrics": {
             "total_evaluated_steps": total_healthy_steps,
+            "overall_per_step_far": healthy_false_alarm_rate,
+            "steady_state_per_step_far": steady_false_alarm_rate,
+            "per_mission_far": per_mission_far,
+            "steady_per_mission_far": steady_per_mission_far,
             "false_anomaly_rate": healthy_false_alarm_rate,
             "mean_health_index": mean_healthy_hi,
             "hi_p05": hi_p05,

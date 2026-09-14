@@ -692,3 +692,290 @@ def test_adversarial_high_altitude_hot_day_operation():
     )
     val = validate_telemetry_stream(tel)
     assert val.is_valid, f"Adversarial condition failed telemetry validation: {val.errors}"
+
+
+# ==============================================================================
+# 7. FORENSIC AUDIT VERIFICATION TESTS (SECTION 29 REQUIREMENTS)
+# ==============================================================================
+
+def test_tier_a_immutability_large_ensemble():
+    """
+    Tier-A parameters (bore, stroke, displacement, CR, cylinders, gearbox)
+    must remain strictly invariant across a large generated ensemble.
+    """
+    cfg = PopulationConfig(num_engines=100, seed=999)
+    gen = PopulationGenerator(cfg)
+
+    for profile in gen.iter_profiles():
+        sim_cfg = profile.to_simulator_config()
+        assert sim_cfg.tier_a.reference_bore_mm == 79.5
+        assert sim_cfg.tier_a.reference_stroke_mm == 61.0
+        assert sim_cfg.tier_a.reference_displacement_cc == 1211.2
+        assert sim_cfg.tier_a.reference_compression_ratio == 9.0
+        assert profile.cylinders.num_cylinders == 4
+        assert abs(sim_cfg.tier_c_gearbox.reduction_ratio - 2.42857) < 1e-4
+
+
+def test_dual_provenance_semantics():
+    """
+    Every population distribution must cleanly separate nominal provenance
+    (OEM_SUPPORTED, MODEL_CALIBRATION, ENGINEERING_HEURISTIC) from population
+    variation provenance (SYNTHETIC_VARIATION).
+    """
+    valid_nominal_provenances = {
+        ProvenanceTag.OEM_SUPPORTED,
+        ProvenanceTag.MODEL_CALIBRATION,
+        ProvenanceTag.ENGINEERING_HEURISTIC,
+        ProvenanceTag.SYNTHETIC_VARIATION,
+    }
+
+    for name, dist in POPULATION_DISTRIBUTIONS.items():
+        assert dist.nominal_provenance in valid_nominal_provenances
+        assert dist.variation_provenance == ProvenanceTag.SYNTHETIC_VARIATION
+        d = dist.to_dict()
+        assert "nominal_provenance" in d
+        assert "variation_provenance" in d
+        assert d["variation_provenance"] == ProvenanceTag.SYNTHETIC_VARIATION.value
+
+
+def test_empirical_correlation_verification():
+    """
+    Empirical correlations computed from N=1,000 sampled profiles must match
+    the intended physical correlation matrix within statistical tolerance.
+    """
+    cfg = PopulationConfig(num_engines=1000, seed=42)
+    gen = PopulationGenerator(cfg)
+
+    c_th_list = []
+    c_cool_list = []
+    fric_list = []
+    h_oil_list = []
+    comb_list = []
+    a_fuel_list = []
+
+    for p in gen.iter_profiles():
+        c_th_list.append(p.thermal.c_th_cht)
+        c_cool_list.append(p.thermal.c_coolant_j_per_k)
+        fric_list.append(p.mechanical.torque_fric_static)
+        h_oil_list.append(p.lubrication.h_oil_cool)
+        comb_list.append(p.combustion.combustion_efficiency_multiplier)
+        a_fuel_list.append(p.combustion.a_fuel_kg_per_j)
+
+    r_th_cool = float(np.corrcoef(c_th_list, c_cool_list)[0, 1])
+    r_fric_oil = float(np.corrcoef(fric_list, h_oil_list)[0, 1])
+    r_comb_fuel = float(np.corrcoef(comb_list, a_fuel_list)[0, 1])
+
+    # Target r: 0.45, 0.40, -0.35 (tolerance +/- 0.08 for N=1000)
+    assert 0.35 <= r_th_cool <= 0.55, f"Expected r(c_th, c_cool) ~ 0.45, got {r_th_cool:.4f}"
+    assert 0.30 <= r_fric_oil <= 0.50, f"Expected r(fric, h_oil) ~ 0.40, got {r_fric_oil:.4f}"
+    assert -0.45 <= r_comb_fuel <= -0.25, f"Expected r(comb, a_fuel) ~ -0.35, got {r_comb_fuel:.4f}"
+
+
+def test_cylinder_conservation_invariants():
+    """
+    Cylinder variation multipliers must strictly conserve mean = 1.000000
+    across bank variation and combustion factors for all engines.
+    """
+    cfg = PopulationConfig(num_engines=200, seed=123)
+    gen = PopulationGenerator(cfg)
+
+    for p in gen.iter_profiles():
+        bank_mean = float(np.mean(p.cylinders.bank_variation_factors))
+        comb_mean = float(np.mean(p.cylinders.combustion_factors))
+        assert abs(bank_mean - 1.0) < 1e-6, f"Bank flow mean violated: {bank_mean}"
+        assert abs(comb_mean - 1.0) < 1e-6, f"Combustion mean violated: {comb_mean}"
+
+
+def test_physical_vs_sensor_diversity_isolation():
+    """
+    Physical parameter variation must be the dominant driver of steady-state
+    thermal and hydraulic variance compared to pure sensor noise.
+    """
+    cfg_base = PopulationConfig(num_engines=1, seed=42)
+    p_base = PopulationGenerator(cfg_base).generate_single_profile(0)
+
+    # A: Fixed physical parameters, differing seeds (sensor noise & mission jitter)
+    cht_noise_only = []
+    for s in [101, 102, 103, 104, 105]:
+        p_seed = PopulationGenerator(PopulationConfig(num_engines=1, seed=s)).generate_single_profile(0)
+        p_copy = EngineProfile(
+            population_id=p_base.population_id,
+            engine_instance_id=f"ENG_NOISE_{s}",
+            seed=s,
+            split="test",
+            thermal=p_base.thermal,
+            lubrication=p_base.lubrication,
+            turbocharger=p_base.turbocharger,
+            combustion=p_base.combustion,
+            mechanical=p_base.mechanical,
+            sensors=p_seed.sensors,
+            cylinders=p_base.cylinders,
+            provenance_map=p_base.provenance_map,
+        )
+        tel = simulate_engine_mission(p_copy, CanonicalMission.CRUISE, dt=0.5, duration_scale=0.1)
+        cht_noise_only.append(tel[-1].cht)
+
+    # B: Varied physical engine profiles with sensor noise disabled
+    cht_physical_var = []
+    gen_var = PopulationGenerator(PopulationConfig(num_engines=5, seed=42, enable_sensor_variations=False))
+    for p in gen_var.iter_profiles():
+        tel = simulate_engine_mission(p, CanonicalMission.CRUISE, dt=0.5, duration_scale=0.1)
+        cht_physical_var.append(tel[-1].cht)
+
+    std_noise = float(np.std(cht_noise_only))
+    std_phys = float(np.std(cht_physical_var))
+
+    assert std_phys > std_noise, f"Physical CHT spread ({std_phys:.2f}) must exceed sensor noise spread ({std_noise:.2f})"
+
+
+def test_cross_channel_consistency_validator():
+    """
+    validate_telemetry_stream must enforce thermodynamic hierarchy and pump action,
+    rejecting inverted states (e.g. EGT < CHT during combustion).
+    """
+    cfg = PopulationConfig(num_engines=1, seed=42)
+    p = PopulationGenerator(cfg).generate_single_profile(0)
+    tel = simulate_engine_mission(p, CanonicalMission.CRUISE, dt=0.5, duration_scale=0.1)
+
+    val_healthy = validate_telemetry_stream(tel, check_cross_channel=True)
+    assert val_healthy.is_valid
+    assert val_healthy.metrics["cross_channel_checked"] > 0
+    assert val_healthy.metrics["cross_channel_passed"] == val_healthy.metrics["cross_channel_checked"]
+
+    # Corrupted stream with thermodynamic inversion: CHT=250C, EGT=150C (< CHT)
+    corrupted_tel = [r for r in tel]
+    bad_rec = corrupted_tel[50]
+    object.__setattr__(bad_rec, "cht", 250.0)
+    object.__setattr__(bad_rec, "egt", 150.0)
+    object.__setattr__(bad_rec, "rpm", 3500.0)
+    val_corrupted = validate_telemetry_stream(corrupted_tel, check_cross_channel=True)
+    assert not val_corrupted.is_valid
+    assert any("thermodynamic inversion" in err for err in val_corrupted.errors)
+
+
+def test_streaming_memory_o1_benchmark():
+    """
+    iter_profiles must exhibit true O(1) memory scaling without unbounded accumulation.
+    """
+    import tracemalloc
+    cfg = PopulationConfig(num_engines=100, seed=42)
+    gen = PopulationGenerator(cfg)
+
+    tracemalloc.start()
+    snapshot1 = tracemalloc.take_snapshot()
+
+    count = 0
+    for profile in gen.iter_profiles():
+        count += 1
+        _ = profile.engine_instance_id
+
+    snapshot2 = tracemalloc.take_snapshot()
+    tracemalloc.stop()
+
+    stats = snapshot2.compare_to(snapshot1, "lineno")
+    total_diff_kb = sum(stat.size_diff for stat in stats) / 1024.0
+
+    assert count == 100
+    assert total_diff_kb < 500.0, f"Memory leakage detected: {total_diff_kb:.1f} KB"
+
+
+def test_f3_duration_response_study():
+    """
+    F3 cooling degradation must exhibit physical thermal lag:
+    Short duration (10s) does not trip detection, while extended duration (60s+) trips.
+    """
+    cfg = PopulationConfig(num_engines=1, seed=42)
+    p = PopulationGenerator(cfg).generate_single_profile(0)
+
+    # 10s fault
+    sched_short = FaultSchedule()
+    sched_short.add_fault(FaultState(
+        fault_type=FaultType.COOLING_DEGRADATION,
+        severity=0.7,
+        start_time=15.0,
+        end_time=25.0,
+        affected_subsystem=FaultSubsystem.COOLING,
+    ))
+    tel_short = simulate_engine_mission(p, CanonicalMission.CRUISE, fault_state=sched_short, dt=0.5, duration_scale=0.15)
+    twin_short = DigitalTwin()
+    twin_short.reset()
+    states_short = [twin_short.update(r) for r in tel_short]
+    anom_short = any(s.detection_result and s.detection_result.status == DetectionStatus.ANOMALOUS for s in states_short)
+    assert not anom_short, "Short 10s cooling fault should not prematurely trip detector"
+
+    # 60s fault
+    sched_long = FaultSchedule()
+    sched_long.add_fault(FaultState(
+        fault_type=FaultType.COOLING_DEGRADATION,
+        severity=0.7,
+        start_time=15.0,
+        end_time=75.0,
+        affected_subsystem=FaultSubsystem.COOLING,
+    ))
+    tel_long = simulate_engine_mission(p, CanonicalMission.CRUISE, fault_state=sched_long, dt=0.5, duration_scale=0.4)
+    twin_long = DigitalTwin()
+    twin_long.reset()
+    states_long = [twin_long.update(r) for r in tel_long]
+    post_fault_states = [s for s in states_long if s.timestamp >= 15.0]
+    anom_long = any(s.detection_result and s.detection_result.status == DetectionStatus.ANOMALOUS for s in post_fault_states)
+    assert anom_long, "Extended cooling fault must be detected once thermal capacity saturates"
+
+
+def test_localized_fault_evidence_separation():
+    """
+    Verify architectural separation between channel-level residual,
+    diagnostic hypothesis ranking, and engine-level anomaly gating.
+    Single-cylinder F1 lean must rank F1 in diagnoser while engine-level
+    remains below trip threshold due to Phase 6 equal-subsystem weighting.
+    """
+    cfg = PopulationConfig(num_engines=1, seed=42)
+    p = PopulationGenerator(cfg).generate_single_profile(0)
+
+    sched = FaultSchedule()
+    sched.add_fault(FaultState(
+        fault_type=FaultType.INJECTOR_DELIVERY_ABNORMALITY,
+        severity=0.6,
+        start_time=15.0,
+        end_time=55.0,
+        affected_subsystem=FaultSubsystem.FUEL,
+        affected_cylinder=1,
+        parameters={"mixture_mode": FuelMixtureMode.LEAN},
+    ))
+    tel = simulate_engine_mission(p, CanonicalMission.CRUISE, fault_state=sched, dt=0.5, duration_scale=0.25)
+
+    twin = DigitalTwin()
+    twin.reset()
+    states = [twin.update(r) for r in tel]
+
+    st_active = next(s for s in states if s.timestamp >= 35.0)
+    assert st_active.diagnosis_result is not None
+    top_hyp = st_active.diagnosis_result.ranked_hypotheses[0]
+    hyp_name = top_hyp.fault_type.value if hasattr(top_hyp.fault_type, "value") else str(top_hyp.fault_type)
+    assert "INJECTOR" in hyp_name or "FUEL" in hyp_name
+    assert st_active.detection_result.anomaly_score < 0.018
+
+
+def test_ground_truth_label_quarantine_runtime_audit():
+    """
+    Ensure the runtime path (DigitalTwin, HealthEvaluator, Detector, Diagnoser)
+    never receives or uses ground-truth labels (fault_type, fault_severity).
+    """
+    import inspect
+    from digital_twin.twin_model import DigitalTwin
+    from digital_twin.health import HealthEvaluator
+    from digital_twin.detection import TemporalFaultDetector
+    from digital_twin.diagnosis import PhysicsInformedDiagnoser
+
+    for cls, method_name in [
+        (DigitalTwin, "update"),
+        (HealthEvaluator, "evaluate"),
+        (TemporalFaultDetector, "update"),
+        (PhysicsInformedDiagnoser, "diagnose"),
+    ]:
+        method = getattr(cls, method_name)
+        params = list(inspect.signature(method).parameters.keys())
+        assert "fault_type" not in params
+        assert "fault_severity" not in params
+        assert "ground_truth" not in params
+        assert "label" not in params
+

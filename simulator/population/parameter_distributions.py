@@ -36,6 +36,9 @@ class DistributionType(str, Enum):
 class ParameterDistribution:
     """
     Typed, bounded parameter distribution with explicit provenance and rationale.
+
+    Distinguishes nominal parameter provenance (OEM_SUPPORTED, MODEL_CALIBRATION,
+    or ENGINEERING_HEURISTIC) from population variation provenance (SYNTHETIC_VARIATION).
     """
     name: str
     nominal: float
@@ -47,6 +50,12 @@ class ParameterDistribution:
     distribution_type: DistributionType = DistributionType.TRUNCATED_NORMAL
     std_dev: float = 0.0
     log_sigma: float = 0.0
+    nominal_provenance: Optional[ProvenanceTag] = None
+    variation_provenance: ProvenanceTag = ProvenanceTag.SYNTHETIC_VARIATION
+
+    def __post_init__(self):
+        if self.nominal_provenance is None:
+            object.__setattr__(self, "nominal_provenance", self.provenance)
 
     def sample(self, rng: np.random.Generator) -> float:
         """
@@ -88,11 +97,14 @@ class ParameterDistribution:
             "upper_bound": self.upper_bound,
             "units": self.units,
             "provenance": self.provenance.value,
+            "nominal_provenance": self.nominal_provenance.value if self.nominal_provenance else self.provenance.value,
+            "variation_provenance": self.variation_provenance.value,
             "rationale": self.rationale,
             "distribution_type": self.distribution_type.value,
             "std_dev": self.std_dev,
             "log_sigma": self.log_sigma,
         }
+
 
 
 # ==============================================================================

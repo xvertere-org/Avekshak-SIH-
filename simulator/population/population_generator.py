@@ -91,8 +91,8 @@ class PopulationGenerator:
         engine_id = f"ENG_{self.config.population_id}_{engine_index:04d}"
         split = self._determine_split(engine_index)
 
-        # Derive independent RNG for this specific engine
-        engine_seed_seq = self.seed_seq.spawn(self.config.num_engines)[engine_index]
+        # Derive independent RNG for this specific engine with true O(1) memory scaling
+        engine_seed_seq = np.random.SeedSequence([self.config.seed, engine_index])
         engine_rng = np.random.default_rng(engine_seed_seq)
         engine_seed = int(engine_rng.integers(0, 2**31 - 1))
 
