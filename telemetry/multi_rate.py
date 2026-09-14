@@ -30,7 +30,7 @@ from telemetry.canonical import CanonicalMeasurement, CanonicalTelemetryPacket, 
 class ChannelSample:
     """Historical sample for a single channel in the multi-rate buffer."""
     timestamp: float
-    value: float
+    value: Optional[float]
     unit: str
     quality: DataQualityStatus
     status: QuantityStatus
@@ -77,17 +77,16 @@ class MultiRateBuffer:
         return self.channel_stale_limits.get(channel_name, self.default_tau_stale)
 
     def push_measurement(self, measurement: CanonicalMeasurement) -> None:
-        """Add a validated canonical measurement to the rolling channel buffer."""
-        if measurement.value is None or math.isnan(measurement.value):
-            return
-
+        """Add a canonical measurement to the rolling channel buffer, including dropouts."""
         ch = measurement.channel_name
         if ch not in self._buffers:
             self._buffers[ch] = deque(maxlen=self.max_buffer_len)
 
+        val = float(measurement.value) if measurement.value is not None and not math.isnan(measurement.value) else None
+
         sample = ChannelSample(
             timestamp=float(measurement.timestamp),
-            value=float(measurement.value),
+            value=val,
             unit=measurement.unit,
             quality=measurement.quality,
             status=measurement.status,
@@ -112,10 +111,12 @@ class MultiRateBuffer:
         Extract an aligned measurement for channel at target_timestamp.
 
         Alignment Policy:
-        - If an exact sample exists at target_timestamp, return it as MEASURED.
-        - If allow_interpolation is True and target_timestamp is bounded by two samples
-          within max_interpolation_gap, compute linear interpolation (marked ESTIMATED / INTERPOLATED).
+        - If an exact sample exists at target_timestamp, return it directly.
+        - If allow_interpolation is True and target_timestamp is bounded by two strictly VALID
+          samples within max_interpolation_gap with NO intervening invalid/dropout samples,
+          compute linear interpolation (marked ESTIMATED / INTERPOLATED).
         - Otherwise, use hold-last-value from latest preceding sample:
+          - If preceding sample is not VALID or value is None: return unavailable/invalid.
           - If age <= tau_stale: return sample marked ESTIMATED with notes='HELD_LAST_VALUE'.
           - If age > tau_stale: return sample marked STALE / UNAVAILABLE.
         """
@@ -133,7 +134,7 @@ class MultiRateBuffer:
                 notes="NO_HISTORY_AVAILABLE",
             )
 
-        # Look for exact match or bounding samples
+        # Look for exact match or immediate bounding samples
         exact_sample = None
         prev_sample = None
         next_sample = None
@@ -165,9 +166,27 @@ class MultiRateBuffer:
             )
 
         # 2. Linear Interpolation (if enabled and bounded)
+        # Strictly forbidden across invalid samples, NaNs, dropouts, or gaps > max_interpolation_gap
         if allow_interpolation and prev_sample is not None and next_sample is not None:
             gap = next_sample.timestamp - prev_sample.timestamp
-            if gap <= self.max_interpolation_gap and prev_sample.quality == DataQualityStatus.VALID and next_sample.quality == DataQualityStatus.VALID:
+            # Ensure both bounding samples are strictly VALID with finite values
+            can_interpolate = (
+                gap <= self.max_interpolation_gap
+                and prev_sample.quality == DataQualityStatus.VALID
+                and next_sample.quality == DataQualityStatus.VALID
+                and prev_sample.value is not None
+                and next_sample.value is not None
+            )
+
+            # Also check that no intervening samples between prev and next were invalid/dropped
+            if can_interpolate:
+                for s in buf:
+                    if prev_sample.timestamp < s.timestamp < next_sample.timestamp:
+                        if s.quality != DataQualityStatus.VALID or s.value is None:
+                            can_interpolate = False
+                            break
+
+            if can_interpolate:
                 fraction = (target_timestamp - prev_sample.timestamp) / gap
                 interp_val = prev_sample.value + fraction * (next_sample.value - prev_sample.value)
                 return CanonicalMeasurement(
@@ -185,6 +204,21 @@ class MultiRateBuffer:
 
         # 3. Hold-Last-Value from preceding sample
         if prev_sample is not None:
+            # If preceding sample itself was invalid or missing, do NOT hold a bogus value
+            if prev_sample.quality != DataQualityStatus.VALID or prev_sample.value is None:
+                return CanonicalMeasurement(
+                    channel_name=channel_name,
+                    value=None,
+                    unit=prev_sample.unit,
+                    timestamp=target_timestamp,
+                    source_timestamp=prev_sample.timestamp,
+                    quality=prev_sample.quality,
+                    status=QuantityStatus.UNAVAILABLE,
+                    source_id=prev_sample.source_id,
+                    source_type=prev_sample.source_type,
+                    notes=f"HOLD_PRECEDING_INVALID ({prev_sample.quality.value})",
+                )
+
             age = target_timestamp - prev_sample.timestamp
             if age <= tau_stale:
                 return CanonicalMeasurement(
@@ -212,6 +246,7 @@ class MultiRateBuffer:
                     source_type=prev_sample.source_type,
                     notes=f"STALE (age={age:.4f}s > tau_stale={tau_stale}s)",
                 )
+
 
         # No preceding sample available
         return CanonicalMeasurement(

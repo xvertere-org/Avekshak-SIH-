@@ -489,6 +489,35 @@ def test_multi_rate_buffer_interpolation_forbidden_across_large_gap():
     assert "HELD_LAST_VALUE" in aligned.notes
 
 
+def test_multi_rate_buffer_interpolation_forbidden_across_invalid_sample():
+    """Verify interpolation strictly refuses to bridge across an intermediate invalid sample (valid -> invalid -> valid)."""
+    buf = MultiRateBuffer(max_interpolation_gap=1.0)
+    buf.push_measurement(CanonicalMeasurement("cht", 100.0, "degC", timestamp=10.0, quality=DataQualityStatus.VALID))
+    # Intervening invalid sample at 10.2
+    buf.push_measurement(CanonicalMeasurement("cht", None, "degC", timestamp=10.2, quality=DataQualityStatus.INVALID))
+    buf.push_measurement(CanonicalMeasurement("cht", 110.0, "degC", timestamp=10.4, quality=DataQualityStatus.VALID))
+
+    # Query at 10.3 between invalid and valid
+    aligned = buf.get_aligned_measurement("cht", target_timestamp=10.3, allow_interpolation=True)
+    # Interpolation must be refused! And preceding sample was invalid, so hold-last-value is UNAVAILABLE
+    assert aligned.value is None
+    assert aligned.status == QuantityStatus.UNAVAILABLE
+
+
+def test_multi_rate_buffer_interpolation_forbidden_across_dropout():
+    """Verify interpolation strictly refuses to bridge across a sensor dropout (valid -> dropout -> valid)."""
+    buf = MultiRateBuffer(max_interpolation_gap=1.0)
+    buf.push_measurement(CanonicalMeasurement("rpm", 5000.0, "RPM", timestamp=10.0, quality=DataQualityStatus.VALID))
+    # Intervening dropout at 10.2
+    buf.push_measurement(CanonicalMeasurement("rpm", None, "RPM", timestamp=10.2, quality=DataQualityStatus.MISSING))
+    buf.push_measurement(CanonicalMeasurement("rpm", 5020.0, "RPM", timestamp=10.4, quality=DataQualityStatus.VALID))
+
+    aligned = buf.get_aligned_measurement("rpm", target_timestamp=10.3, allow_interpolation=True)
+    assert aligned.value is None
+    assert aligned.status == QuantityStatus.UNAVAILABLE
+
+
+
 def test_multi_rate_packet_alignment_mixed_rates():
     """Verify multi-rate packet aligner aligns channels sampled at distinct rates."""
     buf = MultiRateBuffer(tau_stale=5.0)
