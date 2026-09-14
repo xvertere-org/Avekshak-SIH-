@@ -36,9 +36,16 @@ def get_git_info() -> Dict[str, str]:
         except Exception as e:
             return f"ERROR: {e}"
 
+    # Deterministically resolve the implementation source commit
+    # that produced the code under test (digital_twin, simulator, telemetry, fault_injection).
+    # This distinguishes code changes from documentation or evidence-only commits.
+    source_commit = run_cmd("git log -1 --format=%H -- digital_twin/ simulator/ telemetry/ fault_injection/")
+    if not source_commit or "ERROR" in source_commit:
+        source_commit = run_cmd("git rev-parse HEAD")
+
     return {
         "branch": run_cmd("git rev-parse --abbrev-ref HEAD"),
-        "source_commit": run_cmd("git rev-parse HEAD"),
+        "source_commit": source_commit,
         "head_sha": run_cmd("git rev-parse HEAD"),
         "origin_head": run_cmd("git rev-parse origin/rotax-914-greybox-engine"),
         "main_sha": run_cmd("git rev-parse main"),
