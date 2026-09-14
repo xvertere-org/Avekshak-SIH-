@@ -72,6 +72,27 @@ from digital_twin.diagnosis import (
     HypothesisRanking,
     CanonicalFaultType,
 )
+from digital_twin.degradation_types import (
+    DegradationSubsystem,
+    DegradationRegime,
+    RULStatus,
+    RULScenario,
+    ProvenanceTag,
+    SubsystemDegradationState,
+    DegradationAssessment,
+    RULAssessment,
+    DEFAULT_SCENARIO_STRESS_FACTORS,
+)
+from digital_twin.degradation import (
+    TheilSenResult,
+    TheilSenEstimator,
+    DegradationEstimatorConfig,
+    DegradationEstimator,
+)
+from digital_twin.rul import (
+    RULEstimatorConfig,
+    RULEstimator,
+)
 
 __all__ = [
     "DigitalTwin",
@@ -118,4 +139,20 @@ __all__ = [
     "DiagnosisResult",
     "HypothesisRanking",
     "CanonicalFaultType",
+    "DegradationSubsystem",
+    "DegradationRegime",
+    "RULStatus",
+    "RULScenario",
+    "ProvenanceTag",
+    "SubsystemDegradationState",
+    "DegradationAssessment",
+    "RULAssessment",
+    "DEFAULT_SCENARIO_STRESS_FACTORS",
+    "TheilSenResult",
+    "TheilSenEstimator",
+    "DegradationEstimatorConfig",
+    "DegradationEstimator",
+    "RULEstimatorConfig",
+    "RULEstimator",
 ]
+

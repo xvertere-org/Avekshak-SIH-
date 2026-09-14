@@ -43,6 +43,9 @@ from digital_twin.diagnosis import (
     DiagnosisResult,
     CanonicalFaultType,
 )
+from digital_twin.degradation import DegradationEstimator, DegradationEstimatorConfig
+from digital_twin.rul import RULEstimator, RULEstimatorConfig
+from digital_twin.degradation_types import RULScenario
 from digital_twin.state import (
     CanonicalTwinState,
     QuantityStatus,
@@ -345,6 +348,8 @@ class DigitalTwin:
         estimator_config: Optional[EstimatorConfig] = None,
         health_config: Optional[HealthIndicatorConfig] = None,
         detection_config: Optional[DetectionConfig] = None,
+        degradation_config: Optional[DegradationEstimatorConfig] = None,
+        rul_config: Optional[RULEstimatorConfig] = None,
         calibration: Optional[FrozenScaleCalibration] = None,
     ):
         self.engine_config = engine_config or EngineConfig()
@@ -352,6 +357,8 @@ class DigitalTwin:
         self.estimator_config = estimator_config or EstimatorConfig()
         self.health_config = health_config or HealthIndicatorConfig()
         self.detection_config = detection_config or DetectionConfig()
+        self.degradation_config = degradation_config or DegradationEstimatorConfig()
+        self.rul_config = rul_config or RULEstimatorConfig()
         self.calibration = calibration
 
         self.model = DigitalTwinModel(sim_config=self.sim_config, engine_config=self.engine_config)
@@ -360,6 +367,8 @@ class DigitalTwin:
         self.health_evaluator = HealthEvaluator(config=self.health_config)
         self.fault_detector = TemporalFaultDetector(config=self.detection_config)
         self.fault_diagnoser = PhysicsInformedDiagnoser()
+        self.degradation_estimator = DegradationEstimator(config=self.degradation_config)
+        self.rul_estimator = RULEstimator(config=self.rul_config)
         self.estimator = StateEstimator(
             config=self.estimator_config,
             sim_config=self.sim_config,
@@ -377,6 +386,7 @@ class DigitalTwin:
         self.health_evaluator.reset()
         self.fault_detector.reset()
         self.fault_diagnoser.reset()
+        self.degradation_estimator.reset()
         self.history.clear()
         self.canonical_history.clear()
         self.canonical_state = None
@@ -475,6 +485,18 @@ class DigitalTwin:
             engine_id=telemetry.engine_id,
         )
 
+        # Phase 8: Degradation estimation and robust Theil-Sen trend extraction
+        degradation_assessment = self.degradation_estimator.estimate(
+            health_assessment=health_assessment,
+            dt=dt,
+        )
+
+        # Phase 8: Uncertainty-aware Remaining Useful Life (RUL) estimation
+        rul_assessment = self.rul_estimator.estimate(
+            degradation_assessment=degradation_assessment,
+            scenario=RULScenario.CURRENT_PROFILE,
+        )
+
         nominal_estimates = {
             # Tier A reference anchor for audit compatibility (test_audit_cleanup.py)
             "nominal_cht": self.sim_config.tier_a.cht_nominal_c,
@@ -506,6 +528,8 @@ class DigitalTwin:
             residual_vector=residual_vector,
             detection_result=detection_result,
             diagnosis_result=diagnosis_result,
+            degradation_assessment=degradation_assessment,
+            rul_assessment=rul_assessment,
             metadata={
                 "power_expected_kw": expected.get("power_expected_kw", 0.0),
                 "order_1x_freq_hz": expected.get("order_1x_freq_hz", 25.0),
@@ -517,8 +541,11 @@ class DigitalTwin:
                 "health_assessment": health_assessment,
                 "detection_result": detection_result,
                 "diagnosis_result": diagnosis_result,
+                "degradation_assessment": degradation_assessment,
+                "rul_assessment": rul_assessment,
             },
         )
+
         self.history.append(twin_state)
         return twin_state
 
