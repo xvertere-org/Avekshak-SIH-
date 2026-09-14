@@ -953,7 +953,7 @@ class DashboardAdapter:
 
         # 3. Anomaly Status Card
         if diagnostics_vm.anomaly_status != "Unavailable":
-            anom_val = diagnostics_vm.anomaly_status.title()
+            anom_val = diagnostics_vm.anomaly_status
             anom_status = map_anomaly_to_status(diagnostics_vm.anomaly_status)
             score_str = f"Score: {diagnostics_vm.anomaly_score:.2f} · Persistence: {diagnostics_vm.persistence_count} cycles" if diagnostics_vm.anomaly_score is not None else f"Persistence: {diagnostics_vm.persistence_count} cycles"
             anom_subtext = score_str
@@ -1017,11 +1017,11 @@ class DashboardAdapter:
         )
 
         # 5. Data Quality Card
-        dq_val = format_data_quality_status(data_quality_vm.quality_status)
+        dq_val = data_quality_vm.quality_status
         if is_total_sensor_blackout or data_quality_vm.quality_status.upper() in ("MISSING", "SENSOR_BLACKOUT"):
             dq_status = StatusLevel.DEGRADED
-            if is_total_sensor_blackout and data_quality_vm.quality_status == "NOMINAL":
-                dq_val = format_data_quality_status("MISSING")
+            if is_total_sensor_blackout and dq_val == "NOMINAL":
+                dq_val = "MISSING"
         elif data_quality_vm.quality_status in ("NOMINAL", "VALID"):
             dq_status = StatusLevel.HEALTHY
         elif data_quality_vm.quality_status in (
