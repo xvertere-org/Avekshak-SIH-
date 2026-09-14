@@ -99,7 +99,10 @@ Degradation trajectories are categorized into 4 mutually exclusive regimes based
 | `INSUFFICIENT_DATA` | $N < 10$ samples or $\Delta t < 15\text{s}$ or $C_{data} < 0.35$ | Gated: insufficient evidence to infer trend |
 | `STABLE` | $|dD/dh| < 0.02/\text{hour}$ | Nominal engine baseline or zero-mean noise |
 | `DEGRADING` | $0.02 \le dD/dh < 0.20/\text{hour}$ | Gradual persistent progressive wear |
-| `RAPID_DEGRADATION` | $dD/dh \ge 0.20/\text{hour}$ | Accelerating or steep abnormal wear |
+| `RAPID_DEGRADATION` | $dD/dh \ge 0.20/\text{hour}$ | Rapid local degradation trend |
+
+> [!NOTE]
+> **Non-Linear Wear Classification**: `RAPID_DEGRADATION` captures steep local degradation trends (e.g. accelerating quadratic wear). The estimator extrapolates linearly using the instantaneous local Theil-Sen slope; it does NOT fit higher-order polynomial curvatures or claim non-linear wear parameter identification. For accelerating trajectories, linear extrapolation provides a conservative instantaneous projection that will overestimate remaining time as wear accelerates further.
 
 ---
 
@@ -113,7 +116,7 @@ $$D_{EOL} = 0.50 \iff HI_{EOL} = 0.50$$
 
 ---
 
-## 6. Uncertainty-Aware RUL Equations
+## 6. Uncertainty-Aware RUL Equations & Horizon Projections
 
 For linear progressive wear to horizon $D_{EOL}$, remaining headroom is:
 $$\Delta D = \max(0.0, D_{EOL} - D(t))$$
@@ -128,6 +131,11 @@ $$RUL_{high} = \frac{\Delta D}{\text{slope}_{low} \cdot S_{stress} \cdot 3600.0}
 
 If $\text{slope}_{low} \le 0$, $RUL_{high}$ is set to `None` (unbounded upper horizon under model assumptions).
 
+### Empirical Uncertainty Intervals vs. Confidence Intervals
+- **Interval Ordering**: $RUL_{low} \le RUL_{median} \le RUL_{high}$ holds in 100% of cases by mathematical construction ($Q_{0.15} \le \text{median} \le Q_{0.85}$). This proves mathematical ordering, NOT statistical confidence calibration.
+- **True Empirical Coverage**: Evaluated by determining whether the true known future horizon falls within $[RUL_{low}, RUL_{high}]$ on unseen synthetic test trajectories ($100\%$ on evaluated linear trajectories).
+- **Terminology**: Designated as **empirical uncertainty intervals under the estimator**, not formal Bayesian credible intervals.
+
 ### Minimum Data Gating & Non-Degrading Behavior
 A successful RUL system must know when it does NOT have enough evidence. RUL returns `None` for hours when:
 - Status is `INSUFFICIENT_DATA` ($N < 10$ or window $< 15\text{s}$).
@@ -140,26 +148,27 @@ A successful RUL system must know when it does NOT have enough evidence. RUL ret
 
 ## 7. Operational Scenario Multipliers
 
-Phase 8 models sensitivity to operational flight envelopes via explicit stress multipliers:
+Phase 8 models sensitivity to operational flight envelopes via explicit stress multipliers. All scenario multipliers are engineering heuristics rather than physically fitted damage laws:
 
 | Scenario | Multiplier ($S_{stress}$) | Physical Rationale | Provenance |
 |---|---|---|---|
 | `CURRENT_PROFILE` | $1.00$ | Baseline observed mission profile | `ENGINEERING_HEURISTIC` |
 | `NORMAL_MISSION` | $1.00$ | Nominal cruise/climb profile | `ENGINEERING_HEURISTIC` |
-| `HIGH_ALTITUDE` | $1.15$ | Lower air density, higher turbocharger pressure ratio, reduced radiator mass flow | `MODEL_CALIBRATION` |
-| `HOT_DAY` | $1.30$ | Elevated ambient heat rejection limit, increased thermal accumulation | `MODEL_CALIBRATION` |
-| `HIGH_LOAD` | $1.50$ | Sustained maximum continuous rating (5500 RPM, 115 HP) | `MODEL_CALIBRATION` |
+| `HIGH_ALTITUDE` | $1.15$ | Lower air density, higher turbocharger pressure ratio, reduced radiator mass flow | `ENGINEERING_HEURISTIC` |
+| `HOT_DAY` | $1.30$ | Elevated ambient heat rejection limit, increased thermal accumulation | `ENGINEERING_HEURISTIC` |
+| `HIGH_LOAD` | $1.50$ | Sustained maximum continuous rating (5500 RPM, 115 HP) | `ENGINEERING_HEURISTIC` |
 
 ---
 
-## 8. Causal Fault vs. Degradation Separation
+## 8. Causal Fault vs. Degradation Separation & Limitations
 
 Phase 8 explicitly differentiates transient fault disturbances from progressive degradation:
 
-- **Case A (Transient Fault)**: A temporary F3 cooling disturbance increases residuals and raises $D(t)$ briefly. When cleared, temperatures normalize and $D(t) \to 0$. As slope becomes negative or near zero, status returns to `NON_DEGRADING` / `STABLE`, preventing false RUL countdown latching.
+- **Case A (Transient Fault)**: A temporary F3 cooling disturbance increases residuals and raises $D(t)$ briefly. When cleared, temperatures normalize and $D(t) \to 0$. As slope becomes negative or near zero, status returns to `NON_DEGRADING` / `STABLE`, preventing false RUL countdown latching. The rolling window retains transient elevation until the window duration ($300\text{s}$) has completely elapsed, after which regime returns to `STABLE`.
 - **Case B (Persistent Wear)**: Continuous synthetic wear produces monotonic positive Theil-Sen slope, shrinking RUL hours, and high trend confidence.
 - **Case C (Telemetry Noise)**: Zero-mean Gaussian noise yields $|dD/dh| < 0.02$, maintaining `STABLE` status with null RUL hours.
-- **Case D (Sensor Bias / Dropout)**: Invalid or biased sensor observations degrade $C_{data}$ and $C_{obs}$, triggering `DATA_QUALITY_DEGRADED` rather than manufacturing false mechanical wear.
+- **Case D (Severe Sensor Bias / Dropout)**: Invalid or large sensor bias observations degrade $C_{data}$ and $C_{obs}$, triggering `DATA_QUALITY_DEGRADED` rather than manufacturing false mechanical wear.
+- **Case E (Slow Sensor Drift Limitation)**: Slow unflagged sensor drift below data quality rejection thresholds can masquerade as gradual physical degradation. This is a fundamental single-sensor observability limitation.
 
 ---
 
@@ -172,23 +181,22 @@ Phase 8 explicitly differentiates transient fault disturbances from progressive 
 | `min_window_duration_s` | $15.0\text{s}$ | `ENGINEERING_HEURISTIC` | Minimum temporal span for causal stability |
 | `min_valid_data_fraction` | $0.70$ | `ENGINEERING_HEURISTIC` | Reject telemetry streams with $>30\%$ missing data |
 | `stable_slope_threshold_per_hour`| $0.02/\text{hr}$ | `ENGINEERING_HEURISTIC` | Threshold separating noise from persistent drift |
-| `rapid_slope_threshold_per_hour` | $0.20/\text{hr}$ | `ENGINEERING_HEURISTIC` | Threshold indicating steep abnormal degradation |
+| `rapid_slope_threshold_per_hour` | $0.20/\text{hr}$ | `ENGINEERING_HEURISTIC` | Threshold indicating steep local degradation trend |
 | `eol_threshold` ($D_{EOL}$) | $0.50$ | `ENGINEERING_HEURISTIC` | Model-defined computational horizon ($HI = 0.50$) |
-| `high_altitude_stress` | $1.15$ | `MODEL_CALIBRATION` | Atmospheric density and turbo boost stress factor |
-| `hot_day_stress` | $1.30$ | `MODEL_CALIBRATION` | ISA+20K thermal rejection penalty factor |
-| `high_load_stress` | $1.50$ | `MODEL_CALIBRATION` | Maximum continuous power exposure factor |
+| `high_altitude_stress` | $1.15$ | `ENGINEERING_HEURISTIC` | Assumed atmospheric density and turbo boost stress factor |
+| `hot_day_stress` | $1.30$ | `ENGINEERING_HEURISTIC` | Assumed ISA+20K thermal rejection penalty factor |
+| `high_load_stress` | $1.50$ | `ENGINEERING_HEURISTIC` | Assumed maximum continuous power exposure factor |
 
 ---
 
 ## 10. Performance & Verification Metrics
 
-- **Total Phase 8 Tests**: 39 non-tautological unit and integration tests.
-- **Full Regression**: All existing repository tests (Phases 1–7) pass without regressions.
-- **1000-Update Benchmark**:
-  - Mean latency: $2.17\text{ms}$
-  - Median latency: $2.17\text{ms}$
-  - P95 latency: $3.45\text{ms}$
-  - P99 latency: $4.18\text{ms}$
-  - Max latency: $29.86\text{ms}$
-  - Soft real-time compliant: $< 5.0\text{ms}$ p95 budget satisfied.
-- **Validation Matrix**: 19 diverse scenarios evaluated in `evidence/phase8_rul_matrix.json` with zero false degradation or false collapse events.
+- **Total Phase 8 Tests**: 50 non-tautological unit and integration tests (`tests/test_phase8_rul.py`).
+- **Full Regression**: All 563 repository tests (Phases 1–8) pass without regressions.
+- **Latency Benchmarks (1000 consecutive updates)**:
+  - **Phase 8 Isolated (Degradation + RUL)**: Mean: $1.40\text{ms}$, Median: $1.25\text{ms}$, P95: $2.14\text{ms}$, Max: $2.68\text{ms}$.
+  - **End-to-End DigitalTwin (Physics + Observability + Health + Anomaly + Phase 8)**: Mean: $2.17\text{ms}$, Median: $2.17\text{ms}$, P95: $3.45\text{ms}$, Max: $29.86\text{ms}$.
+  - **Real-Time Classification**: Soft real-time compliant ($< 5.0\text{ms}$ p95 budget satisfied). No hard real-time guarantees.
+- **Memory Boundedness**: History queue is strictly bounded to $\le 305$ elements over 2,500 streaming updates ($300\text{s}$ rolling window at $1\text{Hz}$). Zero unbounded array growth.
+- **Validation Matrix**: 19 base scenarios and 65 synthetic horizon prediction scenarios evaluated in `evidence/phase8_rul_matrix.json`. Zero false degradation or false collapse events.
+

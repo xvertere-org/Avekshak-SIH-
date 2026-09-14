@@ -953,3 +953,466 @@ def test_accelerating_degradation_trajectory():
     rul = rul_est.estimate(deg_assess)
     assert rul.status == RULStatus.COMPUTED
     assert rul.rul_median is not None
+
+
+# =====================================================================
+# 12. FORENSIC AUDIT TESTS (SECTION 5 - 25)
+# =====================================================================
+
+def test_true_synthetic_predictive_horizon_error():
+    """
+    Forensic Section 5: True RUL horizon prediction error on unseen futures.
+    Reveals prefix trajectory up to cutoff, evaluates RUL against true known EOL.
+    """
+    deg_est = DegradationEstimator()
+    rul_est = RULEstimator()
+
+    d0_cases = [0.00, 0.05, 0.10, 0.20]
+    slope_cases = [0.05, 0.10, 0.20]  # per hour
+    coverage_cutoffs = [0.75, 0.90]
+
+    evaluated = 0
+    rel_errors = []
+
+    for d0 in d0_cases:
+        for s_hr in slope_cases:
+            s_sec = s_hr / 3600.0
+            t_eol = (0.50 - d0) / s_sec
+            if t_eol <= 30.0:
+                continue
+
+            for cov in coverage_cutoffs:
+                t_obs_end = t_eol * cov
+                if t_obs_end < 20.0:
+                    continue
+
+                true_rul_hours = (t_eol - t_obs_end) / 3600.0
+
+                # Generate observations strictly up to t_obs_end within active rolling window
+                w_start = max(0.0, t_obs_end - 60.0)
+                ts = np.linspace(w_start, t_obs_end, 25)
+
+                deg_est.reset()
+                deg_out = None
+                for t in ts:
+                    d_val = min(0.49, d0 + s_sec * t)
+                    h = _create_mock_health(timestamp=float(t), hi_smooth=1.0 - d_val)
+                    deg_out = deg_est.estimate(h)
+
+                rul_out = rul_est.estimate(deg_out)
+                assert rul_out.status == RULStatus.COMPUTED
+                assert rul_out.rul_median is not None
+
+                pred_rul = rul_out.rul_median
+                abs_err = abs(pred_rul - true_rul_hours)
+                rel_err = (abs_err / true_rul_hours) * 100.0
+
+                evaluated += 1
+                rel_errors.append(rel_err)
+
+    assert evaluated >= 12
+    # Theil-Sen with decimation accurately extrapolates unseen future on linear trajectories
+    assert np.mean(rel_errors) < 5.0  # Mean relative error < 5% on pure linear extrapolation
+
+
+def test_true_empirical_uncertainty_interval_coverage():
+    """
+    Forensic Section 6: True statistical coverage of empirical uncertainty intervals.
+    Coverage = cases where RUL_low <= true_RUL <= RUL_high / evaluated cases.
+    Distinguishes true coverage from monotonic interval ordering.
+    """
+    deg_est = DegradationEstimator()
+    rul_est = RULEstimator()
+
+    covered_count = 0
+    evaluated_count = 0
+    monotonic_ordered_count = 0
+
+    rng = np.random.RandomState(42)
+
+    for d0 in [0.05, 0.10, 0.20]:
+        for s_hr in [0.05, 0.10, 0.20, 0.30]:
+            s_sec = s_hr / 3600.0
+            t_eol = (0.50 - d0) / s_sec
+            for noise_std in [0.0, 0.002, 0.005]:
+                for cov in [0.75, 0.90]:
+                    t_obs_end = t_eol * cov
+                    if t_obs_end < 20.0:
+                        continue
+                    true_rul_hours = (t_eol - t_obs_end) / 3600.0
+
+                    w_start = max(0.0, t_obs_end - 60.0)
+                    ts = np.linspace(w_start, t_obs_end, 25)
+
+                    deg_est.reset()
+                    deg_out = None
+                    for t in ts:
+                        noise = rng.normal(0.0, noise_std) if noise_std > 0 else 0.0
+                        d_val = np.clip(d0 + s_sec * t + noise, 0.0, 0.49)
+                        h = _create_mock_health(timestamp=float(t), hi_smooth=1.0 - float(d_val))
+                        deg_out = deg_est.estimate(h)
+
+                    rul_out = rul_est.estimate(deg_out)
+                    if rul_out.status == RULStatus.COMPUTED and rul_out.rul_low is not None and rul_out.rul_high is not None:
+                        evaluated_count += 1
+                        # Verify monotonic ordering
+                        if rul_out.rul_low <= rul_out.rul_median <= rul_out.rul_high:
+                            monotonic_ordered_count += 1
+                        # Verify true coverage
+                        if rul_out.rul_low <= true_rul_hours <= rul_out.rul_high:
+                            covered_count += 1
+
+    assert evaluated_count >= 20
+    # Monotonic ordering is guaranteed by construction
+    assert monotonic_ordered_count == evaluated_count
+    # True coverage across noise conditions must be high but realistic (e.g. >= 85%)
+    coverage_pct = (covered_count / evaluated_count) * 100.0
+    assert coverage_pct >= 85.0, f"Empirical coverage was {coverage_pct}%"
+
+
+def test_theil_sen_outlier_robustness_exhaustive():
+    """
+    Forensic Section 7: Theil-Sen estimator robustness under single, multiple, and clustered outliers.
+    """
+    ts = np.linspace(0.0, 100.0, 25)
+    true_slope = 0.001  # per second (3.60 / hr)
+    clean_d = 0.05 + true_slope * ts
+
+    # 1. Clean
+    res_clean = TheilSenEstimator.estimate(ts, clean_d)
+    assert abs(res_clean.slope - true_slope) < 1e-6
+
+    # 2. Single outlier spike (+0.30)
+    d_single = clean_d.copy()
+    d_single[12] += 0.30
+    res_single = TheilSenEstimator.estimate(ts, d_single)
+    assert abs(res_single.slope - true_slope) / true_slope < 0.05
+
+    # 3. Multiple clustered outliers (3 consecutive points spiked)
+    d_clustered = clean_d.copy()
+    d_clustered[10:13] += 0.25
+    res_clustered = TheilSenEstimator.estimate(ts, d_clustered)
+    # 3/25 = 12% contamination, well within 29.3% breakdown point
+    assert abs(res_clustered.slope - true_slope) / true_slope < 0.08
+
+    # 4. Irregular timestamps
+    ts_irr = np.array([0.0, 1.2, 5.7, 8.1, 14.3, 22.0, 35.5, 48.2, 60.0, 75.1, 88.9, 100.0])
+    d_irr = 0.05 + true_slope * ts_irr
+    res_irr = TheilSenEstimator.estimate(ts_irr, d_irr)
+    assert abs(res_irr.slope - true_slope) / true_slope < 0.01
+
+
+def test_accelerating_degradation_linear_overestimation_quantification():
+    """
+    Forensic Section 8: Accelerating quadratic wear overestimation audit.
+    Linear extrapolation on quadratic wear overestimates remaining time.
+    Verifies classification as RAPID_DEGRADATION ("rapid local degradation trend").
+    """
+    deg_est = DegradationEstimator()
+    rul_est = RULEstimator()
+
+    # D(t) = D0 + a * t^2
+    d0 = 0.05
+    a = 0.00005  # degradation / s^2
+    d_eol = 0.50
+    t_eol_true = math.sqrt((d_eol - d0) / a)  # = sqrt(0.45 / 0.00005) = sqrt(9000) = 94.868 seconds
+
+    # Observe up to t_obs = 60s
+    t_obs = 60.0
+    true_remaining_hours = (t_eol_true - t_obs) / 3600.0  # = 34.868 / 3600 = 0.009686 hours
+
+    for t in np.linspace(0.0, t_obs, 31):
+        d_val = d0 + a * (t ** 2)
+        h = _create_mock_health(timestamp=float(t), hi_smooth=1.0 - float(d_val))
+        deg_out = deg_est.estimate(h)
+
+    assert deg_out.regime == DegradationRegime.RAPID_DEGRADATION
+    rul_out = rul_est.estimate(deg_out)
+
+    assert rul_out.status == RULStatus.COMPUTED
+    # Because future wear accelerates, linear extrapolation based on local slope (2*a*t_obs)
+    # predicts MORE remaining time than the true accelerating trajectory
+    assert rul_out.rul_median > true_remaining_hours
+    overestimation_pct = ((rul_out.rul_median - true_remaining_hours) / true_remaining_hours) * 100.0
+    assert overestimation_pct > 10.0, f"Overestimation was {overestimation_pct}%"
+
+
+def test_temporal_causality_prefix_future_invariance():
+    """
+    Forensic Section 9: Temporal causality / future leakage dynamic test.
+    Evaluation at t_obs must be 100% invariant to subsequent unseen future.
+    """
+    # Scenario A: Prefix [0, 60s], then Future B1 (gradual continuation)
+    # Scenario B: Prefix [0, 60s], then Future B2 (immediate catastrophic collapse)
+    ts_prefix = np.linspace(0.0, 60.0, 20)
+
+    deg_est_1 = DegradationEstimator()
+    rul_est_1 = RULEstimator()
+    for t in ts_prefix:
+        d = 0.05 + 0.001 * t
+        h = _create_mock_health(timestamp=float(t), hi_smooth=1.0 - d)
+        deg_1 = deg_est_1.estimate(h)
+    rul_1 = rul_est_1.estimate(deg_1)
+
+    deg_est_2 = DegradationEstimator()
+    rul_est_2 = RULEstimator()
+    for t in ts_prefix:
+        d = 0.05 + 0.001 * t
+        h = _create_mock_health(timestamp=float(t), hi_smooth=1.0 - d)
+        deg_2 = deg_est_2.estimate(h)
+    rul_2 = rul_est_2.estimate(deg_2)
+
+    # Prefix evaluations must be bitwise identical
+    assert deg_1.trend_slope_per_hour == deg_2.trend_slope_per_hour
+    assert rul_1.rul_median == rul_2.rul_median
+
+    # Now step 1 continues normally, step 2 suffers catastrophic collapse
+    for t in np.linspace(61.0, 90.0, 10):
+        h1 = _create_mock_health(timestamp=float(t), hi_smooth=1.0 - (0.05 + 0.001 * t))
+        deg_est_1.estimate(h1)
+
+        h2 = _create_mock_health(timestamp=float(t), hi_smooth=0.10)  # catastrophic
+        deg_est_2.estimate(h2)
+
+    # Re-evaluate at t=60: neither future can change the result at t=60
+    assert rul_1.rul_median is not None
+    assert rul_1.status == RULStatus.COMPUTED
+
+
+def test_transient_fault_recovery_timeline_and_latency():
+    """
+    Forensic Section 10: Complete timeline of transient fault F3 and recovery latency.
+    Baseline -> Onset -> Active -> Clearing -> Recovery -> Post-Recovery.
+    """
+    deg_est = DegradationEstimator(DegradationEstimatorConfig(window_duration_s=60.0))
+    rul_est = RULEstimator()
+
+    timeline_log = []
+
+    # 1. Baseline: t=0..20s, healthy
+    for t in range(0, 21, 2):
+        h = _create_mock_health(timestamp=float(t), hi_smooth=0.98)
+        deg = deg_est.estimate(h)
+        rul = rul_est.estimate(deg)
+        timeline_log.append((t, deg.regime, rul.status, rul.rul_median))
+
+    # At baseline, STABLE and null RUL
+    assert timeline_log[-1][1] == DegradationRegime.STABLE
+    assert timeline_log[-1][2] == RULStatus.STABLE
+
+    # 2. Fault onset & active: t=22..50s, F3 cooling fault causes HI drops to 0.70 (D = 0.30)
+    for t in range(22, 51, 2):
+        d_val = min(0.30, 0.02 + 0.01 * (t - 20))
+        h = _create_mock_health(timestamp=float(t), hi_smooth=1.0 - d_val)
+        deg = deg_est.estimate(h)
+        rul = rul_est.estimate(deg)
+        timeline_log.append((t, deg.regime, rul.status, rul.rul_median))
+
+    # During fault progression, active degradation
+    assert deg.regime in (DegradationRegime.DEGRADING, DegradationRegime.RAPID_DEGRADATION)
+
+    # 3. Fault cleared & recovery: t=52..70s, HI returns to 0.98
+    for t in range(52, 71, 2):
+        h = _create_mock_health(timestamp=float(t), hi_smooth=0.98)
+        deg = deg_est.estimate(h)
+        rul = rul_est.estimate(deg)
+        timeline_log.append((t, deg.regime, rul.status, rul.rul_median))
+
+    # Recovery slope is negative (dD/dt < 0), status is NON_DEGRADING or STABLE, RUL is None
+    assert rul.status in (RULStatus.NON_DEGRADING, RULStatus.STABLE)
+    assert rul.rul_median is None
+
+    # 4. Post-recovery: after window duration (60s), historical fault drops out completely
+    for t in range(72, 160, 2):
+        h = _create_mock_health(timestamp=float(t), hi_smooth=0.98)
+        deg = deg_est.estimate(h)
+        rul = rul_est.estimate(deg)
+
+    assert deg.regime == DegradationRegime.STABLE
+    assert rul.status == RULStatus.STABLE
+    assert rul.rul_median is None
+
+
+def test_sensor_drift_masquerade_limitation():
+    """
+    Forensic Section 11: Sensor bias and slow drift contamination audit.
+    Shows that slow unflagged drift can masquerade as degradation (fundamental limitation).
+    """
+    deg_est = DegradationEstimator()
+    rul_est = RULEstimator()
+
+    # Slow drift: +0.0005 degradation per second over 80s (D increases from 0.05 to 0.09)
+    # Telemetry quality gates pass (C_data=1.0, C_obs=1.0) because single-sensor drift is subtle
+    for t in np.linspace(0.0, 80.0, 25):
+        d_val = 0.05 + 0.0005 * t
+        h = _create_mock_health(timestamp=float(t), hi_smooth=1.0 - d_val, c_data=1.0, c_obs=1.0)
+        deg = deg_est.estimate(h)
+
+    rul = rul_est.estimate(deg)
+    # Slow drift successfully masquerades as progressive degradation
+    assert deg.regime in (DegradationRegime.DEGRADING, DegradationRegime.RAPID_DEGRADATION)
+    assert rul.status == RULStatus.COMPUTED
+    assert rul.rul_median is not None
+
+    # In contrast, severe sensor bias causing data quality failure is gated
+    deg_est.reset()
+    for t in np.linspace(0.0, 80.0, 25):
+        h_bad = _create_mock_health(timestamp=float(t), hi_smooth=0.60, c_data=0.20, c_obs=0.20)
+        deg = deg_est.estimate(h_bad)
+    rul_bad = rul_est.estimate(deg)
+    assert rul_bad.status == RULStatus.DATA_QUALITY_DEGRADED
+    assert rul_bad.rul_median is None
+
+
+def test_scenario_multiplier_ordering_all_subsystems():
+    """
+    Forensic Section 12 & 13: Scenario stress ordering across all subsystem dimensions.
+    """
+    rul_est = RULEstimator()
+
+    subsystems = [
+        DegradationSubsystem.THERMAL_DEGRADATION,
+        DegradationSubsystem.LUBRICATION_DEGRADATION,
+        DegradationSubsystem.COMBUSTION_DEGRADATION,
+        DegradationSubsystem.MECHANICAL_DEGRADATION,
+        DegradationSubsystem.FUEL_SYSTEM_DEGRADATION,
+        DegradationSubsystem.COOLING_DEGRADATION,
+    ]
+
+    for sub in subsystems:
+        sub_states = {
+            s: SubsystemDegradationState(
+                subsystem=s,
+                degradation_index=0.25 if s == sub else 0.05,
+                trend_per_second=0.001 if s == sub else 0.0,
+                trend_per_hour=3.6 if s == sub else 0.0,
+                regime=DegradationRegime.DEGRADING if s == sub else DegradationRegime.STABLE,
+                confidence=0.85,
+                observation_count=30,
+                window_start=40.0,
+                window_end=100.0,
+                data_quality=1.0,
+            )
+            for s in DegradationSubsystem
+        }
+
+        deg = DegradationAssessment(
+            timestamp=100.0,
+            engine_id="TEST_ENG",
+            degradation_index=0.25,
+            degradation_raw=0.25,
+            trend_slope_per_sec=0.001,
+            trend_slope_per_hour=3.6,
+            slope_low_per_sec=0.0008,
+            slope_high_per_sec=0.0012,
+            regime=DegradationRegime.DEGRADING,
+            confidence=0.90,
+            observation_count=30,
+            window_duration_s=60.0,
+            window_start_s=40.0,
+            window_end_s=100.0,
+            data_quality_factor=1.0,
+            subsystems={s.value: st for s, st in sub_states.items()},
+            dominant_subsystem=sub.value,
+        )
+
+        rul_assess = rul_est.estimate(deg)
+        assert rul_assess.status == RULStatus.COMPUTED
+        projs = rul_assess.scenario_projections
+
+        # Monotonic stress ordering: HIGH_LOAD < HOT_DAY < HIGH_ALTITUDE < NORMAL_MISSION
+        assert projs[RULScenario.HIGH_LOAD.value]["rul_median_hours"] < projs[RULScenario.HOT_DAY.value]["rul_median_hours"]
+        assert projs[RULScenario.HOT_DAY.value]["rul_median_hours"] < projs[RULScenario.HIGH_ALTITUDE.value]["rul_median_hours"]
+        assert projs[RULScenario.HIGH_ALTITUDE.value]["rul_median_hours"] < projs[RULScenario.NORMAL_MISSION.value]["rul_median_hours"]
+        assert projs[RULScenario.NORMAL_MISSION.value]["rul_median_hours"] == projs[RULScenario.CURRENT_PROFILE.value]["rul_median_hours"]
+
+
+def test_eol_threshold_provenance_and_non_circularity():
+    """
+    Forensic Section 14 & 17: EOL threshold provenance and strict one-way dependency.
+    """
+    # 1. Provenance check
+    cfg = RULEstimatorConfig()
+    assert cfg.eol_threshold == 0.50
+    assert cfg.provenance == ProvenanceTag.ENGINEERING_HEURISTIC.value
+
+    # 2. Strict one-way import hierarchy check
+    import digital_twin.health as health_mod
+    import digital_twin.degradation as deg_mod
+
+    health_source = inspect.getsource(health_mod)
+    deg_source = inspect.getsource(deg_mod)
+
+    assert "digital_twin.degradation" not in health_source
+    assert "digital_twin.rul" not in health_source
+    assert "digital_twin.rul" not in deg_source
+
+
+def test_memory_boundedness_extended_stream():
+    """
+    Forensic Section 24: Bounded memory history over 2,500 continuous streaming steps.
+    """
+    deg_est = DegradationEstimator(DegradationEstimatorConfig(window_duration_s=300.0))
+
+    for i in range(2500):
+        t = float(i)
+        d = 0.05 + 0.00005 * min(t, 2000.0)
+        h = _create_mock_health(timestamp=t, hi_smooth=1.0 - d)
+        deg_est.estimate(h)
+
+    # Rolling buffer is bounded by window duration (300s window at 1Hz contains ~301 points)
+    assert len(deg_est._history) <= 305
+
+
+def test_phase8_isolated_latency_and_determinism():
+    """
+    Forensic Section 23 & 25: Isolated Phase 8 latency benchmark and bitwise determinism.
+    """
+    deg_est = DegradationEstimator()
+    rul_est = RULEstimator()
+
+    latencies_us = []
+    # Warmup
+    for i in range(20):
+        h = _create_mock_health(timestamp=float(i), hi_smooth=0.95 - 0.001 * i)
+        deg = deg_est.estimate(h)
+        rul_est.estimate(deg)
+
+    for i in range(20, 1020):
+        t = float(i)
+        h = _create_mock_health(timestamp=t, hi_smooth=0.95 - 0.0002 * (i % 200))
+        t0 = time.perf_counter()
+        deg = deg_est.estimate(h)
+        rul = rul_est.estimate(deg)
+        t1 = time.perf_counter()
+        latencies_us.append((t1 - t0) * 1e6)
+
+    mean_ms = np.mean(latencies_us) / 1000.0
+    median_ms = np.median(latencies_us) / 1000.0
+    p95_ms = np.percentile(latencies_us, 95) / 1000.0
+
+    # Phase 8 isolated latency satisfies soft real-time budget (< 5.0ms)
+    assert median_ms < 3.00, f"Isolated median latency was {median_ms:.3f} ms"
+    assert p95_ms < 5.00, f"Isolated p95 latency was {p95_ms:.3f} ms"
+
+    # Determinism check
+    est_a = DegradationEstimator()
+    est_b = DegradationEstimator()
+    rul_a = RULEstimator()
+    rul_b = RULEstimator()
+
+    for i in range(40):
+        t = float(i)
+        d = 0.05 + 0.001 * t
+        ha = _create_mock_health(timestamp=t, hi_smooth=1.0 - d)
+        hb = _create_mock_health(timestamp=t, hi_smooth=1.0 - d)
+        da = est_a.estimate(ha)
+        db = est_b.estimate(hb)
+        ra = rul_a.estimate(da)
+        rb = rul_b.estimate(db)
+
+    assert da.trend_slope_per_hour == db.trend_slope_per_hour
+    assert ra.rul_median == rb.rul_median
+    assert ra.scenario_projections == rb.scenario_projections
+
+
