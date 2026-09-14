@@ -195,21 +195,29 @@ class ThermalSystem:
 
         # Conductance and heat generation distributed to 4 individual heads
         h_cool_cyl_base = h_cool_nominal / 4.0
-        q_gen_total = max(0.0, fuel_mass_flow_kg_s * self.tier_c.fuel_lhv_j_per_kg * self.tier_c.q_gen_fraction)
-        q_gen_per_cyl_base = q_gen_total / 4.0
         h_head_to_coolant = 12.0  # W/K per cylinder head to liquid jacket
+
+        # Pre-compute localized fuel delivery factors across cylinders to avoid duplicate fuel degradation:
+        # fuel_mass_flow_kg_s is already the aggregate delivered fuel flow from FuelSystem.
+        f_fuel_list = [1.0] * 4
+        if per_cylinder_fuel_severities is not None and len(per_cylinder_fuel_severities) == 4:
+            for idx in range(4):
+                s_f = max(0.0, min(1.0, float(per_cylinder_fuel_severities[idx])))
+                if s_f > 0.0:
+                    if "rich" in mode_str:
+                        f_fuel_list[idx] = 1.0 + getattr(self.tier_c, "k_fuel_flow_rich", 0.30) * s_f
+                    else:
+                        f_fuel_list[idx] = max(0.0, 1.0 - getattr(self.tier_c, "k_fuel_flow_lean", 0.35) * s_f)
+
+        mean_f_fuel = sum(f_fuel_list) / 4.0
+        # Base fuel flow per cylinder normalizing out aggregate multiplier so sum(m_fuel_cyl_i) == fuel_mass_flow_kg_s
+        m_fuel_nom_cyl = (max(0.0, fuel_mass_flow_kg_s) / max(1e-4, mean_f_fuel)) / 4.0
+        q_gen_total = max(0.0, fuel_mass_flow_kg_s * self.tier_c.fuel_lhv_j_per_kg * self.tier_c.q_gen_fraction)
 
         dcht_dt_sum = 0.0
         for i in range(4):
-            # Evaluate per-cylinder localized fuel factor
-            f_fuel_i = 1.0
-            if per_cylinder_fuel_severities is not None and len(per_cylinder_fuel_severities) == 4:
-                s_f = max(0.0, min(1.0, float(per_cylinder_fuel_severities[i])))
-                if s_f > 0.0:
-                    if "rich" in mode_str:
-                        f_fuel_i = 1.0 + getattr(self.tier_c, "k_fuel_flow_rich", 0.30) * s_f
-                    else:
-                        f_fuel_i = max(0.0, 1.0 - getattr(self.tier_c, "k_fuel_flow_lean", 0.35) * s_f)
+            f_fuel_i = f_fuel_list[i]
+            m_fuel_cyl_i = m_fuel_nom_cyl * f_fuel_i
 
             # Evaluate per-cylinder localized combustion efficiency factor
             eta_comb_i = 1.0
@@ -217,7 +225,13 @@ class ThermalSystem:
                 eta_comb_i = max(0.0, min(1.0, float(per_cylinder_combustion_efficiencies[i])))
 
             # Cylinder heat generation: fuel delivery * combustion efficiency * bank factor
-            q_gen_i = q_gen_per_cyl_base * self.variation_factors[i] * f_fuel_i * eta_comb_i
+            q_gen_i = (
+                m_fuel_cyl_i
+                * self.tier_c.fuel_lhv_j_per_kg
+                * self.tier_c.q_gen_fraction
+                * self.variation_factors[i]
+                * eta_comb_i
+            )
 
             # Evaluate per-cylinder localized cooling conductance
             h_cool_cyl_i = h_cool_cyl_base
