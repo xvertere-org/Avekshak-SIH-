@@ -40,14 +40,14 @@ from dashboard.pages.report_page import render_report_page
 from dashboard.pages.what_if_page import render_what_if_page
 
 
-@st.cache_resource(show_spinner="Bootstrapping Phase 13 Pipeline Orchestrator (XGBoost + Isolation Forest)...")
+@st.cache_resource(show_spinner="Preparing engine simulation and health analysis...")
 def get_cached_orchestrator() -> SystemPipelineOrchestrator:
     """Initialize singleton production orchestrator with deterministic bootstrap."""
     cfg = OrchestratorConfig(auto_bootstrap_on_init=True, deterministic_seed=42)
     return SystemPipelineOrchestrator(config=cfg)
 
 
-@st.cache_data(show_spinner="Executing Phase 13 End-to-End Simulation Pipeline...")
+@st.cache_data(show_spinner="Running engine simulation and health analysis...")
 def run_live_simulation(
     scenario_fault_str: str,
     duration_s: float,
@@ -109,7 +109,7 @@ class DashboardInterface:
     Preserves Phase 1 main.py dry-run contract while supporting modern Phase 13 schemas.
     """
 
-    def __init__(self, title: str = "Aero Piston Engine Digital Twin - SIH26054"):
+    def __init__(self, title: str = "Avekshak · Aero-Piston Engine Health & Prognostics"):
         self.title = title
         self.adapter = DashboardAdapter()
 
@@ -156,7 +156,7 @@ class DashboardInterface:
 def main():
     """Main Streamlit application entrypoint."""
     st.set_page_config(
-        page_title="SIH26054 Aero Engine Digital Twin",
+        page_title="Avekshak · Aero-Piston Engine Health",
         page_icon="✈️",
         layout="wide",
         initial_sidebar_state="expanded",
@@ -169,28 +169,31 @@ def main():
     with st.sidebar:
         st.markdown(
             '<div style="text-align: center; margin-bottom: 20px; padding: 10px 0; border-bottom: 1px solid #21262d;">'
-            '<h3 style="margin: 0; color: #58a6ff; font-weight: 700; letter-spacing: 1px;">SIH26054</h3>'
-            '<div style="font-size: 11px; color: #8b949e; margin-top: 4px;">MALE UAV Aero-Piston Engine Twin</div>'
+            '<h3 style="margin: 0; color: #58a6ff; font-weight: 700; letter-spacing: 1px;">Avekshak</h3>'
+            '<div style="font-size: 10px; color: #c9d1d9; margin-top: 2px; font-weight: 600;">AI-Enabled Real-Time Digital Twin</div>'
+            '<div style="font-size: 10px; color: #8b949e; margin-top: 2px;">SIH26054 · Aero-Piston Engine Health</div>'
             '</div>',
             unsafe_allow_html=True,
         )
 
-        # Navigation / System Views
+        # Navigation
         st.markdown(
-            '<div style="font-size: 11px; font-weight: 700; color: #8b949e; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;">VIEWS</div>',
+            '<div style="font-size: 10px; font-weight: 700; color: #58a6ff; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px;">MISSION</div>',
             unsafe_allow_html=True,
         )
         active_tab = st.radio(
-            "System Views",
+            "Navigation",
             [
-                "Overview",
-                "Live Telemetry",
-                "Diagnostics",
-                "Prognostics",
-                "System Status",
+                "Mission Overview",
+                "Live Engine",
                 "Mission Replay",
+                "What-If Analysis",
+                "— Engine Health —",
+                "Diagnostics",
+                "Health & Prognostics",
+                "System Status",
+                "— Analysis —",
                 "Mission Report",
-                "What-If Comparison",
             ],
             index=0,
             label_visibility="collapsed",
@@ -200,27 +203,27 @@ def main():
 
         # Simulation Controls
         st.markdown(
-            '<div style="font-size: 11px; font-weight: 700; color: #8b949e; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;">OPERATIONAL FEED</div>',
+            '<div style="font-size: 11px; font-weight: 700; color: #8b949e; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;">DATA SOURCE</div>',
             unsafe_allow_html=True,
         )
 
         feed_mode = st.radio(
-            "Telemetry Source",
+            "Data Source",
             [
-                "Phase 13 Live Pipeline Orchestrator",
-                "Pre-Packaged Demo Scenarios",
+                "Live Analysis",
+                "Simulation Scenarios",
             ],
             index=0,
-            help="Select live end-to-end backend orchestrator or pre-packaged static demo.",
+            help="Choose live engine simulation or pre-built demonstration scenarios.",
         )
 
         history_data = None
         payloads: List[DashboardStatePayload] = []
         adapter = DashboardAdapter()
 
-        if feed_mode == "Phase 13 Live Pipeline Orchestrator":
+        if feed_mode == "Live Analysis":
             st.markdown("---")
-            st.markdown("#### Live Mission Scenarios")
+            st.markdown("#### Mission Scenarios")
             live_scenarios = [
                 "1. Nominal Healthy Cruise",
                 "2. Cooling Degradation (Thermal Conductance Loss)",
@@ -231,7 +234,7 @@ def main():
             ]
             selected_scenario = st.selectbox("Scenario", live_scenarios, index=1)
 
-            with st.expander("⚙️ Mission & Fault Settings", expanded=False):
+            with st.expander("⚙️ Mission Settings", expanded=False):
                 duration = st.slider("Duration (s)", min_value=15, max_value=90, value=35, step=5)
                 fault_start = st.slider("Fault Injection Time (s)", min_value=5, max_value=max(6, duration - 5), value=15, step=1)
                 severity = st.slider("Fault Severity", min_value=0.1, max_value=1.0, value=0.7, step=0.05)
@@ -254,12 +257,12 @@ def main():
             default_step = min(max_step, 25)
 
             step_slider = st.slider(
-                "Mission Elapsed Time (s)",
+                "Mission Time (s)",
                 min_value=0,
                 max_value=max_step,
                 value=default_step,
                 step=1,
-                help="Scrub flight time to observe causal real-time pipeline inference.",
+                help="Move through the mission timeline to see how engine health evolved.",
             )
 
             current_payload = payloads[step_slider]
@@ -268,17 +271,17 @@ def main():
 
         else:
             st.markdown("---")
-            st.markdown("#### Test Scenarios")
+            st.markdown("#### Demo Scenarios")
             scenarios = DemoScenarioProvider.get_available_scenarios()
             selected_scenario = st.selectbox("Scenario", scenarios, index=0)
 
             step_slider = st.slider(
-                "Mission Elapsed Time (s)",
+                "Mission Time (s)",
                 min_value=5,
                 max_value=120,
                 value=35,
                 step=1,
-                help="Advance flight time step to observe progressive degradation.",
+                help="Step through the mission to observe progressive engine degradation.",
             )
 
             contract, history_data = DemoScenarioProvider.generate_scenario_payload(
@@ -316,9 +319,9 @@ def main():
         st.markdown(
             '<div style="font-size: 11px; color: #8b949e; line-height: 1.5; background: #161b22; '
             'border: 1px solid #21262d; border-radius: 4px; padding: 8px 10px;">'
-            '<b style="color: #c9d1d9;">Engineering Reference Anchor:</b><br/>'
-            'Rotax 912 ULS grey-box baseline.<br/>'
-            '<span style="color: #6e7681;">Strict non-fabrication presentation layer.</span>'
+            '<b style="color: #c9d1d9;">Physics Reference:</b><br/>'
+            'Rotax 912 ULS grey-box simulator.<br/>'
+            '<span style="color: #6e7681;">AI-informed results. Not certified for airworthiness decisions.</span>'
             '</div>',
             unsafe_allow_html=True,
         )
@@ -327,26 +330,28 @@ def main():
     render_header(vm.overview)
 
     # Render Active View
-    if active_tab == "Overview" or "Overview" in active_tab:
+    if active_tab == "Mission Overview" or active_tab == "— Engine Health —" or active_tab == "— Analysis —":
         render_overview_page(vm, history_data=history_data)
-    elif active_tab == "Live Telemetry" or "Live Telemetry" in active_tab:
+    elif active_tab == "Live Engine":
         render_telemetry_page(vm, history_data=history_data)
-    elif active_tab == "Diagnostics" or "Diagnostics" in active_tab:
+    elif active_tab == "Diagnostics":
         render_diagnostics_page(vm)
-    elif active_tab == "Prognostics" or "Prognostics" in active_tab:
+    elif active_tab == "Health & Prognostics":
         hist_hi_ts = history_data.get("health_index", {}).get("timestamps") if history_data else None
         hist_hi = history_data.get("health_index", {}).get("hi") if history_data else None
         render_prognostics_page(vm, history_timestamps=hist_hi_ts, history_hi=hist_hi)
-    elif active_tab == "System Status" or "Status" in active_tab or "Data Quality" in active_tab:
+    elif active_tab == "System Status":
         render_system_status_page(vm)
-    elif active_tab == "Mission Replay" or "Replay" in active_tab:
+    elif active_tab == "Mission Replay":
         render_replay_page(payloads, scenario_name=selected_scenario)
-    elif active_tab == "Mission Report" or "Report" in active_tab:
+    elif active_tab == "Mission Report":
         scenario_meta = {"scenario_name": selected_scenario, "feed_mode": feed_mode}
         render_report_page(payloads, scenario_metadata=scenario_meta)
-    elif active_tab == "What-If Comparison" or "What-If" in active_tab:
+    elif active_tab == "What-If Analysis":
         orch = get_cached_orchestrator()
         render_what_if_page(orchestrator=orch)
+    else:
+        render_overview_page(vm, history_data=history_data)
 
 
 if __name__ == "__main__":

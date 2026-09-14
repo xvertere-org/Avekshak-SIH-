@@ -14,7 +14,7 @@ def render_header(overview: OverviewViewModel):
     if overview.is_synthetic_demo or overview.simulation_mode == "SYNTHETIC_SIMULATION":
         st.markdown(
             '<div class="demo-watermark-compact">'
-            'DEMO MODE · SYNTHETIC TELEMETRY · NOT LIVE AIRCRAFT DATA'
+            'SIMULATION ENVIRONMENT · SYNTHETIC ENGINE TELEMETRY'
             '</div>',
             unsafe_allow_html=True,
         )
@@ -24,9 +24,9 @@ def render_header(overview: OverviewViewModel):
     with col_title:
         st.markdown(
             '<div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px;">'
-            '<span style="font-size: 18px; font-weight: 700; color: #f0f6fc; letter-spacing: -0.3px;">Aero-Piston Engine Digital Twin</span>'
+            '<span style="font-size: 20px; font-weight: 800; color: #f0f6fc; letter-spacing: -0.3px;">Avekshak</span>'
             '<span style="font-size: 11px; font-weight: 700; color: #58a6ff; font-family: monospace; background: #161b22; border: 1px solid #21262d; border-radius: 3px; padding: 2px 6px;">SIH26054</span>'
-            '<span style="font-size: 12px; color: #8b949e;">Rotax 912/914 MALE UAV Propulsion Health Monitoring</span>'
+            '<span style="font-size: 12px; color: #8b949e;">Aero-Piston Engine Health & Prognostics</span>'
             '</div>',
             unsafe_allow_html=True,
         )
@@ -45,9 +45,9 @@ def render_header(overview: OverviewViewModel):
         f'flex-wrap: wrap; gap: 16px; align-items: center; margin-top: 4px; margin-bottom: 12px;">'
         f'<div><span style="color: #6e7681;">ENGINE:</span> <b style="color: #58a6ff;">{overview.engine_id}</b></div>'
         f'<div><span style="color: #6e7681;">MISSION:</span> <b style="color: #f0f6fc;">{overview.mission_id or "NOT_ASSIGNED"}</b></div>'
-        f'<div><span style="color: #6e7681;">REGIME:</span> <b style="color: #f0f6fc;">{overview.mission_phase}</b></div>'
-        f'<div><span style="color: #6e7681;">MET:</span> <b style="color: #f0f6fc;">{format_timestamp(overview.timestamp)}</b></div>'
-        f'<div><span style="color: #6e7681;">FEED:</span> <b style="color: #8b949e;">{overview.simulation_mode}</b></div>'
+        f'<div><span style="color: #6e7681;">FLIGHT PHASE:</span> <b style="color: #f0f6fc;">{overview.mission_phase}</b></div>'
+        f'<div><span style="color: #6e7681;">MISSION TIME:</span> <b style="color: #f0f6fc;">{format_timestamp(overview.timestamp)}</b></div>'
+        f'<div><span style="color: #6e7681;">DATA SOURCE:</span> <b style="color: #8b949e;">{overview.simulation_mode}</b></div>'
         f'</div>'
     )
     st.markdown(meta_strip, unsafe_allow_html=True)
@@ -56,8 +56,8 @@ def render_header(overview: OverviewViewModel):
     st.markdown(
         """
         <div style="background-color: #161b22; border: 1px solid #30363d; border-radius: 4px; padding: 5px 12px; margin-top: -4px; margin-bottom: 12px; font-size: 11px; color: #8b949e;">
-            <b style="color: #58a6ff;">Operational Mode:</b> Synthetic Simulation / Ground Station Decision Support
-            <span style="color: #6e7681; margin-left: 8px;">(Displaying real-time inferred PHM outputs; scenario configurations are isolated in demo controls)</span>
+            <b style="color: #58a6ff;">Avekshak:</b> AI-Enabled Real-Time Digital Twin for Aero-Piston Engine Health & Prognostics.
+            <span style="color: #6e7681; margin-left: 8px;">Results represent simulated engine behaviour for engineering evaluation and decision support.</span>
         </div>
         """,
         unsafe_allow_html=True,

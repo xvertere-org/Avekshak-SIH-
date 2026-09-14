@@ -28,19 +28,18 @@ def render_replay_page(
     scenario_name: str = "Active Mission",
 ):
     """Render 6. MISSION REPLAY section."""
-    st.markdown("### Chronological Mission Replay")
+    st.markdown("### Mission Replay")
     st.markdown(
         """
         <div style="font-size: 13px; color: #8b949e; margin-bottom: 16px;">
-            Replay recorded flight missions step-by-step. All PHM metrics, diagnostics, health trajectories,
-            and advisory decisions are retrieved directly from Phase 13 pipeline outputs.
+            Step through the mission and see how engine behaviour, diagnostics, health, and recommendations changed over time.
         </div>
         """,
         unsafe_allow_html=True,
     )
 
     if not payloads:
-        st.warning("No mission telemetry data available for replay. Please execute a scenario from the sidebar.")
+        st.warning("No mission data available for replay. Run a scenario from the sidebar first.")
         return
 
     # Initialize Replay Session via MissionReplayManager
@@ -48,7 +47,7 @@ def render_replay_page(
     try:
         session = mgr.create_session_from_payloads(payloads, scenario_name=scenario_name)
     except Exception as e:
-        st.error(f"Replay Session Error: {e}")
+        st.error(f"Mission replay could not be loaded. Try resetting the simulation and running it again.")
         return
 
     # Playback Controls Bar
@@ -57,20 +56,20 @@ def render_replay_page(
 
     with col_ctrl1:
         step_idx = st.slider(
-            "Replay Timestep Navigation (Seconds Elapsed)",
+            "Mission Timeline",
             min_value=0,
             max_value=max_step,
             value=min(max_step, max(0, max_step // 2)),
             step=1,
-            help="Scrub through mission timeline to view synchronous digital twin and PHM state.",
+            help="Step through the mission to see engine health, diagnostics and decisions at each point.",
         )
 
     with col_ctrl2:
         st.markdown(
             f"""
             <div style="background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 12px; margin-top: 5px; text-align: center;">
-                <div style="font-size: 10px; color: #8b949e; text-transform: uppercase;">Mission Time / Steps</div>
-                <div style="font-size: 18px; font-weight: 700; color: #58a6ff;">T+{step_idx * session.dt:.1f} s <span style="font-size: 12px; color: #8b949e;">({step_idx + 1}/{session.total_steps})</span></div>
+                <div style="font-size: 10px; color: #8b949e; text-transform: uppercase;">Mission Time</div>
+                <div style="font-size: 18px; font-weight: 700; color: #58a6ff;">T+{step_idx * session.dt:.1f}s <span style="font-size: 12px; color: #8b949e;">({step_idx + 1}/{session.total_steps})</span></div>
             </div>
             """,
             unsafe_allow_html=True,
@@ -120,7 +119,7 @@ def render_replay_page(
         st.markdown(
             f"""
             <div style="background-color: #161b22; border-left: 4px solid #d29922; border: 1px solid #30363d; border-radius: 6px; padding: 10px 14px; margin: 15px 0;">
-                <div style="font-size: 11px; font-weight: 700; color: #8b949e;">ADVISORY DECISION SUPPORT: <code>{adv.action_code}</code> (Urgency: {adv.urgency})</div>
+                <div style="font-size: 11px; font-weight: 700; color: #8b949e;">DECISION SUPPORT: <code>{adv.action_code}</code> (Urgency: {adv.urgency})</div>
                 <div style="font-size: 14px; font-weight: 600; color: #f0f6fc; margin: 4px 0;">{adv.headline}</div>
                 <div style="font-size: 12px; color: #c9d1d9;"><b>Action:</b> {adv.recommended_action}</div>
             </div>
@@ -129,7 +128,7 @@ def render_replay_page(
         )
 
     # Synchronized History Timeline Plot
-    st.markdown("#### Mission Historical Trajectory")
+    st.markdown("#### Engine Health Timeline")
     history = session.get_history(step_idx)
     ts = history.get("timestamps", [])
 

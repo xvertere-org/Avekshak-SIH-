@@ -13,7 +13,7 @@ from dashboard.utils.styles import STATUS_COLORS, render_status_badge
 
 def render_quality_summary(quality: DataQualityViewModel):
     """Render high-level data quality KPIs and issue summary."""
-    st.markdown("#### Telemetry Stream Integrity Assessment")
+    st.markdown("#### Data Quality Summary")
 
     cols = st.columns(4)
     with cols[0]:
@@ -43,7 +43,7 @@ def render_quality_summary(quality: DataQualityViewModel):
 
 def render_sensor_status_matrix(quality: DataQualityViewModel):
     """Render table of channel-level sensor statuses."""
-    st.markdown("#### Sensor Channel Health Matrix")
+    st.markdown("#### Sensor Status")
 
     if not quality.channel_summaries:
         st.info("ℹ️ Granular channel quality summaries currently unavailable.")
@@ -81,17 +81,18 @@ def render_sensor_status_matrix(quality: DataQualityViewModel):
 
 def render_provenance_card(quality: DataQualityViewModel):
     """Render telemetry and model provenance details."""
-    st.markdown("#### System & Execution Provenance")
+    st.markdown("#### System Information")
 
-    engine_val = quality.provenance.get('pipeline', 'SystemPipelineOrchestrator')
+    dq = quality
+    engine_val = dq.provenance.get('pipeline', 'SystemPipelineOrchestrator')
     prov_html = (
-        f'<div style="background-color: #11151c; border: 1px solid #21262d; '
-        f'border-radius: 4px; padding: 14px 16px; font-size: 13px;">'
-        f'<div style="margin-bottom: 8px;"><span style="color: #8b949e;">Data Feed Source:</span> <b style="color: #58a6ff; font-family: monospace;">{quality.provenance_source}</b></div>'
-        f'<div style="margin-bottom: 8px;"><span style="color: #8b949e;">Pipeline Execution Latency:</span> <b style="color: #3fb950; font-family: monospace;">{quality.execution_latency_ms:.2f} ms</b></div>'
-        f'<div style="margin-bottom: 8px;"><span style="color: #8b949e;">Telemetry Quality Status:</span> <code style="color: #f0f6fc;">{quality.quality_status}</code></div>'
-        f'<div><span style="color: #8b949e;">Pipeline Execution Engine:</span> <code style="color: #f0f6fc;">{engine_val}</code></div>'
+        f'<div class="console-panel" style="padding: 12px 14px;">'
+        f'<div style="font-size: 12px; color: #c9d1d9; line-height: 1.8;">'
+        f'<div><span style="color: #8b949e;">Analysis Engine:</span> <code style="color: #58a6ff;">{engine_val}</code></div>'
+        f'<div><span style="color: #8b949e;">Data Feed Source:</span> <code style="color: #f0f6fc;">{dq.provenance_source}</code></div>'
+        f'<div><span style="color: #8b949e;">Pipeline Latency:</span> <code style="color: #3fb950;">{dq.execution_latency_ms:.2f} ms</code></div>'
+        f'<div><span style="color: #8b949e;">Quality Status:</span> <code style="color: #f0f6fc;">{dq.quality_status}</code></div>'
+        f'</div>'
         f'</div>'
     )
     st.markdown(prov_html, unsafe_allow_html=True)
-

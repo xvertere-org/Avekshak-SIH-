@@ -23,7 +23,7 @@ def render_telemetry_page(
     history_data: Optional[Dict[str, Dict[str, List[float]]]] = None,
 ):
     """Render 2. LIVE TELEMETRY section."""
-    st.markdown("### Propulsion Telemetry Streams")
+    st.markdown("### Live Engine Data")
 
     # Operating context ribbon
     render_operating_context_cards(vm.telemetry)
