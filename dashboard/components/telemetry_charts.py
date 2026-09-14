@@ -76,23 +76,35 @@ def build_channel_figure(
             marker=dict(color=PLOT_COLORS["observed"], size=9, symbol="circle"),
         ))
 
-    # 2. Historical & Current Digital Twin Expected
+    # 2. Historical & Current Digital Twin Expected (Physics Estimate)
     if history_timestamps and history_expected:
         fig.add_trace(go.Scatter(
             x=history_timestamps,
             y=history_expected,
             mode="lines",
-            name="DT Expected",
+            name="Physics estimate",
             line=dict(color=PLOT_COLORS["expected"], width=2, dash="dash"),
         ))
-    elif model.expected_value is not None:
+    elif model.physics_estimate is not None or model.expected_value is not None:
+        val = model.physics_estimate if model.physics_estimate is not None else model.expected_value
         fig.add_trace(go.Scatter(
             x=[0],
-            y=[model.expected_value],
+            y=[val],
             mode="markers",
-            name="DT Expected",
+            name="Physics estimate",
             marker=dict(color=PLOT_COLORS["expected"], size=8, symbol="diamond"),
         ))
+
+    # 2b. Corrected Prediction Marker (Sensor-informed Grey-Box)
+    if model.corrected_prediction is not None and model.observed_value is None:
+        fig.add_trace(go.Scatter(
+            x=[0],
+            y=[model.corrected_prediction],
+            mode="markers",
+            name="Corrected prediction",
+            marker=dict(color="#56d364", size=8, symbol="star"),
+        ))
+
 
     # 3. Future Forecast Trajectory (Phase 10)
     if model.forecast_values and model.forecast_timestamps:
@@ -191,19 +203,33 @@ def render_canonical_telemetry_grid(
             # Top summary row for the channel
             hdr_col1, hdr_col2 = st.columns([3, 1])
             with hdr_col1:
-                obs_str = format_value(ch_model.observed_value, decimals=1, unit=ch_model.unit)
-                exp_str = format_value(ch_model.expected_value, decimals=1, unit=ch_model.unit)
-                res_str = format_value(ch_model.residual, decimals=2, unit=ch_model.unit)
+                phys_val = ch_model.physics_estimate if ch_model.physics_estimate is not None else ch_model.expected_value
+                phys_str = format_value(phys_val, decimals=1, unit=ch_model.unit)
+                corr_str = format_value(ch_model.corrected_prediction, decimals=1, unit=ch_model.unit)
+                sc_val = ch_model.sensor_correction if ch_model.sensor_correction is not None else ch_model.residual
+                sc_str = format_value(sc_val, decimals=2, unit=ch_model.unit)
+                dev_val = ch_model.detected_deviation if ch_model.detected_deviation is not None else ch_model.residual
+                dev_str = format_value(dev_val, decimals=2, unit=ch_model.unit)
+                conf_str = f"{ch_model.model_confidence * 100.0:.0f}%" if ch_model.model_confidence is not None else "100%"
+                pi_str = ""
+                if ch_model.prediction_lower is not None and ch_model.prediction_upper is not None:
+                    pi_str = f" | Prediction range: <b style='color: #79c0ff; font-family: monospace;'>[{ch_model.prediction_lower:.1f} – {ch_model.prediction_upper:.1f}]</b>"
 
                 hdr_html = (
                     f'<div style="font-size: 13px; font-weight: 700; color: #f0f6fc;">{ch_model.display_name}</div>'
-                    f'<div style="font-size: 11px; color: #8b949e; margin-bottom: 4px;">'
-                    f'Measured: <b style="color: {PLOT_COLORS["observed"]}; font-family: monospace;">{obs_str}</b> | '
-                    f'DT Expected: <b style="color: {PLOT_COLORS["expected"]}; font-family: monospace;">{exp_str}</b> | '
-                    f'Deviation: <b style="color: #f0f6fc; font-family: monospace;">{res_str}</b>'
+                    f'<div style="font-size: 11px; color: #8b949e; margin-bottom: 2px;">'
+                    f'Physics estimate: <b style="color: {PLOT_COLORS["expected"]}; font-family: monospace;">{phys_str}</b> | '
+                    f'Sensor-informed correction: <b style="color: #79c0ff; font-family: monospace;">{sc_str}</b> | '
+                    f'Corrected prediction: <b style="color: #56d364; font-family: monospace;">{corr_str}</b>'
+                    f'</div>'
+                    f'<div style="font-size: 10px; color: #8b949e; margin-bottom: 4px;">'
+                    f'Detected deviation: <b style="color: #f0f6fc; font-family: monospace;">{dev_str}</b> | '
+                    f'Model confidence: <b style="color: #e6edf3; font-family: monospace;">{conf_str}</b>'
+                    f'{pi_str}'
                     f'</div>'
                 )
                 st.markdown(hdr_html, unsafe_allow_html=True)
+
             with hdr_col2:
                 status_text = "ISOLATED" if ch_model.is_isolated else ch_model.status.value
                 st.markdown(

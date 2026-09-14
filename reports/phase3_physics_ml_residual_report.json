@@ -1,0 +1,613 @@
+{
+  "title": "SIH26054 Phase 3: Physics\u2013ML Residual Integration Technical Report",
+  "timestamp": "2026-09-14T21:13:07.172251",
+  "completion_status": "IMPLEMENTATION_COMPLETE_SIMULATED_WORKFLOW",
+  "conclusion": "Phase 3 is implementation-complete and verified for the current simulated aero-piston workflow. The physics-only, pure-ML, and physics-plus-ML residual paths are implemented. Residual calculation, corrected prediction, leakage protection, deterministic inference, explainability structure, dashboard integration, and automated tests are in place. Evaluation shows target-dependent performance. The grey-box model improves oil temperature, coolant temperature, exhaust-gas temperature relative to pure ML, fuel flow relative to pure ML, and vibration relative to pure ML. It does not outperform the physics-only baseline on every channel, so the results should be presented as a controlled technical demonstration rather than universal performance superiority. The current implementation uses simulated aero-piston telemetry and controlled benchmark datasets. It does not constitute certified validation of the complete Rotax 914 engine and must not be presented as OEM, FAA, or real-flight validation.",
+  "architecture_flow": {
+    "step_1": "Observable flight context (throttle, altitude, ambient_temp) -> DigitalTwinModel nominal physics baseline",
+    "step_2": "Telemetry measurement y_observed",
+    "step_3": "Residual formulation: residual = y_observed - y_physics",
+    "step_4": "ML residual regressor (Ridge / GBR) trained strictly on training flight partitions",
+    "step_5": "Corrected prediction: corrected_prediction = y_physics + predicted_residual",
+    "step_6": "Operator-facing outputs: Physics estimate, Sensor-informed correction, Corrected prediction, Detected deviation, Model confidence"
+  },
+  "governing_physics_model": {
+    "engine_reference": "Rotax 914 UL/F reduced-order grey-box model",
+    "deterministic_outputs": [
+      "rpm_expected",
+      "load_expected",
+      "cht_expected",
+      "egt_expected",
+      "coolant_temp_expected",
+      "fuel_flow_expected",
+      "oil_temp_expected",
+      "oil_pressure_expected",
+      "vibration_expected",
+      "map_bar_expected"
+    ],
+    "decoupling_rule": "Observed RPM is NEVER used as input to expected state tracking to maintain sensor fault isolation."
+  },
+  "target_mapping": {
+    "physics_inputs": [
+      "throttle (%)",
+      "altitude (m)",
+      "ambient_temp (\u00b0C)",
+      "airspeed (m/s)"
+    ],
+    "observed_targets": {
+      "cht": "cht (\u00b0C)",
+      "egt": "egt (\u00b0C)",
+      "oil_temp": "oil_temp (\u00b0C)",
+      "oil_pressure": "oil_pressure (bar)",
+      "fuel_flow": "fuel_flow (L/h)",
+      "rpm": "rpm (RPM)",
+      "map_bar": "map_bar (bar)",
+      "coolant_temp": "coolant_temp (\u00b0C)",
+      "vibration": "vibration (g)"
+    },
+    "physics_predictions": {
+      "cht": "cht_expected",
+      "egt": "egt_expected",
+      "oil_temp": "oil_temp_expected",
+      "oil_pressure": "oil_pressure_expected",
+      "fuel_flow": "fuel_flow_expected",
+      "rpm": "rpm_expected",
+      "map_bar": "map_bar_expected",
+      "coolant_temp": "coolant_temp_expected",
+      "vibration": "vibration_expected"
+    },
+    "residual_targets": {
+      "cht": "observed_cht - cht_expected",
+      "egt": "observed_egt - egt_expected",
+      "oil_temp": "observed_oil_temp - oil_temp_expected",
+      "oil_pressure": "observed_oil_pressure - oil_pressure_expected",
+      "fuel_flow": "observed_fuel_flow - fuel_flow_expected",
+      "rpm": "observed_rpm - rpm_expected",
+      "map_bar": "observed_map_bar - map_bar_expected",
+      "coolant_temp": "observed_coolant_temp - coolant_temp_expected",
+      "vibration": "observed_vibration - vibration_expected"
+    },
+    "ml_features": [
+      "throttle",
+      "altitude",
+      "ambient_temp",
+      "d_throttle",
+      "d_altitude",
+      "phys_cht",
+      "phys_egt",
+      "phys_oil_temp",
+      "phys_oil_pressure",
+      "phys_fuel_flow",
+      "phys_rpm",
+      "phys_map_bar",
+      "phys_coolant_temp",
+      "phys_vibration"
+    ],
+    "health_indicators": "Normalized deviation z-scores and absolute deviations between observed and physics estimates"
+  },
+  "controlled_benchmark_policy": {
+    "external_datasets": {
+      "paderborn": "Controlled benchmark demonstration for bearing fault diagnosis; independent experiment files; not a full aero-piston engine validation.",
+      "cwru": "Controlled demonstration for feature extraction across 3 source files.",
+      "femto": "Controlled benchmark for bearing degradation and run-to-failure regression.",
+      "cmapss": "Controlled benchmark for turbofan degradation and RUL modeling."
+    },
+    "claim_isolation": "External component benchmarks are auxiliary demonstrators. Full aero-piston thermodynamic and fluid dynamics are modeled via the Rotax 914 UL/F digital twin physics."
+  },
+  "data_leakage_safeguards": {
+    "flight_level_separation": "Training flights (FLIGHT_TR_001..003) and test flights (FLIGHT_TE_001..002) have zero overlapping flight IDs or time intervals.",
+    "preprocessor_fitting": "LeakageSafePreprocessor fitted strictly on training partition.",
+    "future_information": "Zero lookahead or future window leakage in residual regression."
+  },
+  "model_comparison": {
+    "model_type": "ridge",
+    "train_samples": 14,
+    "test_samples": 600,
+    "evaluated_targets": [
+      "cht",
+      "egt",
+      "oil_temp",
+      "oil_pressure",
+      "fuel_flow",
+      "rpm",
+      "map_bar",
+      "coolant_temp",
+      "vibration"
+    ],
+    "channel_metrics": {
+      "cht": {
+        "target": "cht",
+        "unit": "\u00b0C",
+        "n_samples": 600,
+        "physics_only_mae": 6.0733,
+        "physics_only_rmse": 7.8038,
+        "physics_only_r2": -0.2199,
+        "pure_ml_mae": 6.304,
+        "pure_ml_rmse": 8.4663,
+        "pure_ml_r2": -0.4359,
+        "grey_box_mae": 6.5381,
+        "grey_box_rmse": 8.1197,
+        "grey_box_r2": -0.3207,
+        "delta_mae_vs_physics": -0.4648,
+        "delta_mae_vs_pure_ml": -0.2341,
+        "performance_vs_physics": "DEGRADED",
+        "performance_vs_pure_ml": "DEGRADED",
+        "error_reduction_vs_physics_pct": -7.65,
+        "error_reduction_vs_pure_ml_pct": -3.71,
+        "r2_meaningful": true,
+        "notes": null
+      },
+      "egt": {
+        "target": "egt",
+        "unit": "\u00b0C",
+        "n_samples": 600,
+        "physics_only_mae": 8.8504,
+        "physics_only_rmse": 31.3726,
+        "physics_only_r2": 0.5445,
+        "pure_ml_mae": 29.5363,
+        "pure_ml_rmse": 41.286,
+        "pure_ml_r2": 0.2111,
+        "grey_box_mae": 12.6465,
+        "grey_box_rmse": 26.5766,
+        "grey_box_r2": 0.6731,
+        "delta_mae_vs_physics": -3.7961,
+        "delta_mae_vs_pure_ml": 16.8898,
+        "performance_vs_physics": "DEGRADED",
+        "performance_vs_pure_ml": "IMPROVED",
+        "error_reduction_vs_physics_pct": -42.89,
+        "error_reduction_vs_pure_ml_pct": 57.18,
+        "r2_meaningful": true,
+        "notes": null
+      },
+      "oil_temp": {
+        "target": "oil_temp",
+        "unit": "\u00b0C",
+        "n_samples": 600,
+        "physics_only_mae": 8.8024,
+        "physics_only_rmse": 13.2928,
+        "physics_only_r2": -0.6588,
+        "pure_ml_mae": 7.9804,
+        "pure_ml_rmse": 9.2384,
+        "pure_ml_r2": 0.1987,
+        "grey_box_mae": 5.1454,
+        "grey_box_rmse": 6.1189,
+        "grey_box_r2": 0.6485,
+        "delta_mae_vs_physics": 3.6569,
+        "delta_mae_vs_pure_ml": 2.835,
+        "performance_vs_physics": "IMPROVED",
+        "performance_vs_pure_ml": "IMPROVED",
+        "error_reduction_vs_physics_pct": 41.55,
+        "error_reduction_vs_pure_ml_pct": 35.52,
+        "r2_meaningful": true,
+        "notes": null
+      },
+      "oil_pressure": {
+        "target": "oil_pressure",
+        "unit": "bar",
+        "n_samples": 600,
+        "physics_only_mae": 0.3582,
+        "physics_only_rmse": 0.5365,
+        "physics_only_r2": -0.0366,
+        "pure_ml_mae": 0.4521,
+        "pure_ml_rmse": 0.6314,
+        "pure_ml_r2": -0.4358,
+        "grey_box_mae": 0.4891,
+        "grey_box_rmse": 0.6585,
+        "grey_box_r2": -0.5616,
+        "delta_mae_vs_physics": -0.1309,
+        "delta_mae_vs_pure_ml": -0.037,
+        "performance_vs_physics": "DEGRADED",
+        "performance_vs_pure_ml": "DEGRADED",
+        "error_reduction_vs_physics_pct": -36.54,
+        "error_reduction_vs_pure_ml_pct": -8.19,
+        "r2_meaningful": true,
+        "notes": null
+      },
+      "fuel_flow": {
+        "target": "fuel_flow",
+        "unit": "L/h",
+        "n_samples": 600,
+        "physics_only_mae": 0.351,
+        "physics_only_rmse": 1.3876,
+        "physics_only_r2": 0.7069,
+        "pure_ml_mae": 1.0972,
+        "pure_ml_rmse": 2.144,
+        "pure_ml_r2": 0.3003,
+        "grey_box_mae": 0.5193,
+        "grey_box_rmse": 1.3017,
+        "grey_box_r2": 0.7421,
+        "delta_mae_vs_physics": -0.1683,
+        "delta_mae_vs_pure_ml": 0.578,
+        "performance_vs_physics": "DEGRADED",
+        "performance_vs_pure_ml": "IMPROVED",
+        "error_reduction_vs_physics_pct": -47.95,
+        "error_reduction_vs_pure_ml_pct": 52.68,
+        "r2_meaningful": true,
+        "notes": null
+      },
+      "rpm": {
+        "target": "rpm",
+        "unit": "RPM",
+        "n_samples": 600,
+        "physics_only_mae": 61.5075,
+        "physics_only_rmse": 328.3637,
+        "physics_only_r2": 0.5508,
+        "pure_ml_mae": 188.8911,
+        "pure_ml_rmse": 445.2055,
+        "pure_ml_r2": 0.1742,
+        "grey_box_mae": 147.8079,
+        "grey_box_rmse": 311.6223,
+        "grey_box_r2": 0.5954,
+        "delta_mae_vs_physics": -86.3004,
+        "delta_mae_vs_pure_ml": 41.0832,
+        "performance_vs_physics": "DEGRADED",
+        "performance_vs_pure_ml": "IMPROVED",
+        "error_reduction_vs_physics_pct": -140.31,
+        "error_reduction_vs_pure_ml_pct": 21.75,
+        "r2_meaningful": true,
+        "notes": null
+      },
+      "map_bar": {
+        "target": "map_bar",
+        "unit": "bar",
+        "n_samples": 600,
+        "physics_only_mae": 0.0055,
+        "physics_only_rmse": 0.0346,
+        "physics_only_r2": 0.564,
+        "pure_ml_mae": 0.0185,
+        "pure_ml_rmse": 0.0503,
+        "pure_ml_r2": 0.0806,
+        "grey_box_mae": 0.0183,
+        "grey_box_rmse": 0.0345,
+        "grey_box_r2": 0.5674,
+        "delta_mae_vs_physics": -0.0127,
+        "delta_mae_vs_pure_ml": 0.0002,
+        "performance_vs_physics": "DEGRADED",
+        "performance_vs_pure_ml": "SIMILAR",
+        "error_reduction_vs_physics_pct": -229.54,
+        "error_reduction_vs_pure_ml_pct": 1.23,
+        "r2_meaningful": true,
+        "notes": null
+      },
+      "coolant_temp": {
+        "target": "coolant_temp",
+        "unit": "\u00b0C",
+        "n_samples": 600,
+        "physics_only_mae": 0.9921,
+        "physics_only_rmse": 1.2675,
+        "physics_only_r2": -0.2104,
+        "pure_ml_mae": 1.1004,
+        "pure_ml_rmse": 1.3792,
+        "pure_ml_r2": -0.4332,
+        "grey_box_mae": 0.7939,
+        "grey_box_rmse": 1.0923,
+        "grey_box_r2": 0.1011,
+        "delta_mae_vs_physics": 0.1983,
+        "delta_mae_vs_pure_ml": 0.3066,
+        "performance_vs_physics": "IMPROVED",
+        "performance_vs_pure_ml": "IMPROVED",
+        "error_reduction_vs_physics_pct": 19.99,
+        "error_reduction_vs_pure_ml_pct": 27.86,
+        "r2_meaningful": true,
+        "notes": null
+      },
+      "vibration": {
+        "target": "vibration",
+        "unit": "g",
+        "n_samples": 600,
+        "physics_only_mae": 0.0178,
+        "physics_only_rmse": 0.042,
+        "physics_only_r2": 0.6275,
+        "pure_ml_mae": 0.0416,
+        "pure_ml_rmse": 0.0629,
+        "pure_ml_r2": 0.1645,
+        "grey_box_mae": 0.0206,
+        "grey_box_rmse": 0.0393,
+        "grey_box_r2": 0.6739,
+        "delta_mae_vs_physics": -0.0028,
+        "delta_mae_vs_pure_ml": 0.0209,
+        "performance_vs_physics": "DEGRADED",
+        "performance_vs_pure_ml": "IMPROVED",
+        "error_reduction_vs_physics_pct": -15.76,
+        "error_reduction_vs_pure_ml_pct": 50.37,
+        "r2_meaningful": true,
+        "notes": null
+      }
+    },
+    "mean_error_reduction_vs_physics_pct": -51.01,
+    "mean_error_reduction_vs_pure_ml_pct": 26.08,
+    "timestamp": "2026-09-14T21:13:07.146832"
+  },
+  "sample_explainability": {
+    "cht": {
+      "physics_drivers": {
+        "throttle_pct": 78.0,
+        "altitude_m": 2200.0,
+        "ambient_temp_c": 0.7
+      },
+      "residual_drivers": {
+        "throttle": 1.7372,
+        "altitude": -0.356,
+        "ambient_temp": 0.3507,
+        "d_throttle": -0.1148,
+        "d_altitude": -0.1364,
+        "phys_cht": -6.5093,
+        "phys_egt": 3.497,
+        "phys_oil_temp": -1.0505,
+        "phys_oil_pressure": 0.3839,
+        "phys_fuel_flow": -1.0817,
+        "phys_rpm": 0.2349,
+        "phys_map_bar": 0.5882,
+        "phys_coolant_temp": 0.5902,
+        "phys_vibration": -3.6167
+      },
+      "health_indicator": {
+        "physics_estimate": 84.39,
+        "sensor_informed_correction": 0.112,
+        "corrected_prediction": 84.5,
+        "detected_deviation": 8.25,
+        "status": "NOMINAL"
+      },
+      "disclaimer": "Feature attributions reflect local model sensitivities and do not establish physical causation."
+    },
+    "egt": {
+      "physics_drivers": {
+        "throttle_pct": 78.0,
+        "altitude_m": 2200.0,
+        "ambient_temp_c": 0.7
+      },
+      "residual_drivers": {
+        "throttle": 31.23,
+        "altitude": -0.6536,
+        "ambient_temp": 0.5907,
+        "d_throttle": 0.724,
+        "d_altitude": 1.2072,
+        "phys_cht": -59.8508,
+        "phys_egt": -38.8303,
+        "phys_oil_temp": -3.9345,
+        "phys_oil_pressure": -16.5105,
+        "phys_fuel_flow": 43.4414,
+        "phys_rpm": -16.2784,
+        "phys_map_bar": -17.1545,
+        "phys_coolant_temp": 13.3116,
+        "phys_vibration": 63.0064
+      },
+      "health_indicator": {
+        "physics_estimate": 575.53,
+        "sensor_informed_correction": -5.503,
+        "corrected_prediction": 570.03,
+        "detected_deviation": 177.58,
+        "status": "ELEVATED"
+      },
+      "disclaimer": "Feature attributions reflect local model sensitivities and do not establish physical causation."
+    },
+    "oil_temp": {
+      "physics_drivers": {
+        "throttle_pct": 78.0,
+        "altitude_m": 2200.0,
+        "ambient_temp_c": 0.7
+      },
+      "residual_drivers": {
+        "throttle": -5.3929,
+        "altitude": -1.788,
+        "ambient_temp": 1.7862,
+        "d_throttle": -0.1773,
+        "d_altitude": -0.0643,
+        "phys_cht": -2.0071,
+        "phys_egt": 8.2253,
+        "phys_oil_temp": -8.7248,
+        "phys_oil_pressure": -12.041,
+        "phys_fuel_flow": 29.0559,
+        "phys_rpm": -12.4764,
+        "phys_map_bar": -1.2938,
+        "phys_coolant_temp": 4.5958,
+        "phys_vibration": 3.4122
+      },
+      "health_indicator": {
+        "physics_estimate": 64.89,
+        "sensor_informed_correction": 7.296,
+        "corrected_prediction": 72.19,
+        "detected_deviation": 18.31,
+        "status": "ELEVATED"
+      },
+      "disclaimer": "Feature attributions reflect local model sensitivities and do not establish physical causation."
+    },
+    "oil_pressure": {
+      "physics_drivers": {
+        "throttle_pct": 78.0,
+        "altitude_m": 2200.0,
+        "ambient_temp_c": 0.7
+      },
+      "residual_drivers": {
+        "throttle": 0.2078,
+        "altitude": -0.0079,
+        "ambient_temp": 0.0084,
+        "d_throttle": 0.0378,
+        "d_altitude": 0.0388,
+        "phys_cht": -0.4747,
+        "phys_egt": -0.4521,
+        "phys_oil_temp": 0.0577,
+        "phys_oil_pressure": -0.2665,
+        "phys_fuel_flow": 0.3914,
+        "phys_rpm": -0.2457,
+        "phys_map_bar": -0.0115,
+        "phys_coolant_temp": 0.1488,
+        "phys_vibration": 0.623
+      },
+      "health_indicator": {
+        "physics_estimate": 2.2,
+        "sensor_informed_correction": 0.076,
+        "corrected_prediction": 2.28,
+        "detected_deviation": 2.386,
+        "status": "NOMINAL"
+      },
+      "disclaimer": "Feature attributions reflect local model sensitivities and do not establish physical causation."
+    },
+    "fuel_flow": {
+      "physics_drivers": {
+        "throttle_pct": 78.0,
+        "altitude_m": 2200.0,
+        "ambient_temp_c": 0.7
+      },
+      "residual_drivers": {
+        "throttle": 0.616,
+        "altitude": -0.02,
+        "ambient_temp": 0.0175,
+        "d_throttle": 0.1368,
+        "d_altitude": 0.1647,
+        "phys_cht": -1.6251,
+        "phys_egt": -1.4549,
+        "phys_oil_temp": -0.0982,
+        "phys_oil_pressure": -1.1011,
+        "phys_fuel_flow": 1.7719,
+        "phys_rpm": -1.0623,
+        "phys_map_bar": -0.1875,
+        "phys_coolant_temp": 0.5276,
+        "phys_vibration": 2.5607
+      },
+      "health_indicator": {
+        "physics_estimate": 3.67,
+        "sensor_informed_correction": 0.424,
+        "corrected_prediction": 4.09,
+        "detected_deviation": 13.33,
+        "status": "ELEVATED"
+      },
+      "disclaimer": "Feature attributions reflect local model sensitivities and do not establish physical causation."
+    },
+    "rpm": {
+      "physics_drivers": {
+        "throttle_pct": 78.0,
+        "altitude_m": 2200.0,
+        "ambient_temp_c": 0.7
+      },
+      "residual_drivers": {
+        "throttle": 196.5003,
+        "altitude": -27.7482,
+        "ambient_temp": 27.1459,
+        "d_throttle": 41.3725,
+        "d_altitude": 46.1578,
+        "phys_cht": -562.1158,
+        "phys_egt": -452.628,
+        "phys_oil_temp": -13.672,
+        "phys_oil_pressure": -434.0438,
+        "phys_fuel_flow": 730.4121,
+        "phys_rpm": -413.3077,
+        "phys_map_bar": -15.0649,
+        "phys_coolant_temp": 206.9114,
+        "phys_vibration": 759.2123
+      },
+      "health_indicator": {
+        "physics_estimate": 1553.2,
+        "sensor_informed_correction": 184.753,
+        "corrected_prediction": 1737.95,
+        "detected_deviation": 2993.6,
+        "status": "ELEVATED"
+      },
+      "disclaimer": "Feature attributions reflect local model sensitivities and do not establish physical causation."
+    },
+    "map_bar": {
+      "physics_drivers": {
+        "throttle_pct": 78.0,
+        "altitude_m": 2200.0,
+        "ambient_temp_c": 0.7
+      },
+      "residual_drivers": {
+        "throttle": 0.0305,
+        "altitude": -0.0061,
+        "ambient_temp": 0.0061,
+        "d_throttle": 0.0018,
+        "d_altitude": 0.0049,
+        "phys_cht": -0.0667,
+        "phys_egt": -0.0308,
+        "phys_oil_temp": 0.0015,
+        "phys_oil_pressure": -0.0632,
+        "phys_fuel_flow": 0.0936,
+        "phys_rpm": -0.0597,
+        "phys_map_bar": 0.015,
+        "phys_coolant_temp": 0.0278,
+        "phys_vibration": 0.0556
+      },
+      "health_indicator": {
+        "physics_estimate": 0.9,
+        "sensor_informed_correction": 0.05,
+        "corrected_prediction": 0.95,
+        "detected_deviation": 0.272,
+        "status": "NOMINAL"
+      },
+      "disclaimer": "Feature attributions reflect local model sensitivities and do not establish physical causation."
+    },
+    "coolant_temp": {
+      "physics_drivers": {
+        "throttle_pct": 78.0,
+        "altitude_m": 2200.0,
+        "ambient_temp_c": 0.7
+      },
+      "residual_drivers": {
+        "throttle": -0.1151,
+        "altitude": -0.088,
+        "ambient_temp": 0.0879,
+        "d_throttle": 0.0053,
+        "d_altitude": 0.0089,
+        "phys_cht": 0.2003,
+        "phys_egt": 0.081,
+        "phys_oil_temp": 0.0956,
+        "phys_oil_pressure": -0.038,
+        "phys_fuel_flow": -0.4257,
+        "phys_rpm": -0.024,
+        "phys_map_bar": 0.0682,
+        "phys_coolant_temp": -1.3395,
+        "phys_vibration": 0.3715
+      },
+      "health_indicator": {
+        "physics_estimate": 75.01,
+        "sensor_informed_correction": 0.018,
+        "corrected_prediction": 75.03,
+        "detected_deviation": 2.22,
+        "status": "NOMINAL"
+      },
+      "disclaimer": "Feature attributions reflect local model sensitivities and do not establish physical causation."
+    },
+    "vibration": {
+      "physics_drivers": {
+        "throttle_pct": 78.0,
+        "altitude_m": 2200.0,
+        "ambient_temp_c": 0.7
+      },
+      "residual_drivers": {
+        "throttle": 0.02,
+        "altitude": -0.001,
+        "ambient_temp": 0.0009,
+        "d_throttle": 0.005,
+        "d_altitude": 0.0031,
+        "phys_cht": -0.0488,
+        "phys_egt": -0.0433,
+        "phys_oil_temp": -0.0014,
+        "phys_oil_pressure": -0.03,
+        "phys_fuel_flow": 0.0526,
+        "phys_rpm": -0.0285,
+        "phys_map_bar": -0.0044,
+        "phys_coolant_temp": 0.0158,
+        "phys_vibration": 0.0679
+      },
+      "health_indicator": {
+        "physics_estimate": 0.34,
+        "sensor_informed_correction": 0.006,
+        "corrected_prediction": 0.34,
+        "detected_deviation": 0.388,
+        "status": "NOMINAL"
+      },
+      "disclaimer": "Feature attributions reflect local model sensitivities and do not establish physical causation."
+    }
+  },
+  "limitations": [
+    "Simulation is based on the Rotax 914 UL/F physics contract and does not represent certified OEM or FAA-cleared engine telemetry.",
+    "ML residual regressors are trained on simulated operational profiles; adaptation to real hardware requires transfer learning and sensor re-calibration.",
+    "Model performance is target-dependent: the residual model improves some channels but does not outperform the physics-only baseline on every channel.",
+    "R\u00b2 metric is undefined for targets with zero operational variance."
+  ],
+  "reproduction_instructions": [
+    "python scripts/generate_phase3_residual_results.py",
+    "pytest -v tests/test_physics_ml_residual.py",
+    "pytest -q tests/test_ml_baselines.py tests/test_ml_data_layer.py tests/test_data_pipeline.py"
+  ]
+}

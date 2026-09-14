@@ -117,25 +117,55 @@ class GroupSplitter:
                 )
 
             rng = np.random.default_rng(seed)
-            shuffled_groups = rng.permutation(unique_groups).tolist()
 
-            n_train = max(1, int(round(train_ratio * n_groups)))
-            n_val = int(round(val_ratio * n_groups)) if val_ratio > 0 else 0
-            n_test = n_groups - n_train - n_val
+            # Check if group-stratified splitting is possible
+            can_stratify = False
+            group_label_map = None
+            if label_column and label_column in df.columns:
+                group_label_map = df.groupby(group_column)[label_column].agg(lambda s: s.mode()[0])
+                label_counts = group_label_map.value_counts()
+                if (label_counts >= 2).all() and len(label_counts) > 1:
+                    can_stratify = True
 
-            # Ensure at least 1 test group if test_ratio > 0
-            if test_ratio > 0 and n_test == 0:
-                if n_train > 1:
-                    n_train -= 1
-                    n_test = 1
-                elif n_val > 1:
-                    n_val -= 1
-                    n_test = 1
+            if can_stratify and group_label_map is not None:
+                train_groups = []
+                val_groups = []
+                test_groups = []
+                for lbl in sorted(group_label_map.unique()):
+                    lbl_groups = rng.permutation(group_label_map[group_label_map == lbl].index.tolist()).tolist()
+                    n_g = len(lbl_groups)
+                    n_tr = max(1, int(round(train_ratio * n_g)))
+                    n_va = int(round(val_ratio * n_g)) if val_ratio > 0 else 0
+                    n_te = n_g - n_tr - n_va
+                    if test_ratio > 0 and n_te == 0 and n_tr > 1:
+                        n_tr -= 1
+                        n_te = 1
+                    train_groups.extend(lbl_groups[:n_tr])
+                    val_groups.extend(lbl_groups[n_tr:n_tr + n_va])
+                    test_groups.extend(lbl_groups[n_tr + n_va:])
+                train_groups = sorted(train_groups)
+                val_groups = sorted(val_groups)
+                test_groups = sorted(test_groups)
+                notes = "Stratified leakage-safe group partition."
+            else:
+                shuffled_groups = rng.permutation(unique_groups).tolist()
+                n_train = max(1, int(round(train_ratio * n_groups)))
+                n_val = int(round(val_ratio * n_groups)) if val_ratio > 0 else 0
+                n_test = n_groups - n_train - n_val
 
-            train_groups = sorted(shuffled_groups[:n_train])
-            val_groups = sorted(shuffled_groups[n_train:n_train + n_val])
-            test_groups = sorted(shuffled_groups[n_train + n_val:])
-            notes = "Standard leakage-safe group partition."
+                # Ensure at least 1 test group if test_ratio > 0
+                if test_ratio > 0 and n_test == 0:
+                    if n_train > 1:
+                        n_train -= 1
+                        n_test = 1
+                    elif n_val > 1:
+                        n_val -= 1
+                        n_test = 1
+
+                train_groups = sorted(shuffled_groups[:n_train])
+                val_groups = sorted(shuffled_groups[n_train:n_train + n_val])
+                test_groups = sorted(shuffled_groups[n_train + n_val:])
+                notes = "Standard leakage-safe group partition."
 
         # Fail-fast verification of disjoint sets
         validate_no_leakage(train_groups, test_groups, val_groups, group_col_name=group_column)

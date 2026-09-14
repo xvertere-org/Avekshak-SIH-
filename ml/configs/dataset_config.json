@@ -78,7 +78,7 @@
       ],
       "processed_path": "data/processed/paderborn",
       "file_pattern": "paderborn_features.parquet",
-      "candidate_grouping_columns": ["bearing_id", "source_file", "measurement_id"],
+      "candidate_grouping_columns": ["source_file", "bearing_id", "measurement_id"],
       "target_columns": ["fault_label"],
       "feature_types": ["vibration"],
       "is_direct_rotax_telemetry": false,

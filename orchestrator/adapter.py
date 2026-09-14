@@ -132,6 +132,14 @@ class PipelineHandoffAdapter:
         """
         Causally update Phase 7 Anomaly Detection with reset_state=False to preserve EWMA & persistence.
         """
+        # Guard against non-finite (inf/-inf) values from sensor blackouts by converting to NaN
+        df = residual_frame.to_dataframe()
+        num_cols = df.select_dtypes(include=[np.number]).columns
+        if not np.isfinite(df[num_cols]).all().all():
+            clean_df = df.copy()
+            clean_df[num_cols] = clean_df[num_cols].replace([np.inf, -np.inf], np.nan)
+            residual_frame = ResidualFrame(clean_df)
+
         anomaly_frame = detector.detect(residual_frame, reset_state=False)
         records = anomaly_frame.to_records()
         if not records:

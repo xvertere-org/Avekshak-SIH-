@@ -1,0 +1,2446 @@
+{
+  "title": "SIH26054 Phase 2 Dataset-Specific ML Baselines Summary",
+  "timestamp": "2026-09-14T20:26:46.592347",
+  "grey_box_principles": {
+    "physics_source": "Rotax 914 UL/F thermodynamic digital twin",
+    "ml_role": "Vibration and component pattern learning (auxiliary to physics)",
+    "rotax_claims": "Zero direct Rotax claims from external benchmarks",
+    "fabricated_physics": "Strictly zero mock residuals or synthetic health labels"
+  },
+  "experiments": {
+    "classification": {
+      "cwru": {
+        "dataset_id": "cwru",
+        "task_name": "FAULT_CLASSIFICATION",
+        "status": "controlled_demonstration",
+        "controlled_demonstration": true,
+        "generalization_claim": false,
+        "target_column": "fault_label",
+        "group_column": "source_file",
+        "feature_count": 25,
+        "feature_names": [
+          "mean",
+          "std",
+          "variance",
+          "RMS",
+          "minimum",
+          "maximum",
+          "peak_to_peak",
+          "absolute_mean",
+          "skewness",
+          "kurtosis",
+          "crest_factor",
+          "shape_factor",
+          "impulse_factor",
+          "clearance_factor",
+          "rms",
+          "peak",
+          "energy",
+          "dominant_frequency",
+          "spectral_energy",
+          "spectral_centroid",
+          "frequency_band_energy",
+          "band_energy_0_1500hz",
+          "band_energy_1500_3000hz",
+          "band_energy_3000_4500hz",
+          "band_energy_4500_6000hz"
+        ],
+        "num_classes": 2,
+        "class_names": [
+          "normal",
+          "outer_race"
+        ],
+        "train_groups": [
+          "97.mat",
+          "130.mat"
+        ],
+        "test_groups": [
+          "105.mat"
+        ],
+        "val_groups": [],
+        "num_train_samples": 828,
+        "num_test_samples": 351,
+        "num_val_samples": 0,
+        "train_class_distribution": {
+          "normal": 474,
+          "outer_race": 354
+        },
+        "test_class_distribution": {
+          "inner_race": 351
+        },
+        "models": {
+          "dummy_most_frequent": {
+            "model_name": "dummy_most_frequent",
+            "model_type": "DummyClassifier",
+            "hyperparameters": {
+              "strategy": "most_frequent"
+            },
+            "metrics": {
+              "accuracy": 0.0,
+              "balanced_accuracy": 0.0,
+              "macro_f1": 0.0,
+              "weighted_f1": 0.0,
+              "labels": [
+                "inner_race",
+                "normal",
+                "outer_race"
+              ],
+              "confusion_matrix": [
+                [
+                  0,
+                  351,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0
+                ]
+              ],
+              "per_class": {
+                "inner_race": {
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "f1_score": 0.0,
+                  "support": 351
+                },
+                "normal": {
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "f1_score": 0.0,
+                  "support": 0
+                },
+                "outer_race": {
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "f1_score": 0.0,
+                  "support": 0
+                }
+              }
+            }
+          },
+          "logistic_regression": {
+            "model_name": "logistic_regression",
+            "model_type": "LogisticRegression",
+            "hyperparameters": {
+              "max_iter": 1000,
+              "random_state": 42
+            },
+            "metrics": {
+              "accuracy": 0.0,
+              "balanced_accuracy": 0.0,
+              "macro_f1": 0.0,
+              "weighted_f1": 0.0,
+              "labels": [
+                "inner_race",
+                "normal",
+                "outer_race"
+              ],
+              "confusion_matrix": [
+                [
+                  0,
+                  244,
+                  107
+                ],
+                [
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0
+                ]
+              ],
+              "per_class": {
+                "inner_race": {
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "f1_score": 0.0,
+                  "support": 351
+                },
+                "normal": {
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "f1_score": 0.0,
+                  "support": 0
+                },
+                "outer_race": {
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "f1_score": 0.0,
+                  "support": 0
+                }
+              }
+            }
+          },
+          "random_forest": {
+            "model_name": "random_forest",
+            "model_type": "RandomForestClassifier",
+            "hyperparameters": {
+              "n_estimators": 50,
+              "max_depth": 10,
+              "random_state": 42
+            },
+            "metrics": {
+              "accuracy": 0.0,
+              "balanced_accuracy": 0.0,
+              "macro_f1": 0.0,
+              "weighted_f1": 0.0,
+              "labels": [
+                "inner_race",
+                "normal",
+                "outer_race"
+              ],
+              "confusion_matrix": [
+                [
+                  0,
+                  117,
+                  234
+                ],
+                [
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0
+                ]
+              ],
+              "per_class": {
+                "inner_race": {
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "f1_score": 0.0,
+                  "support": 351
+                },
+                "normal": {
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "f1_score": 0.0,
+                  "support": 0
+                },
+                "outer_race": {
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "f1_score": 0.0,
+                  "support": 0
+                }
+              }
+            }
+          }
+        },
+        "limitations": [
+          "CONTROLLED DEMONSTRATION ONLY: CWRU contains only 3 source files (97.mat, 130.mat, 105.mat).",
+          "Each file represents an isolated bearing/fault condition; holding out an entire file holds out an entire class.",
+          "Zero statistical generalization claim to unobserved operational machinery."
+        ],
+        "seed": 42
+      },
+      "paderborn": {
+        "dataset_id": "paderborn",
+        "task_name": "FAULT_CLASSIFICATION",
+        "status": "completed",
+        "controlled_demonstration": false,
+        "generalization_claim": true,
+        "target_column": "fault_label",
+        "group_column": "source_file",
+        "feature_count": 15,
+        "feature_names": [
+          "mean",
+          "std",
+          "variance",
+          "rms",
+          "peak",
+          "peak_to_peak",
+          "crest_factor",
+          "skewness",
+          "kurtosis",
+          "dominant_frequency",
+          "spectral_energy",
+          "spectral_centroid",
+          "band_energy_0_5khz",
+          "band_energy_5_15khz",
+          "band_energy_15_32khz"
+        ],
+        "num_classes": 3,
+        "class_names": [
+          "healthy",
+          "inner_race_fault",
+          "outer_race_fault"
+        ],
+        "train_groups": [
+          "N09_M07_F10_K001_1.mat",
+          "N09_M07_F10_K001_10.mat",
+          "N09_M07_F10_K001_11.mat",
+          "N09_M07_F10_K001_12.mat",
+          "N09_M07_F10_K001_13.mat",
+          "N09_M07_F10_K001_14.mat",
+          "N09_M07_F10_K001_16.mat",
+          "N09_M07_F10_K001_18.mat",
+          "N09_M07_F10_K001_19.mat",
+          "N09_M07_F10_K001_5.mat",
+          "N09_M07_F10_K001_6.mat",
+          "N09_M07_F10_K001_7.mat",
+          "N09_M07_F10_K001_8.mat",
+          "N09_M07_F10_KA01_1.mat",
+          "N09_M07_F10_KA01_10.mat",
+          "N09_M07_F10_KA01_11.mat",
+          "N09_M07_F10_KA01_12.mat",
+          "N09_M07_F10_KA01_14.mat",
+          "N09_M07_F10_KA01_15.mat",
+          "N09_M07_F10_KA01_16.mat",
+          "N09_M07_F10_KA01_19.mat",
+          "N09_M07_F10_KA01_20.mat",
+          "N09_M07_F10_KA01_5.mat",
+          "N09_M07_F10_KA01_6.mat",
+          "N09_M07_F10_KA01_7.mat",
+          "N09_M07_F10_KA01_9.mat",
+          "N09_M07_F10_KI04_1.mat",
+          "N09_M07_F10_KI04_11.mat",
+          "N09_M07_F10_KI04_12.mat",
+          "N09_M07_F10_KI04_13.mat",
+          "N09_M07_F10_KI04_15.mat",
+          "N09_M07_F10_KI04_16.mat",
+          "N09_M07_F10_KI04_17.mat",
+          "N09_M07_F10_KI04_19.mat",
+          "N09_M07_F10_KI04_2.mat",
+          "N09_M07_F10_KI04_20.mat",
+          "N09_M07_F10_KI04_3.mat",
+          "N09_M07_F10_KI04_5.mat",
+          "N09_M07_F10_KI04_6.mat",
+          "N09_M07_F10_KI04_7.mat",
+          "N09_M07_F10_KI04_9.mat",
+          "N15_M01_F10_K001_1.mat",
+          "N15_M01_F10_K001_10.mat",
+          "N15_M01_F10_K001_12.mat",
+          "N15_M01_F10_K001_13.mat",
+          "N15_M01_F10_K001_14.mat",
+          "N15_M01_F10_K001_15.mat",
+          "N15_M01_F10_K001_16.mat",
+          "N15_M01_F10_K001_17.mat",
+          "N15_M01_F10_K001_18.mat",
+          "N15_M01_F10_K001_19.mat",
+          "N15_M01_F10_K001_2.mat",
+          "N15_M01_F10_K001_20.mat",
+          "N15_M01_F10_K001_3.mat",
+          "N15_M01_F10_K001_4.mat",
+          "N15_M01_F10_K001_7.mat",
+          "N15_M01_F10_K001_9.mat",
+          "N15_M01_F10_KA01_13.mat",
+          "N15_M01_F10_KA01_16.mat",
+          "N15_M01_F10_KA01_17.mat",
+          "N15_M01_F10_KA01_19.mat",
+          "N15_M01_F10_KA01_20.mat",
+          "N15_M01_F10_KA01_5.mat",
+          "N15_M01_F10_KA01_6.mat",
+          "N15_M01_F10_KA01_8.mat",
+          "N15_M01_F10_KA01_9.mat",
+          "N15_M01_F10_KI04_1.mat",
+          "N15_M01_F10_KI04_13.mat",
+          "N15_M01_F10_KI04_14.mat",
+          "N15_M01_F10_KI04_15.mat",
+          "N15_M01_F10_KI04_16.mat",
+          "N15_M01_F10_KI04_17.mat",
+          "N15_M01_F10_KI04_19.mat",
+          "N15_M01_F10_KI04_2.mat",
+          "N15_M01_F10_KI04_20.mat",
+          "N15_M01_F10_KI04_3.mat",
+          "N15_M01_F10_KI04_4.mat",
+          "N15_M01_F10_KI04_6.mat",
+          "N15_M01_F10_KI04_7.mat",
+          "N15_M01_F10_KI04_8.mat",
+          "N15_M01_F10_KI04_9.mat",
+          "N15_M07_F04_K001_1.mat",
+          "N15_M07_F04_K001_11.mat",
+          "N15_M07_F04_K001_12.mat",
+          "N15_M07_F04_K001_13.mat",
+          "N15_M07_F04_K001_14.mat",
+          "N15_M07_F04_K001_15.mat",
+          "N15_M07_F04_K001_17.mat",
+          "N15_M07_F04_K001_19.mat",
+          "N15_M07_F04_K001_2.mat",
+          "N15_M07_F04_K001_20.mat",
+          "N15_M07_F04_K001_5.mat",
+          "N15_M07_F04_K001_6.mat",
+          "N15_M07_F04_K001_7.mat",
+          "N15_M07_F04_K001_8.mat",
+          "N15_M07_F04_K001_9.mat",
+          "N15_M07_F04_KA01_1.mat",
+          "N15_M07_F04_KA01_11.mat",
+          "N15_M07_F04_KA01_12.mat",
+          "N15_M07_F04_KA01_13.mat",
+          "N15_M07_F04_KA01_15.mat",
+          "N15_M07_F04_KA01_16.mat",
+          "N15_M07_F04_KA01_17.mat",
+          "N15_M07_F04_KA01_18.mat",
+          "N15_M07_F04_KA01_19.mat",
+          "N15_M07_F04_KA01_2.mat",
+          "N15_M07_F04_KA01_20.mat",
+          "N15_M07_F04_KA01_3.mat",
+          "N15_M07_F04_KA01_4.mat",
+          "N15_M07_F04_KA01_5.mat",
+          "N15_M07_F04_KA01_6.mat",
+          "N15_M07_F04_KA01_7.mat",
+          "N15_M07_F04_KA01_8.mat",
+          "N15_M07_F04_KI04_1.mat",
+          "N15_M07_F04_KI04_10.mat",
+          "N15_M07_F04_KI04_12.mat",
+          "N15_M07_F04_KI04_15.mat",
+          "N15_M07_F04_KI04_16.mat",
+          "N15_M07_F04_KI04_19.mat",
+          "N15_M07_F04_KI04_2.mat",
+          "N15_M07_F04_KI04_20.mat",
+          "N15_M07_F04_KI04_3.mat",
+          "N15_M07_F04_KI04_4.mat",
+          "N15_M07_F04_KI04_5.mat",
+          "N15_M07_F04_KI04_6.mat",
+          "N15_M07_F04_KI04_7.mat",
+          "N15_M07_F10_K001_1.mat",
+          "N15_M07_F10_K001_10.mat",
+          "N15_M07_F10_K001_11.mat",
+          "N15_M07_F10_K001_12.mat",
+          "N15_M07_F10_K001_16.mat",
+          "N15_M07_F10_K001_18.mat",
+          "N15_M07_F10_K001_2.mat",
+          "N15_M07_F10_K001_20.mat",
+          "N15_M07_F10_K001_3.mat",
+          "N15_M07_F10_K001_5.mat",
+          "N15_M07_F10_K001_6.mat",
+          "N15_M07_F10_K001_9.mat",
+          "N15_M07_F10_KA01_1.mat",
+          "N15_M07_F10_KA01_10.mat",
+          "N15_M07_F10_KA01_11.mat",
+          "N15_M07_F10_KA01_12.mat",
+          "N15_M07_F10_KA01_13.mat",
+          "N15_M07_F10_KA01_14.mat",
+          "N15_M07_F10_KA01_16.mat",
+          "N15_M07_F10_KA01_17.mat",
+          "N15_M07_F10_KA01_18.mat",
+          "N15_M07_F10_KA01_19.mat",
+          "N15_M07_F10_KA01_2.mat",
+          "N15_M07_F10_KA01_20.mat",
+          "N15_M07_F10_KA01_3.mat",
+          "N15_M07_F10_KA01_4.mat",
+          "N15_M07_F10_KA01_5.mat",
+          "N15_M07_F10_KA01_8.mat",
+          "N15_M07_F10_KA01_9.mat",
+          "N15_M07_F10_KI04_1.mat",
+          "N15_M07_F10_KI04_10.mat",
+          "N15_M07_F10_KI04_11.mat",
+          "N15_M07_F10_KI04_13.mat",
+          "N15_M07_F10_KI04_15.mat",
+          "N15_M07_F10_KI04_16.mat",
+          "N15_M07_F10_KI04_17.mat",
+          "N15_M07_F10_KI04_18.mat",
+          "N15_M07_F10_KI04_19.mat",
+          "N15_M07_F10_KI04_20.mat",
+          "N15_M07_F10_KI04_3.mat",
+          "N15_M07_F10_KI04_7.mat",
+          "N15_M07_F10_KI04_9.mat"
+        ],
+        "test_groups": [
+          "N09_M07_F10_K001_17.mat",
+          "N09_M07_F10_K001_20.mat",
+          "N09_M07_F10_K001_3.mat",
+          "N09_M07_F10_K001_4.mat",
+          "N09_M07_F10_KA01_13.mat",
+          "N09_M07_F10_KA01_18.mat",
+          "N09_M07_F10_KA01_2.mat",
+          "N09_M07_F10_KA01_8.mat",
+          "N09_M07_F10_KI04_4.mat",
+          "N09_M07_F10_KI04_8.mat",
+          "N15_M01_F10_K001_5.mat",
+          "N15_M01_F10_K001_6.mat",
+          "N15_M01_F10_KA01_10.mat",
+          "N15_M01_F10_KA01_12.mat",
+          "N15_M01_F10_KA01_14.mat",
+          "N15_M01_F10_KA01_18.mat",
+          "N15_M01_F10_KI04_10.mat",
+          "N15_M01_F10_KI04_12.mat",
+          "N15_M07_F04_K001_16.mat",
+          "N15_M07_F04_K001_3.mat",
+          "N15_M07_F04_KA01_10.mat",
+          "N15_M07_F04_KA01_14.mat",
+          "N15_M07_F04_KA01_9.mat",
+          "N15_M07_F04_KI04_11.mat",
+          "N15_M07_F04_KI04_14.mat",
+          "N15_M07_F04_KI04_18.mat",
+          "N15_M07_F04_KI04_9.mat",
+          "N15_M07_F10_K001_13.mat",
+          "N15_M07_F10_K001_14.mat",
+          "N15_M07_F10_K001_15.mat",
+          "N15_M07_F10_K001_7.mat",
+          "N15_M07_F10_KA01_15.mat",
+          "N15_M07_F10_KI04_12.mat",
+          "N15_M07_F10_KI04_14.mat",
+          "N15_M07_F10_KI04_2.mat",
+          "N15_M07_F10_KI04_5.mat"
+        ],
+        "val_groups": [
+          "N09_M07_F10_K001_15.mat",
+          "N09_M07_F10_K001_2.mat",
+          "N09_M07_F10_K001_9.mat",
+          "N09_M07_F10_KA01_17.mat",
+          "N09_M07_F10_KA01_3.mat",
+          "N09_M07_F10_KA01_4.mat",
+          "N09_M07_F10_KI04_10.mat",
+          "N09_M07_F10_KI04_14.mat",
+          "N09_M07_F10_KI04_18.mat",
+          "N15_M01_F10_K001_11.mat",
+          "N15_M01_F10_K001_8.mat",
+          "N15_M01_F10_KA01_1.mat",
+          "N15_M01_F10_KA01_11.mat",
+          "N15_M01_F10_KA01_15.mat",
+          "N15_M01_F10_KA01_2.mat",
+          "N15_M01_F10_KA01_3.mat",
+          "N15_M01_F10_KA01_4.mat",
+          "N15_M01_F10_KA01_7.mat",
+          "N15_M01_F10_KI04_11.mat",
+          "N15_M01_F10_KI04_18.mat",
+          "N15_M01_F10_KI04_5.mat",
+          "N15_M07_F04_K001_10.mat",
+          "N15_M07_F04_K001_18.mat",
+          "N15_M07_F04_K001_4.mat",
+          "N15_M07_F04_KI04_13.mat",
+          "N15_M07_F04_KI04_17.mat",
+          "N15_M07_F04_KI04_8.mat",
+          "N15_M07_F10_K001_17.mat",
+          "N15_M07_F10_K001_19.mat",
+          "N15_M07_F10_K001_4.mat",
+          "N15_M07_F10_K001_8.mat",
+          "N15_M07_F10_KA01_6.mat",
+          "N15_M07_F10_KA01_7.mat",
+          "N15_M07_F10_KI04_4.mat",
+          "N15_M07_F10_KI04_6.mat",
+          "N15_M07_F10_KI04_8.mat"
+        ],
+        "num_train_samples": 20853,
+        "num_test_samples": 4472,
+        "num_val_samples": 4467,
+        "train_class_distribution": {
+          "inner_race_fault": 6953,
+          "outer_race_fault": 6951,
+          "healthy": 6949
+        },
+        "test_class_distribution": {
+          "outer_race_fault": 1496,
+          "healthy": 1488,
+          "inner_race_fault": 1488
+        },
+        "models": {
+          "dummy_most_frequent": {
+            "model_name": "dummy_most_frequent",
+            "model_type": "DummyClassifier",
+            "hyperparameters": {
+              "strategy": "most_frequent"
+            },
+            "metrics": {
+              "accuracy": 0.33273703041144903,
+              "balanced_accuracy": 0.3333333333333333,
+              "macro_f1": 0.16644295302013423,
+              "weighted_f1": 0.16614520176249536,
+              "labels": [
+                "healthy",
+                "inner_race_fault",
+                "outer_race_fault"
+              ],
+              "confusion_matrix": [
+                [
+                  0,
+                  1488,
+                  0
+                ],
+                [
+                  0,
+                  1488,
+                  0
+                ],
+                [
+                  0,
+                  1496,
+                  0
+                ]
+              ],
+              "per_class": {
+                "healthy": {
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "f1_score": 0.0,
+                  "support": 1488
+                },
+                "inner_race_fault": {
+                  "precision": 0.33273703041144903,
+                  "recall": 1.0,
+                  "f1_score": 0.4993288590604027,
+                  "support": 1488
+                },
+                "outer_race_fault": {
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "f1_score": 0.0,
+                  "support": 1496
+                }
+              }
+            }
+          },
+          "logistic_regression": {
+            "model_name": "logistic_regression",
+            "model_type": "LogisticRegression",
+            "hyperparameters": {
+              "max_iter": 1000,
+              "random_state": 42
+            },
+            "metrics": {
+              "accuracy": 0.9995527728085868,
+              "balanced_accuracy": 0.999554367201426,
+              "macro_f1": 0.9995531706688888,
+              "weighted_f1": 0.9995527734113039,
+              "labels": [
+                "healthy",
+                "inner_race_fault",
+                "outer_race_fault"
+              ],
+              "confusion_matrix": [
+                [
+                  1488,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  1488,
+                  0
+                ],
+                [
+                  0,
+                  2,
+                  1494
+                ]
+              ],
+              "per_class": {
+                "healthy": {
+                  "precision": 1.0,
+                  "recall": 1.0,
+                  "f1_score": 1.0,
+                  "support": 1488
+                },
+                "inner_race_fault": {
+                  "precision": 0.9986577181208054,
+                  "recall": 1.0,
+                  "f1_score": 0.9993284083277367,
+                  "support": 1488
+                },
+                "outer_race_fault": {
+                  "precision": 1.0,
+                  "recall": 0.9986631016042781,
+                  "f1_score": 0.9993311036789297,
+                  "support": 1496
+                }
+              }
+            }
+          },
+          "random_forest": {
+            "model_name": "random_forest",
+            "model_type": "RandomForestClassifier",
+            "hyperparameters": {
+              "n_estimators": 50,
+              "max_depth": 10,
+              "random_state": 42
+            },
+            "metrics": {
+              "accuracy": 0.9997763864042933,
+              "balanced_accuracy": 0.9997759856630823,
+              "macro_f1": 0.9997759856377888,
+              "weighted_f1": 0.9997763863790451,
+              "labels": [
+                "healthy",
+                "inner_race_fault",
+                "outer_race_fault"
+              ],
+              "confusion_matrix": [
+                [
+                  1487,
+                  1,
+                  0
+                ],
+                [
+                  0,
+                  1488,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  1496
+                ]
+              ],
+              "per_class": {
+                "healthy": {
+                  "precision": 1.0,
+                  "recall": 0.9993279569892473,
+                  "f1_score": 0.9996638655462184,
+                  "support": 1488
+                },
+                "inner_race_fault": {
+                  "precision": 0.9993284083277367,
+                  "recall": 1.0,
+                  "f1_score": 0.9996640913671482,
+                  "support": 1488
+                },
+                "outer_race_fault": {
+                  "precision": 1.0,
+                  "recall": 1.0,
+                  "f1_score": 1.0,
+                  "support": 1496
+                }
+              }
+            }
+          }
+        },
+        "limitations": [
+          "speed_rpm",
+          "torque_nm",
+          "radial_force_n",
+          "window_size",
+          "overlap",
+          "Source-file level grouping on 'source_file' guarantees 0 file-level leakage.",
+          "Benchmarking results are component-specific and not validated on complete Rotax aero engines."
+        ],
+        "seed": 42
+      },
+      "nust": {
+        "dataset_id": "nust",
+        "task_name": "FAULT_CLASSIFICATION",
+        "status": "completed",
+        "controlled_demonstration": false,
+        "generalization_claim": true,
+        "target_column": "bearing_condition",
+        "group_column": "source_file",
+        "feature_count": 19,
+        "feature_names": [
+          "Demand 1",
+          "Control 1",
+          "Output Drive 1",
+          "Channel 1",
+          "Channel 2",
+          "Channel 3",
+          "Channel 4",
+          "Channel 1 Kurtosis",
+          "Channel 2 Kurtosis",
+          "Channel 3 Kurtosis",
+          "Channel 4 Kurtosis",
+          "Rear Input 1",
+          "Rear Input 2",
+          "Rear Input 3",
+          "Rear Input 4",
+          "Rear Input 5",
+          "Rear Input 6",
+          "Rear Input 7",
+          "Rear Input 8"
+        ],
+        "num_classes": 2,
+        "class_names": [
+          "faulty",
+          "healthy"
+        ],
+        "train_groups": [
+          "1ST AT -10 c 2022May27-0325-0011.csv",
+          "1st at -10 2022Jun04-2239-0005.csv",
+          "1st at -10c 2022May26-2336-0006.csv",
+          "1st at -10c 2022May26-2336-0014.csv",
+          "1st at -10c 2022May27-0007-0024.csv",
+          "1st at -10c 2022May27-0007-0030.csv",
+          "1st at -10c 2022May27-0109-0039.csv",
+          "1st at -10c 2022May27-0219-0013.csv",
+          "1st at -10c 2022May27-0338-0064.csv",
+          "1st at -10c 2022May27-0421-0053.csv",
+          "1st at -10c 2022May27-0528-0015.csv",
+          "1st at -10c 2022May27-0528-0021.csv",
+          "1st at -10c 2022May27-2221-0031.csv",
+          "1st at-10c 2022May27-0219-0043.csv",
+          "2ND AT 0C 2022Jun05-2148-0002.csv",
+          "2nd  at 0c 2022May27-0325-0018.csv",
+          "2nd at 0c 2022May26-2304-0046.csv",
+          "2nd at 0c 2022May26-2336-0018.csv",
+          "2nd at 0c 2022May27-0007-0038.csv",
+          "2nd at 0c 2022May27-0109-0030.csv",
+          "2nd at 0c 2022May27-0141-0043.csv",
+          "2nd at 0c 2022May27-0219-0019.csv",
+          "2nd at 0c 2022May27-0338-0041.csv",
+          "2nd at 0c 2022May27-0338-0068.csv",
+          "2nd at 0c 2022May27-0421-0062.csv",
+          "2nd at 0c 2022May27-2221-0022.csv",
+          "2nd at 0c 2022May27-2254-0027.csv",
+          "3 rd  at 15 c 2022May27-0338-0010.csv",
+          "3rd at 15c 2022Jun04-2302-0006.csv",
+          "3rd at 15c 2022May26-2336-0024.csv",
+          "3rd at 15c 2022May27-0007-0003.csv",
+          "3rd at 15c 2022May27-0007-0044.csv",
+          "3rd at 15c 2022May27-0109-0018.csv",
+          "3rd at 15c 2022May27-0109-0060.csv",
+          "3rd at 15c 2022May27-0141-0021.csv",
+          "3rd at 15c 2022May27-0219-0058.csv",
+          "3rd at 15c 2022May27-0421-0038.csv",
+          "3rd at 15c 2022May27-0456-0008.csv",
+          "3rd at 15c 2022May27-2221-0014.csv",
+          "3rd at 15c 2022May27-2254-0008.csv",
+          "3rd at 15c 2022May27-2254-0032.csv",
+          "3th at 15c 2022May26-2304-0037.csv",
+          "4th at 30c 2022Jun05-2302-0006.csv",
+          "4th at 30c 2022May27-0007-0030.csv",
+          "4th at 30c 2022May27-0109-0013.csv",
+          "4th at 30c 2022May27-0141-0007.csv",
+          "4th at 30c 2022May27-0141-0021.csv",
+          "4th at 30c 2022May27-0219-0048.csv",
+          "4th at 30c 2022May27-0338-0041.csv",
+          "4th at 30c 2022May27-0421-0011.csv",
+          "4th at 30c 2022May27-0456-0013.csv",
+          "4th at 30c 2022May27-0456-0032.csv",
+          "4th at 30c 2022May27-2221-0009.csv",
+          "4th at 30c 2022May27-2221-0052.csv",
+          "4th at 30c 2022May27-2254-0037.csv",
+          "5th at 0c 2022May27-0007-0015.csv",
+          "5th at 15c 2022May27-2254-0040.csv",
+          "5th at 45 c  2022May27-0325-0011.csv",
+          "5th at 45 c 2022May27-0338-0035.csv",
+          "5th at 45c 2022May26-2304-0001.csv",
+          "5th at 45c 2022May26-2336-0046.csv",
+          "5th at 45c 2022May27-0007-0058.csv",
+          "5th at 45c 2022May27-0141-0012.csv",
+          "5th at 45c 2022May27-0219-0019.csv",
+          "5th at 45c 2022May27-0219-0043.csv",
+          "5th at 45c 2022May27-0421-0017.csv",
+          "5th at 45c 2022May27-0456-0024.csv",
+          "5th at 45c 2022May27-2221-0043.csv",
+          "5th at 45c 2nd at -0c 2022May26-2336-0018.csv",
+          "AT -10C 2022Jun07-0015-0002.csv",
+          "AT -10C 2022Jun07-0021-0002.csv",
+          "AT -10C 2022Jun07-0026-0002.csv",
+          "AT -10C 2022Jun13-2328-0002.csv",
+          "AT -10C 2022Jun13-2332-0002.csv",
+          "AT 0C 2022Jun06-2245-0002.csv",
+          "AT 0C 2022Jun06-2256-0002.csv",
+          "AT 0C 2022Jun06-2301-0002.csv",
+          "AT 15C 2022Jun06-2323-0002.csv",
+          "AT 15C 2022Jun07-0040-0002.csv",
+          "AT 15C 2022Jun07-0045-0002.csv",
+          "AT 15C 2022Jun13-2318-0002.csv",
+          "AT 30C 2022Jun06-2328-0002.csv",
+          "AT 30C 2022Jun06-2334-0002.csv",
+          "AT 30C 2022Jun07-0052-0002.csv",
+          "AT 30C 2022Jun13-2244-0002.csv",
+          "AT 45C 2022Jun06-2345-0002.csv",
+          "AT 45C 2022Jun06-2350-0002.csv",
+          "AT 45C 2022Jun06-2355-0002.csv",
+          "AT 45C 2022Jun07-0107-0002.csv",
+          "AT 45C 2022Jun07-0112-0002.csv",
+          "AT 45C 2022Jun07-0117-0002.csv",
+          "AT 45C 2022Jun13-2259-0002.csv",
+          "AT 45C 2022Jun13-2306-0002.csv",
+          "AT 45C 2022Jun13-2311-0002.csv"
+        ],
+        "test_groups": [
+          "1st at -10c 2022May27-0219-0014.csv",
+          "1st at 0c 2022May27-2254-0013.csv",
+          "2ND AT 0C 2022Jun05-2203-0003.csv",
+          "2ND AT 0C 2022Jun05-2211-0002.csv",
+          "2nd at 0c 2022Jun04-2243-0005.csv",
+          "2nd at 0c 2022May27-0109-0055.csv",
+          "2nd at 0c 2022May27-0528-0007.csv",
+          "3rd at 15c 2022May27-0338-0046.csv",
+          "3rd at 15c 2022May27-0421-0005.csv",
+          "4th at 30 c 2022May27-0338-0015.csv",
+          "4th at 30c 2022May26-2336-0031.csv",
+          "4th at 30c 2022May26-2336-0055.csv",
+          "5th at 45c 2022May27-0109-0007.csv",
+          "5th at 45c 2022May27-0421-0020.csv",
+          "AT -10C 2022Jun07-0006-0002.csv",
+          "AT 0C 2022Jun06-2306-0002.csv",
+          "AT 15C 2022Jun06-2313-0002.csv",
+          "AT 15C 2022Jun06-2318-0002.csv",
+          "AT 30C 2022Jun07-0058-0002.csv"
+        ],
+        "val_groups": [
+          "1st at -10c 2022May27-0109-0049.csv",
+          "1st at -10c 2022May27-0338-0059.csv",
+          "2ND AT 0C 2022Jun05-2156-0002.csv",
+          "2nd at -10c 2022May27-2254-0015.csv",
+          "2nd at 0c 2022May27-0309-0012.csv",
+          "2nd at 0c 2022May27-0421-0045.csv",
+          "3rd at 15c 2022May27-0219-0024.csv",
+          "3rd at 15c 2022May27-0456-0043.csv",
+          "4th at 30c 2022May26-2304-0026.csv",
+          "4th at 30c 2022May27-0219-0032.csv",
+          "4th at 30c 2022May27-0421-0028.csv",
+          "5th at 45c 2022May27-0141-0021.csv",
+          "5th at 45c 2022May27-0421-0062.csv",
+          "5th at 45c 2022May27-2221-0048.csv",
+          "AT -10C 2022Jun07-0010-0002.csv",
+          "AT -10C 2022Jun07-0030-0002.csv",
+          "AT 15C 2022Jun07-0034-0002.csv",
+          "AT 15C 2022Jun13-2324-0002.csv",
+          "AT 30C 2022Jun06-2341-0002.csv",
+          "AT 30C 2022Jun07-0103-0002.csv",
+          "AT 30C 2022Jun13-2251-0002.csv"
+        ],
+        "num_train_samples": 288548,
+        "num_test_samples": 39273,
+        "num_val_samples": 62442,
+        "train_class_distribution": {
+          "faulty": 157612,
+          "healthy": 130936
+        },
+        "test_class_distribution": {
+          "faulty": 26100,
+          "healthy": 13173
+        },
+        "models": {
+          "dummy_most_frequent": {
+            "model_name": "dummy_most_frequent",
+            "model_type": "DummyClassifier",
+            "hyperparameters": {
+              "strategy": "most_frequent"
+            },
+            "metrics": {
+              "accuracy": 0.6645787182033458,
+              "balanced_accuracy": 0.5,
+              "macro_f1": 0.39924739571382684,
+              "weighted_f1": 0.530662644979038,
+              "labels": [
+                "faulty",
+                "healthy"
+              ],
+              "confusion_matrix": [
+                [
+                  26100,
+                  0
+                ],
+                [
+                  13173,
+                  0
+                ]
+              ],
+              "per_class": {
+                "faulty": {
+                  "precision": 0.6645787182033458,
+                  "recall": 1.0,
+                  "f1_score": 0.7984947914276537,
+                  "support": 26100
+                },
+                "healthy": {
+                  "precision": 0.0,
+                  "recall": 0.0,
+                  "f1_score": 0.0,
+                  "support": 13173
+                }
+              }
+            }
+          },
+          "logistic_regression": {
+            "model_name": "logistic_regression",
+            "model_type": "LogisticRegression",
+            "hyperparameters": {
+              "max_iter": 1000,
+              "random_state": 42
+            },
+            "metrics": {
+              "accuracy": 0.8678736027296107,
+              "balanced_accuracy": 0.8602128919219127,
+              "macro_f1": 0.8541823929072838,
+              "weighted_f1": 0.8688895783296887,
+              "labels": [
+                "faulty",
+                "healthy"
+              ],
+              "confusion_matrix": [
+                [
+                  23059,
+                  3041
+                ],
+                [
+                  2148,
+                  11025
+                ]
+              ],
+              "per_class": {
+                "faulty": {
+                  "precision": 0.914785575435395,
+                  "recall": 0.8834865900383142,
+                  "f1_score": 0.8988637028085836,
+                  "support": 26100
+                },
+                "healthy": {
+                  "precision": 0.7838049196644391,
+                  "recall": 0.8369391938055113,
+                  "f1_score": 0.8095010830059841,
+                  "support": 13173
+                }
+              }
+            }
+          },
+          "random_forest": {
+            "model_name": "random_forest",
+            "model_type": "RandomForestClassifier",
+            "hyperparameters": {
+              "n_estimators": 50,
+              "max_depth": 10,
+              "random_state": 42
+            },
+            "metrics": {
+              "accuracy": 0.9803427291014183,
+              "balanced_accuracy": 0.9817892484714904,
+              "macro_f1": 0.9781193624013884,
+              "weighted_f1": 0.9804151896504727,
+              "labels": [
+                "faulty",
+                "healthy"
+              ],
+              "confusion_matrix": [
+                [
+                  25510,
+                  590
+                ],
+                [
+                  182,
+                  12991
+                ]
+              ],
+              "per_class": {
+                "faulty": {
+                  "precision": 0.9929160828273392,
+                  "recall": 0.9773946360153257,
+                  "f1_score": 0.9850942230460302,
+                  "support": 26100
+                },
+                "healthy": {
+                  "precision": 0.956556954568883,
+                  "recall": 0.9861838609276551,
+                  "f1_score": 0.9711445017567466,
+                  "support": 13173
+                }
+              }
+            }
+          }
+        },
+        "limitations": [
+          "rpm",
+          "humidity_pct",
+          "temperature_celsius",
+          "Source-file level grouping on 'source_file' guarantees 0 file-level leakage.",
+          "Benchmarking results are component-specific and not validated on complete Rotax aero engines."
+        ],
+        "seed": 42
+      }
+    },
+    "anomaly_detection": {
+      "cwru": {
+        "dataset_id": "cwru",
+        "task_name": "ANOMALY_DETECTION",
+        "status": "controlled_demonstration",
+        "controlled_demonstration": true,
+        "generalization_claim": false,
+        "healthy_label_definition": "normal",
+        "target_column": "fault_label",
+        "group_column": "source_file",
+        "feature_count": 25,
+        "feature_names": [
+          "mean",
+          "std",
+          "variance",
+          "RMS",
+          "minimum",
+          "maximum",
+          "peak_to_peak",
+          "absolute_mean",
+          "skewness",
+          "kurtosis",
+          "crest_factor",
+          "shape_factor",
+          "impulse_factor",
+          "clearance_factor",
+          "rms",
+          "peak",
+          "energy",
+          "dominant_frequency",
+          "spectral_energy",
+          "spectral_centroid",
+          "frequency_band_energy",
+          "band_energy_0_1500hz",
+          "band_energy_1500_3000hz",
+          "band_energy_3000_4500hz",
+          "band_energy_4500_6000hz"
+        ],
+        "train_groups": [
+          "97.mat",
+          "130.mat"
+        ],
+        "test_groups": [
+          "105.mat"
+        ],
+        "num_train_healthy_samples": 474,
+        "num_test_samples": 351,
+        "test_healthy_count": 0,
+        "test_anomaly_count": 351,
+        "models": {
+          "isolation_forest": {
+            "model_name": "isolation_forest",
+            "model_type": "IsolationForest",
+            "threshold_method": "95th_percentile_train_healthy",
+            "metrics": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1_score": 1.0,
+              "balanced_accuracy": 1.0,
+              "false_positive_rate": 0.0,
+              "false_negative_rate": 0.0,
+              "confusion_counts": {
+                "true_negatives": 0,
+                "false_positives": 0,
+                "false_negatives": 0,
+                "true_positives": 351
+              },
+              "score_distribution": {
+                "min": 0.6401959244357528,
+                "mean": 0.7122021528103264,
+                "std": 0.029925509361247292,
+                "median": 0.7278586319107014,
+                "max": 0.7446872866351768
+              },
+              "calibrated_threshold": 0.5269987984106199
+            }
+          },
+          "distance_centroid": {
+            "model_name": "distance_centroid",
+            "model_type": "EuclideanCentroidDistance",
+            "threshold_method": "95th_percentile_train_healthy",
+            "metrics": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1_score": 1.0,
+              "balanced_accuracy": 1.0,
+              "false_positive_rate": 0.0,
+              "false_negative_rate": 0.0,
+              "confusion_counts": {
+                "true_negatives": 0,
+                "false_positives": 0,
+                "false_negatives": 0,
+                "true_positives": 351
+              },
+              "score_distribution": {
+                "min": 124.91169480981779,
+                "mean": 3572.9953386775833,
+                "std": 3588.337142136819,
+                "median": 2085.6046179767304,
+                "max": 9549.152526267513
+              },
+              "calibrated_threshold": 7.024619446643835
+            }
+          }
+        },
+        "limitations": [
+          "CWRU controlled demonstration: normal class originates from 97.mat.",
+          "Evaluates anomaly discrimination against held-out fault files.",
+          "Zero statistical generalization claim to unobserved operational machinery."
+        ],
+        "seed": 42
+      },
+      "paderborn": {
+        "dataset_id": "paderborn",
+        "task_name": "ANOMALY_DETECTION",
+        "status": "completed",
+        "controlled_demonstration": false,
+        "generalization_claim": true,
+        "healthy_label_definition": "healthy",
+        "target_column": "fault_label",
+        "group_column": "source_file",
+        "feature_count": 15,
+        "feature_names": [
+          "mean",
+          "std",
+          "variance",
+          "rms",
+          "peak",
+          "peak_to_peak",
+          "crest_factor",
+          "skewness",
+          "kurtosis",
+          "dominant_frequency",
+          "spectral_energy",
+          "spectral_centroid",
+          "band_energy_0_5khz",
+          "band_energy_5_15khz",
+          "band_energy_15_32khz"
+        ],
+        "train_groups": [
+          "N09_M07_F10_K001_1.mat",
+          "N09_M07_F10_K001_10.mat",
+          "N09_M07_F10_K001_11.mat",
+          "N09_M07_F10_K001_12.mat",
+          "N09_M07_F10_K001_13.mat",
+          "N09_M07_F10_K001_14.mat",
+          "N09_M07_F10_K001_16.mat",
+          "N09_M07_F10_K001_18.mat",
+          "N09_M07_F10_K001_19.mat",
+          "N09_M07_F10_K001_5.mat",
+          "N09_M07_F10_K001_6.mat",
+          "N09_M07_F10_K001_7.mat",
+          "N09_M07_F10_K001_8.mat",
+          "N09_M07_F10_KA01_1.mat",
+          "N09_M07_F10_KA01_10.mat",
+          "N09_M07_F10_KA01_11.mat",
+          "N09_M07_F10_KA01_12.mat",
+          "N09_M07_F10_KA01_14.mat",
+          "N09_M07_F10_KA01_15.mat",
+          "N09_M07_F10_KA01_16.mat",
+          "N09_M07_F10_KA01_19.mat",
+          "N09_M07_F10_KA01_20.mat",
+          "N09_M07_F10_KA01_5.mat",
+          "N09_M07_F10_KA01_6.mat",
+          "N09_M07_F10_KA01_7.mat",
+          "N09_M07_F10_KA01_9.mat",
+          "N09_M07_F10_KI04_1.mat",
+          "N09_M07_F10_KI04_11.mat",
+          "N09_M07_F10_KI04_12.mat",
+          "N09_M07_F10_KI04_13.mat",
+          "N09_M07_F10_KI04_15.mat",
+          "N09_M07_F10_KI04_16.mat",
+          "N09_M07_F10_KI04_17.mat",
+          "N09_M07_F10_KI04_19.mat",
+          "N09_M07_F10_KI04_2.mat",
+          "N09_M07_F10_KI04_20.mat",
+          "N09_M07_F10_KI04_3.mat",
+          "N09_M07_F10_KI04_5.mat",
+          "N09_M07_F10_KI04_6.mat",
+          "N09_M07_F10_KI04_7.mat",
+          "N09_M07_F10_KI04_9.mat",
+          "N15_M01_F10_K001_1.mat",
+          "N15_M01_F10_K001_10.mat",
+          "N15_M01_F10_K001_12.mat",
+          "N15_M01_F10_K001_13.mat",
+          "N15_M01_F10_K001_14.mat",
+          "N15_M01_F10_K001_15.mat",
+          "N15_M01_F10_K001_16.mat",
+          "N15_M01_F10_K001_17.mat",
+          "N15_M01_F10_K001_18.mat",
+          "N15_M01_F10_K001_19.mat",
+          "N15_M01_F10_K001_2.mat",
+          "N15_M01_F10_K001_20.mat",
+          "N15_M01_F10_K001_3.mat",
+          "N15_M01_F10_K001_4.mat",
+          "N15_M01_F10_K001_7.mat",
+          "N15_M01_F10_K001_9.mat",
+          "N15_M01_F10_KA01_13.mat",
+          "N15_M01_F10_KA01_16.mat",
+          "N15_M01_F10_KA01_17.mat",
+          "N15_M01_F10_KA01_19.mat",
+          "N15_M01_F10_KA01_20.mat",
+          "N15_M01_F10_KA01_5.mat",
+          "N15_M01_F10_KA01_6.mat",
+          "N15_M01_F10_KA01_8.mat",
+          "N15_M01_F10_KA01_9.mat",
+          "N15_M01_F10_KI04_1.mat",
+          "N15_M01_F10_KI04_13.mat",
+          "N15_M01_F10_KI04_14.mat",
+          "N15_M01_F10_KI04_15.mat",
+          "N15_M01_F10_KI04_16.mat",
+          "N15_M01_F10_KI04_17.mat",
+          "N15_M01_F10_KI04_19.mat",
+          "N15_M01_F10_KI04_2.mat",
+          "N15_M01_F10_KI04_20.mat",
+          "N15_M01_F10_KI04_3.mat",
+          "N15_M01_F10_KI04_4.mat",
+          "N15_M01_F10_KI04_6.mat",
+          "N15_M01_F10_KI04_7.mat",
+          "N15_M01_F10_KI04_8.mat",
+          "N15_M01_F10_KI04_9.mat",
+          "N15_M07_F04_K001_1.mat",
+          "N15_M07_F04_K001_11.mat",
+          "N15_M07_F04_K001_12.mat",
+          "N15_M07_F04_K001_13.mat",
+          "N15_M07_F04_K001_14.mat",
+          "N15_M07_F04_K001_15.mat",
+          "N15_M07_F04_K001_17.mat",
+          "N15_M07_F04_K001_19.mat",
+          "N15_M07_F04_K001_2.mat",
+          "N15_M07_F04_K001_20.mat",
+          "N15_M07_F04_K001_5.mat",
+          "N15_M07_F04_K001_6.mat",
+          "N15_M07_F04_K001_7.mat",
+          "N15_M07_F04_K001_8.mat",
+          "N15_M07_F04_K001_9.mat",
+          "N15_M07_F04_KA01_1.mat",
+          "N15_M07_F04_KA01_11.mat",
+          "N15_M07_F04_KA01_12.mat",
+          "N15_M07_F04_KA01_13.mat",
+          "N15_M07_F04_KA01_15.mat",
+          "N15_M07_F04_KA01_16.mat",
+          "N15_M07_F04_KA01_17.mat",
+          "N15_M07_F04_KA01_18.mat",
+          "N15_M07_F04_KA01_19.mat",
+          "N15_M07_F04_KA01_2.mat",
+          "N15_M07_F04_KA01_20.mat",
+          "N15_M07_F04_KA01_3.mat",
+          "N15_M07_F04_KA01_4.mat",
+          "N15_M07_F04_KA01_5.mat",
+          "N15_M07_F04_KA01_6.mat",
+          "N15_M07_F04_KA01_7.mat",
+          "N15_M07_F04_KA01_8.mat",
+          "N15_M07_F04_KI04_1.mat",
+          "N15_M07_F04_KI04_10.mat",
+          "N15_M07_F04_KI04_12.mat",
+          "N15_M07_F04_KI04_15.mat",
+          "N15_M07_F04_KI04_16.mat",
+          "N15_M07_F04_KI04_19.mat",
+          "N15_M07_F04_KI04_2.mat",
+          "N15_M07_F04_KI04_20.mat",
+          "N15_M07_F04_KI04_3.mat",
+          "N15_M07_F04_KI04_4.mat",
+          "N15_M07_F04_KI04_5.mat",
+          "N15_M07_F04_KI04_6.mat",
+          "N15_M07_F04_KI04_7.mat",
+          "N15_M07_F10_K001_1.mat",
+          "N15_M07_F10_K001_10.mat",
+          "N15_M07_F10_K001_11.mat",
+          "N15_M07_F10_K001_12.mat",
+          "N15_M07_F10_K001_16.mat",
+          "N15_M07_F10_K001_18.mat",
+          "N15_M07_F10_K001_2.mat",
+          "N15_M07_F10_K001_20.mat",
+          "N15_M07_F10_K001_3.mat",
+          "N15_M07_F10_K001_5.mat",
+          "N15_M07_F10_K001_6.mat",
+          "N15_M07_F10_K001_9.mat",
+          "N15_M07_F10_KA01_1.mat",
+          "N15_M07_F10_KA01_10.mat",
+          "N15_M07_F10_KA01_11.mat",
+          "N15_M07_F10_KA01_12.mat",
+          "N15_M07_F10_KA01_13.mat",
+          "N15_M07_F10_KA01_14.mat",
+          "N15_M07_F10_KA01_16.mat",
+          "N15_M07_F10_KA01_17.mat",
+          "N15_M07_F10_KA01_18.mat",
+          "N15_M07_F10_KA01_19.mat",
+          "N15_M07_F10_KA01_2.mat",
+          "N15_M07_F10_KA01_20.mat",
+          "N15_M07_F10_KA01_3.mat",
+          "N15_M07_F10_KA01_4.mat",
+          "N15_M07_F10_KA01_5.mat",
+          "N15_M07_F10_KA01_8.mat",
+          "N15_M07_F10_KA01_9.mat",
+          "N15_M07_F10_KI04_1.mat",
+          "N15_M07_F10_KI04_10.mat",
+          "N15_M07_F10_KI04_11.mat",
+          "N15_M07_F10_KI04_13.mat",
+          "N15_M07_F10_KI04_15.mat",
+          "N15_M07_F10_KI04_16.mat",
+          "N15_M07_F10_KI04_17.mat",
+          "N15_M07_F10_KI04_18.mat",
+          "N15_M07_F10_KI04_19.mat",
+          "N15_M07_F10_KI04_20.mat",
+          "N15_M07_F10_KI04_3.mat",
+          "N15_M07_F10_KI04_7.mat",
+          "N15_M07_F10_KI04_9.mat"
+        ],
+        "test_groups": [
+          "N09_M07_F10_K001_15.mat",
+          "N09_M07_F10_K001_17.mat",
+          "N09_M07_F10_K001_2.mat",
+          "N09_M07_F10_K001_20.mat",
+          "N09_M07_F10_K001_3.mat",
+          "N09_M07_F10_K001_4.mat",
+          "N09_M07_F10_K001_9.mat",
+          "N09_M07_F10_KA01_13.mat",
+          "N09_M07_F10_KA01_17.mat",
+          "N09_M07_F10_KA01_18.mat",
+          "N09_M07_F10_KA01_2.mat",
+          "N09_M07_F10_KA01_3.mat",
+          "N09_M07_F10_KA01_4.mat",
+          "N09_M07_F10_KA01_8.mat",
+          "N09_M07_F10_KI04_10.mat",
+          "N09_M07_F10_KI04_14.mat",
+          "N09_M07_F10_KI04_18.mat",
+          "N09_M07_F10_KI04_4.mat",
+          "N09_M07_F10_KI04_8.mat",
+          "N15_M01_F10_K001_11.mat",
+          "N15_M01_F10_K001_5.mat",
+          "N15_M01_F10_K001_6.mat",
+          "N15_M01_F10_K001_8.mat",
+          "N15_M01_F10_KA01_1.mat",
+          "N15_M01_F10_KA01_10.mat",
+          "N15_M01_F10_KA01_11.mat",
+          "N15_M01_F10_KA01_12.mat",
+          "N15_M01_F10_KA01_14.mat",
+          "N15_M01_F10_KA01_15.mat",
+          "N15_M01_F10_KA01_18.mat",
+          "N15_M01_F10_KA01_2.mat",
+          "N15_M01_F10_KA01_3.mat",
+          "N15_M01_F10_KA01_4.mat",
+          "N15_M01_F10_KA01_7.mat",
+          "N15_M01_F10_KI04_10.mat",
+          "N15_M01_F10_KI04_11.mat",
+          "N15_M01_F10_KI04_12.mat",
+          "N15_M01_F10_KI04_18.mat",
+          "N15_M01_F10_KI04_5.mat",
+          "N15_M07_F04_K001_10.mat",
+          "N15_M07_F04_K001_16.mat",
+          "N15_M07_F04_K001_18.mat",
+          "N15_M07_F04_K001_3.mat",
+          "N15_M07_F04_K001_4.mat",
+          "N15_M07_F04_KA01_10.mat",
+          "N15_M07_F04_KA01_14.mat",
+          "N15_M07_F04_KA01_9.mat",
+          "N15_M07_F04_KI04_11.mat",
+          "N15_M07_F04_KI04_13.mat",
+          "N15_M07_F04_KI04_14.mat",
+          "N15_M07_F04_KI04_17.mat",
+          "N15_M07_F04_KI04_18.mat",
+          "N15_M07_F04_KI04_8.mat",
+          "N15_M07_F04_KI04_9.mat",
+          "N15_M07_F10_K001_13.mat",
+          "N15_M07_F10_K001_14.mat",
+          "N15_M07_F10_K001_15.mat",
+          "N15_M07_F10_K001_17.mat",
+          "N15_M07_F10_K001_19.mat",
+          "N15_M07_F10_K001_4.mat",
+          "N15_M07_F10_K001_7.mat",
+          "N15_M07_F10_K001_8.mat",
+          "N15_M07_F10_KA01_15.mat",
+          "N15_M07_F10_KA01_6.mat",
+          "N15_M07_F10_KA01_7.mat",
+          "N15_M07_F10_KI04_12.mat",
+          "N15_M07_F10_KI04_14.mat",
+          "N15_M07_F10_KI04_2.mat",
+          "N15_M07_F10_KI04_4.mat",
+          "N15_M07_F10_KI04_5.mat",
+          "N15_M07_F10_KI04_6.mat",
+          "N15_M07_F10_KI04_8.mat"
+        ],
+        "num_train_healthy_samples": 6949,
+        "num_test_samples": 8939,
+        "test_healthy_count": 2977,
+        "test_anomaly_count": 5962,
+        "models": {
+          "isolation_forest": {
+            "model_name": "isolation_forest",
+            "model_type": "IsolationForest",
+            "threshold_method": "95th_percentile_train_healthy",
+            "metrics": {
+              "precision": 0.9699664429530201,
+              "recall": 0.9696410600469642,
+              "f1_score": 0.9698037242073477,
+              "balanced_accuracy": 0.9547567073832401,
+              "false_positive_rate": 0.060127645280483706,
+              "false_negative_rate": 0.030358939953035895,
+              "confusion_counts": {
+                "true_negatives": 2798,
+                "false_positives": 179,
+                "false_negatives": 181,
+                "true_positives": 5781
+              },
+              "score_distribution": {
+                "min": 0.37589371966683655,
+                "mean": 0.5710265661684713,
+                "std": 0.09395093112327497,
+                "median": 0.5989491270281256,
+                "max": 0.7092966700307906
+              },
+              "calibrated_threshold": 0.5441471010388015
+            }
+          },
+          "distance_centroid": {
+            "model_name": "distance_centroid",
+            "model_type": "EuclideanCentroidDistance",
+            "threshold_method": "95th_percentile_train_healthy",
+            "metrics": {
+              "precision": 0.9724351655521122,
+              "recall": 1.0,
+              "f1_score": 0.9860249731249483,
+              "balanced_accuracy": 0.9716157205240175,
+              "false_positive_rate": 0.056768558951965066,
+              "false_negative_rate": 0.0,
+              "confusion_counts": {
+                "true_negatives": 2808,
+                "false_positives": 169,
+                "false_negatives": 0,
+                "true_positives": 5962
+              },
+              "score_distribution": {
+                "min": 1.0290328467080612,
+                "mean": 14.476260048987346,
+                "std": 10.36657231213378,
+                "median": 13.246311845916766,
+                "max": 37.89481561773126
+              },
+              "calibrated_threshold": 6.298854492096088
+            }
+          }
+        },
+        "limitations": [
+          "Semi-supervised anomaly detection fitted strictly on 'healthy' records in training groups.",
+          "Source-file level grouping on 'source_file' guarantees 0 file-level leakage."
+        ],
+        "seed": 42
+      },
+      "nust": {
+        "dataset_id": "nust",
+        "task_name": "ANOMALY_DETECTION",
+        "status": "completed",
+        "controlled_demonstration": false,
+        "generalization_claim": true,
+        "healthy_label_definition": "healthy",
+        "target_column": "bearing_condition",
+        "group_column": "source_file",
+        "feature_count": 19,
+        "feature_names": [
+          "Demand 1",
+          "Control 1",
+          "Output Drive 1",
+          "Channel 1",
+          "Channel 2",
+          "Channel 3",
+          "Channel 4",
+          "Channel 1 Kurtosis",
+          "Channel 2 Kurtosis",
+          "Channel 3 Kurtosis",
+          "Channel 4 Kurtosis",
+          "Rear Input 1",
+          "Rear Input 2",
+          "Rear Input 3",
+          "Rear Input 4",
+          "Rear Input 5",
+          "Rear Input 6",
+          "Rear Input 7",
+          "Rear Input 8"
+        ],
+        "train_groups": [
+          "1ST AT -10 c 2022May27-0325-0011.csv",
+          "1st at -10 2022Jun04-2239-0005.csv",
+          "1st at -10c 2022May26-2336-0006.csv",
+          "1st at -10c 2022May26-2336-0014.csv",
+          "1st at -10c 2022May27-0007-0024.csv",
+          "1st at -10c 2022May27-0007-0030.csv",
+          "1st at -10c 2022May27-0109-0039.csv",
+          "1st at -10c 2022May27-0219-0013.csv",
+          "1st at -10c 2022May27-0338-0064.csv",
+          "1st at -10c 2022May27-0421-0053.csv",
+          "1st at -10c 2022May27-0528-0015.csv",
+          "1st at -10c 2022May27-0528-0021.csv",
+          "1st at -10c 2022May27-2221-0031.csv",
+          "1st at-10c 2022May27-0219-0043.csv",
+          "2ND AT 0C 2022Jun05-2148-0002.csv",
+          "2nd  at 0c 2022May27-0325-0018.csv",
+          "2nd at 0c 2022May26-2304-0046.csv",
+          "2nd at 0c 2022May26-2336-0018.csv",
+          "2nd at 0c 2022May27-0007-0038.csv",
+          "2nd at 0c 2022May27-0109-0030.csv",
+          "2nd at 0c 2022May27-0141-0043.csv",
+          "2nd at 0c 2022May27-0219-0019.csv",
+          "2nd at 0c 2022May27-0338-0041.csv",
+          "2nd at 0c 2022May27-0338-0068.csv",
+          "2nd at 0c 2022May27-0421-0062.csv",
+          "2nd at 0c 2022May27-2221-0022.csv",
+          "2nd at 0c 2022May27-2254-0027.csv",
+          "3 rd  at 15 c 2022May27-0338-0010.csv",
+          "3rd at 15c 2022Jun04-2302-0006.csv",
+          "3rd at 15c 2022May26-2336-0024.csv",
+          "3rd at 15c 2022May27-0007-0003.csv",
+          "3rd at 15c 2022May27-0007-0044.csv",
+          "3rd at 15c 2022May27-0109-0018.csv",
+          "3rd at 15c 2022May27-0109-0060.csv",
+          "3rd at 15c 2022May27-0141-0021.csv",
+          "3rd at 15c 2022May27-0219-0058.csv",
+          "3rd at 15c 2022May27-0421-0038.csv",
+          "3rd at 15c 2022May27-0456-0008.csv",
+          "3rd at 15c 2022May27-2221-0014.csv",
+          "3rd at 15c 2022May27-2254-0008.csv",
+          "3rd at 15c 2022May27-2254-0032.csv",
+          "3th at 15c 2022May26-2304-0037.csv",
+          "4th at 30c 2022Jun05-2302-0006.csv",
+          "4th at 30c 2022May27-0007-0030.csv",
+          "4th at 30c 2022May27-0109-0013.csv",
+          "4th at 30c 2022May27-0141-0007.csv",
+          "4th at 30c 2022May27-0141-0021.csv",
+          "4th at 30c 2022May27-0219-0048.csv",
+          "4th at 30c 2022May27-0338-0041.csv",
+          "4th at 30c 2022May27-0421-0011.csv",
+          "4th at 30c 2022May27-0456-0013.csv",
+          "4th at 30c 2022May27-0456-0032.csv",
+          "4th at 30c 2022May27-2221-0009.csv",
+          "4th at 30c 2022May27-2221-0052.csv",
+          "4th at 30c 2022May27-2254-0037.csv",
+          "5th at 0c 2022May27-0007-0015.csv",
+          "5th at 15c 2022May27-2254-0040.csv",
+          "5th at 45 c  2022May27-0325-0011.csv",
+          "5th at 45 c 2022May27-0338-0035.csv",
+          "5th at 45c 2022May26-2304-0001.csv",
+          "5th at 45c 2022May26-2336-0046.csv",
+          "5th at 45c 2022May27-0007-0058.csv",
+          "5th at 45c 2022May27-0141-0012.csv",
+          "5th at 45c 2022May27-0219-0019.csv",
+          "5th at 45c 2022May27-0219-0043.csv",
+          "5th at 45c 2022May27-0421-0017.csv",
+          "5th at 45c 2022May27-0456-0024.csv",
+          "5th at 45c 2022May27-2221-0043.csv",
+          "5th at 45c 2nd at -0c 2022May26-2336-0018.csv",
+          "AT -10C 2022Jun07-0015-0002.csv",
+          "AT -10C 2022Jun07-0021-0002.csv",
+          "AT -10C 2022Jun07-0026-0002.csv",
+          "AT -10C 2022Jun13-2328-0002.csv",
+          "AT -10C 2022Jun13-2332-0002.csv",
+          "AT 0C 2022Jun06-2245-0002.csv",
+          "AT 0C 2022Jun06-2256-0002.csv",
+          "AT 0C 2022Jun06-2301-0002.csv",
+          "AT 15C 2022Jun06-2323-0002.csv",
+          "AT 15C 2022Jun07-0040-0002.csv",
+          "AT 15C 2022Jun07-0045-0002.csv",
+          "AT 15C 2022Jun13-2318-0002.csv",
+          "AT 30C 2022Jun06-2328-0002.csv",
+          "AT 30C 2022Jun06-2334-0002.csv",
+          "AT 30C 2022Jun07-0052-0002.csv",
+          "AT 30C 2022Jun13-2244-0002.csv",
+          "AT 45C 2022Jun06-2345-0002.csv",
+          "AT 45C 2022Jun06-2350-0002.csv",
+          "AT 45C 2022Jun06-2355-0002.csv",
+          "AT 45C 2022Jun07-0107-0002.csv",
+          "AT 45C 2022Jun07-0112-0002.csv",
+          "AT 45C 2022Jun07-0117-0002.csv",
+          "AT 45C 2022Jun13-2259-0002.csv",
+          "AT 45C 2022Jun13-2306-0002.csv",
+          "AT 45C 2022Jun13-2311-0002.csv"
+        ],
+        "test_groups": [
+          "1st at -10c 2022May27-0109-0049.csv",
+          "1st at -10c 2022May27-0219-0014.csv",
+          "1st at -10c 2022May27-0338-0059.csv",
+          "1st at 0c 2022May27-2254-0013.csv",
+          "2ND AT 0C 2022Jun05-2156-0002.csv",
+          "2ND AT 0C 2022Jun05-2203-0003.csv",
+          "2ND AT 0C 2022Jun05-2211-0002.csv",
+          "2nd at -10c 2022May27-2254-0015.csv",
+          "2nd at 0c 2022Jun04-2243-0005.csv",
+          "2nd at 0c 2022May27-0109-0055.csv",
+          "2nd at 0c 2022May27-0309-0012.csv",
+          "2nd at 0c 2022May27-0421-0045.csv",
+          "2nd at 0c 2022May27-0528-0007.csv",
+          "3rd at 15c 2022May27-0219-0024.csv",
+          "3rd at 15c 2022May27-0338-0046.csv",
+          "3rd at 15c 2022May27-0421-0005.csv",
+          "3rd at 15c 2022May27-0456-0043.csv",
+          "4th at 30 c 2022May27-0338-0015.csv",
+          "4th at 30c 2022May26-2304-0026.csv",
+          "4th at 30c 2022May26-2336-0031.csv",
+          "4th at 30c 2022May26-2336-0055.csv",
+          "4th at 30c 2022May27-0219-0032.csv",
+          "4th at 30c 2022May27-0421-0028.csv",
+          "5th at 45c 2022May27-0109-0007.csv",
+          "5th at 45c 2022May27-0141-0021.csv",
+          "5th at 45c 2022May27-0421-0020.csv",
+          "5th at 45c 2022May27-0421-0062.csv",
+          "5th at 45c 2022May27-2221-0048.csv",
+          "AT -10C 2022Jun07-0006-0002.csv",
+          "AT -10C 2022Jun07-0010-0002.csv",
+          "AT -10C 2022Jun07-0030-0002.csv",
+          "AT 0C 2022Jun06-2306-0002.csv",
+          "AT 15C 2022Jun06-2313-0002.csv",
+          "AT 15C 2022Jun06-2318-0002.csv",
+          "AT 15C 2022Jun07-0034-0002.csv",
+          "AT 15C 2022Jun13-2324-0002.csv",
+          "AT 30C 2022Jun06-2341-0002.csv",
+          "AT 30C 2022Jun07-0058-0002.csv",
+          "AT 30C 2022Jun07-0103-0002.csv",
+          "AT 30C 2022Jun13-2251-0002.csv"
+        ],
+        "num_train_healthy_samples": 130936,
+        "num_test_samples": 101715,
+        "test_healthy_count": 49665,
+        "test_anomaly_count": 52050,
+        "models": {
+          "isolation_forest": {
+            "model_name": "isolation_forest",
+            "model_type": "IsolationForest",
+            "threshold_method": "95th_percentile_train_healthy",
+            "metrics": {
+              "precision": 0.6646987587042082,
+              "recall": 0.0843611911623439,
+              "f1_score": 0.14972040370976542,
+              "balanced_accuracy": 0.5198811895608357,
+              "false_positive_rate": 0.04459881204067251,
+              "false_negative_rate": 0.9156388088376561,
+              "confusion_counts": {
+                "true_negatives": 47450,
+                "false_positives": 2215,
+                "false_negatives": 47659,
+                "true_positives": 4391
+              },
+              "score_distribution": {
+                "min": 0.33445972652642114,
+                "mean": 0.4289761989078813,
+                "std": 0.08651350511758485,
+                "median": 0.3981332498021679,
+                "max": 0.7672774374781183
+              },
+              "calibrated_threshold": 0.5778295460634529
+            }
+          },
+          "distance_centroid": {
+            "model_name": "distance_centroid",
+            "model_type": "EuclideanCentroidDistance",
+            "threshold_method": "95th_percentile_train_healthy",
+            "metrics": {
+              "precision": 0.6424842725204123,
+              "recall": 0.09221902017291066,
+              "f1_score": 0.161287612775323,
+              "balanced_accuracy": 0.5192193459869889,
+              "false_positive_rate": 0.05378032819893285,
+              "false_negative_rate": 0.9077809798270894,
+              "confusion_counts": {
+                "true_negatives": 46994,
+                "false_positives": 2671,
+                "false_negatives": 47250,
+                "true_positives": 4800
+              },
+              "score_distribution": {
+                "min": 0.6535754108968945,
+                "mean": 2.6149051768349905,
+                "std": 3.4730398432663954,
+                "median": 1.4855175517359172,
+                "max": 295.9565576582771
+              },
+              "calibrated_threshold": 7.117470661901576
+            }
+          }
+        },
+        "limitations": [
+          "Semi-supervised anomaly detection fitted strictly on 'healthy' records in training groups.",
+          "Source-file level grouping on 'source_file' guarantees 0 file-level leakage."
+        ],
+        "seed": 42
+      },
+      "femto": {
+        "dataset_id": "femto",
+        "task_name": "ANOMALY_DETECTION",
+        "status": "skipped",
+        "reason": "FEMTO is a continuous run-to-failure degradation dataset without an explicit binary healthy reference class in the processed feature table.",
+        "can_be_enabled_later": true,
+        "recommendation": "Use for degradation/RUL regression; anomaly detection requires calibrating a threshold on early life cycles."
+      }
+    },
+    "degradation_rul": {
+      "femto": {
+        "dataset_id": "femto",
+        "task_name": "DEGRADATION_RUL_REGRESSION",
+        "status": "completed",
+        "target_column": "rul_label",
+        "group_column": "bearing_id",
+        "time_column": "file_index",
+        "split_type": "entity_held_out",
+        "feature_count": 16,
+        "feature_names": [
+          "h_rms",
+          "h_std",
+          "h_peak",
+          "h_peak_to_peak",
+          "h_crest_factor",
+          "h_kurtosis",
+          "h_skewness",
+          "h_energy",
+          "v_rms",
+          "v_std",
+          "v_peak",
+          "v_peak_to_peak",
+          "v_crest_factor",
+          "v_kurtosis",
+          "v_skewness",
+          "v_energy"
+        ],
+        "num_total_entities": 6,
+        "num_train_entities": 4,
+        "num_test_entities": 2,
+        "train_entities": [
+          "Bearing2_1",
+          "Bearing2_2",
+          "Bearing3_1",
+          "Bearing3_2"
+        ],
+        "test_entities": [
+          "Bearing1_1",
+          "Bearing1_2"
+        ],
+        "num_train_samples": 3860,
+        "num_test_samples": 3674,
+        "per_entity_test_metrics": {
+          "Bearing1_1": {
+            "sample_count": 2803,
+            "mae": 867.5116160707379,
+            "rmse": 1081.6771231251228
+          },
+          "Bearing1_2": {
+            "sample_count": 871,
+            "mae": 204.1435459064681,
+            "rmse": 260.1933600951624
+          }
+        },
+        "models": {
+          "dummy_mean": {
+            "model_name": "dummy_mean",
+            "model_type": "DummyRegressor",
+            "hyperparameters": {
+              "strategy": "mean"
+            },
+            "metrics": {
+              "mae": 778.8764769095816,
+              "rmse": 1022.1342744498123,
+              "r2_score": -0.5290307554915417,
+              "max_error": 2231.240414507772,
+              "target_range": [
+                0.0,
+                2802.0
+              ],
+              "near_eol_metrics": {
+                "threshold": 200.0,
+                "sample_count": 402,
+                "mae": 470.75958549222804,
+                "rmse": 474.3218885941076
+              }
+            }
+          },
+          "ridge_regression": {
+            "model_name": "ridge_regression",
+            "model_type": "Ridge",
+            "hyperparameters": {
+              "alpha": 1.0,
+              "random_state": 42
+            },
+            "metrics": {
+              "mae": 823.3765492797525,
+              "rmse": 1175.8886887011006,
+              "r2_score": -1.0236376167285544,
+              "max_error": 13574.895666254115,
+              "target_range": [
+                0.0,
+                2802.0
+              ],
+              "near_eol_metrics": {
+                "threshold": 200.0,
+                "sample_count": 402,
+                "mae": 955.2694346793885,
+                "rmse": 1993.8049778928985
+              }
+            }
+          },
+          "random_forest": {
+            "model_name": "random_forest",
+            "model_type": "RandomForestRegressor",
+            "hyperparameters": {
+              "n_estimators": 50,
+              "max_depth": 10,
+              "random_state": 42
+            },
+            "metrics": {
+              "mae": 710.2460773899869,
+              "rmse": 953.2553744199738,
+              "r2_score": -0.3298995627935517,
+              "max_error": 2295.136464262918,
+              "target_range": [
+                0.0,
+                2802.0
+              ],
+              "near_eol_metrics": {
+                "threshold": 200.0,
+                "sample_count": 402,
+                "mae": 124.85714191214979,
+                "rmse": 188.3312322070052
+              }
+            }
+          }
+        },
+        "limitations": [
+          "FEMTO evaluation uses 6 total bearings from the processed training inventory: 4 train, 2 test.",
+          "Zero validation split is created at entity level to avoid starving training variance.",
+          "Test set consists of complete run-to-failure bearing trajectories with preserved temporal ordering."
+        ],
+        "seed": 42
+      },
+      "nasa_battery": {
+        "dataset_id": "nasa_battery",
+        "task_name": "DEGRADATION_RUL_REGRESSION",
+        "status": "completed",
+        "target_column": "soh",
+        "group_column": "battery_id",
+        "time_column": "cycle",
+        "split_type": "entity_held_out",
+        "feature_count": 10,
+        "feature_names": [
+          "ambient_temperature",
+          "voltage_mean",
+          "voltage_min",
+          "voltage_max",
+          "current_mean",
+          "current_min",
+          "current_max",
+          "temperature_mean",
+          "temperature_min",
+          "temperature_max"
+        ],
+        "num_total_entities": 34,
+        "num_train_entities": 24,
+        "num_test_entities": 10,
+        "train_entities": [
+          "B0005",
+          "B0018",
+          "B0026",
+          "B0027",
+          "B0028",
+          "B0030",
+          "B0031",
+          "B0033",
+          "B0038",
+          "B0039",
+          "B0040",
+          "B0041",
+          "B0042",
+          "B0043",
+          "B0045",
+          "B0046",
+          "B0047",
+          "B0048",
+          "B0049",
+          "B0050",
+          "B0051",
+          "B0052",
+          "B0053",
+          "B0056"
+        ],
+        "test_entities": [
+          "B0006",
+          "B0007",
+          "B0025",
+          "B0029",
+          "B0032",
+          "B0034",
+          "B0036",
+          "B0044",
+          "B0054",
+          "B0055"
+        ],
+        "num_train_samples": 1597,
+        "num_test_samples": 1153,
+        "per_entity_test_metrics": {
+          "B0006": {
+            "sample_count": 168,
+            "mae": 0.09303373505337542,
+            "rmse": 0.10845792712611564
+          },
+          "B0007": {
+            "sample_count": 168,
+            "mae": 0.030515642117408433,
+            "rmse": 0.039617279133012946
+          },
+          "B0025": {
+            "sample_count": 28,
+            "mae": 0.0466183638885435,
+            "rmse": 0.06951519961337461
+          },
+          "B0029": {
+            "sample_count": 40,
+            "mae": 0.0263753937165462,
+            "rmse": 0.03175497861232786
+          },
+          "B0032": {
+            "sample_count": 40,
+            "mae": 0.17084010184579504,
+            "rmse": 0.17510226136270785
+          },
+          "B0034": {
+            "sample_count": 197,
+            "mae": 0.03189626601052438,
+            "rmse": 0.04273870824674117
+          },
+          "B0036": {
+            "sample_count": 197,
+            "mae": 0.08776749829136687,
+            "rmse": 0.11592698721942599
+          },
+          "B0044": {
+            "sample_count": 111,
+            "mae": 0.03563723568145102,
+            "rmse": 0.07069054034303678
+          },
+          "B0054": {
+            "sample_count": 102,
+            "mae": 0.05812716503046685,
+            "rmse": 0.07229616096193112
+          },
+          "B0055": {
+            "sample_count": 102,
+            "mae": 0.05971382408476158,
+            "rmse": 0.07218586828248509
+          }
+        },
+        "models": {
+          "dummy_mean": {
+            "model_name": "dummy_mean",
+            "model_type": "DummyRegressor",
+            "hyperparameters": {
+              "strategy": "mean"
+            },
+            "metrics": {
+              "mae": 0.1706481152398747,
+              "rmse": 0.21101926611903124,
+              "r2_score": -0.1387174110735625,
+              "max_error": 0.6094158452332024,
+              "target_range": [
+                0.027558456669893587,
+                1.2220312160393278
+              ],
+              "near_eol_metrics": {
+                "threshold": 0.75,
+                "sample_count": 597,
+                "mae": 0.12404282627148422,
+                "rmse": 0.1935221676039367
+              }
+            }
+          },
+          "ridge_regression": {
+            "model_name": "ridge_regression",
+            "model_type": "Ridge",
+            "hyperparameters": {
+              "alpha": 1.0,
+              "random_state": 42
+            },
+            "metrics": {
+              "mae": 0.09341603537067454,
+              "rmse": 0.12093360621276944,
+              "r2_score": 0.6260050382073519,
+              "max_error": 0.39901962285809567,
+              "target_range": [
+                0.027558456669893587,
+                1.2220312160393278
+              ],
+              "near_eol_metrics": {
+                "threshold": 0.75,
+                "sample_count": 597,
+                "mae": 0.07412563498417966,
+                "rmse": 0.09273471912468566
+              }
+            }
+          },
+          "random_forest": {
+            "model_name": "random_forest",
+            "model_type": "RandomForestRegressor",
+            "hyperparameters": {
+              "n_estimators": 50,
+              "max_depth": 10,
+              "random_state": 42
+            },
+            "metrics": {
+              "mae": 0.06027710754027016,
+              "rmse": 0.08468403022958239,
+              "r2_score": 0.8166103669642835,
+              "max_error": 0.37830833727003976,
+              "target_range": [
+                0.027558456669893587,
+                1.2220312160393278
+              ],
+              "near_eol_metrics": {
+                "threshold": 0.75,
+                "sample_count": 597,
+                "mae": 0.05118193594097535,
+                "rmse": 0.07160080760786511
+              }
+            }
+          }
+        },
+        "limitations": [
+          "NASA Battery aging benchmark: evaluated on 34 lithium-ion cells.",
+          "Filtered strictly to discharge cycles where SOH is physically defined.",
+          "SOH is an electrochemical benchmark and must never be treated as Rotax telemetry."
+        ],
+        "seed": 42
+      },
+      "cmapss": {
+        "dataset_id": "cmapss",
+        "task_name": "DEGRADATION_RUL_REGRESSION",
+        "status": "completed",
+        "target_column": "rul_label",
+        "group_column": "unit_number",
+        "time_column": "time_cycles",
+        "split_type": "entity_held_out",
+        "feature_count": 15,
+        "feature_names": [
+          "cmapss_s_2",
+          "cmapss_s_3",
+          "cmapss_s_4",
+          "cmapss_s_6",
+          "cmapss_s_7",
+          "cmapss_s_8",
+          "cmapss_s_9",
+          "cmapss_s_11",
+          "cmapss_s_12",
+          "cmapss_s_13",
+          "cmapss_s_14",
+          "cmapss_s_15",
+          "cmapss_s_17",
+          "cmapss_s_20",
+          "cmapss_s_21"
+        ],
+        "num_total_entities": 100,
+        "num_train_entities": 70,
+        "num_test_entities": 30,
+        "train_entities": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          8,
+          10,
+          11,
+          16,
+          17,
+          18,
+          19,
+          21,
+          22,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          32,
+          33,
+          34,
+          38,
+          39,
+          40,
+          41,
+          43,
+          44,
+          46,
+          47,
+          49,
+          51,
+          52,
+          53,
+          56,
+          57,
+          58,
+          60,
+          61,
+          62,
+          63,
+          64,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          76,
+          77,
+          79,
+          80,
+          81,
+          82,
+          84,
+          85,
+          87,
+          88,
+          90,
+          92,
+          93,
+          94,
+          95,
+          96,
+          97,
+          98,
+          100
+        ],
+        "test_entities": [
+          7,
+          9,
+          12,
+          13,
+          14,
+          15,
+          20,
+          23,
+          31,
+          35,
+          36,
+          37,
+          42,
+          45,
+          48,
+          50,
+          54,
+          55,
+          59,
+          65,
+          66,
+          67,
+          68,
+          75,
+          78,
+          83,
+          86,
+          89,
+          91,
+          99
+        ],
+        "num_train_samples": 14407,
+        "num_test_samples": 6224,
+        "per_entity_test_metrics": {
+          "7": {
+            "sample_count": 259,
+            "mae": 9.720807768656439,
+            "rmse": 12.210935002261332
+          },
+          "9": {
+            "sample_count": 201,
+            "mae": 4.73801943383186,
+            "rmse": 6.612877696098867
+          },
+          "12": {
+            "sample_count": 170,
+            "mae": 12.520490312900368,
+            "rmse": 15.960434058087145
+          },
+          "13": {
+            "sample_count": 163,
+            "mae": 10.283907030470822,
+            "rmse": 12.11555924828643
+          },
+          "14": {
+            "sample_count": 180,
+            "mae": 11.717684193302494,
+            "rmse": 14.471103085228696
+          },
+          "15": {
+            "sample_count": 207,
+            "mae": 18.27533907221391,
+            "rmse": 26.711418830452732
+          },
+          "20": {
+            "sample_count": 234,
+            "mae": 14.127661368310667,
+            "rmse": 16.70417590581878
+          },
+          "23": {
+            "sample_count": 168,
+            "mae": 13.854196842362956,
+            "rmse": 17.877912357737962
+          },
+          "31": {
+            "sample_count": 234,
+            "mae": 14.316040537461113,
+            "rmse": 21.697965949051003
+          },
+          "35": {
+            "sample_count": 181,
+            "mae": 12.429194438536646,
+            "rmse": 14.800655544997147
+          },
+          "36": {
+            "sample_count": 158,
+            "mae": 13.846250788008042,
+            "rmse": 17.219215379786203
+          },
+          "37": {
+            "sample_count": 170,
+            "mae": 14.54607834410887,
+            "rmse": 19.60706342950729
+          },
+          "42": {
+            "sample_count": 196,
+            "mae": 14.707079329281624,
+            "rmse": 18.421130393357686
+          },
+          "45": {
+            "sample_count": 158,
+            "mae": 18.050663257998536,
+            "rmse": 22.357703195982122
+          },
+          "48": {
+            "sample_count": 231,
+            "mae": 6.4926216425871655,
+            "rmse": 7.976012680660698
+          },
+          "50": {
+            "sample_count": 198,
+            "mae": 11.2882704403294,
+            "rmse": 13.923356646650342
+          },
+          "54": {
+            "sample_count": 257,
+            "mae": 5.233881899858617,
+            "rmse": 6.847395157289363
+          },
+          "55": {
+            "sample_count": 193,
+            "mae": 8.074334835841583,
+            "rmse": 9.814185784769451
+          },
+          "59": {
+            "sample_count": 231,
+            "mae": 14.43626536769814,
+            "rmse": 21.478349060938182
+          },
+          "65": {
+            "sample_count": 153,
+            "mae": 29.76536501948904,
+            "rmse": 38.660949685678794
+          },
+          "66": {
+            "sample_count": 202,
+            "mae": 19.362822568812213,
+            "rmse": 23.473287788856062
+          },
+          "67": {
+            "sample_count": 313,
+            "mae": 20.89716577322626,
+            "rmse": 23.9768078551956
+          },
+          "68": {
+            "sample_count": 199,
+            "mae": 15.16041941870667,
+            "rmse": 19.3140240026227
+          },
+          "75": {
+            "sample_count": 229,
+            "mae": 10.510810693431386,
+            "rmse": 12.136355982519559
+          },
+          "78": {
+            "sample_count": 231,
+            "mae": 10.82331972855804,
+            "rmse": 15.31897310489594
+          },
+          "83": {
+            "sample_count": 293,
+            "mae": 10.598203859471038,
+            "rmse": 16.99624524394685
+          },
+          "86": {
+            "sample_count": 278,
+            "mae": 16.124867696834432,
+            "rmse": 18.841427564061174
+          },
+          "89": {
+            "sample_count": 217,
+            "mae": 14.72151762243446,
+            "rmse": 20.637671913988424
+          },
+          "91": {
+            "sample_count": 135,
+            "mae": 10.144603713275568,
+            "rmse": 13.3633637962529
+          },
+          "99": {
+            "sample_count": 185,
+            "mae": 19.221580483405948,
+            "rmse": 26.319177851548865
+          }
+        },
+        "models": {
+          "dummy_mean": {
+            "model_name": "dummy_mean",
+            "model_type": "DummyRegressor",
+            "hyperparameters": {
+              "strategy": "mean"
+            },
+            "metrics": {
+              "mae": 36.98677710492417,
+              "rmse": 41.654551993284244,
+              "r2_score": -5.352690150894901e-05,
+              "max_error": 86.73734989935448,
+              "target_range": [
+                0.0,
+                125.0
+              ],
+              "near_eol_metrics": {
+                "threshold": 30.0,
+                "sample_count": 930,
+                "mae": 71.73734989935448,
+                "rmse": 72.29278920184512
+              }
+            }
+          },
+          "ridge_regression": {
+            "model_name": "ridge_regression",
+            "model_type": "Ridge",
+            "hyperparameters": {
+              "alpha": 1.0,
+              "random_state": 42
+            },
+            "metrics": {
+              "mae": 17.13718359887385,
+              "rmse": 20.831168201128808,
+              "r2_score": 0.7498931644659657,
+              "max_error": 77.8587801784702,
+              "target_range": [
+                0.0,
+                125.0
+              ],
+              "near_eol_metrics": {
+                "threshold": 30.0,
+                "sample_count": 930,
+                "mae": 17.723467733884423,
+                "rmse": 21.353203016309365
+              }
+            }
+          },
+          "random_forest": {
+            "model_name": "random_forest",
+            "model_type": "RandomForestRegressor",
+            "hyperparameters": {
+              "n_estimators": 50,
+              "max_depth": 10,
+              "random_state": 42
+            },
+            "metrics": {
+              "mae": 13.400800643176256,
+              "rmse": 18.485893859142664,
+              "r2_score": 0.8030394627126793,
+              "max_error": 79.09239628735689,
+              "target_range": [
+                0.0,
+                125.0
+              ],
+              "near_eol_metrics": {
+                "threshold": 30.0,
+                "sample_count": 930,
+                "mae": 7.112778816508754,
+                "rmse": 11.277176775969034
+              }
+            }
+          }
+        },
+        "limitations": [
+          "C-MAPSS FD001 turbofan degradation benchmark: evaluated on 100 engine units.",
+          "Entity-held-out split guarantees zero engine unit leakage.",
+          "Target is piecewise linear RUL (capped at 125 cycles)."
+        ],
+        "seed": 42
+      }
+    },
+    "unavailable_datasets": {
+      "basic": {
+        "status": "skipped",
+        "reason": "Dataset is UNAVAILABLE pending manual download of raw archives from Zenodo DOI 10.5281/zenodo.8195068 into data/raw/basic/."
+      }
+    }
+  }
+}
