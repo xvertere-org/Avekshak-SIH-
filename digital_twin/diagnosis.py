@@ -165,10 +165,14 @@ class PhysicsInformedDiagnoser:
         self.tau_nom = tau_nom
         self.tau_crit = tau_crit
         self._last_timestamp: Optional[float] = None
+        self._prev_residuals: Dict[str, float] = {}
+        self._residual_history: Dict[str, List[Tuple[float, float]]] = {}
 
     def reset(self) -> None:
         """Reset internal history."""
         self._last_timestamp = None
+        self._prev_residuals = {}
+        self._residual_history = {}
 
     def diagnose(
         self,
@@ -217,8 +221,29 @@ class PhysicsInformedDiagnoser:
             )
 
         # 2. Check Nominal Healthy Condition
-        # If detection is NORMAL and health index is high, engine is healthy
-        if detection_result.status == DetectionStatus.NORMAL and detection_result.anomaly_score < 0.15:
+        # Engine is genuinely healthy only if detection is NORMAL, no channel deviates beyond deadband,
+        # no data quality faults exist, and cylinder runner spreads are nominal.
+        has_channel_anomalies = any(
+            ind.valid and abs(ind.normalized_residual) > self.tau_nom
+            for ind in health_assessment.channel_indicators.values()
+            if not math.isnan(ind.normalized_residual)
+        )
+        has_quality_faults = any(
+            not ind.valid
+            for ind in health_assessment.channel_indicators.values()
+        )
+        has_cylinder_spread = False
+        cyl_res = residual_vector.cylinder_residuals
+        if cyl_res is not None:
+            if cyl_res.egt_spread_c > 50.0 or (not math.isnan(cyl_res.cht_spread_c) and cyl_res.cht_spread_c > 25.0):
+                has_cylinder_spread = True
+
+        if (
+            detection_result.status == DetectionStatus.NORMAL
+            and not has_channel_anomalies
+            and not has_quality_faults
+            and not has_cylinder_spread
+        ):
             hyp = HypothesisRanking(
                 fault_type=CanonicalFaultType.HEALTHY.value,
                 compatibility_score=1.0,
@@ -255,11 +280,12 @@ class PhysicsInformedDiagnoser:
         cyl = residual_vector.cylinder_residuals
 
         # 4. Sensor Fault Disambiguation (F6 / F7)
-        # Check for dropout / stuck or isolated single-channel sensor bias
+        # Check for dropout / stuck or isolated single-channel sensor bias/drift
         sensor_hypotheses, is_sensor_dominant = self._evaluate_sensor_faults(
             health_assessment=health_assessment,
             residual_vector=residual_vector,
             z_map=z_map,
+            dt=dt,
         )
 
         # 5. Evaluate Physical Fault Signatures (F1–F5)
@@ -323,6 +349,17 @@ class PhysicsInformedDiagnoser:
             diag_status = "CONFIRMED" if detection_result.anomaly_detected and confidence >= 0.60 else "SUSPECTED"
 
         evidence_list = top_hyp.matched_evidence if top_hyp else ["No matched patterns"]
+
+        # Track residuals for drift computation across steps
+        for ch_k, res_k in residual_vector.residuals.items():
+            if not math.isnan(res_k.raw_residual):
+                self._prev_residuals[ch_k] = res_k.raw_residual
+                if ch_k not in self._residual_history:
+                    self._residual_history[ch_k] = []
+                self._residual_history[ch_k].append((timestamp, res_k.raw_residual))
+                if len(self._residual_history[ch_k]) > 30:
+                    self._residual_history[ch_k].pop(0)
+        self._last_timestamp = timestamp
 
         return DiagnosisResult(
             timestamp=timestamp,
@@ -568,6 +605,7 @@ class PhysicsInformedDiagnoser:
         health_assessment: ModelObservationHealthAssessment,
         residual_vector: ResidualVector,
         z_map: Dict[str, float],
+        dt: Optional[float] = None,
     ) -> Tuple[List[HypothesisRanking], bool]:
         """
         Evaluate observation-layer sensor faults using cross-channel physical consistency.
@@ -621,8 +659,33 @@ class PhysicsInformedDiagnoser:
             dev_ch = deviated_channels[0]
             z_dev = z_map[dev_ch]
 
+            # Assess drift rate using windowed history (filters out single-step sensor noise)
+            hist = self._residual_history.get(dev_ch, [])
+            is_drifting = False
+            if len(hist) >= 5:
+                dt_win = hist[-1][0] - hist[0][0]
+                if dt_win >= 0.5:
+                    drift_rate = abs(hist[-1][1] - hist[0][1]) / dt_win
+                    drift_thresh = {
+                        "oil_pressure": 0.05,  # bar/s
+                        "cht": 0.5,           # °C/s
+                        "egt": 2.0,           # °C/s
+                        "coolant_temp": 0.5,  # °C/s
+                        "oil_temp": 0.5,      # °C/s
+                        "fuel_flow": 0.2,     # L/h/s
+                        "rpm": 5.0,           # RPM/s
+                        "vibration": 0.05,    # g/s
+                    }.get(dev_ch, 0.1)
+                    if drift_rate > drift_thresh:
+                        is_drifting = True
+
+            score_primary = 0.92
+            score_secondary = 0.78
+            fault_primary = CanonicalFaultType.SENSOR_DRIFT.value if is_drifting else CanonicalFaultType.SENSOR_BIAS.value
+            fault_secondary = CanonicalFaultType.SENSOR_BIAS.value if is_drifting else CanonicalFaultType.SENSOR_DRIFT.value
+
             # Cross-coupling checks:
-            # If CHT is deviated, but coolant_temp and oil_temp show NO heating (<0.5 C rise) -> CHT Sensor Bias!
+            # If CHT is deviated, but coolant_temp and oil_temp show NO heating (<0.5 C rise) -> CHT Sensor Fault!
             if dev_ch == "cht":
                 z_cool = abs(z_map.get("coolant_temp", 0.0))
                 z_oil = abs(z_map.get("oil_temp", 0.0))
@@ -631,17 +694,25 @@ class PhysicsInformedDiagnoser:
                 if z_cool < 0.5 and z_oil < 0.5 and r_cool < 0.5 and r_oil < 0.5:
                     hypotheses.append(
                         HypothesisRanking(
-                            fault_type=CanonicalFaultType.SENSOR_BIAS.value,
-                            compatibility_score=0.90,
+                            fault_type=fault_primary,
+                            compatibility_score=score_primary,
                             matched_evidence=[
-                                f"Isolated CHT deviation (z={z_dev:.2f}) with nominal coolant/oil temps (physical inconsistency)",
+                                f"Isolated CHT {'drift' if is_drifting else 'bias'} (z={z_dev:.2f}) with nominal coolant/oil temps",
                             ],
                             unmatched_evidence=["Coupled coolant/oil temperature rise absent"],
                         )
                     )
+                    hypotheses.append(
+                        HypothesisRanking(
+                            fault_type=fault_secondary,
+                            compatibility_score=score_secondary,
+                            matched_evidence=[f"Alternative sensor calibration error hypothesis on {dev_ch}"],
+                            unmatched_evidence=[],
+                        )
+                    )
                     is_sensor_dominant = True
 
-            # If oil_pressure is deviated, but oil_temp shows NO heating (<0.5 C rise) -> Oil Pressure Sensor Bias!
+            # If oil_pressure is deviated, but oil_temp shows NO heating (<0.5 C rise) -> Oil Pressure Sensor Fault!
             elif dev_ch == "oil_pressure":
                 z_oil_t = abs(z_map.get("oil_temp", 0.0))
                 r_oil_t = r_map.get("oil_temp", 0.0)
@@ -649,17 +720,25 @@ class PhysicsInformedDiagnoser:
                 if z_oil_t < 0.20 and r_oil_t < 0.5 and z_rpm < 0.5:
                     hypotheses.append(
                         HypothesisRanking(
-                            fault_type=CanonicalFaultType.SENSOR_BIAS.value,
-                            compatibility_score=0.90,
+                            fault_type=fault_primary,
+                            compatibility_score=score_primary,
                             matched_evidence=[
-                                f"Isolated oil pressure deviation (z={z_dev:.2f}) with nominal oil temp/RPM",
+                                f"Isolated oil pressure {'drift' if is_drifting else 'bias'} (z={z_dev:.2f}) with nominal oil temp/RPM",
                             ],
                             unmatched_evidence=["Coupled thermal heating absent"],
                         )
                     )
+                    hypotheses.append(
+                        HypothesisRanking(
+                            fault_type=fault_secondary,
+                            compatibility_score=score_secondary,
+                            matched_evidence=[f"Alternative sensor calibration error hypothesis on {dev_ch}"],
+                            unmatched_evidence=[],
+                        )
+                    )
                     is_sensor_dominant = True
 
-            # If fuel_flow is deviated, but EGT and CHT are healthy -> Fuel Flow Sensor Bias!
+            # If fuel_flow is deviated, but EGT and CHT are healthy -> Fuel Flow Sensor Fault!
             elif dev_ch == "fuel_flow":
                 z_egt = abs(z_map.get("egt", 0.0))
                 z_cht = abs(z_map.get("cht", 0.0))
@@ -667,12 +746,20 @@ class PhysicsInformedDiagnoser:
                 if z_egt < 0.5 and z_cht < 0.5 and r_egt < 5.0:
                     hypotheses.append(
                         HypothesisRanking(
-                            fault_type=CanonicalFaultType.SENSOR_BIAS.value,
-                            compatibility_score=0.90,
+                            fault_type=fault_primary,
+                            compatibility_score=score_primary,
                             matched_evidence=[
-                                f"Isolated fuel flow deviation (z={z_dev:.2f}) with nominal combustion temps",
+                                f"Isolated fuel flow {'drift' if is_drifting else 'bias'} (z={z_dev:.2f}) with nominal combustion temps",
                             ],
                             unmatched_evidence=["Combustion heat release nominal"],
+                        )
+                    )
+                    hypotheses.append(
+                        HypothesisRanking(
+                            fault_type=fault_secondary,
+                            compatibility_score=score_secondary,
+                            matched_evidence=[f"Alternative sensor calibration error hypothesis on {dev_ch}"],
+                            unmatched_evidence=[],
                         )
                     )
                     is_sensor_dominant = True

@@ -107,6 +107,7 @@ PHYSICAL_INSTRUMENT_LIMITS: Dict[str, Tuple[float, float]] = {
     "fuel_flow": (0.0, 100.0),            # Fuel flow meter bounds [L/h]
     "vibration": (0.0, 50.0),             # Accelerometer full-scale range [g]
     "map": (0.1, 3.0),                    # Manifold pressure sensor bounds [bar]
+    "map_bar": (0.1, 3.0),                # Manifold pressure sensor bounds [bar]
     "throttle": (0.0, 100.0),             # Throttle position sensor [%]
     "altitude": (-1000.0, 15000.0),       # Barometric / GPS altitude [m]
     "ambient_temp": (-70.0, 70.0),        # Ambient air temp [°C]
@@ -203,7 +204,16 @@ class TelemetryQualityValidator:
             "rpm", "cht", "egt", "oil_pressure", "oil_temp",
             "fuel_flow", "vibration",
         ]
-        # Include per-cylinder channels only if explicitly provided in packet
+        # Include optional / extended channels (coolant_temp, map_bar, per-cylinder) only if provided in packet
+        for opt_key in ["coolant_temp", "map_bar", "map", "charge_air_temp"]:
+            has_key = False
+            if isinstance(telemetry, dict) and opt_key in telemetry and telemetry[opt_key] is not None:
+                has_key = True
+            elif hasattr(telemetry, opt_key) and getattr(telemetry, opt_key, None) is not None:
+                has_key = True
+            if has_key and opt_key not in channels_to_evaluate:
+                channels_to_evaluate.append(opt_key)
+
         for i in range(1, 5):
             for prefix in ["cht_cyl", "egt_cyl"]:
                 key = f"{prefix}{i}"

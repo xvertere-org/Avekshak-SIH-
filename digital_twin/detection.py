@@ -39,7 +39,7 @@ class DetectionConfig:
     Configuration parameters for temporal anomaly detection.
     Explicitly tags all heuristic thresholds with ENGINEERING_HEURISTIC provenance.
     """
-    anomaly_threshold: float = 0.15     # Anomaly active when S_anom >= 0.15 (HI_raw <= 0.85)
+    anomaly_threshold: float = 0.018    # Anomaly active when S_anom >= 0.018 (HI_raw <= 0.982)
     persistence_seconds: float = 3.0    # Duration required to confirm ANOMALOUS from SUSPECTED
     recovery_seconds: float = 5.0       # Duration of nominal conditions required to clear RECOVERED to NORMAL
     min_valid_channels: int = 5         # Minimum valid primary channels (5/9 coverage gate)
@@ -183,26 +183,14 @@ class TemporalFaultDetector:
                 },
             )
 
-        # 2. Compute Explicit Anomaly Score: S_anom in [0.0, 1.0]
-        # Evaluates physical degradation across:
-        # a) Engine-level composite health: 1.0 - HI_raw
-        # b) Primary channel degradation: max_k (1.0 - H_k)
+        # 2. Compute Authoritative Engine-Level Anomaly Score: S_anom = 1.0 - HI_raw
+        # In strict adherence to authorized Phase 5/6 architecture, engine-level anomaly detection
+        # is governed exclusively by composite physical health HI_raw.
+        # Cylinder runner spreads (cht_cyl1..4, egt_cyl1..4) are reserved strictly for the
+        # diagnostic layer (cylinder localization & imbalance evidence) and do NOT inflate
+        # engine-level anomaly votes or drive the temporal persistence timer.
         hi_raw = health_assessment.HI_raw
-        primary_scores = [
-            ind.channel_score
-            for ind in health_assessment.channel_indicators.values()
-            if ind.valid and ind.is_primary and not math.isnan(ind.channel_score)
-        ]
-        min_primary_score = min(primary_scores) if primary_scores else hi_raw
-
-        # Cylinder runner spread anomaly (abnormal runner divergence > 50 C, nominal baseline is ~35 C)
-        cyl_anom = 0.0
-        cr = residual_vector.cylinder_residuals
-        if cr is not None and cr.valid_cylinder_count > 0:
-            if cr.egt_spread_c > 50.0:
-                cyl_anom = min(1.0, (cr.egt_spread_c - 50.0) / 40.0)
-
-        s_anom = max(0.0, min(1.0, max(1.0 - hi_raw, 1.0 - min_primary_score, cyl_anom)))
+        s_anom = max(0.0, min(1.0, 1.0 - hi_raw))
 
         # 3. Identify Contributing Channels (|z| > tau_nom) and Subsystems
         contributing_channels: List[str] = []
