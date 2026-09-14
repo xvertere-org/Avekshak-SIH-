@@ -20,6 +20,7 @@ from dashboard.utils.formatters import (
     format_rul_state,
     format_limiting_factor,
     format_forecast_status,
+    format_forecast_assisted_mode,
     format_data_quality_status,
     format_error,
     map_health_to_status,
@@ -158,4 +159,10 @@ def test_avekshak_terminology_layer():
     err_str = format_error(KeyError("missing_col"), context="Mission report")
     assert "Mission report failed" in err_str
     assert "KeyError" not in err_str
+
+    # Forecast-assisted mode
+    assert format_forecast_assisted_mode(assisted=True) == "ACTIVE"
+    assert format_forecast_assisted_mode(status="BLOCKED_UNAUTHENTICATED_GATED") == "BLOCKED"
+    assert format_forecast_assisted_mode(status="UNAVAILABLE") == "UNAVAILABLE"
+    assert format_forecast_assisted_mode(status="OFF") == "OFF (Causal Trend)"
 
