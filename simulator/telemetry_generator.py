@@ -90,6 +90,8 @@ class TelemetryGenerator:
         fault_type: str = FaultCategory.NONE.value,
         fault_severity: float = 0.0,
         sensor_faults: Optional[List[Any]] = None,
+        turbo_state: Optional[Any] = None,
+        cooling_state: Optional[Any] = None,
     ) -> TelemetryRecord:
         """
         Produce a single TelemetryRecord from subsystem states.
@@ -98,6 +100,8 @@ class TelemetryGenerator:
             sensor_faults: Optional list of FaultState objects with
                            fault_type == SENSOR_FAULT. Applied after
                            normal sensor noise at the observation layer.
+            turbo_state: Optional TurboState from TurbochargerSubsystem.
+            cooling_state: Optional CoolingState from CoolingSubsystem.
         """
         # Physical truth values
         rpm_val = op_point.rpm
@@ -176,6 +180,21 @@ class TelemetryGenerator:
             source="simulator_v1_physics",
             source_type="synthetic",
             simulation_version=self.config.provenance_version,
+            # Phase 2 optional channels populated directly from physical states
+            map_bar=round(turbo_state.map_bar, 3) if turbo_state is not None else None,
+            charge_air_temp=round(turbo_state.charge_air_temp_c, 2) if turbo_state is not None else None,
+            engine_rpm=round(op_point.rpm, 1),
+            propeller_rpm=round(op_point.propeller_rpm, 1),
+            cht_cyl1=round(getattr(thermal_state, "cht_cyl1", cht_val), 2),
+            cht_cyl2=round(getattr(thermal_state, "cht_cyl2", cht_val), 2),
+            cht_cyl3=round(getattr(thermal_state, "cht_cyl3", cht_val), 2),
+            cht_cyl4=round(getattr(thermal_state, "cht_cyl4", cht_val), 2),
+            egt_cyl1=round(getattr(thermal_state, "egt_cyl1", egt_val), 2),
+            egt_cyl2=round(getattr(thermal_state, "egt_cyl2", egt_val), 2),
+            egt_cyl3=round(getattr(thermal_state, "egt_cyl3", egt_val), 2),
+            egt_cyl4=round(getattr(thermal_state, "egt_cyl4", egt_val), 2),
+            coolant_temp=round(cooling_state.coolant_temp_c, 2) if cooling_state is not None else None,
+            tcu_wastegate_position=round(turbo_state.wastegate_position, 3) if turbo_state is not None else None,
             metadata={
                 "power_kw": round(op_point.power_target_w / 1000.0, 2),
                 "torque_nm": round(op_point.torque_engine_nm, 2),
@@ -183,6 +202,10 @@ class TelemetryGenerator:
                 "order_1x_freq_hz": round(vib_state.order_1x_freq_hz, 2),
                 "order_2x_freq_hz": round(vib_state.order_2x_freq_hz, 2),
                 "bsfc_g_kwh": round(fuel_state.bsfc_g_kwh, 1),
+                "propeller_rpm": round(op_point.propeller_rpm, 1),
+                "power_prop_kw": round(op_point.power_prop_w / 1000.0, 2),
+                "gearbox_loss_kw": round(op_point.gearbox_loss_w / 1000.0, 2),
+                "pressure_ratio": round(turbo_state.pressure_ratio, 3) if turbo_state is not None else 1.0,
             },
         )
         return record

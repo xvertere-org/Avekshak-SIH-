@@ -222,7 +222,7 @@ class EWMADetector:
             elif abs_s >= self.warning_threshold:
                 warning_ch.append(ch)
 
-        if valid_count == 0 and not self.state:
+        if valid_count == 0:
             return {
                 "ewma_score": np.nan,
                 "smoothed_values": smoothed,

@@ -1,0 +1,192 @@
+{
+  "phase": "Phase 5",
+  "name": "Residual Generation, Health Index & Physics-Based Health Assessment",
+  "rotax_engine": "Rotax 914 UL/F Turbocharged Aircraft Piston Engine",
+  "provenance_disclaimer": "RESEARCH PROTOTYPE ONLY: Calibrations and thresholds are ENGINEERING_HEURISTIC and FROZEN_SYNTHETIC_BASELINE_MAD parameters. Not FAA/EASA airworthiness certified.",
+  "primary_channels_total": 9,
+  "coverage_gate": {
+    "minimum_valid_primary_channels": 5,
+    "minimum_coverage_ratio": 0.5556,
+    "insufficient_coverage_state": "UNAVAILABLE",
+    "insufficient_coverage_hi_raw": null
+  },
+  "primary_channels": [
+    {
+      "channel": "rpm",
+      "units": "RPM",
+      "subsystem": "ROTATIONAL",
+      "ownership": "PRIMARY",
+      "default_scale": 50.0
+    },
+    {
+      "channel": "map_bar",
+      "units": "bar",
+      "subsystem": "AIR_INDUCTION",
+      "ownership": "PRIMARY",
+      "default_scale": 0.03
+    },
+    {
+      "channel": "fuel_flow",
+      "units": "L/h",
+      "subsystem": "FUEL",
+      "ownership": "PRIMARY",
+      "default_scale": 1.0
+    },
+    {
+      "channel": "cht",
+      "units": "deg_c",
+      "subsystem": "THERMAL",
+      "ownership": "PRIMARY",
+      "default_scale": 4.0
+    },
+    {
+      "channel": "coolant_temp",
+      "units": "deg_c",
+      "subsystem": "THERMAL",
+      "ownership": "PRIMARY",
+      "default_scale": 3.0
+    },
+    {
+      "channel": "oil_temp",
+      "units": "deg_c",
+      "subsystem": "THERMAL",
+      "ownership": "PRIMARY",
+      "default_scale": 3.0
+    },
+    {
+      "channel": "oil_pressure",
+      "units": "bar",
+      "subsystem": "LUBRICATION",
+      "ownership": "PRIMARY",
+      "default_scale": 0.25
+    },
+    {
+      "channel": "egt",
+      "units": "deg_c",
+      "subsystem": "COMBUSTION",
+      "ownership": "PRIMARY",
+      "default_scale": 15.0
+    },
+    {
+      "channel": "vibration",
+      "units": "g",
+      "subsystem": "MECHANICAL",
+      "ownership": "PRIMARY",
+      "default_scale": 0.15
+    }
+  ],
+  "secondary_channels": [
+    {
+      "channel": "charge_air_temp",
+      "units": "deg_c",
+      "subsystem": "AIR_INDUCTION",
+      "ownership": "SECONDARY_MODEL_CONSISTENCY",
+      "engine_level_vote_weight": 0.0
+    },
+    {
+      "channel": "cylinder_cht_spread",
+      "units": "deg_c",
+      "subsystem": "THERMAL",
+      "ownership": "SECONDARY_DIAGNOSTIC",
+      "engine_level_vote_weight": 0.0
+    },
+    {
+      "channel": "cylinder_egt_spread",
+      "units": "deg_c",
+      "subsystem": "COMBUSTION",
+      "ownership": "SECONDARY_DIAGNOSTIC",
+      "engine_level_vote_weight": 0.0
+    }
+  ],
+  "heuristics_config": {
+    "tau_nom": 1.5,
+    "tau_crit": 5.0,
+    "persistence_sec": 3.0,
+    "recovery_sec": 5.0,
+    "ewma_alpha": 0.15,
+    "provenance": "ENGINEERING_HEURISTIC"
+  },
+  "causal_fault_matrix_verification": [
+    {
+      "fault_id": "F1",
+      "mechanism": "INJECTOR_CLOGGING",
+      "subsystem": "FUEL",
+      "injected_cylinder": 1,
+      "expected_direction": {
+        "fuel_flow": "NEGATIVE",
+        "egt": "POSITIVE",
+        "cht": "NEGATIVE",
+        "egt_cyl_1": "POSITIVE"
+      },
+      "verification_status": "VERIFIED_PASS"
+    },
+    {
+      "fault_id": "F2",
+      "mechanism": "OIL_LEAK / PUMP_WEAR",
+      "subsystem": "LUBRICATION",
+      "expected_direction": {
+        "oil_pressure": "NEGATIVE",
+        "oil_temp": "POSITIVE"
+      },
+      "verification_status": "VERIFIED_PASS"
+    },
+    {
+      "fault_id": "F3",
+      "mechanism": "COOLANT_LEAK / RADIATOR_BLOCKAGE",
+      "subsystem": "COOLING",
+      "expected_direction": {
+        "coolant_temp": "POSITIVE",
+        "cht": "POSITIVE"
+      },
+      "verification_status": "VERIFIED_PASS"
+    },
+    {
+      "fault_id": "F4",
+      "mechanism": "SPARK_PLUG_FOULING / MISFIRE",
+      "subsystem": "COMBUSTION",
+      "injected_cylinder": 3,
+      "expected_direction": {
+        "vibration": "POSITIVE",
+        "cylinder_egt_imbalance": "POSITIVE"
+      },
+      "verification_status": "VERIFIED_PASS"
+    },
+    {
+      "fault_id": "F5",
+      "mechanism": "BEARING_WEAR",
+      "subsystem": "MECHANICAL",
+      "expected_direction": {
+        "vibration": "POSITIVE"
+      },
+      "verification_status": "VERIFIED_PASS"
+    },
+    {
+      "fault_id": "F6",
+      "mechanism": "SENSOR_BIAS (CHT)",
+      "layer": "OBSERVATION_ONLY",
+      "expected_behavior": "CHT normalized residual shifts by bias magnitude; cross-channel coolant_temp and oil_temp physical residuals remain healthy.",
+      "verification_status": "VERIFIED_PASS"
+    },
+    {
+      "fault_id": "F7",
+      "mechanism": "SENSOR_DROPOUT (CHT NaN)",
+      "layer": "OBSERVATION_ONLY",
+      "expected_behavior": "CHT marked UNAVAILABLE; coverage C_obs drops to 8/9; remaining 8 channels compute unaffected healthy HI_raw.",
+      "verification_status": "VERIFIED_PASS"
+    }
+  ],
+  "benchmark_profile_1000_steps": {
+    "mean_latency_ms": 0.314,
+    "p95_latency_ms": 0.470,
+    "p99_latency_ms": 0.751,
+    "max_latency_ms": 20.388,
+    "real_time_budget_50hz_ms": 20.0,
+    "cpu_utilization_ratio": 0.0157
+  },
+  "test_suite_summary": {
+    "targeted_phase5_tests": 25,
+    "total_regression_tests_passed": 436,
+    "total_regression_tests_skipped": 2,
+    "total_regression_tests_failed": 0
+  }
+}

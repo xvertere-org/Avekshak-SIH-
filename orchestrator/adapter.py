@@ -1,3 +1,4 @@
+
 """
 Interface adapter layer for Phase 13 Unified System Pipeline Orchestrator.
 Performs clean, non-mutating data transformations and orchestrates handoffs
@@ -68,17 +69,24 @@ class PipelineHandoffAdapter:
         Does NOT call predict_expected (which would reset nominal state tracking).
         """
         timestamp = float(telemetry_dict.get("timestamp", 0.0))
-        throttle = float(telemetry_dict.get("throttle", 75.0))
-        altitude = float(telemetry_dict.get("altitude", 2000.0))
-        ambient_temp = float(telemetry_dict.get("ambient_temp", 15.0))
+        raw_th = telemetry_dict.get("throttle")
+        throttle = float(raw_th) if raw_th is not None and math.isfinite(float(raw_th)) else 75.0
+        raw_alt = telemetry_dict.get("altitude")
+        altitude = float(raw_alt) if raw_alt is not None and math.isfinite(float(raw_alt)) else 2000.0
+        raw_amb = telemetry_dict.get("ambient_temp")
+        ambient_temp = float(raw_amb) if raw_amb is not None and math.isfinite(float(raw_amb)) else 15.0
         phase = str(telemetry_dict.get("mission_phase", "CRUISE"))
 
         # Compute dynamic dt
-        if twin.last_timestamp is not None and timestamp > twin.last_timestamp:
-            dt = timestamp - twin.last_timestamp
+        if twin.last_timestamp is not None:
+            if timestamp > twin.last_timestamp:
+                dt = timestamp - twin.last_timestamp
+                twin.last_timestamp = timestamp
+            else:
+                dt = 0.0
         else:
             dt = twin.sim_config.default_dt
-        twin.last_timestamp = timestamp
+            twin.last_timestamp = timestamp
 
         # Predict expected state using observable context only
         expected = twin.model.step_expected(
@@ -125,6 +133,14 @@ class PipelineHandoffAdapter:
         """
         Causally update Phase 7 Anomaly Detection with reset_state=False to preserve EWMA & persistence.
         """
+        # Guard against non-finite (inf/-inf) values from sensor blackouts by converting to NaN
+        df = residual_frame.to_dataframe()
+        num_cols = df.select_dtypes(include=[np.number]).columns
+        if not np.isfinite(df[num_cols]).all().all():
+            clean_df = df.copy()
+            clean_df[num_cols] = clean_df[num_cols].replace([np.inf, -np.inf], np.nan)
+            residual_frame = ResidualFrame(clean_df)
+
         anomaly_frame = detector.detect(residual_frame, reset_state=False)
         records = anomaly_frame.to_records()
         if not records:
@@ -137,9 +153,15 @@ class PipelineHandoffAdapter:
             }
 
         rec = records[0]
+        raw_anom_score = rec.get("anomaly_score")
+        if raw_anom_score is None or pd.isna(raw_anom_score):
+            parsed_score = float("nan")
+        else:
+            parsed_score = float(raw_anom_score)
+
         return {
             "anomaly_status": str(rec.get("anomaly_status", "NORMAL")),
-            "anomaly_score": float(rec.get("anomaly_score", 0.0)),
+            "anomaly_score": parsed_score,
             "contributing_channels": list(rec.get("contributing_channels", []) or []),
             "persistence_count": int(rec.get("persistence_count", 0)),
             "evidence": {
@@ -156,6 +178,8 @@ class PipelineHandoffAdapter:
         residual_frame: ResidualFrame,
         anomaly_status: Optional[str] = None,
         anomaly_score: Optional[float] = None,
+        observed_telemetry: Optional[Dict[str, Any]] = None,
+        contributing_channels: Optional[List[str]] = None,
     ) -> FaultDiagnosisResult:
         """
         Execute Phase 8 diagnosis on current residual frame with Phase 7 context.
@@ -170,6 +194,8 @@ class PipelineHandoffAdapter:
             sample=row_dict,
             anomaly_status=anomaly_status,
             anomaly_score=anomaly_score,
+            observed_telemetry=observed_telemetry,
+            contributing_channels=contributing_channels,
         )
 
     @staticmethod
@@ -194,8 +220,18 @@ class PipelineHandoffAdapter:
             optional_context["predicted_fault_type"] = diagnosis_result.predicted_fault_type
             optional_context["diagnostic_confidence"] = diagnosis_result.diagnostic_confidence
             if diagnosis_result.predicted_fault_type == "sensor_fault":
-                # Check for suspect sensor channel
-                optional_context["suspect_channel"] = "cht"  # Default fallback if unspecified
+                suspect = diagnosis_result.suspect_sensor
+                if suspect and suspect not in ("unknown", "uncertain", "NONE"):
+                    optional_context["suspect_channel"] = suspect
+                else:
+                    optional_context["suspect_channel"] = None
+                if diagnosis_result.suspect_sensors:
+                    valid_suspects = [
+                        s for s in diagnosis_result.suspect_sensors
+                        if s and s not in ("unknown", "uncertain", "NONE")
+                    ]
+                    if valid_suspects:
+                        optional_context["suspect_channels"] = valid_suspects
 
         if anomaly_status is not None:
             optional_context["anomaly_status"] = anomaly_status

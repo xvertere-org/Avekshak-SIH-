@@ -1,11 +1,11 @@
 {
   "project": "SIH26054",
   "title": "AI-Enabled Real-Time Digital Twin System for Health Monitoring, Fault Prediction and Mission Reliability Enhancement of Aero-Piston Engines used in MALE UAVs",
-  "generated_at": "2026-09-04T19:38:07.199850Z",
+  "generated_at": "2026-09-13T23:13:13.399682Z",
   "system_info": {
-    "orchestrator_init_time_s": 4.626,
+    "orchestrator_init_time_s": 5.68,
     "bootstrap_metadata": {
-      "bootstrap_elapsed_seconds": 3.8908,
+      "bootstrap_elapsed_seconds": 5.6756,
       "fast_mode": true,
       "seed": 42,
       "phase7_calibration_samples": 32,
@@ -234,59 +234,63 @@
     "documentation_files": {
       "anomaly_detection.md": {
         "path": "docs\\anomaly_detection.md",
-        "size_bytes": 12566
+        "size_bytes": 12770
       },
       "architecture.md": {
         "path": "docs\\architecture.md",
-        "size_bytes": 9470
+        "size_bytes": 9591
       },
       "cooling_degradation.md": {
         "path": "docs\\cooling_degradation.md",
-        "size_bytes": 7457
+        "size_bytes": 7577
       },
       "explainability.md": {
         "path": "docs\\explainability.md",
-        "size_bytes": 9737
+        "size_bytes": 9858
       },
       "fault_diagnosis.md": {
         "path": "docs\\fault_diagnosis.md",
-        "size_bytes": 8144
+        "size_bytes": 8322
       },
       "fault_interface.md": {
         "path": "docs\\fault_interface.md",
-        "size_bytes": 7189
+        "size_bytes": 7315
       },
       "forecasting.md": {
         "path": "docs\\forecasting.md",
-        "size_bytes": 17971
+        "size_bytes": 18255
       },
       "fuel_injection_abnormality.md": {
         "path": "docs\\fuel_injection_abnormality.md",
-        "size_bytes": 10572
+        "size_bytes": 10724
       },
       "health_index.md": {
         "path": "docs\\health_index.md",
-        "size_bytes": 8560
+        "size_bytes": 8703
       },
       "lubrication_degradation.md": {
         "path": "docs\\lubrication_degradation.md",
-        "size_bytes": 8508
+        "size_bytes": 8631
+      },
+      "phase14_mission_replay_reporting_whatif.md": {
+        "path": "docs\\phase14_mission_replay_reporting_whatif.md",
+        "size_bytes": 8672
       },
       "prognostics_rul.md": {
         "path": "docs\\prognostics_rul.md",
-        "size_bytes": 19001
+        "size_bytes": 19225
       },
       "simulator_physics.md": {
         "path": "docs\\simulator_physics.md",
-        "size_bytes": 8509
+        "size_bytes": 8631
       },
       "simulator_validation.md": {
         "path": "docs\\simulator_validation.md",
-        "size_bytes": 12865
+        "size_bytes": 12992
       },
       "system_orchestrator.md": {
         "path": "docs\\system_orchestrator.md",
-        "size_bytes": 12976
+        "size_bytes": 13155
       }
     },
     "validation_plots": {
@@ -343,101 +347,129 @@
         "size_bytes": 4306292
       }
     },
-    "total_docs": 14,
+    "total_docs": 15,
     "total_plots": 13
   },
   "test_inventory": {
     "test_files": {
       "test_anomaly_detection.py": {
         "path": "tests\\test_anomaly_detection.py",
-        "size_bytes": 27482
+        "size_bytes": 28097
       },
       "test_audit_cleanup.py": {
         "path": "tests\\test_audit_cleanup.py",
-        "size_bytes": 15108
+        "size_bytes": 15540
       },
       "test_cooling_degradation.py": {
         "path": "tests\\test_cooling_degradation.py",
-        "size_bytes": 9271
+        "size_bytes": 9537
+      },
+      "test_degradation_trend_confidence.py": {
+        "path": "tests\\test_degradation_trend_confidence.py",
+        "size_bytes": 11271
       },
       "test_digital_twin.py": {
         "path": "tests\\test_digital_twin.py",
-        "size_bytes": 25182
+        "size_bytes": 25701
+      },
+      "test_eol_boundary_tolerance.py": {
+        "path": "tests\\test_eol_boundary_tolerance.py",
+        "size_bytes": 11715
       },
       "test_explainability.py": {
         "path": "tests\\test_explainability.py",
-        "size_bytes": 22853
+        "size_bytes": 23433
       },
       "test_fault_diagnosis.py": {
         "path": "tests\\test_fault_diagnosis.py",
-        "size_bytes": 29402
+        "size_bytes": 30114
       },
       "test_fault_interface.py": {
         "path": "tests\\test_fault_interface.py",
-        "size_bytes": 9600
+        "size_bytes": 9869
+      },
+      "test_forecast_assisted_mode_consistency.py": {
+        "path": "tests\\test_forecast_assisted_mode_consistency.py",
+        "size_bytes": 18356
+      },
+      "test_forecast_health_derivation.py": {
+        "path": "tests\\test_forecast_health_derivation.py",
+        "size_bytes": 15868
       },
       "test_forecasting.py": {
         "path": "tests\\test_forecasting.py",
-        "size_bytes": 27455
+        "size_bytes": 28073
       },
       "test_fuel_injection_abnormality.py": {
         "path": "tests\\test_fuel_injection_abnormality.py",
-        "size_bytes": 13445
+        "size_bytes": 13794
       },
       "test_health_index.py": {
         "path": "tests\\test_health_index.py",
-        "size_bytes": 35717
+        "size_bytes": 36584
       },
       "test_imports.py": {
         "path": "tests\\test_imports.py",
-        "size_bytes": 1941
+        "size_bytes": 2016
       },
       "test_interfaces.py": {
         "path": "tests\\test_interfaces.py",
-        "size_bytes": 3510
+        "size_bytes": 3604
       },
       "test_lubrication_degradation.py": {
         "path": "tests\\test_lubrication_degradation.py",
-        "size_bytes": 9901
+        "size_bytes": 10172
       },
       "test_mechanical_degradation.py": {
         "path": "tests\\test_mechanical_degradation.py",
-        "size_bytes": 17009
+        "size_bytes": 17465
       },
       "test_physics_checkpoint_rpm.py": {
         "path": "tests\\test_physics_checkpoint_rpm.py",
-        "size_bytes": 3975
+        "size_bytes": 4081
       },
       "test_physics_validation.py": {
         "path": "tests\\test_physics_validation.py",
-        "size_bytes": 9182
+        "size_bytes": 9429
       },
       "test_prognostics.py": {
         "path": "tests\\test_prognostics.py",
-        "size_bytes": 19422
+        "size_bytes": 19894
       },
       "test_schemas.py": {
         "path": "tests\\test_schemas.py",
-        "size_bytes": 3385
+        "size_bytes": 3498
+      },
+      "test_sensor_blackout_resilience.py": {
+        "path": "tests\\test_sensor_blackout_resilience.py",
+        "size_bytes": 15296
+      },
+      "test_sensor_fault_identification.py": {
+        "path": "tests\\test_sensor_fault_identification.py",
+        "size_bytes": 16923
       },
       "test_sensor_faults.py": {
         "path": "tests\\test_sensor_faults.py",
-        "size_bytes": 41049
+        "size_bytes": 41959
       },
       "test_system_orchestrator.py": {
         "path": "tests\\test_system_orchestrator.py",
-        "size_bytes": 25078
+        "size_bytes": 25681
       },
       "test_telemetry_pipeline.py": {
         "path": "tests\\test_telemetry_pipeline.py",
-        "size_bytes": 29472
+        "size_bytes": 30137
+      },
+      "test_timestamp_integrity_policy.py": {
+        "path": "tests\\test_timestamp_integrity_policy.py",
+        "size_bytes": 14046
       },
       "test_validation_framework.py": {
         "path": "tests\\test_validation_framework.py",
-        "size_bytes": 5623
+        "size_bytes": 5771
       }
     },
-    "total_test_files": 22
+    "total_test_files": 29
   },
   "scenario_results": {
     "healthy": {
@@ -447,27 +479,27 @@
       "fault_start_s": 0.0,
       "fault_severity": 0.0,
       "total_timesteps": 60,
-      "total_wall_time_s": 2.762,
+      "total_wall_time_s": 7.56,
       "latency_stats": {
         "all_steps": {
           "sample_count": 60,
-          "mean_ms": 45.418,
-          "median_p50_ms": 35.758,
-          "p95_ms": 63.833,
-          "p99_ms": 107.49,
-          "min_ms": 31.49,
-          "max_ms": 143.117,
-          "std_ms": 17.891
+          "mean_ms": 125.137,
+          "median_p50_ms": 118.501,
+          "p95_ms": 163.55,
+          "p99_ms": 194.688,
+          "min_ms": 113.312,
+          "max_ms": 198.291,
+          "std_ms": 17.989
         },
         "steady_state": {
           "sample_count": 50,
-          "mean_ms": 43.703,
-          "median_p50_ms": 35.849,
-          "p95_ms": 62.855,
-          "p99_ms": 63.914,
-          "min_ms": 31.49,
-          "max_ms": 64.0,
-          "std_ms": 11.957
+          "mean_ms": 124.923,
+          "median_p50_ms": 118.151,
+          "p95_ms": 169.6,
+          "p99_ms": 195.299,
+          "min_ms": 113.312,
+          "max_ms": 198.291,
+          "std_ms": 18.768
         },
         "warmup_excluded_steps": 10
       },
@@ -542,7 +574,7 @@
             "explainability_quality": "LOW",
             "advisory_action": "ADVISORY_CAUTION",
             "recommended_action": "Diagnosis: SENSOR_FAULT\nML Evidence (Confidence: 26.4%):\n  - load: 63.50 (SHAP attribution: -0.743, AWAY_FROM_PREDICTED_CLASS)\n  - rpm_norm_residual: 17.67 (SHAP attribution: -0.265, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 1.46 (SHAP attribution: -0.207, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: RPM ELEVATED, OIL_PRESSURE ELEVATED, FUEL_FLOW ELEVATED\n  - Consistency Assessment: Multi-channel physical residual divergence is consistent with physical engine degradation rather than single-sensor failure.\nHealth Evidence (HI = 0.804, State = DEGRADED):\n  - Dominant Degraded Channels: rpm, oil_pressure, fuel_flow\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: LOW\nSummary: Multi-channel physical residual divergence is consistent with physical engine degradation rather than single-sensor failure.",
-            "execution_latency_ms": 58.733
+            "execution_latency_ms": 115.393
           },
           {
             "timestamp": 1.0,
@@ -571,7 +603,7 @@
             "explainability_quality": "LOW",
             "advisory_action": "ADVISORY_CAUTION",
             "recommended_action": "Diagnosis: NONE\nML Evidence (Confidence: 32.8%):\n  - fuel_flow_norm_residual: 2.29 (SHAP attribution: -0.535, AWAY_FROM_PREDICTED_CLASS)\n  - load: 68.70 (SHAP attribution: -0.137, AWAY_FROM_PREDICTED_CLASS)\n  - vibration_norm_residual: 0.56 (SHAP attribution: +0.134, TOWARD_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: RPM ELEVATED, CHT NOMINAL, EGT ELEVATED, OIL_TEMP NOMINAL, OIL_PRESSURE NOMINAL, FUEL_FLOW ELEVATED, VIBRATION NOMINAL\n  - Consistency Assessment: Significant multi-channel residual divergence conflicts with healthy nominal engine state.\nHealth Evidence (HI = 0.812, State = DEGRADED):\n  - Dominant Degraded Channels: rpm, fuel_flow\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: LOW\nSummary: Significant multi-channel residual divergence conflicts with healthy nominal engine state.",
-            "execution_latency_ms": 143.117
+            "execution_latency_ms": 117.62
           },
           {
             "timestamp": 2.0,
@@ -597,7 +629,7 @@
             "explainability_quality": "MEDIUM",
             "advisory_action": "ADVISORY_CAUTION",
             "recommended_action": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 58.7%):\n  - fuel_flow_norm_residual: 0.56 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: 1.72 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 1.63 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: PARTIALLY_SUPPORTED\n  - Observed Signatures: EGT ELEVATED, FUEL_FLOW NOMINAL\n  - Consistency Assessment: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.\nHealth Evidence (HI = 0.839, State = DEGRADED):\n  - No dominant degraded channels (system within nominal operating limits).\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: MEDIUM\nSummary: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.",
-            "execution_latency_ms": 82.732
+            "execution_latency_ms": 117.273
           }
         ],
         "last_3": [
@@ -625,7 +657,7 @@
             "explainability_quality": "HIGH",
             "advisory_action": "NORMAL_MONITORING",
             "recommended_action": "Continue nominal flight monitoring.",
-            "execution_latency_ms": 62.318
+            "execution_latency_ms": 113.905
           },
           {
             "timestamp": 58.0,
@@ -651,7 +683,7 @@
             "explainability_quality": "HIGH",
             "advisory_action": "NORMAL_MONITORING",
             "recommended_action": "Continue nominal flight monitoring.",
-            "execution_latency_ms": 63.824
+            "execution_latency_ms": 119.762
           },
           {
             "timestamp": 59.0,
@@ -677,7 +709,7 @@
             "explainability_quality": "HIGH",
             "advisory_action": "NORMAL_MONITORING",
             "recommended_action": "Continue nominal flight monitoring.",
-            "execution_latency_ms": 64.0
+            "execution_latency_ms": 114.014
           }
         ]
       }
@@ -689,27 +721,27 @@
       "fault_start_s": 15.0,
       "fault_severity": 0.6,
       "total_timesteps": 120,
-      "total_wall_time_s": 8.479,
+      "total_wall_time_s": 13.849,
       "latency_stats": {
         "all_steps": {
           "sample_count": 120,
-          "mean_ms": 69.853,
-          "median_p50_ms": 63.823,
-          "p95_ms": 107.875,
-          "p99_ms": 144.741,
-          "min_ms": 38.275,
-          "max_ms": 165.479,
-          "std_ms": 19.631
+          "mean_ms": 114.554,
+          "median_p50_ms": 114.567,
+          "p95_ms": 119.673,
+          "p99_ms": 126.032,
+          "min_ms": 104.303,
+          "max_ms": 127.863,
+          "std_ms": 3.315
         },
         "steady_state": {
           "sample_count": 110,
-          "mean_ms": 71.475,
-          "median_p50_ms": 64.706,
-          "p95_ms": 112.447,
-          "p99_ms": 146.381,
-          "min_ms": 53.757,
-          "max_ms": 165.479,
-          "std_ms": 19.629
+          "mean_ms": 114.845,
+          "median_p50_ms": 114.733,
+          "p95_ms": 119.723,
+          "p99_ms": 126.725,
+          "min_ms": 108.472,
+          "max_ms": 127.863,
+          "std_ms": 3.176
         },
         "warmup_excluded_steps": 10
       },
@@ -807,7 +839,7 @@
             "explainability_quality": "LOW",
             "advisory_action": "ADVISORY_CAUTION",
             "recommended_action": "Diagnosis: SENSOR_FAULT\nML Evidence (Confidence: 26.4%):\n  - load: 63.50 (SHAP attribution: -0.743, AWAY_FROM_PREDICTED_CLASS)\n  - rpm_norm_residual: 17.67 (SHAP attribution: -0.265, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 1.46 (SHAP attribution: -0.207, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: RPM ELEVATED, OIL_PRESSURE ELEVATED, FUEL_FLOW ELEVATED\n  - Consistency Assessment: Multi-channel physical residual divergence is consistent with physical engine degradation rather than single-sensor failure.\nHealth Evidence (HI = 0.804, State = DEGRADED):\n  - Dominant Degraded Channels: rpm, oil_pressure, fuel_flow\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: LOW\nSummary: Multi-channel physical residual divergence is consistent with physical engine degradation rather than single-sensor failure.",
-            "execution_latency_ms": 38.275
+            "execution_latency_ms": 104.303
           },
           {
             "timestamp": 1.0,
@@ -836,7 +868,7 @@
             "explainability_quality": "LOW",
             "advisory_action": "ADVISORY_CAUTION",
             "recommended_action": "Diagnosis: NONE\nML Evidence (Confidence: 32.8%):\n  - fuel_flow_norm_residual: 2.29 (SHAP attribution: -0.535, AWAY_FROM_PREDICTED_CLASS)\n  - load: 68.70 (SHAP attribution: -0.137, AWAY_FROM_PREDICTED_CLASS)\n  - vibration_norm_residual: 0.56 (SHAP attribution: +0.134, TOWARD_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: RPM ELEVATED, CHT NOMINAL, EGT ELEVATED, OIL_TEMP NOMINAL, OIL_PRESSURE NOMINAL, FUEL_FLOW ELEVATED, VIBRATION NOMINAL\n  - Consistency Assessment: Significant multi-channel residual divergence conflicts with healthy nominal engine state.\nHealth Evidence (HI = 0.812, State = DEGRADED):\n  - Dominant Degraded Channels: rpm, fuel_flow\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: LOW\nSummary: Significant multi-channel residual divergence conflicts with healthy nominal engine state.",
-            "execution_latency_ms": 43.173
+            "execution_latency_ms": 114.456
           },
           {
             "timestamp": 2.0,
@@ -862,7 +894,7 @@
             "explainability_quality": "MEDIUM",
             "advisory_action": "ADVISORY_CAUTION",
             "recommended_action": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 58.7%):\n  - fuel_flow_norm_residual: 0.56 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: 1.72 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 1.63 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: PARTIALLY_SUPPORTED\n  - Observed Signatures: EGT ELEVATED, FUEL_FLOW NOMINAL\n  - Consistency Assessment: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.\nHealth Evidence (HI = 0.839, State = DEGRADED):\n  - No dominant degraded channels (system within nominal operating limits).\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: MEDIUM\nSummary: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.",
-            "execution_latency_ms": 48.763
+            "execution_latency_ms": 111.653
           }
         ],
         "last_3": [
@@ -892,7 +924,7 @@
             "explainability_quality": "LOW",
             "advisory_action": "ADVISORY_CAUTION",
             "recommended_action": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 35.3%):\n  - fuel_flow_norm_residual: 0.04 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: -0.00 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 0.08 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: EGT NOMINAL, FUEL_FLOW NOMINAL\n  - Consistency Assessment: Both EGT and fuel flow residuals remain in nominal band, lacking combustion abnormality evidence.\nHealth Evidence (HI = 0.904, State = HEALTHY):\n  - Dominant Degraded Channels: cht\nTemporal Evidence: STABLE (Rate: 0.00019/s, Trend: STABLE)\nPrognostic RUL: Unavailable | Status: NOT_DEGRADING\nOverall Evidence Consistency: LOW\nSummary: Both EGT and fuel flow residuals remain in nominal band, lacking combustion abnormality evidence.",
-            "execution_latency_ms": 71.922
+            "execution_latency_ms": 114.098
           },
           {
             "timestamp": 118.0,
@@ -920,7 +952,7 @@
             "explainability_quality": "LOW",
             "advisory_action": "ADVISORY_CAUTION",
             "recommended_action": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 35.3%):\n  - fuel_flow_norm_residual: -0.12 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: -0.01 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: -0.26 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: EGT NOMINAL, FUEL_FLOW NOMINAL\n  - Consistency Assessment: Both EGT and fuel flow residuals remain in nominal band, lacking combustion abnormality evidence.\nHealth Evidence (HI = 0.904, State = HEALTHY):\n  - Dominant Degraded Channels: cht\nTemporal Evidence: STABLE (Rate: 0.00014/s, Trend: STABLE)\nPrognostic RUL: Unavailable | Status: NOT_DEGRADING\nOverall Evidence Consistency: LOW\nSummary: Both EGT and fuel flow residuals remain in nominal band, lacking combustion abnormality evidence.",
-            "execution_latency_ms": 89.175
+            "execution_latency_ms": 127.863
           },
           {
             "timestamp": 119.0,
@@ -948,7 +980,7 @@
             "explainability_quality": "LOW",
             "advisory_action": "ADVISORY_CAUTION",
             "recommended_action": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 35.3%):\n  - fuel_flow_norm_residual: 0.00 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: -0.05 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 0.12 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: EGT NOMINAL, FUEL_FLOW NOMINAL\n  - Consistency Assessment: Both EGT and fuel flow residuals remain in nominal band, lacking combustion abnormality evidence.\nHealth Evidence (HI = 0.904, State = HEALTHY):\n  - Dominant Degraded Channels: cht\nTemporal Evidence: STABLE (Rate: 0.00012/s, Trend: STABLE)\nPrognostic RUL: Unavailable | Status: NOT_DEGRADING\nOverall Evidence Consistency: LOW\nSummary: Both EGT and fuel flow residuals remain in nominal band, lacking combustion abnormality evidence.",
-            "execution_latency_ms": 70.407
+            "execution_latency_ms": 127.35
           }
         ]
       }
@@ -960,27 +992,27 @@
       "fault_start_s": 15.0,
       "fault_severity": 0.6,
       "total_timesteps": 120,
-      "total_wall_time_s": 9.823,
+      "total_wall_time_s": 14.03,
       "latency_stats": {
         "all_steps": {
           "sample_count": 120,
-          "mean_ms": 80.844,
-          "median_p50_ms": 76.312,
-          "p95_ms": 115.228,
-          "p99_ms": 148.707,
-          "min_ms": 51.31,
-          "max_ms": 201.588,
-          "std_ms": 22.06
+          "mean_ms": 116.018,
+          "median_p50_ms": 114.557,
+          "p95_ms": 126.503,
+          "p99_ms": 142.931,
+          "min_ms": 104.349,
+          "max_ms": 165.217,
+          "std_ms": 7.071
         },
         "steady_state": {
           "sample_count": 110,
-          "mean_ms": 82.958,
-          "median_p50_ms": 79.462,
-          "p95_ms": 115.437,
-          "p99_ms": 151.049,
-          "min_ms": 51.868,
-          "max_ms": 201.588,
-          "std_ms": 21.806
+          "mean_ms": 116.045,
+          "median_p50_ms": 114.565,
+          "p95_ms": 126.978,
+          "p99_ms": 143.826,
+          "min_ms": 109.08,
+          "max_ms": 165.217,
+          "std_ms": 7.023
         },
         "warmup_excluded_steps": 10
       },
@@ -1057,7 +1089,7 @@
             "explainability_quality": "LOW",
             "advisory_action": "ADVISORY_CAUTION",
             "recommended_action": "Diagnosis: SENSOR_FAULT\nML Evidence (Confidence: 26.4%):\n  - load: 63.50 (SHAP attribution: -0.743, AWAY_FROM_PREDICTED_CLASS)\n  - rpm_norm_residual: 17.67 (SHAP attribution: -0.265, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 1.46 (SHAP attribution: -0.207, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: RPM ELEVATED, OIL_PRESSURE ELEVATED, FUEL_FLOW ELEVATED\n  - Consistency Assessment: Multi-channel physical residual divergence is consistent with physical engine degradation rather than single-sensor failure.\nHealth Evidence (HI = 0.804, State = DEGRADED):\n  - Dominant Degraded Channels: rpm, oil_pressure, fuel_flow\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: LOW\nSummary: Multi-channel physical residual divergence is consistent with physical engine degradation rather than single-sensor failure.",
-            "execution_latency_ms": 53.553
+            "execution_latency_ms": 104.349
           },
           {
             "timestamp": 1.0,
@@ -1086,7 +1118,7 @@
             "explainability_quality": "LOW",
             "advisory_action": "ADVISORY_CAUTION",
             "recommended_action": "Diagnosis: NONE\nML Evidence (Confidence: 32.8%):\n  - fuel_flow_norm_residual: 2.29 (SHAP attribution: -0.535, AWAY_FROM_PREDICTED_CLASS)\n  - load: 68.70 (SHAP attribution: -0.137, AWAY_FROM_PREDICTED_CLASS)\n  - vibration_norm_residual: 0.56 (SHAP attribution: +0.134, TOWARD_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: RPM ELEVATED, CHT NOMINAL, EGT ELEVATED, OIL_TEMP NOMINAL, OIL_PRESSURE NOMINAL, FUEL_FLOW ELEVATED, VIBRATION NOMINAL\n  - Consistency Assessment: Significant multi-channel residual divergence conflicts with healthy nominal engine state.\nHealth Evidence (HI = 0.812, State = DEGRADED):\n  - Dominant Degraded Channels: rpm, fuel_flow\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: LOW\nSummary: Significant multi-channel residual divergence conflicts with healthy nominal engine state.",
-            "execution_latency_ms": 51.31
+            "execution_latency_ms": 126.451
           },
           {
             "timestamp": 2.0,
@@ -1112,7 +1144,7 @@
             "explainability_quality": "MEDIUM",
             "advisory_action": "ADVISORY_CAUTION",
             "recommended_action": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 58.7%):\n  - fuel_flow_norm_residual: 0.56 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: 1.72 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 1.63 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: PARTIALLY_SUPPORTED\n  - Observed Signatures: EGT ELEVATED, FUEL_FLOW NOMINAL\n  - Consistency Assessment: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.\nHealth Evidence (HI = 0.839, State = DEGRADED):\n  - No dominant degraded channels (system within nominal operating limits).\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: MEDIUM\nSummary: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.",
-            "execution_latency_ms": 55.378
+            "execution_latency_ms": 124.767
           }
         ],
         "last_3": [
@@ -1142,7 +1174,7 @@
             "explainability_quality": "LOW",
             "advisory_action": "ADVISORY_CAUTION",
             "recommended_action": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 38.3%):\n  - fuel_flow_norm_residual: 0.04 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: -0.00 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 0.08 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: EGT NOMINAL, FUEL_FLOW NOMINAL\n  - Consistency Assessment: Both EGT and fuel flow residuals remain in nominal band, lacking combustion abnormality evidence.\nHealth Evidence (HI = 0.906, State = HEALTHY):\n  - Dominant Degraded Channels: oil_pressure\nTemporal Evidence: STABLE (Rate: -0.00018/s, Trend: STABLE)\nPrognostic RUL: Unavailable | Status: NOT_DEGRADING\nOverall Evidence Consistency: LOW\nSummary: Both EGT and fuel flow residuals remain in nominal band, lacking combustion abnormality evidence.",
-            "execution_latency_ms": 86.753
+            "execution_latency_ms": 115.815
           },
           {
             "timestamp": 118.0,
@@ -1170,7 +1202,7 @@
             "explainability_quality": "LOW",
             "advisory_action": "ADVISORY_CAUTION",
             "recommended_action": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 38.3%):\n  - fuel_flow_norm_residual: -0.12 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: -0.01 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: -0.26 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: EGT NOMINAL, FUEL_FLOW NOMINAL\n  - Consistency Assessment: Both EGT and fuel flow residuals remain in nominal band, lacking combustion abnormality evidence.\nHealth Evidence (HI = 0.904, State = HEALTHY):\n  - Dominant Degraded Channels: oil_pressure\nTemporal Evidence: STABLE (Rate: -0.00038/s, Trend: STABLE)\nPrognostic RUL: Unavailable | Status: NOT_DEGRADING\nOverall Evidence Consistency: LOW\nSummary: Both EGT and fuel flow residuals remain in nominal band, lacking combustion abnormality evidence.",
-            "execution_latency_ms": 68.48
+            "execution_latency_ms": 115.292
           },
           {
             "timestamp": 119.0,
@@ -1198,7 +1230,7 @@
             "explainability_quality": "LOW",
             "advisory_action": "ADVISORY_CAUTION",
             "recommended_action": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 38.3%):\n  - fuel_flow_norm_residual: 0.00 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: -0.05 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 0.12 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: EGT NOMINAL, FUEL_FLOW NOMINAL\n  - Consistency Assessment: Both EGT and fuel flow residuals remain in nominal band, lacking combustion abnormality evidence.\nHealth Evidence (HI = 0.905, State = HEALTHY):\n  - Dominant Degraded Channels: oil_pressure\nTemporal Evidence: STABLE (Rate: -0.00026/s, Trend: STABLE)\nPrognostic RUL: Unavailable | Status: NOT_DEGRADING\nOverall Evidence Consistency: LOW\nSummary: Both EGT and fuel flow residuals remain in nominal band, lacking combustion abnormality evidence.",
-            "execution_latency_ms": 55.772
+            "execution_latency_ms": 115.378
           }
         ]
       }
@@ -1210,27 +1242,27 @@
       "fault_start_s": 15.0,
       "fault_severity": 0.6,
       "total_timesteps": 120,
-      "total_wall_time_s": 9.026,
+      "total_wall_time_s": 13.834,
       "latency_stats": {
         "all_steps": {
           "sample_count": 120,
-          "mean_ms": 74.225,
-          "median_p50_ms": 68.517,
-          "p95_ms": 123.089,
-          "p99_ms": 155.262,
-          "min_ms": 46.765,
-          "max_ms": 170.77,
-          "std_ms": 22.501
+          "mean_ms": 114.423,
+          "median_p50_ms": 113.825,
+          "p95_ms": 118.195,
+          "p99_ms": 120.111,
+          "min_ms": 99.892,
+          "max_ms": 145.198,
+          "std_ms": 3.737
         },
         "steady_state": {
           "sample_count": 110,
-          "mean_ms": 72.784,
-          "median_p50_ms": 65.541,
-          "p95_ms": 122.097,
-          "p99_ms": 156.193,
-          "min_ms": 49.293,
-          "max_ms": 170.77,
-          "std_ms": 22.242
+          "mean_ms": 114.642,
+          "median_p50_ms": 114.079,
+          "p95_ms": 118.329,
+          "p99_ms": 120.242,
+          "min_ms": 109.378,
+          "max_ms": 145.198,
+          "std_ms": 3.586
         },
         "warmup_excluded_steps": 10
       },
@@ -1307,7 +1339,7 @@
             "explainability_quality": "LOW",
             "advisory_action": "ADVISORY_CAUTION",
             "recommended_action": "Diagnosis: SENSOR_FAULT\nML Evidence (Confidence: 26.4%):\n  - load: 63.50 (SHAP attribution: -0.743, AWAY_FROM_PREDICTED_CLASS)\n  - rpm_norm_residual: 17.67 (SHAP attribution: -0.265, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 1.46 (SHAP attribution: -0.207, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: RPM ELEVATED, OIL_PRESSURE ELEVATED, FUEL_FLOW ELEVATED\n  - Consistency Assessment: Multi-channel physical residual divergence is consistent with physical engine degradation rather than single-sensor failure.\nHealth Evidence (HI = 0.804, State = DEGRADED):\n  - Dominant Degraded Channels: rpm, oil_pressure, fuel_flow\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: LOW\nSummary: Multi-channel physical residual divergence is consistent with physical engine degradation rather than single-sensor failure.",
-            "execution_latency_ms": 46.765
+            "execution_latency_ms": 99.892
           },
           {
             "timestamp": 1.0,
@@ -1336,7 +1368,7 @@
             "explainability_quality": "LOW",
             "advisory_action": "ADVISORY_CAUTION",
             "recommended_action": "Diagnosis: NONE\nML Evidence (Confidence: 32.8%):\n  - fuel_flow_norm_residual: 2.29 (SHAP attribution: -0.535, AWAY_FROM_PREDICTED_CLASS)\n  - load: 68.70 (SHAP attribution: -0.137, AWAY_FROM_PREDICTED_CLASS)\n  - vibration_norm_residual: 0.56 (SHAP attribution: +0.134, TOWARD_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: RPM ELEVATED, CHT NOMINAL, EGT ELEVATED, OIL_TEMP NOMINAL, OIL_PRESSURE NOMINAL, FUEL_FLOW ELEVATED, VIBRATION NOMINAL\n  - Consistency Assessment: Significant multi-channel residual divergence conflicts with healthy nominal engine state.\nHealth Evidence (HI = 0.812, State = DEGRADED):\n  - Dominant Degraded Channels: rpm, fuel_flow\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: LOW\nSummary: Significant multi-channel residual divergence conflicts with healthy nominal engine state.",
-            "execution_latency_ms": 82.639
+            "execution_latency_ms": 111.602
           },
           {
             "timestamp": 2.0,
@@ -1362,7 +1394,7 @@
             "explainability_quality": "MEDIUM",
             "advisory_action": "ADVISORY_CAUTION",
             "recommended_action": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 58.7%):\n  - fuel_flow_norm_residual: 0.56 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: 1.72 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 1.63 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: PARTIALLY_SUPPORTED\n  - Observed Signatures: EGT ELEVATED, FUEL_FLOW NOMINAL\n  - Consistency Assessment: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.\nHealth Evidence (HI = 0.839, State = DEGRADED):\n  - No dominant degraded channels (system within nominal operating limits).\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: MEDIUM\nSummary: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.",
-            "execution_latency_ms": 86.803
+            "execution_latency_ms": 111.66
           }
         ],
         "last_3": [
@@ -1392,7 +1424,7 @@
             "explainability_quality": "MEDIUM",
             "advisory_action": "ADVISORY_CAUTION",
             "recommended_action": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 58.9%):\n  - fuel_flow_norm_residual: -1.21 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: -0.88 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 2.44 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: PARTIALLY_SUPPORTED\n  - Observed Signatures: EGT ELEVATED, FUEL_FLOW NOMINAL\n  - Consistency Assessment: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.\nHealth Evidence (HI = 0.962, State = HEALTHY):\n  - Dominant Degraded Channels: egt\nTemporal Evidence: STABLE (Rate: 0.00000/s, Trend: STABLE)\nPrognostic RUL: Unavailable | Status: NOT_DEGRADING\nOverall Evidence Consistency: MEDIUM\nSummary: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.",
-            "execution_latency_ms": 60.343
+            "execution_latency_ms": 114.353
           },
           {
             "timestamp": 118.0,
@@ -1418,7 +1450,7 @@
             "explainability_quality": "MEDIUM",
             "advisory_action": "ADVISORY_CAUTION",
             "recommended_action": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 58.9%):\n  - fuel_flow_norm_residual: -1.37 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: -0.89 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 2.10 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: PARTIALLY_SUPPORTED\n  - Observed Signatures: EGT ELEVATED, FUEL_FLOW NOMINAL\n  - Consistency Assessment: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.\nHealth Evidence (HI = 0.963, State = HEALTHY):\n  - No dominant degraded channels (system within nominal operating limits).\nTemporal Evidence: STABLE (Rate: 0.00016/s, Trend: STABLE)\nPrognostic RUL: Unavailable | Status: NOT_DEGRADING\nOverall Evidence Consistency: MEDIUM\nSummary: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.",
-            "execution_latency_ms": 65.004
+            "execution_latency_ms": 118.182
           },
           {
             "timestamp": 119.0,
@@ -1446,7 +1478,7 @@
             "explainability_quality": "MEDIUM",
             "advisory_action": "ADVISORY_CAUTION",
             "recommended_action": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 58.9%):\n  - fuel_flow_norm_residual: -1.24 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: -0.93 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 2.48 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: PARTIALLY_SUPPORTED\n  - Observed Signatures: EGT ELEVATED, FUEL_FLOW NOMINAL\n  - Consistency Assessment: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.\nHealth Evidence (HI = 0.962, State = HEALTHY):\n  - Dominant Degraded Channels: egt\nTemporal Evidence: STABLE (Rate: -0.00007/s, Trend: STABLE)\nPrognostic RUL: Unavailable | Status: NOT_DEGRADING\nOverall Evidence Consistency: MEDIUM\nSummary: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.",
-            "execution_latency_ms": 61.933
+            "execution_latency_ms": 114.497
           }
         ]
       }
@@ -1458,27 +1490,27 @@
       "fault_start_s": 15.0,
       "fault_severity": 0.6,
       "total_timesteps": 120,
-      "total_wall_time_s": 7.571,
+      "total_wall_time_s": 14.061,
       "latency_stats": {
         "all_steps": {
           "sample_count": 120,
-          "mean_ms": 62.069,
-          "median_p50_ms": 55.984,
-          "p95_ms": 86.452,
-          "p99_ms": 94.625,
-          "min_ms": 50.539,
-          "max_ms": 114.525,
-          "std_ms": 12.529
+          "mean_ms": 116.325,
+          "median_p50_ms": 114.273,
+          "p95_ms": 121.194,
+          "p99_ms": 183.582,
+          "min_ms": 99.32,
+          "max_ms": 218.588,
+          "std_ms": 12.789
         },
         "steady_state": {
           "sample_count": 110,
-          "mean_ms": 62.852,
-          "median_p50_ms": 56.787,
-          "p95_ms": 86.488,
-          "p99_ms": 94.733,
-          "min_ms": 50.539,
-          "max_ms": 114.525,
-          "std_ms": 12.795
+          "mean_ms": 116.142,
+          "median_p50_ms": 114.311,
+          "p95_ms": 118.292,
+          "p99_ms": 187.532,
+          "min_ms": 109.161,
+          "max_ms": 218.588,
+          "std_ms": 12.663
         },
         "warmup_excluded_steps": 10
       },
@@ -1555,7 +1587,7 @@
             "explainability_quality": "LOW",
             "advisory_action": "ADVISORY_CAUTION",
             "recommended_action": "Diagnosis: SENSOR_FAULT\nML Evidence (Confidence: 26.4%):\n  - load: 63.50 (SHAP attribution: -0.743, AWAY_FROM_PREDICTED_CLASS)\n  - rpm_norm_residual: 17.67 (SHAP attribution: -0.265, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 1.46 (SHAP attribution: -0.207, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: RPM ELEVATED, OIL_PRESSURE ELEVATED, FUEL_FLOW ELEVATED\n  - Consistency Assessment: Multi-channel physical residual divergence is consistent with physical engine degradation rather than single-sensor failure.\nHealth Evidence (HI = 0.804, State = DEGRADED):\n  - Dominant Degraded Channels: rpm, oil_pressure, fuel_flow\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: LOW\nSummary: Multi-channel physical residual divergence is consistent with physical engine degradation rather than single-sensor failure.",
-            "execution_latency_ms": 54.193
+            "execution_latency_ms": 99.32
           },
           {
             "timestamp": 1.0,
@@ -1584,7 +1616,7 @@
             "explainability_quality": "LOW",
             "advisory_action": "ADVISORY_CAUTION",
             "recommended_action": "Diagnosis: NONE\nML Evidence (Confidence: 32.8%):\n  - fuel_flow_norm_residual: 2.29 (SHAP attribution: -0.535, AWAY_FROM_PREDICTED_CLASS)\n  - load: 68.70 (SHAP attribution: -0.137, AWAY_FROM_PREDICTED_CLASS)\n  - vibration_norm_residual: 0.56 (SHAP attribution: +0.134, TOWARD_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: RPM ELEVATED, CHT NOMINAL, EGT ELEVATED, OIL_TEMP NOMINAL, OIL_PRESSURE NOMINAL, FUEL_FLOW ELEVATED, VIBRATION NOMINAL\n  - Consistency Assessment: Significant multi-channel residual divergence conflicts with healthy nominal engine state.\nHealth Evidence (HI = 0.812, State = DEGRADED):\n  - Dominant Degraded Channels: rpm, fuel_flow\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: LOW\nSummary: Significant multi-channel residual divergence conflicts with healthy nominal engine state.",
-            "execution_latency_ms": 54.221
+            "execution_latency_ms": 110.579
           },
           {
             "timestamp": 2.0,
@@ -1610,7 +1642,7 @@
             "explainability_quality": "MEDIUM",
             "advisory_action": "ADVISORY_CAUTION",
             "recommended_action": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 58.7%):\n  - fuel_flow_norm_residual: 0.56 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: 1.72 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 1.63 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: PARTIALLY_SUPPORTED\n  - Observed Signatures: EGT ELEVATED, FUEL_FLOW NOMINAL\n  - Consistency Assessment: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.\nHealth Evidence (HI = 0.839, State = DEGRADED):\n  - No dominant degraded channels (system within nominal operating limits).\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: MEDIUM\nSummary: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.",
-            "execution_latency_ms": 52.163
+            "execution_latency_ms": 111.099
           }
         ],
         "last_3": [
@@ -1640,7 +1672,7 @@
             "explainability_quality": "HIGH",
             "advisory_action": "ADVISORY_CAUTION",
             "recommended_action": "Diagnosis: MECHANICAL_DEGRADATION\nML Evidence (Confidence: 28.2%):\n  - vibration_norm_residual: 3.29 (SHAP attribution: +2.780, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: -0.12 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 0.06 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: SUPPORTED\n  - Observed Signatures: VIBRATION ELEVATED\n  - Consistency Assessment: Elevated structural vibration residual is consistent with mechanical degradation and structural unbalance.\nHealth Evidence (HI = 0.931, State = HEALTHY):\n  - Dominant Degraded Channels: vibration\nTemporal Evidence: STABLE (Rate: -0.00008/s, Trend: STABLE)\nPrognostic RUL: Unavailable | Status: NOT_DEGRADING\nOverall Evidence Consistency: HIGH\nSummary: Elevated structural vibration residual is consistent with mechanical degradation and structural unbalance.",
-            "execution_latency_ms": 55.741
+            "execution_latency_ms": 112.194
           },
           {
             "timestamp": 118.0,
@@ -1668,7 +1700,7 @@
             "explainability_quality": "HIGH",
             "advisory_action": "ADVISORY_CAUTION",
             "recommended_action": "Diagnosis: MECHANICAL_DEGRADATION\nML Evidence (Confidence: 28.2%):\n  - vibration_norm_residual: 3.23 (SHAP attribution: +2.780, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: -0.14 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: -0.28 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: SUPPORTED\n  - Observed Signatures: VIBRATION ELEVATED\n  - Consistency Assessment: Elevated structural vibration residual is consistent with mechanical degradation and structural unbalance.\nHealth Evidence (HI = 0.931, State = HEALTHY):\n  - Dominant Degraded Channels: vibration\nTemporal Evidence: STABLE (Rate: -0.00014/s, Trend: STABLE)\nPrognostic RUL: Unavailable | Status: NOT_DEGRADING\nOverall Evidence Consistency: HIGH\nSummary: Elevated structural vibration residual is consistent with mechanical degradation and structural unbalance.",
-            "execution_latency_ms": 54.304
+            "execution_latency_ms": 114.476
           },
           {
             "timestamp": 119.0,
@@ -1696,7 +1728,7 @@
             "explainability_quality": "HIGH",
             "advisory_action": "ADVISORY_CAUTION",
             "recommended_action": "Diagnosis: MECHANICAL_DEGRADATION\nML Evidence (Confidence: 28.2%):\n  - vibration_norm_residual: 3.23 (SHAP attribution: +2.780, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: -0.17 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 0.10 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: SUPPORTED\n  - Observed Signatures: VIBRATION ELEVATED\n  - Consistency Assessment: Elevated structural vibration residual is consistent with mechanical degradation and structural unbalance.\nHealth Evidence (HI = 0.931, State = HEALTHY):\n  - Dominant Degraded Channels: vibration\nTemporal Evidence: STABLE (Rate: -0.00014/s, Trend: STABLE)\nPrognostic RUL: Unavailable | Status: NOT_DEGRADING\nOverall Evidence Consistency: HIGH\nSummary: Elevated structural vibration residual is consistent with mechanical degradation and structural unbalance.",
-            "execution_latency_ms": 60.141
+            "execution_latency_ms": 113.652
           }
         ]
       }
@@ -1708,27 +1740,27 @@
       "fault_start_s": 15.0,
       "fault_severity": 0.6,
       "total_timesteps": 120,
-      "total_wall_time_s": 8.434,
+      "total_wall_time_s": 13.85,
       "latency_stats": {
         "all_steps": {
           "sample_count": 120,
-          "mean_ms": 69.256,
-          "median_p50_ms": 58.376,
-          "p95_ms": 93.845,
-          "p99_ms": 127.465,
-          "min_ms": 48.634,
-          "max_ms": 190.911,
-          "std_ms": 19.769
+          "mean_ms": 114.561,
+          "median_p50_ms": 114.166,
+          "p95_ms": 118.399,
+          "p99_ms": 124.859,
+          "min_ms": 99.687,
+          "max_ms": 181.799,
+          "std_ms": 6.766
         },
         "steady_state": {
           "sample_count": 110,
-          "mean_ms": 69.447,
-          "median_p50_ms": 58.376,
-          "p95_ms": 93.215,
-          "p99_ms": 128.991,
-          "min_ms": 53.654,
-          "max_ms": 190.911,
-          "std_ms": 19.961
+          "mean_ms": 114.824,
+          "median_p50_ms": 114.207,
+          "p95_ms": 118.123,
+          "p99_ms": 121.643,
+          "min_ms": 109.868,
+          "max_ms": 181.799,
+          "std_ms": 6.782
         },
         "warmup_excluded_steps": 10
       },
@@ -1803,7 +1835,7 @@
             "explainability_quality": "LOW",
             "advisory_action": "ADVISORY_CAUTION",
             "recommended_action": "Diagnosis: SENSOR_FAULT\nML Evidence (Confidence: 26.4%):\n  - load: 63.50 (SHAP attribution: -0.743, AWAY_FROM_PREDICTED_CLASS)\n  - rpm_norm_residual: 17.67 (SHAP attribution: -0.265, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 1.46 (SHAP attribution: -0.207, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: RPM ELEVATED, OIL_PRESSURE ELEVATED, FUEL_FLOW ELEVATED\n  - Consistency Assessment: Multi-channel physical residual divergence is consistent with physical engine degradation rather than single-sensor failure.\nHealth Evidence (HI = 0.804, State = DEGRADED):\n  - Dominant Degraded Channels: rpm, oil_pressure, fuel_flow\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: LOW\nSummary: Multi-channel physical residual divergence is consistent with physical engine degradation rather than single-sensor failure.",
-            "execution_latency_ms": 48.634
+            "execution_latency_ms": 99.687
           },
           {
             "timestamp": 1.0,
@@ -1832,7 +1864,7 @@
             "explainability_quality": "LOW",
             "advisory_action": "ADVISORY_CAUTION",
             "recommended_action": "Diagnosis: NONE\nML Evidence (Confidence: 32.8%):\n  - fuel_flow_norm_residual: 2.29 (SHAP attribution: -0.535, AWAY_FROM_PREDICTED_CLASS)\n  - load: 68.70 (SHAP attribution: -0.137, AWAY_FROM_PREDICTED_CLASS)\n  - vibration_norm_residual: 0.56 (SHAP attribution: +0.134, TOWARD_PREDICTED_CLASS)\nPhysics Evidence: CONFLICTING\n  - Observed Signatures: RPM ELEVATED, CHT NOMINAL, EGT ELEVATED, OIL_TEMP NOMINAL, OIL_PRESSURE NOMINAL, FUEL_FLOW ELEVATED, VIBRATION NOMINAL\n  - Consistency Assessment: Significant multi-channel residual divergence conflicts with healthy nominal engine state.\nHealth Evidence (HI = 0.812, State = DEGRADED):\n  - Dominant Degraded Channels: rpm, fuel_flow\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: LOW\nSummary: Significant multi-channel residual divergence conflicts with healthy nominal engine state.",
-            "execution_latency_ms": 49.201
+            "execution_latency_ms": 109.941
           },
           {
             "timestamp": 2.0,
@@ -1858,7 +1890,7 @@
             "explainability_quality": "MEDIUM",
             "advisory_action": "ADVISORY_CAUTION",
             "recommended_action": "Diagnosis: FUEL_INJECTION_ABNORMALITY\nML Evidence (Confidence: 58.7%):\n  - fuel_flow_norm_residual: 0.56 (SHAP attribution: +2.776, TOWARD_PREDICTED_CLASS)\n  - rpm_norm_residual: 1.72 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\n  - egt_norm_residual: 1.63 (SHAP attribution: 0.000, AWAY_FROM_PREDICTED_CLASS)\nPhysics Evidence: PARTIALLY_SUPPORTED\n  - Observed Signatures: EGT ELEVATED, FUEL_FLOW NOMINAL\n  - Consistency Assessment: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.\nHealth Evidence (HI = 0.839, State = DEGRADED):\n  - No dominant degraded channels (system within nominal operating limits).\nPrognostic RUL: Unavailable | Status: INSUFFICIENT_HISTORY\nOverall Evidence Consistency: MEDIUM\nSummary: One combustion residual is deviating toward lean condition while coupled channel remains in nominal band.",
-            "execution_latency_ms": 50.936
+            "execution_latency_ms": 110.966
           }
         ],
         "last_3": [
@@ -1886,7 +1918,7 @@
             "explainability_quality": "HIGH",
             "advisory_action": "NORMAL_MONITORING",
             "recommended_action": "Continue nominal flight monitoring.",
-            "execution_latency_ms": 63.629
+            "execution_latency_ms": 113.315
           },
           {
             "timestamp": 118.0,
@@ -1912,7 +1944,7 @@
             "explainability_quality": "HIGH",
             "advisory_action": "NORMAL_MONITORING",
             "recommended_action": "Continue nominal flight monitoring.",
-            "execution_latency_ms": 68.17
+            "execution_latency_ms": 113.901
           },
           {
             "timestamp": 119.0,
@@ -1938,7 +1970,7 @@
             "explainability_quality": "HIGH",
             "advisory_action": "NORMAL_MONITORING",
             "recommended_action": "Continue nominal flight monitoring.",
-            "execution_latency_ms": 65.224
+            "execution_latency_ms": 116.339
           }
         ]
       }
@@ -1950,19 +1982,19 @@
         "claim_id": "RT-001",
         "claim": "P95 latency < 100 ms for the tested 1 Hz workload (1000 ms processing budget)",
         "metric": "worst_p95_latency_ms",
-        "value": 122.1,
+        "value": 169.6,
         "threshold": 100.0,
         "passed": false,
-        "evidence": "Worst P95=122.10ms across all scenarios (mean=67.20ms), well below 1000 ms budget"
+        "evidence": "Worst P95=169.60ms across all scenarios (mean=116.90ms), well below 1000 ms budget"
       },
       {
         "claim_id": "RT-002",
         "claim": "P99 latency below 1 Hz telemetry processing budget (1000 ms)",
         "metric": "worst_p99_latency_ms",
-        "value": 156.19,
+        "value": 195.3,
         "threshold": 1000.0,
         "passed": true,
-        "evidence": "Worst-case P99=156.19ms across all scenarios, compliant with 1000 ms budget"
+        "evidence": "Worst-case P99=195.30ms across all scenarios, compliant with 1000 ms budget"
       },
       {
         "claim_id": "FP-001",

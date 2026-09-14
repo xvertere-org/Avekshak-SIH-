@@ -104,6 +104,16 @@ class ChannelTelemetryModel:
     observed_value: Optional[float] = None
     expected_value: Optional[float] = None
     residual: Optional[float] = None
+    # Operator-facing Grey-Box Digital Twin fields (Phase 3 & Phase 4)
+    physics_estimate: Optional[float] = None
+    sensor_correction: Optional[float] = None
+    corrected_prediction: Optional[float] = None
+    detected_deviation: Optional[float] = None
+    model_confidence: float = 1.0
+    prediction_lower: Optional[float] = None
+    prediction_upper: Optional[float] = None
+    uncertainty_width: Optional[float] = None
+    confidence_basis: Optional[str] = None
     forecast_values: List[float] = field(default_factory=list)
     forecast_timestamps: List[float] = field(default_factory=list)
     forecast_lower_bounds: List[float] = field(default_factory=list)
@@ -170,6 +180,9 @@ class DiagnosticsViewModel:
     diagnosis_data_quality: str = "VALID"
     sensor_fault_indicated: bool = False
     isolated_channels: List[str] = field(default_factory=list)
+    suspect_sensor: Optional[str] = None
+    suspect_sensors: List[str] = field(default_factory=list)
+    sensor_isolation_status: str = "NONE"
 
     # Explainability (Phase 12)
     summary_explanation: Optional[str] = None
@@ -182,6 +195,13 @@ class DiagnosticsViewModel:
     temporal_evidence: Optional[Dict[str, Any]] = None
     fused_evidence: Optional[Dict[str, Any]] = None
     shap_disclaimer: Optional[str] = None
+
+    # Operator-Facing Diagnostics & Health Monitoring (Phase 4)
+    alert_classification: str = "Nominal"
+    alert_classification_raw: str = "NOMINAL"
+    degradation_severity: Optional[float] = None
+    affected_subsystems: List[str] = field(default_factory=list)
+    evidence: Dict[str, Any] = field(default_factory=dict)
 
     availability: AvailabilityStatus = AvailabilityStatus.AVAILABLE
 
@@ -201,6 +221,15 @@ class PrognosticsViewModel:
     dominant_channels: List[str] = field(default_factory=list)
     channel_contributions: Dict[str, float] = field(default_factory=dict)
 
+    # Phase 4 Health State & Prognostics
+    engine_health_score: Optional[float] = None
+    subsystem_health_states: Dict[str, str] = field(default_factory=dict)
+    subsystem_scores: Dict[str, float] = field(default_factory=dict)
+    trend_state: str = "Unavailable"
+    trend_state_raw: str = "UNAVAILABLE"
+    prognostics_reason: Optional[str] = None
+    prediction_intervals: Dict[str, Dict[str, float]] = field(default_factory=dict)
+
     # RUL & Prognostics (Phase 11)
     rul_state: str = "Unavailable"
     rul_status: str = "Unavailable"
@@ -212,6 +241,7 @@ class PrognosticsViewModel:
     rul_p95_hours: Optional[float] = None
     limiting_factor: Optional[str] = None
     forecast_assisted_mode: bool = False
+    forecast_mode_status: str = "OFF"
     eol_provenance: Dict[str, Any] = field(default_factory=dict)
     prognostic_confidence: Optional[float] = None
 
@@ -239,6 +269,10 @@ class DataQualityViewModel:
     timestamp: float
     quality_score: Optional[float] = None
     quality_status: str = "NOMINAL"
+
+    @property
+    def data_quality_status(self) -> str:
+        return self.quality_status
     is_regular_sampling: bool = True
     sampling_interval_mean: Optional[float] = None
     missing_sensors: List[str] = field(default_factory=list)

@@ -1,0 +1,622 @@
+{
+  "engine_identity": {
+    "manufacturer": "BRP-Rotax GmbH & Co KG",
+    "model": "914",
+    "variants": ["914 UL", "914 F"],
+    "certification_basis": "EASA TCDS E.122 / FAA TCDS E00057EN (Certified 914 F); ASTM F2339 (Non-certified 914 UL)",
+    "engine_type": "Four-cylinder horizontally opposed spark-ignition aero piston engine with turbocharger",
+    "cycle": "4-stroke Otto cycle",
+    "cylinder_count": 4,
+    "cylinder_arrangement": "horizontally_opposed_boxer",
+    "cooling_architecture": "hybrid_liquid_air",
+    "cooling_description": "Liquid-cooled cylinder heads with dedicated radiator loop; ram-air cooled cylinder barrels",
+    "aspiration_architecture": "turbocharged_with_intercooler_provision",
+    "fuel_system": "dual_carburetors_pressurized_airbox",
+    "ignition_architecture": "dual_capacitive_discharge_ignition_cdi",
+    "lubrication_architecture": "dry_sump_forced_lubrication",
+    "reduction_gearbox_architecture": "integrated_spur_gearbox_with_torsional_damper",
+    "engine_applicability": {
+      "engine_family": "Rotax 914",
+      "engine_variants_certified": ["Rotax 914 F2", "Rotax 914 F3", "Rotax 914 F4"],
+      "engine_variants_non_certified": ["Rotax 914 UL"],
+      "certification_standard": "EASA TCDS E.122 Issue 06 (05 September 2016); FAA TCDS E00057EN; ASTM F2339 (914 UL)",
+      "easa_tcds_tcu_ratings": {
+        "tcu_configuration_v4_3": {
+          "tcu_version": "Version 4.3 / Rotax 21",
+          "applicable_serial_range": "Up to engine s/n 4,420.199",
+          "continuous_power_kw": 73.5,
+          "continuous_rpm": 5500.0,
+          "continuous_map_bar": 1.150,
+          "continuous_map_hpa": 1150.0,
+          "continuous_map_inhg": 34.0,
+          "continuous_critical_altitude_m": 4875.0,
+          "continuous_critical_altitude_ft": 16000.0,
+          "takeoff_power_kw": 84.5,
+          "takeoff_rpm": 5800.0,
+          "takeoff_map_bar": 1.300,
+          "takeoff_map_hpa": 1300.0,
+          "takeoff_map_inhg": 38.4,
+          "takeoff_critical_altitude_m": 2450.0,
+          "takeoff_critical_altitude_ft": 8000.0,
+          "source": "EASA TCDS E.122 Issue 06, Section III.6 Ratings"
+        },
+        "tcu_configuration_v4_6": {
+          "tcu_version": "Version 4.6 / Rotax 99",
+          "applicable_serial_range": "From engine s/n 4,420.200 onwards",
+          "continuous_power_kw": 73.5,
+          "continuous_rpm": 5500.0,
+          "continuous_map_bar": 1.180,
+          "continuous_map_hpa": 1180.0,
+          "continuous_map_inhg": 34.9,
+          "continuous_critical_altitude_m": 4875.0,
+          "continuous_critical_altitude_ft": 16000.0,
+          "takeoff_power_kw": 84.5,
+          "takeoff_rpm": 5800.0,
+          "takeoff_map_bar": 1.320,
+          "takeoff_map_hpa": 1320.0,
+          "takeoff_map_inhg": 39.0,
+          "takeoff_critical_altitude_m": 2450.0,
+          "takeoff_critical_altitude_ft": 8000.0,
+          "source": "EASA TCDS E.122 Issue 06, Section III.6 Ratings"
+        }
+      },
+      "selected_model_configuration": {
+        "continuous_map_target_bar": 1.200,
+        "continuous_map_acceptance_min_bar": 1.185,
+        "continuous_map_acceptance_max_bar": 1.215,
+        "takeoff_map_target_bar": 1.350,
+        "takeoff_map_acceptance_min_bar": 1.335,
+        "takeoff_map_acceptance_max_bar": 1.365,
+        "continuous_critical_altitude_m": 4572.0,
+        "takeoff_critical_altitude_m": 2500.0,
+        "classification": "MODEL_CONFIGURATION_VALUE",
+        "rationale": "Selected simulator operating configuration. Represents nominal operating setpoints corresponding to Rotax 914 Operators Manual Section 2.1 continuous (1.200 bar, 4572 m) and takeoff (1.350 bar) ratings, and EASA TCDS E.122 upper operating limits. This is not asserted as a universal OEM limit and does not replace TCU-specific EASA reference values. Ranges 1.185-1.215 bar and 1.335-1.365 bar represent MODEL_ACCEPTANCE_BAND (+/-15 hPa numerical simulation tolerance) around nominal targets, NOT OEM published operational limits."
+      }
+    }
+  },
+  "geometry": {
+    "displacement_cc": {
+      "value": 1211.2,
+      "unit": "cm^3",
+      "source": "BRP-Rotax 914 Series Operators Manual Ed. 4 / Rev. 0, Section 2.1; EASA TCDS E.122",
+      "source_type": "OEM_OPERATORS_MANUAL",
+      "status": "AUTHORITATIVE_VERIFIED",
+      "notes": "Calculated: bore 79.5 mm, stroke 61.0 mm, 4 cylinders -> 1211.2 cc"
+    },
+    "bore_mm": {
+      "value": 79.5,
+      "unit": "mm",
+      "source": "BRP-Rotax 914 Series Operators Manual Ed. 4 / Rev. 0, Section 2.1",
+      "source_type": "OEM_OPERATORS_MANUAL",
+      "status": "AUTHORITATIVE_VERIFIED",
+      "notes": "Standard cylinder bore"
+    },
+    "stroke_mm": {
+      "value": 61.0,
+      "unit": "mm",
+      "source": "BRP-Rotax 914 Series Operators Manual Ed. 4 / Rev. 0, Section 2.1",
+      "source_type": "OEM_OPERATORS_MANUAL",
+      "status": "AUTHORITATIVE_VERIFIED",
+      "notes": "Piston stroke"
+    },
+    "compression_ratio": {
+      "value": 9.0,
+      "unit": "ratio",
+      "source": "BRP-Rotax 914 Series Operators Manual Ed. 4 / Rev. 0, Section 2.1; EASA TCDS E.122",
+      "source_type": "OEM_OPERATORS_MANUAL",
+      "status": "AUTHORITATIVE_VERIFIED",
+      "notes": "Nominal compression ratio 9.0:1 (reduced from 912 ULS 10.8:1 to accommodate turbo boost)"
+    },
+    "firing_order": {
+      "value": "1-4-3-2",
+      "unit": "sequence",
+      "source": "BRP-Rotax 914 Series Operators Manual Ed. 4 / Rev. 0, Section 2.1",
+      "source_type": "OEM_OPERATORS_MANUAL",
+      "status": "AUTHORITATIVE_VERIFIED",
+      "notes": "Standard Rotax boxer 4-cylinder firing sequence"
+    }
+  },
+  "operating_limits": {
+    "takeoff_power_w": {
+      "value": 84500.0,
+      "unit": "W",
+      "source": "BRP-Rotax 914 Series Operators Manual Ed. 4 / Rev. 0, Section 2.1; EASA TCDS E.122 Issue 06, Section III.6",
+      "source_type": "OEM_OPERATORS_MANUAL",
+      "status": "AUTHORITATIVE_VERIFIED",
+      "notes": "84.5 kW (115 hp) @ 5800 RPM (SOURCE_SPECIFIC_REFERENCE_VALUE from Rotax 914 Operators Manual Ed. 4 / Rev. 0, Section 2.1 and EASA TCDS E.122 Issue 06 Section III.6 Ratings; selected as the model configuration reference value. Note that 84.8 kW appears in some secondary certification conversions due to 115 metric hp conversion rounding, but 84.5 kW is the authoritative primary published figure in EASA TCDS E.122 Issue 06)."
+    },
+    "continuous_power_w": {
+      "value": 73500.0,
+      "unit": "W",
+      "source": "BRP-Rotax 914 Series Operators Manual Ed. 4 / Rev. 0, Section 2.1; EASA TCDS E.122 Issue 06, Section III.6",
+      "source_type": "OEM_OPERATORS_MANUAL",
+      "status": "AUTHORITATIVE_VERIFIED",
+      "notes": "73.5 kW (100 hp) @ 5500 RPM, continuous, MAP 35.4 inHg (1.20 bar)"
+    },
+    "rpm_max_takeoff": {
+      "value": 5800.0,
+      "unit": "RPM",
+      "source": "BRP-Rotax 914 Series Operators Manual Ed. 4 / Rev. 0, Section 2.1; EASA TCDS E.122",
+      "source_type": "OEM_OPERATORS_MANUAL",
+      "status": "AUTHORITATIVE_VERIFIED",
+      "notes": "Maximum permissible crankshaft RPM (5 min limit)"
+    },
+    "rpm_max_continuous": {
+      "value": 5500.0,
+      "unit": "RPM",
+      "source": "BRP-Rotax 914 Series Operators Manual Ed. 4 / Rev. 0, Section 2.1; EASA TCDS E.122",
+      "source_type": "OEM_OPERATORS_MANUAL",
+      "status": "AUTHORITATIVE_VERIFIED",
+      "notes": "Maximum continuous crankshaft RPM"
+    },
+    "rpm_idle": {
+      "value": 1400.0,
+      "unit": "RPM",
+      "source": "BRP-Rotax 914 Series Operators Manual Ed. 4 / Rev. 0, Section 2.1",
+      "source_type": "OEM_OPERATORS_MANUAL",
+      "status": "AUTHORITATIVE_VERIFIED",
+      "notes": "Recommended idle engine speed"
+    },
+    "map_takeoff_bar": {
+      "value": 1.35,
+      "unit": "bar",
+      "source": "BRP-Rotax 914 Series Operators Manual Ed. 4 / Rev. 0, Section 2.1; EASA TCDS E.122 Issue 06, Section IV.3.3",
+      "source_type": "OEM_OPERATORS_MANUAL",
+      "status": "AUTHORITATIVE_VERIFIED",
+      "notes": "Takeoff manifold absolute pressure maximum: 39.9 inHg (1.35 bar / 1350 hPa). Selected as simulator takeoff target (MODEL_CONFIGURATION_VALUE). Note that EASA TCDS E.122 §III.6 specifies TCU Version 4.3 rating at 1.300 bar and Version 4.6 at 1.320 bar."
+    },
+    "map_continuous_bar": {
+      "value": 1.20,
+      "unit": "bar",
+      "source": "BRP-Rotax 914 Series Operators Manual Ed. 4 / Rev. 0, Section 2.1; EASA TCDS E.122 Issue 06, Section IV.3.3",
+      "source_type": "OEM_OPERATORS_MANUAL",
+      "status": "AUTHORITATIVE_VERIFIED",
+      "notes": "Continuous manifold absolute pressure maximum: 35.4 inHg (1.20 bar / 1200 hPa). Selected as simulator continuous target (MODEL_CONFIGURATION_VALUE). Note that EASA TCDS E.122 §III.6 specifies TCU Version 4.3 rating at 1.150 bar and Version 4.6 at 1.180 bar."
+    },
+    "critical_altitude_m": {
+      "value": 4572.0,
+      "unit": "m",
+      "source": "BRP-Rotax 914 Series Operators Manual Ed. 4 / Rev. 0, Section 2.1",
+      "source_type": "OEM_OPERATORS_MANUAL",
+      "status": "AUTHORITATIVE_VERIFIED",
+      "notes": "Continuous critical altitude 15,000 ft (4572 m) where turbocharger maintains rated continuous MAP (OM-914 §2.1). Selected as simulator model configuration value (MODEL_CONFIGURATION_VALUE). Note that EASA TCDS E.122 §III.6 lists 16,000 ft / 4875 m for TCU v4.3 and v4.6. Documented divergence for surrogate configuration."
+    },
+    "cht_limit_c": {
+      "value": 135.0,
+      "unit": "deg_C",
+      "source": "BRP-Rotax 914 Series Operators Manual Ed. 4 / Rev. 0, Section 2.1; Service Instruction SI-914-019",
+      "source_type": "OEM_OPERATORS_MANUAL",
+      "status": "AUTHORITATIVE_VERIFIED",
+      "notes": "Maximum cylinder head temperature (135 °C with water/glycol coolant mix; 120 °C if waterless coolant)"
+    },
+    "egt_max_takeoff_c": {
+      "value": 950.0,
+      "unit": "deg_C",
+      "source": "BRP-Rotax 914 Series Operators Manual Ed. 4 / Rev. 0, Section 2.1",
+      "source_type": "OEM_OPERATORS_MANUAL",
+      "status": "AUTHORITATIVE_VERIFIED",
+      "notes": "Maximum exhaust gas temperature at takeoff (5 min)"
+    },
+    "egt_max_continuous_c": {
+      "value": 910.0,
+      "unit": "deg_C",
+      "source": "BRP-Rotax 914 Series Operators Manual Ed. 4 / Rev. 0, Section 2.1",
+      "source_type": "OEM_OPERATORS_MANUAL",
+      "status": "AUTHORITATIVE_VERIFIED",
+      "notes": "Maximum continuous exhaust gas temperature"
+    },
+    "oil_temp_min_c": {
+      "value": 50.0,
+      "unit": "deg_C",
+      "source": "BRP-Rotax 914 Series Operators Manual Ed. 4 / Rev. 0, Section 2.1",
+      "source_type": "OEM_OPERATORS_MANUAL",
+      "status": "AUTHORITATIVE_VERIFIED",
+      "notes": "Minimum operational oil temperature before takeoff power"
+    },
+    "oil_temp_max_c": {
+      "value": 130.0,
+      "unit": "deg_C",
+      "source": "BRP-Rotax 914 Series Operators Manual Ed. 4 / Rev. 0, Section 2.1",
+      "source_type": "OEM_OPERATORS_MANUAL",
+      "status": "AUTHORITATIVE_VERIFIED",
+      "notes": "Maximum permissible oil temperature"
+    },
+    "oil_temp_nominal_min_c": {
+      "value": 90.0,
+      "unit": "deg_C",
+      "source": "BRP-Rotax 914 Series Operators Manual Ed. 4 / Rev. 0, Section 2.1",
+      "source_type": "OEM_OPERATORS_MANUAL",
+      "status": "AUTHORITATIVE_VERIFIED",
+      "notes": "Recommended normal operating oil temperature lower bound"
+    },
+    "oil_temp_nominal_max_c": {
+      "value": 110.0,
+      "unit": "deg_C",
+      "source": "BRP-Rotax 914 Series Operators Manual Ed. 4 / Rev. 0, Section 2.1",
+      "source_type": "OEM_OPERATORS_MANUAL",
+      "status": "AUTHORITATIVE_VERIFIED",
+      "notes": "Recommended normal operating oil temperature upper bound"
+    },
+    "oil_press_min_bar": {
+      "value": 0.8,
+      "unit": "bar",
+      "source": "BRP-Rotax 914 Series Operators Manual Ed. 4 / Rev. 0, Section 2.1",
+      "source_type": "OEM_OPERATORS_MANUAL",
+      "status": "AUTHORITATIVE_VERIFIED",
+      "notes": "Minimum oil pressure at idle (<3500 RPM)"
+    },
+    "oil_press_max_bar": {
+      "value": 7.0,
+      "unit": "bar",
+      "source": "BRP-Rotax 914 Series Operators Manual Ed. 4 / Rev. 0, Section 2.1",
+      "source_type": "OEM_OPERATORS_MANUAL",
+      "status": "AUTHORITATIVE_VERIFIED",
+      "notes": "Maximum permissible oil pressure (short-duration cold-start limit)"
+    },
+    "oil_press_normal_min_bar": {
+      "value": 2.0,
+      "unit": "bar",
+      "source": "BRP-Rotax 914 Series Operators Manual Ed. 4 / Rev. 0, Section 2.1",
+      "source_type": "OEM_OPERATORS_MANUAL",
+      "status": "AUTHORITATIVE_VERIFIED",
+      "notes": "Normal operational oil pressure lower bound (>3500 RPM)"
+    },
+    "oil_press_normal_max_bar": {
+      "value": 5.0,
+      "unit": "bar",
+      "source": "BRP-Rotax 914 Series Operators Manual Ed. 4 / Rev. 0, Section 2.1",
+      "source_type": "OEM_OPERATORS_MANUAL",
+      "status": "AUTHORITATIVE_VERIFIED",
+      "notes": "Normal operational oil pressure upper bound (>3500 RPM)"
+    },
+    "fuel_pressure_min_bar": {
+      "value": 0.15,
+      "unit": "bar",
+      "source": "BRP-Rotax 914 Series Operators Manual Ed. 4 / Rev. 0, Section 2.1",
+      "source_type": "OEM_OPERATORS_MANUAL",
+      "status": "AUTHORITATIVE_VERIFIED",
+      "notes": "Differential pressure above airbox manifold pressure"
+    },
+    "fuel_pressure_max_bar": {
+      "value": 0.35,
+      "unit": "bar",
+      "source": "BRP-Rotax 914 Series Operators Manual Ed. 4 / Rev. 0, Section 2.1",
+      "source_type": "OEM_OPERATORS_MANUAL",
+      "status": "AUTHORITATIVE_VERIFIED",
+      "notes": "Differential pressure above airbox manifold pressure"
+    }
+  },
+  "turbo_system": {
+    "turbocharger_present": true,
+    "compressor_present": true,
+    "turbine_present": true,
+    "wastegate_present": true,
+    "wastegate_actuator_type": "electric_servo_motor",
+    "tcu_present": true,
+    "tcu_description": "Electronic Turbo Control Unit regulating wastegate servo based on throttle, RPM, ambient pressure, and airbox pressure",
+    "map_boost_required": true,
+    "charge_air_temp_required": true,
+    "critical_altitude_m": 4572.0,
+    "boost_control_concept": "Closed-loop electromechanical wastegate positioning by TCU maintaining target manifold pressure",
+    "compressor_efficiency_map": {
+      "value": "UNKNOWN",
+      "unit": "map_surface",
+      "source": "Proprietary OEM turbocharger data (IHI / Rotax)",
+      "source_type": "PROPRIETARY_OEM",
+      "status": "UNKNOWN",
+      "notes": "Compressor map not published in public manuals. Not fabricated."
+    },
+    "turbine_efficiency_map": {
+      "value": "UNKNOWN",
+      "unit": "map_surface",
+      "source": "Proprietary OEM turbocharger data (IHI / Rotax)",
+      "source_type": "PROPRIETARY_OEM",
+      "status": "UNKNOWN",
+      "notes": "Turbine map not published in public manuals. Not fabricated."
+    },
+    "tcu_control_gains": {
+      "value": "UNKNOWN",
+      "unit": "control_gains",
+      "source": "Proprietary TCU firmware calibration",
+      "source_type": "PROPRIETARY_OEM",
+      "status": "UNKNOWN",
+      "notes": "TCU PID servo gains not published in public manuals. Not fabricated."
+    },
+    "surrogate_disclosure": {
+      "value": "REDUCED_ORDER_TCU_AND_TURBINE_SURROGATE",
+      "status": "MODEL_ASSUMPTION_AND_CALIBRATION",
+      "notes": "Exhaust manifold pressure P3 = Pamb + Delta_P_exh, turbine expansion approximately to ambient, and turbine pressure ratio are modeled quantities (MODEL_ASSUMPTION / MODEL_CALIBRATION) rather than OEM compressor/turbine-map data. Does not claim to reproduce proprietary Rotax/IHI turbocharger maps."
+    }
+  },
+  "drivetrain": {
+    "engine_crankshaft_configuration": "driving_pinion",
+    "reduction_gearbox_present": true,
+    "gearbox_type": "integrated_spur_reduction_with_torsional_damper",
+    "reduction_ratio": {
+      "value": 2.4286,
+      "unit": "ratio",
+      "source": "BRP-Rotax 914 Series Operators Manual Ed. 4 / Rev. 0, Section 2.1; EASA TCDS E.122",
+      "source_type": "OEM_OPERATORS_MANUAL",
+      "status": "AUTHORITATIVE_VERIFIED",
+      "notes": "Gear ratio i = 51 / 21 = 2.42857 (standard designation 2.43:1; alternative optional 2.27:1 [50:22])"
+    },
+    "propeller_rotation_direction": "clockwise_viewed_from_front",
+    "propeller_speed_takeoff_rpm": {
+      "value": 2388.0,
+      "unit": "RPM",
+      "source": "Calculated: 5800 engine RPM / 2.4286 ratio",
+      "source_type": "ENGINEERING_DERIVATION",
+      "status": "AUTHORITATIVE_VERIFIED",
+      "notes": "Propeller speed at takeoff rating"
+    },
+    "propeller_speed_continuous_rpm": {
+      "value": 2265.0,
+      "unit": "RPM",
+      "source": "Calculated: 5500 engine RPM / 2.4286 ratio",
+      "source_type": "ENGINEERING_DERIVATION",
+      "status": "AUTHORITATIVE_VERIFIED",
+      "notes": "Propeller speed at maximum continuous rating"
+    },
+    "simulator_current_representation": {
+      "mode": "Phase 1: 1:1 direct propeller load without reduction gear modeling; Phase 2: Integrated spur reduction gearbox (i=2.42857) with propeller load torque reflection and mechanical power conservation",
+      "status": "SIMULATOR_SIMPLIFICATION",
+      "notes": "Propeller speed omega_prop = omega_eng / i. Aerodynamic torque T_prop = k_prop * omega_prop^2 reflected to crankshaft as T_prop / (i * eta_gb). Power conserved: P_eng_out >= P_prop."
+    }
+  },
+  "telemetry_channel_contract": {
+    "rpm": {
+      "description": "Engine crankshaft rotational speed",
+      "unit": "RPM",
+      "status": "PHYSICALLY_MODELED_LUMPED",
+      "notes": "Implemented in simulator via 1-DOF rotational ODE"
+    },
+    "propeller_rpm": {
+      "description": "Propeller shaft rotational speed",
+      "unit": "RPM",
+      "status": "NOT_MODELED_CURRENTLY",
+      "notes": "Currently conflated with engine RPM due to 1:1 direct drivetrain simplification"
+    },
+    "map": {
+      "description": "Manifold absolute pressure (airbox boost pressure)",
+      "unit": "bar",
+      "status": "NOT_MODELED_CURRENTLY",
+      "notes": "Current simulator uses naturally aspirated density scaling; turbo boost MAP is absent"
+    },
+    "ambient_pressure": {
+      "description": "Static atmospheric pressure at flight altitude",
+      "unit": "Pa",
+      "status": "PHYSICALLY_MODELED",
+      "notes": "Implemented via standard ISA equations"
+    },
+    "ambient_temperature": {
+      "description": "Outside air temperature (OAT)",
+      "unit": "deg_C",
+      "status": "PHYSICALLY_MODELED",
+      "notes": "Implemented via ISA lapse rate and mission configuration"
+    },
+    "airbox_temperature": {
+      "description": "Charge-air temperature after compressor / in airbox",
+      "unit": "deg_C",
+      "status": "NOT_MODELED_CURRENTLY",
+      "notes": "Requires compressor thermodynamic equations (Phase 2+)"
+    },
+    "cht": {
+      "description": "Cylinder head temperature",
+      "unit": "deg_C",
+      "status": "PHYSICALLY_MODELED_LUMPED_SCALAR",
+      "notes": "Current simulator models single lumped thermal node; does not model 4 individual cylinder heads"
+    },
+    "cht_cyl_1_4": {
+      "description": "Individual cylinder head temperatures (cylinders 1 to 4)",
+      "unit": "deg_C",
+      "status": "NOT_MODELED_CURRENTLY",
+      "notes": "Requires multi-cylinder thermal network (Phase 2+)"
+    },
+    "egt": {
+      "description": "Exhaust gas temperature",
+      "unit": "deg_C",
+      "status": "PHYSICALLY_MODELED_LUMPED_SCALAR",
+      "notes": "Current simulator models single empirical algebraic node with first-order thermocouple lag"
+    },
+    "egt_cyl_1_4": {
+      "description": "Individual exhaust runner temperatures (cylinders 1 to 4)",
+      "unit": "deg_C",
+      "status": "NOT_MODELED_CURRENTLY",
+      "notes": "Requires individual cylinder exhaust runner physics"
+    },
+    "oil_temperature": {
+      "description": "Engine lubrication oil temperature",
+      "unit": "deg_C",
+      "status": "PHYSICALLY_MODELED_LUMPED",
+      "notes": "Implemented via lumped thermal capacitance with CHT coupling and cooler dissipation"
+    },
+    "oil_pressure": {
+      "description": "Engine lubrication oil pressure",
+      "unit": "bar",
+      "status": "PHYSICALLY_MODELED_ALGEBRAIC",
+      "notes": "Implemented via speed-gain and temperature-viscosity proxy equation"
+    },
+    "fuel_flow": {
+      "description": "Engine fuel volumetric flow rate",
+      "unit": "L/h",
+      "status": "PHYSICALLY_MODELED_WILLANS",
+      "notes": "Implemented via Willans-line affine power approximation"
+    },
+    "vibration_rms": {
+      "description": "Mechanical vibration acceleration magnitude",
+      "unit": "g",
+      "status": "SYNTHESIZED_ORDER_PROXY",
+      "notes": "Synthesized analytically from 1x and 2x rotational orders plus broadband noise"
+    },
+    "throttle": {
+      "description": "Commanded throttle position",
+      "unit": "percent",
+      "status": "INPUT_COMMAND",
+      "notes": "Pilot / autopilot throttle command input (0-100 %)"
+    },
+    "tcu_wastegate_position": {
+      "description": "TCU wastegate actuator position",
+      "unit": "percent",
+      "status": "NOT_MODELED_CURRENTLY",
+      "notes": "Planned for turbocharger subsystem"
+    },
+    "tcu_caution_lamp": {
+      "description": "TCU caution/warning lamp discrete signal",
+      "unit": "boolean",
+      "status": "NOT_MODELED_CURRENTLY",
+      "notes": "Planned for TCU diagnostic interface"
+    },
+    "bus_voltage": {
+      "description": "Aircraft/engine electrical DC bus voltage",
+      "unit": "V",
+      "status": "NOT_MODELED_CURRENTLY",
+      "notes": "Planned for electrical subsystem"
+    }
+  },
+  "reference_data": {
+    "easa_tcds_e122": {
+      "type_certificate_data_sheet": "EASA.E.122",
+      "issue": "06",
+      "date": "05 September 2016",
+      "type_certificate_holder": "BRP-Rotax GmbH & Co KG",
+      "engine_models": ["Rotax 914 F2", "Rotax 914 F3", "Rotax 914 F4"],
+      "source_document": "European Aviation Safety Agency Type-Certificate Data Sheet No. E.122 Issue 06",
+      "source_status": "AUTHORITATIVE_VERIFIED",
+      "tcu_configurations": {
+        "tcu_configuration_v4_3": {
+          "tcu_version": "Version 4.3 / Rotax 21",
+          "applicable_serial_range": "Up to engine s/n 4,420.199",
+          "continuous_power_kw": 73.5,
+          "continuous_rpm": 5500.0,
+          "continuous_map_bar": 1.150,
+          "continuous_map_hpa": 1150.0,
+          "continuous_map_inhg": 34.0,
+          "continuous_critical_altitude_m": 4875.0,
+          "continuous_critical_altitude_ft": 16000.0,
+          "takeoff_power_kw": 84.5,
+          "takeoff_rpm": 5800.0,
+          "takeoff_map_bar": 1.300,
+          "takeoff_map_hpa": 1300.0,
+          "takeoff_map_inhg": 38.4,
+          "takeoff_critical_altitude_m": 2450.0,
+          "takeoff_critical_altitude_ft": 8000.0,
+          "status": "AUTHORITATIVE_VERIFIED",
+          "source": "EASA TCDS E.122 Issue 06, Section III.6 Ratings"
+        },
+        "tcu_configuration_v4_6": {
+          "tcu_version": "Version 4.6 / Rotax 99",
+          "applicable_serial_range": "From engine s/n 4,420.200 onwards",
+          "continuous_power_kw": 73.5,
+          "continuous_rpm": 5500.0,
+          "continuous_map_bar": 1.180,
+          "continuous_map_hpa": 1180.0,
+          "continuous_map_inhg": 34.9,
+          "continuous_critical_altitude_m": 4875.0,
+          "continuous_critical_altitude_ft": 16000.0,
+          "takeoff_power_kw": 84.5,
+          "takeoff_rpm": 5800.0,
+          "takeoff_map_bar": 1.320,
+          "takeoff_map_hpa": 1320.0,
+          "takeoff_map_inhg": 39.0,
+          "takeoff_critical_altitude_m": 2450.0,
+          "takeoff_critical_altitude_ft": 8000.0,
+          "status": "AUTHORITATIVE_VERIFIED",
+          "source": "EASA TCDS E.122 Issue 06, Section III.6 Ratings"
+        }
+      },
+      "certified_operating_limits": {
+        "takeoff_map_max_bar": 1.350,
+        "takeoff_map_min_bar": 1.300,
+        "continuous_map_max_bar": 1.200,
+        "continuous_map_min_bar": 1.150,
+        "takeoff_speed_max_rpm": 5800.0,
+        "continuous_speed_max_rpm": 5500.0,
+        "reduction_gear_ratio": 2.4286,
+        "cht_max_conventional_coolant_c": 135.0,
+        "coolant_exit_temp_max_c": 120.0,
+        "oil_temp_max_inlet_c": 130.0,
+        "oil_press_normal_min_bar": 2.0,
+        "oil_press_normal_max_bar": 5.0,
+        "oil_press_idle_min_bar": 0.8,
+        "oil_press_cold_start_max_bar": 7.0,
+        "source": "EASA TCDS E.122 Issue 06, Section IV Operating Limitations",
+        "status": "AUTHORITATIVE_VERIFIED"
+      }
+    },
+    "rotax_om_914": {
+      "document": "BRP-Rotax 914 Series Operators Manual Ed. 4 / Rev. 0, Section 2.1",
+      "takeoff_power_w": 84500.0,
+      "continuous_power_w": 73500.0,
+      "takeoff_map_bar": 1.350,
+      "continuous_map_bar": 1.200,
+      "continuous_critical_altitude_m": 4572.0,
+      "takeoff_critical_altitude_m": 2500.0,
+      "gearbox_reduction_ratio": 2.42857,
+      "source_status": "AUTHORITATIVE_VERIFIED"
+    }
+  },
+  "model_configuration": {
+    "continuous_map_target_bar": 1.200,
+    "takeoff_map_target_bar": 1.350,
+    "continuous_critical_altitude_m": 4572.0,
+    "takeoff_critical_altitude_m": 2500.0,
+    "continuous_power_reference_w": 73500.0,
+    "takeoff_power_reference_w": 84500.0,
+    "gearbox_reduction_ratio": 2.4285714,
+    "classification": "MODEL_CONFIGURATION_VALUE",
+    "rationale": "Selected simulator operating configuration. Represents nominal operating setpoints corresponding to Rotax 914 Operators Manual Section 2.1 continuous (1.200 bar, 4572 m) and takeoff (1.350 bar) ratings, and EASA TCDS E.122 upper operating limits. This is not asserted as a universal OEM limit and does not replace TCU-specific EASA reference values."
+  },
+  "model_acceptance_bands": {
+    "continuous_map_acceptance_band_bar": {
+      "nominal": 1.200,
+      "min": 1.185,
+      "max": 1.215,
+      "tolerance_hpa": 15.0,
+      "classification": "MODEL_ACCEPTANCE_BAND",
+      "notes": "Numerical simulation acceptance band (+/- 15 hPa) around 1.200 bar continuous target. Strictly a MODEL_ACCEPTANCE_BAND tolerance, NOT an OEM operating limit."
+    },
+    "takeoff_map_acceptance_band_bar": {
+      "nominal": 1.350,
+      "min": 1.335,
+      "max": 1.365,
+      "tolerance_hpa": 15.0,
+      "classification": "MODEL_ACCEPTANCE_BAND",
+      "notes": "Numerical simulation acceptance band (+/- 15 hPa) around 1.350 bar takeoff target. Strictly a MODEL_ACCEPTANCE_BAND tolerance, NOT an OEM operating limit."
+    }
+  },
+  "model_calibration": {
+    "effective_lumped_cooling_thermal_capacitance_J_per_K": {
+      "value": 4500.0,
+      "classification": "MODEL_CALIBRATION",
+      "notes": "Effective lumped thermal capacitance of the cylinder head water jackets and head coolant volume (fast-response thermal mass ~1.2 kg equivalent). Strictly classified as MODEL_CALIBRATION; NOT the full physical 4 L cooling system inventory."
+    },
+    "idle_intake_conductance_fraction": {
+      "value": 0.55,
+      "classification": "MODEL_CALIBRATION",
+      "notes": "Throttle butterfly bypass conductance fraction preventing non-physical complete intake vacuum at 0% throttle."
+    },
+    "gearbox_efficiency": {
+      "value": 0.975,
+      "classification": "MODEL_CALIBRATION",
+      "notes": "Mechanical transmission efficiency of integrated spur reduction gearbox."
+    },
+    "propeller_torque_coefficient": {
+      "value": 0.0018,
+      "classification": "MODEL_CALIBRATION",
+      "notes": "Aerodynamic torque absorption coefficient calibrated to absorb rated power at rated propeller RPM."
+    }
+  },
+  "model_assumption": {
+    "bank_variation_multipliers": {
+      "value": [0.98, 1.00, 1.03, 0.99],
+      "classification": "MODEL_ASSUMPTION",
+      "notes": "Deterministic bank thermal variation factors (front cylinders 1, 2 receive slightly better ram air; rear cylinders 3, 4 run slightly warmer), normalized to mean 1.000."
+    },
+    "surrogate_turbo_wastegate": {
+      "value": "REDUCED_ORDER_TURBO_SURROGATE",
+      "classification": "MODEL_ASSUMPTION",
+      "notes": "Coupled thermodynamic loop with TCU wastegate servo surrogate; proprietary OEM compressor and turbine efficiency maps are not public and are not fabricated."
+    }
+  }
+}
+

@@ -4,32 +4,40 @@ Renders anomaly breakdown, fault diagnosis probabilities, digital twin residuals
 and sensor fault isolation status.
 """
 
-from typing import Dict, Any, List
 import streamlit as st
 import plotly.graph_objects as go
-from dashboard.schemas.view_model import DiagnosticsViewModel, StatusLevel, AvailabilityStatus
+from dashboard.schemas.view_model import DiagnosticsViewModel
 from dashboard.utils.formatters import format_value, format_fault_name, format_percent
-from dashboard.utils.styles import PLOT_COLORS, STATUS_COLORS, render_status_badge
+from dashboard.utils.styles import PLOT_COLORS
 
 
 def render_anomaly_diagnostics(diag: DiagnosticsViewModel):
     """Render anomaly detection scores and detector decomposition."""
-    st.markdown("#### Hybrid Anomaly Detection")
+    st.markdown("#### Health Monitoring & Anomaly Detection")
 
-    if diag.anomaly_status == "Unavailable":
-        st.info("ℹ️ Anomaly detection outputs currently unavailable.")
+    if diag.anomaly_status == "Unavailable" and diag.alert_classification == "Nominal":
+        st.info("ℹ️ Health monitoring and anomaly detection outputs currently unavailable.")
         return
 
-    r1_col1, r1_col2 = st.columns(2)
+    r1_col1, r1_col2, r1_col3 = st.columns(3)
     with r1_col1:
         st.metric(
-            label="Active Anomaly Status",
-            value=diag.anomaly_status,
+            label="Alert Classification",
+            value=diag.alert_classification or "Nominal",
+            help="Categorical discrimination between possible physical degradation, sensor anomaly, or model disagreement.",
         )
     with r1_col2:
         st.metric(
-            label="Composite Anomaly Score",
-            value=format_value(diag.anomaly_score, decimals=2),
+            label="Degradation Severity",
+            value=format_value(diag.degradation_severity if diag.degradation_severity is not None else diag.anomaly_score, decimals=2),
+            help="Engineering estimate of degradation intensity bounded to [0.0, 1.0].",
+        )
+    with r1_col3:
+        aff_sys_str = ", ".join(diag.affected_subsystems) if diag.affected_subsystems else "None"
+        st.metric(
+            label="Affected Subsystem",
+            value=aff_sys_str,
+            help="Subsystems exhibiting statistically elevated residual excursions.",
         )
 
     r2_col1, r2_col2 = st.columns(2)
@@ -42,13 +50,35 @@ def render_anomaly_diagnostics(diag: DiagnosticsViewModel):
     with r2_col2:
         ewma_score = diag.detector_scores.get("ewma")
         st.metric(
-            label="EWMA Score",
+            label="Trend Anomaly Score",
             value=format_value(ewma_score, decimals=2),
         )
 
+    # Operator Alert Breakdown Box
+    if diag.alert_classification != "Nominal" or diag.contributing_channels:
+        ev_summary = diag.evidence.get("summary", "Residual deviation observed across telemetry channels.") if isinstance(diag.evidence, dict) else "Residual deviation observed."
+        alert_bg = "#1f1a14" if "Physical" in diag.alert_classification else "#161b22"
+        alert_border = "#d29922" if "Physical" in diag.alert_classification else "#58a6ff"
+        alert_box_html = (
+            f'<div style="background-color: {alert_bg}; border: 1px solid {alert_border}; '
+            f'border-radius: 4px; padding: 12px 14px; margin: 10px 0; font-size: 12px; color: #c9d1d9;">'
+            f'<div style="font-weight: 600; color: #f0f6fc; margin-bottom: 4px;">'
+            f'Detected Deviation: <span style="color: {alert_border};">{diag.alert_classification}</span>'
+            f'</div>'
+            f'<div><b>Evidence:</b> {ev_summary}</div>'
+            f'<div style="margin-top: 4px; font-size: 11px; color: #8b949e;">'
+            f'<b>Basis:</b> Rolling residual dispersion engineering estimate. Single noisy samples filtered via persistence counters.'
+            f'</div>'
+            f'<div style="margin-top: 6px; color: #8b949e; font-style: italic;">'
+            f'Recommended inspection: inspect affected subsystem instrumentation during next scheduled servicing (demonstration aid only; not a certified maintenance directive).'
+            f'</div>'
+            f'</div>'
+        )
+        st.markdown(alert_box_html, unsafe_allow_html=True)
+
     if diag.contributing_channels:
         st.markdown(
-            f"**Contributing Degradation Channels:** `"
+            f"**Contributing Channels:** `"
             + "`, `".join(diag.contributing_channels)
             + "`"
         )
@@ -56,7 +86,7 @@ def render_anomaly_diagnostics(diag: DiagnosticsViewModel):
 
 def render_fault_classification(diag: DiagnosticsViewModel):
     """Render fault classification and class probabilities."""
-    st.markdown("#### Multi-Class Fault Diagnosis")
+    st.markdown("#### Fault Diagnosis")
 
     if diag.predicted_fault == "Unavailable":
         st.info("ℹ️ Fault diagnosis classification currently unavailable.")
@@ -66,16 +96,16 @@ def render_fault_classification(diag: DiagnosticsViewModel):
 
     with col1:
         sensor_text = (
-            "⚠️ <b>Sensor Fault Indicated:</b> Channel isolated from physical Twin"
+            "⚠️ <b>Sensor Fault Indicated:</b> This channel has been isolated from the Digital Twin"
             if diag.sensor_fault_indicated
-            else "✅ Physical evidence consistent with engine state"
+            else "✅ Engine behaviour is consistent with the Digital Twin's expected state"
         )
         diag_card_html = (
             f'<div style="background-color: #11151c; border: 1px solid #21262d; '
             f'border-radius: 4px; padding: 14px 16px;">'
-            f'<div style="font-size: 11px; font-weight: 700; color: #8b949e; text-transform: uppercase; letter-spacing: 0.5px;">PREDICTED FAULT CLASS</div>'
+            f'<div style="font-size: 11px; font-weight: 700; color: #8b949e; text-transform: uppercase; letter-spacing: 0.5px;">FAULT DIAGNOSIS</div>'
             f'<div style="font-size: 18px; font-weight: 700; color: #f0f6fc; margin: 6px 0;">{format_fault_name(diag.predicted_fault_class)}</div>'
-            f'<div style="font-size: 12px; color: #8b949e; margin-bottom: 4px;">Diagnosis Probability: <b style="color: #58a6ff; font-family: monospace;">{format_percent(diag.diagnostic_confidence)}</b></div>'
+            f'<div style="font-size: 12px; color: #8b949e; margin-bottom: 4px;">Confidence: <b style="color: #58a6ff; font-family: monospace;">{format_percent(diag.diagnostic_confidence)}</b></div>'
             f'<div style="font-size: 11px; color: #8b949e; margin-bottom: 8px;">Data Quality: <code style="color: #f0f6fc;">{diag.diagnosis_data_quality}</code></div>'
             f'<div style="margin-top: 8px; border-top: 1px solid #21262d; padding-top: 8px; font-size: 11px; color: #c9d1d9;">{sensor_text}</div>'
             f'</div>'
@@ -113,7 +143,7 @@ def render_fault_classification(diag: DiagnosticsViewModel):
 
 def render_residual_table(diag: DiagnosticsViewModel):
     """Render table of digital twin expected values, residuals, and normalized excursions."""
-    st.markdown("#### Digital Twin Expected States & Residuals")
+    st.markdown("#### Digital Twin Deviation Table")
 
 
     if not diag.residuals and not diag.expected_telemetry:
@@ -131,10 +161,10 @@ def render_residual_table(diag: DiagnosticsViewModel):
         norm_val = diag.normalized_residuals.get(f"{k.lower()}_norm", diag.normalized_residuals.get(k.lower()))
 
         rows.append({
-            "Channel": clean_name,
-            "Expected Value": format_value(exp_val, decimals=2),
-            "Raw Residual": format_value(res_val, decimals=3),
-            "Normalized Residual (σ)": format_value(norm_val, decimals=2),
+            "Sensor": clean_name,
+            "DT Expected": format_value(exp_val, decimals=2),
+            "Deviation": format_value(res_val, decimals=3),
+            "Deviation (σ)": format_value(norm_val, decimals=2),
         })
 
     st.dataframe(rows, use_container_width=True, hide_index=True)

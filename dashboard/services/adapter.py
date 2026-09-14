@@ -327,6 +327,10 @@ class DashboardAdapter:
                 or self._extract_dict_or_attr(self._extract_dict_or_attr(payload, "forecast"), "quality")
                 or "INSUFFICIENT_CONTEXT"
             )
+            fc_projected_health = (
+                self._extract_dict_or_attr(payload, "projected_health_trajectory")
+                or self._extract_dict_or_attr(self._extract_dict_or_attr(payload, "forecast"), "projected_health_trajectory")
+            )
         else:
             fc_status = "Unavailable"
             fc_source = "Unavailable"
@@ -335,6 +339,7 @@ class DashboardAdapter:
             forecast_timestamps = []
             is_pretrained = False
             fc_quality = None
+            fc_projected_health = None
 
         # Extract RUL / Prognostics
         rul_state = (
@@ -388,8 +393,35 @@ class DashboardAdapter:
         fc_assisted = bool(
             self._extract_dict_or_attr(payload, "forecast_assisted_mode")
             if self._extract_dict_or_attr(payload, "forecast_assisted_mode") is not None
-            else self._extract_dict_or_attr(self._extract_dict_or_attr(payload, "rul"), "forecast_assisted", False)
+            else (
+                self._extract_dict_or_attr(payload, "forecast_assisted")
+                if self._extract_dict_or_attr(payload, "forecast_assisted") is not None
+                else (
+                    self._extract_dict_or_attr(self._extract_dict_or_attr(payload, "prognostics"), "forecast_assisted_mode")
+                    if self._extract_dict_or_attr(self._extract_dict_or_attr(payload, "prognostics"), "forecast_assisted_mode") is not None
+                    else (
+                        self._extract_dict_or_attr(self._extract_dict_or_attr(payload, "prognostics"), "forecast_assisted")
+                        if self._extract_dict_or_attr(self._extract_dict_or_attr(payload, "prognostics"), "forecast_assisted") is not None
+                        else self._extract_dict_or_attr(self._extract_dict_or_attr(payload, "rul"), "forecast_assisted", False)
+                    )
+                )
+            )
         )
+        fc_mode_status = (
+            self._extract_dict_or_attr(payload, "forecast_mode_status")
+            or self._extract_dict_or_attr(self._extract_dict_or_attr(payload, "prognostics"), "forecast_mode_status")
+            or self._extract_dict_or_attr(self._extract_dict_or_attr(payload, "rul"), "forecast_mode_status")
+        )
+        if not fc_mode_status:
+            if fc_assisted:
+                fc_mode_status = "ACTIVE"
+            elif fc_status in ("BLOCKED_UNAUTHENTICATED_GATED", "LOCAL_UNCHECKPOINTED_GRAPH", "BLOCKED"):
+                fc_mode_status = "BLOCKED"
+            elif fc_status in ("INSUFFICIENT_DATA", "INSUFFICIENT_CONTEXT", "MISSING", "BUFFERING", "UNAVAILABLE"):
+                fc_mode_status = "UNAVAILABLE"
+            else:
+                fc_mode_status = "OFF"
+
         eol_provenance = dict(
             self._extract_dict_or_attr(payload, "eol_provenance")
             or self._extract_dict_or_attr(self._extract_dict_or_attr(payload, "rul"), "eol_provenance")
@@ -447,16 +479,45 @@ class DashboardAdapter:
                     disclaimer=str(getattr(advisory_raw, "disclaimer", "")),
                 )
 
+        # Extract diagnosis section and suspect sensor data
+        diag_sec = self._extract_dict_or_attr(payload, "diagnosis")
+        suspect_sensor = (
+            self._extract_dict_or_attr(payload, "suspect_sensor")
+            or self._extract_dict_or_attr(diag_sec, "suspect_sensor")
+            or self._extract_dict_or_attr(diag_sec, "suspect_channel")
+        )
+        suspect_sensors = list(
+            self._extract_dict_or_attr(payload, "suspect_sensors")
+            or self._extract_dict_or_attr(diag_sec, "suspect_sensors")
+            or []
+        )
+        sensor_isolation_status = str(
+            self._extract_dict_or_attr(payload, "sensor_isolation_status")
+            or self._extract_dict_or_attr(diag_sec, "sensor_isolation_status")
+            or "NONE"
+        )
+
         # Extract isolated channels from payload
+        if suspect_sensors:
+            confirmed_isolated = [s for s in suspect_sensors if s and s not in ("unknown", "uncertain", "NONE")]
+        elif suspect_sensor and suspect_sensor not in ("unknown", "uncertain", "NONE"):
+            confirmed_isolated = [suspect_sensor]
+        else:
+            confirmed_isolated = []
+
         isolated_channels = list(
             self._extract_dict_or_attr(payload, "isolated_channels")
             or self._extract_dict_or_attr(self._extract_dict_or_attr(payload, "health_index"), "excluded_channels")
-            or (anom_contrib if pred_fault.lower() == "sensor_fault" else [])
+            or confirmed_isolated
+            or (anom_contrib if pred_fault.lower() == "sensor_fault" and not confirmed_isolated else [])
             or []
         )
         sensor_fault_indicated = (pred_fault.lower() == "sensor_fault" or len(isolated_channels) > 0)
 
         # 1. Build TelemetryViewModel
+        payload_ch_unc = self._extract_dict_or_attr(payload, "channel_uncertainties", {}) or {}
+        payload_pred_intervals = self._extract_dict_or_attr(payload, "prediction_intervals", {}) or {}
+
         channels: Dict[str, ChannelTelemetryModel] = {}
         for ch in CANONICAL_CHANNELS:
             meta = CANONICAL_CHANNEL_METADATA[ch]
@@ -508,6 +569,61 @@ class DashboardAdapter:
             else:
                 status = StatusLevel.UNAVAILABLE
 
+            # Grey-Box Operator Fields (Phase 3)
+            phys_est = exp_val
+            sensor_corr_raw = (
+                self._extract_dict_or_attr(payload, "sensor_corrections", {}).get(ch)
+                if isinstance(self._extract_dict_or_attr(payload, "sensor_corrections"), dict)
+                else None
+            )
+            sensor_corr = float(sensor_corr_raw) if (sensor_corr_raw is not None and not safe_is_nan(sensor_corr_raw)) else res_val
+
+            det_dev = (
+                (obs_val - exp_val) if (obs_val is not None and exp_val is not None)
+                else res_val
+            )
+
+            corr_pred_raw = (
+                self._extract_dict_or_attr(payload, "corrected_telemetry", {}).get(ch)
+                if isinstance(self._extract_dict_or_attr(payload, "corrected_telemetry"), dict)
+                else None
+            )
+            if corr_pred_raw is not None and not safe_is_nan(corr_pred_raw):
+                corr_pred = float(corr_pred_raw)
+            elif exp_val is not None and sensor_corr is not None:
+                corr_pred = exp_val + sensor_corr
+            else:
+                corr_pred = exp_val
+
+            conf_val = (
+                self._extract_dict_or_attr(payload, "model_confidence")
+                if self._extract_dict_or_attr(payload, "model_confidence") is not None
+                else (
+                    self._extract_dict_or_attr(payload, "diagnostic_confidence")
+                    if self._extract_dict_or_attr(payload, "diagnostic_confidence") is not None
+                    else diag_conf
+                )
+            )
+            model_conf = float(conf_val) if conf_val is not None and not safe_is_nan(conf_val) else 1.0
+
+            # Phase 4 Prediction Intervals & Uncertainty
+            ch_unc = payload_ch_unc.get(ch) if isinstance(payload_ch_unc, dict) else None
+            ch_pi = payload_pred_intervals.get(ch) if isinstance(payload_pred_intervals, dict) else None
+            pred_lower: Optional[float] = None
+            pred_upper: Optional[float] = None
+            unc_width: Optional[float] = None
+            conf_basis: Optional[str] = None
+            if ch_unc is not None:
+                pred_lower = getattr(ch_unc, "prediction_lower", None) or (ch_unc.get("prediction_lower") if isinstance(ch_unc, dict) else None)
+                pred_upper = getattr(ch_unc, "prediction_upper", None) or (ch_unc.get("prediction_upper") if isinstance(ch_unc, dict) else None)
+                unc_width = getattr(ch_unc, "uncertainty_width", None) or (ch_unc.get("uncertainty_width") if isinstance(ch_unc, dict) else None)
+                conf_basis = getattr(ch_unc, "confidence_basis", None) or (ch_unc.get("confidence_basis") if isinstance(ch_unc, dict) else None)
+            elif ch_pi is not None:
+                pred_lower = ch_pi.get("lower") if isinstance(ch_pi, dict) else getattr(ch_pi, "lower", None)
+                pred_upper = ch_pi.get("upper") if isinstance(ch_pi, dict) else getattr(ch_pi, "upper", None)
+                if pred_lower is not None and pred_upper is not None:
+                    unc_width = pred_upper - pred_lower
+
             channels[ch] = ChannelTelemetryModel(
                 channel=ch,
                 display_name=meta["display_name"],
@@ -515,6 +631,15 @@ class DashboardAdapter:
                 observed_value=obs_val,
                 expected_value=exp_val,
                 residual=res_val,
+                physics_estimate=phys_est,
+                sensor_correction=sensor_corr,
+                corrected_prediction=corr_pred,
+                detected_deviation=det_dev,
+                model_confidence=model_conf,
+                prediction_lower=pred_lower,
+                prediction_upper=pred_upper,
+                uncertainty_width=unc_width,
+                confidence_basis=conf_basis,
                 forecast_values=fc_vals,
                 forecast_timestamps=forecast_timestamps,
                 status=status,
@@ -522,6 +647,7 @@ class DashboardAdapter:
                 is_missing=is_missing,
                 availability=AvailabilityStatus.AVAILABLE if obs_val is not None else AvailabilityStatus.UNAVAILABLE,
             )
+
 
         thr_val = self._extract_dict_or_attr(obs_raw, "throttle")
         ld_val = self._extract_dict_or_attr(obs_raw, "load")
@@ -559,6 +685,25 @@ class DashboardAdapter:
             phys_status = str(physics_ev.get("status", "Unavailable"))
             phys_reason = physics_ev.get("consistency_reason")
 
+        # Phase 4 Operator-Facing Diagnostics & Alerts
+        raw_alert_class = str(
+            self._extract_dict_or_attr(payload, "alert_classification")
+            or self._extract_dict_or_attr(payload, "alert_class")
+            or "NOMINAL"
+        ).upper()
+        alert_label_map = {
+            "POSSIBLE_PHYSICAL_DEGRADATION": "Possible physical degradation",
+            "SENSOR_ANOMALY": "Sensor anomaly",
+            "MODEL_DISAGREEMENT": "Model disagreement",
+            "INSUFFICIENT_DATA": "Insufficient data",
+            "NOMINAL": "Nominal",
+        }
+        operator_alert_class = alert_label_map.get(raw_alert_class, raw_alert_class.replace("_", " ").title())
+        deg_severity_raw = self._extract_dict_or_attr(payload, "degradation_severity")
+        deg_severity = float(deg_severity_raw) if (deg_severity_raw is not None and not safe_is_nan(deg_severity_raw)) else None
+        aff_subsystems = list(self._extract_dict_or_attr(payload, "affected_subsystems", []) or [])
+        diag_evidence = dict(self._extract_dict_or_attr(payload, "evidence", {}) or {})
+
         diagnostics_vm = DiagnosticsViewModel(
             timestamp=timestamp,
             expected_telemetry=exp_raw,
@@ -577,6 +722,9 @@ class DashboardAdapter:
             diagnosis_data_quality=diag_quality,
             sensor_fault_indicated=sensor_fault_indicated,
             isolated_channels=isolated_channels,
+            suspect_sensor=suspect_sensor,
+            suspect_sensors=suspect_sensors,
+            sensor_isolation_status=sensor_isolation_status,
             summary_explanation=summary_explanation,
             recommended_operator_action=recommended_action,
             shap_top_features=shap_features,
@@ -586,10 +734,41 @@ class DashboardAdapter:
             physics_consistency_reason=phys_reason,
             temporal_evidence=temporal_ev,
             fused_evidence=fused_ev,
+            alert_classification=operator_alert_class,
+            alert_classification_raw=raw_alert_class,
+            degradation_severity=deg_severity,
+            affected_subsystems=aff_subsystems,
+            evidence=diag_evidence,
             availability=AvailabilityStatus.AVAILABLE if anom_status != "Unavailable" or pred_fault != "Unavailable" else AvailabilityStatus.UNAVAILABLE,
         )
 
         # 3. Build PrognosticsViewModel
+        eng_hi_raw = (
+            self._extract_dict_or_attr(payload, "engine_health_score")
+            if self._extract_dict_or_attr(payload, "engine_health_score") is not None
+            else self._extract_dict_or_attr(payload, "health_score")
+        )
+        engine_health_score = float(eng_hi_raw) if (eng_hi_raw is not None and not safe_is_nan(eng_hi_raw)) else smoothed_health_index
+        sub_states = dict(self._extract_dict_or_attr(payload, "subsystem_health_states", {}) or {})
+        sub_scores = dict(self._extract_dict_or_attr(payload, "subsystem_scores", {}) or {})
+        raw_trend_state = str(
+            self._extract_dict_or_attr(payload, "trend_state") or "UNAVAILABLE"
+        ).upper()
+        trend_label_map = {
+            "STABLE": "Stable",
+            "DEGRADING": "Degrading",
+            "RAPIDLY_DEGRADING": "Rapidly degrading",
+            "IMPROVING": "Improving",
+            "INSUFFICIENT_HISTORY": "Insufficient history",
+            "UNAVAILABLE": "Unavailable",
+        }
+        operator_trend_state = trend_label_map.get(raw_trend_state, deg_trend or "Unavailable")
+        prog_reason = (
+            self._extract_dict_or_attr(payload, "prognostics_reason")
+            or ("RUL unavailable: continuous degradation trajectory not detected" if rul_state == "UNAVAILABLE" else None)
+        )
+        prediction_intervals_map = dict(self._extract_dict_or_attr(payload, "prediction_intervals", {}) or {})
+
         prognostics_vm = PrognosticsViewModel(
             timestamp=timestamp,
             health_index=smoothed_health_index,
@@ -600,6 +779,13 @@ class DashboardAdapter:
             degradation_trend=deg_trend,
             dominant_channels=dominant_channels,
             channel_contributions=channel_contributions,
+            engine_health_score=engine_health_score,
+            subsystem_health_states=sub_states,
+            subsystem_scores=sub_scores,
+            trend_state=operator_trend_state,
+            trend_state_raw=raw_trend_state,
+            prognostics_reason=prog_reason,
+            prediction_intervals=prediction_intervals_map,
             rul_state=rul_state,
             rul_status=rul_state,
             point_rul_seconds=point_rul_seconds,
@@ -610,6 +796,7 @@ class DashboardAdapter:
             rul_p95_hours=rul_p95_hours,
             limiting_factor=limiting_factor,
             forecast_assisted_mode=fc_assisted,
+            forecast_mode_status=fc_mode_status,
             eol_provenance=eol_provenance,
             forecast_status=fc_status,
             forecast_source=fc_source,
@@ -620,6 +807,7 @@ class DashboardAdapter:
             is_pretrained=is_pretrained,
             predicted_telemetry=pred_telemetry if isinstance(pred_telemetry, dict) else None,
             forecast_timestamps=forecast_timestamps,
+            projected_health_trajectory=fc_projected_health,
             availability=AvailabilityStatus.AVAILABLE if smoothed_health_index is not None or rul_state != "Unavailable" else AvailabilityStatus.UNAVAILABLE,
         )
 
@@ -694,6 +882,8 @@ class DashboardAdapter:
         advisory: Optional[OperatorAdvisoryModel] = None,
     ) -> OverviewViewModel:
         """Create synthesized overview KPI cards without calculating metrics."""
+        is_total_sensor_blackout = (len(data_quality_vm.missing_sensors) == len(CANONICAL_CHANNELS))
+
         # 1. Health Index Card
         if prognostics_vm.smoothed_health_index is not None:
             hi_val = format_health_index(prognostics_vm.smoothed_health_index)
@@ -728,6 +918,11 @@ class DashboardAdapter:
             rul_status = StatusLevel.HEALTHY if prognostics_vm.rul_state == "NOT_DEGRADING" else StatusLevel.WARNING
             rul_subtext = f"State: {prognostics_vm.rul_state} | Limiting: {prognostics_vm.limiting_factor}"
             rul_avail = AvailabilityStatus.AVAILABLE
+        elif prognostics_vm.rul_state in ("INSUFFICIENT_DATA", "Unavailable") or len(data_quality_vm.missing_sensors) == len(CANONICAL_CHANNELS):
+            rul_val = "Unavailable"
+            rul_status = StatusLevel.UNAVAILABLE
+            rul_subtext = "Data insufficient for prognostics"
+            rul_avail = AvailabilityStatus.UNAVAILABLE
         elif prognostics_vm.rul_state != "Unavailable":
             rul_val = prognostics_vm.rul_state
             rul_status = StatusLevel.WARNING if prognostics_vm.rul_state == "INSUFFICIENT_HISTORY" else StatusLevel.DEGRADED
@@ -769,7 +964,24 @@ class DashboardAdapter:
         )
 
         # 4. Fault Diagnosis Card
-        if diagnostics_vm.predicted_fault_class != "Unavailable":
+        if (
+            diagnostics_vm.predicted_fault in ("Unavailable", None)
+            or diagnostics_vm.predicted_fault_class in ("Unavailable", None)
+        ):
+            fault_val = "Unavailable"
+            fault_status = StatusLevel.UNAVAILABLE
+            fault_subtext = "Diagnosis not supplied"
+            fault_avail = AvailabilityStatus.UNAVAILABLE
+        elif (
+            getattr(diagnostics_vm, "diagnosis_data_quality", None) == "INSUFFICIENT_DATA"
+            or diagnostics_vm.availability == AvailabilityStatus.UNAVAILABLE
+            or (is_total_sensor_blackout and diagnostics_vm.predicted_fault_class.lower() in ("none", "normal"))
+        ):
+            fault_val = "Insufficient Data"
+            fault_status = StatusLevel.UNAVAILABLE
+            fault_subtext = "Insufficient telemetry for diagnosis"
+            fault_avail = AvailabilityStatus.UNAVAILABLE
+        else:
             fault_val = format_fault_name(diagnostics_vm.predicted_fault_class)
             if diagnostics_vm.predicted_fault_class.lower() in ("none", "normal"):
                 fault_status = StatusLevel.HEALTHY
@@ -786,11 +998,6 @@ class DashboardAdapter:
             prob_str = f"{prob_val * 100.0:.1f}%" if (prob_val is not None and not safe_is_nan(prob_val)) else "N/A"
             fault_subtext = f"Diagnosis Probability: {prob_str}"
             fault_avail = AvailabilityStatus.AVAILABLE
-        else:
-            fault_val = "Unavailable"
-            fault_status = StatusLevel.UNAVAILABLE
-            fault_subtext = "Diagnosis not supplied"
-            fault_avail = AvailabilityStatus.UNAVAILABLE
 
         fault_card = MetricCardModel(
             label="Diagnosed Fault",
@@ -802,9 +1009,20 @@ class DashboardAdapter:
 
         # 5. Data Quality Card
         dq_val = data_quality_vm.quality_status
-        if data_quality_vm.quality_status in ("NOMINAL", "VALID"):
+        if is_total_sensor_blackout or data_quality_vm.quality_status.upper() in ("MISSING", "SENSOR_BLACKOUT"):
+            dq_status = StatusLevel.DEGRADED
+            if is_total_sensor_blackout and dq_val == "NOMINAL":
+                dq_val = "MISSING"
+        elif data_quality_vm.quality_status in ("NOMINAL", "VALID"):
             dq_status = StatusLevel.HEALTHY
-        elif data_quality_vm.quality_status in ("DEGRADED", "OUT_OF_ORDER_REJECTED", "INVALID"):
+        elif data_quality_vm.quality_status in (
+            "DEGRADED",
+            "OUT_OF_ORDER_REJECTED",
+            "INVALID",
+            "DUPLICATE_TIMESTAMP_REJECTED",
+            "INVALID_TIMESTAMP_REJECTED",
+            "PARTIAL_MISSING",
+        ):
             dq_status = StatusLevel.DEGRADED
         else:
             dq_status = StatusLevel.WARNING
@@ -823,6 +1041,12 @@ class DashboardAdapter:
             overall_status = StatusLevel.CRITICAL
         elif prognostics_vm.health_state in ("DEGRADED", "SEVERELY_DEGRADED") or diagnostics_vm.anomaly_status == "WARNING":
             overall_status = StatusLevel.WARNING
+        elif (
+            is_total_sensor_blackout
+            or prognostics_vm.health_state == "INSUFFICIENT_DATA"
+            or diagnostics_vm.anomaly_status == "INSUFFICIENT_DATA"
+        ):
+            overall_status = StatusLevel.UNAVAILABLE
         elif prognostics_vm.health_state in ("HEALTHY", "NORMAL") and diagnostics_vm.anomaly_status in ("NORMAL", "HEALTHY"):
             overall_status = StatusLevel.HEALTHY
         elif diagnostics_vm.sensor_fault_indicated:

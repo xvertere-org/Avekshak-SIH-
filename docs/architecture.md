@@ -62,8 +62,9 @@ The SIH26054 Digital Twin platform follows a modular, decoupled pipeline archite
 
 ### 2.1 Simulator (`simulator/` & `validation/`)
 - **Responsibility**: Simulates aero piston engine thermal, mechanical, and fluid dynamic responses across flight envelopes (Takeoff, Climb, Cruise, Loiter, Descent, Landing).
-- **Phase 2B/3 Status**: Fully operational, calibrated, and validated grey-box physical engine simulator.
-- **Reference Anchor Disclaimer**: The simulator uses the **Rotax 912 ULS** strictly as a publicly documented engineering reference anchor. It is **NOT** a computational fluid dynamics (CFD) solver, certified engine model, or actual classified UAV engine.
+- **Phase 2B/3 Status**: Operational reduced-order grey-box physical engine simulator prototype.
+- **Reference Architecture & Fidelity Boundary**: The simulator references the **Rotax 914 UL/F** architecture ([`configs/engine_reference/rotax_914_ul_f.json`](file:///d:/SIH%20Drone/configs/engine_reference/rotax_914_ul_f.json)). In its current prototype form, it operates as a reduced-order lumped-parameter grey-box model (naturally aspirated altitude scaling, 1:1 direct drive, 1-node thermal states). Turbocharging, wastegate/TCU, 2.43:1 gearbox, and 4-cylinder thermal networks are cataloged as unmodeled in [`docs/physics_contract.md`](file:///d:/SIH%20Drone/docs/physics_contract.md). It is **NOT** a certified OEM engine model or actual classified UAV propulsion hardware.
+
 - **Validation Framework (`validation/`)**:
   - 8 automated validation suites (Physical bounds, monotonicity, transient lag hierarchy, empirical timestep sweep, steady-state stability, cross-channel coherence, vibration order tracking, representative mission).
   - Recommended operating timestep: $dt = 0.1\text{ s}$ (10 Hz).
@@ -115,7 +116,8 @@ The SIH26054 Digital Twin platform follows a modular, decoupled pipeline archite
 ## 3. Parameter Tier Structure
 
 All simulator parameters are structured in `simulator/config.py`:
-- **Tier A (Public Reference)**: Rotax 912 ULS anchor specifications (58 kW continuous power @ 5500 RPM, 5800 max RPM, CHT limit 135 °C, oil temp/pressure envelopes, ISA constants).
+- **Tier A (Reference Specifications)**: Authoritative Rotax 914 UL/F reference specifications (takeoff 84.5 kW @ 5800 RPM, continuous 73.5 kW @ 5500 RPM, 2.4286:1 reduction gearbox, 1211.2 cc displacement, 9.0:1 compression ratio, ISA constants) alongside the calibrated prototype continuous power ceiling (58 kW).
+
 - **Tier B (Physics-Derived)**: Analytical conversions for atmospheric density factor $\sigma$, $\omega$, torque, and power derating.
 - **Tier C (Calibration Parameters)**: Inertia ($I=0.28\text{ kg}\cdot\text{m}^2$), propeller load constant $k_{\text{load}}$, friction parameters, thermal conductances, Willans fuel slope/intercept, and sensor noise variances.
 - **Tier D (Engineering Assumptions)**: Combustion efficiency curve approximation, airspeed proxies, and vibration order weights.

@@ -3,12 +3,14 @@ End-to-end forecasting pipeline for Phase 10: TimesFM-3 Future Telemetry Forecas
 """
 
 from typing import Dict, List, Optional, Any, Union
+import math
 import numpy as np
 import pandas as pd
 
 from forecasting.schema import (
     DEFAULT_FORECAST_CHANNELS,
     DEFAULT_NRMSE_DENOMINATORS,
+    DEFAULT_NOMINAL_EXPECTED,
     ForecastingConfig,
     ForecastResult,
     ForecastQuality,
@@ -158,18 +160,16 @@ class ForecastingPipeline:
             "clamping_flags": clamping_flags,
         }
 
-        # 5. Optional Derived Projected Health Trajectory
+        # 5. Derived Projected Health Trajectory
         projected_health: Optional[List[float]] = None
-        if self._health_calculator is not None:
-            # Downstream projection: evaluated purely as projected health, NEVER current health
-            projected_health = []
-            for k in range(horizon):
-                step_res: Dict[str, float] = {}
-                for ch in self.config.target_channels:
-                    val = predicted_telemetry[ch][k]
-                    # Compute normalized residual expectation against reference scale
-                    step_res[ch] = val
-                projected_health.append(1.0)  # Default nominal projection placeholder
+        if self.config.enable_projected_health:
+            projected_health = self._compute_projected_health_trajectory(
+                predicted_telemetry=predicted_telemetry,
+                forecast_timestamps=forecast_timestamps,
+                optional_context=optional_context,
+                engine_id=engine_id,
+                mission_id=mission_id,
+            )
 
         provenance = {
             "imputed_channels": meta.get("imputed_channels", []),
@@ -239,3 +239,100 @@ class ForecastingPipeline:
                 results.append(res)
 
         return results
+
+    def _compute_projected_health_trajectory(
+        self,
+        predicted_telemetry: Dict[str, List[float]],
+        forecast_timestamps: List[float],
+        optional_context: Optional[Dict[str, Any]] = None,
+        engine_id: str = "ENG_001",
+        mission_id: Optional[str] = None,
+    ) -> List[float]:
+        """
+        Mathematically derive projected Health Index trajectory from forecasted sensor values
+        using the canonical Phase 9 HealthCalculator and Digital Twin residual scales.
+        """
+        horizon = len(forecast_timestamps)
+        if horizon == 0 or not predicted_telemetry:
+            return []
+
+        # Ensure HealthCalculator is available
+        if self._health_calculator is None:
+            try:
+                from health_index.calculator import HealthCalculator
+                from health_index.schema import HealthIndexConfig
+                self._health_calculator = HealthCalculator(HealthIndexConfig())
+            except ImportError:
+                return []
+
+        ctx = optional_context or {}
+        expected_dict = ctx.get("expected_telemetry") or ctx.get("expected_dict") or DEFAULT_NOMINAL_EXPECTED
+
+        # Residual scale factors (matching Digital Twin Phase 6)
+        try:
+            from digital_twin.residuals import DEFAULT_RESIDUAL_SCALES
+            scale_factors = DEFAULT_RESIDUAL_SCALES
+        except ImportError:
+            scale_factors = {
+                "rpm": 100.0,
+                "cht": 10.0,
+                "egt": 20.0,
+                "oil_temp": 10.0,
+                "oil_pressure": 0.5,
+                "fuel_flow": 2.0,
+                "vibration": 0.2,
+            }
+
+        isolated_channels = set(ctx.get("isolated_channels") or [])
+        fault_type = ctx.get("fault_type") or ctx.get("predicted_fault_type")
+        diag_conf = ctx.get("diagnostic_confidence")
+        suspect_ch = ctx.get("suspect_channel")
+
+        # Causal continuity: initialize EWMA from current smoothed health index if available
+        current_hi = ctx.get("current_health_index")
+        smoothed_val: Optional[float] = None
+        if current_hi is not None and isinstance(current_hi, (int, float)) and not math.isnan(current_hi):
+            smoothed_val = max(0.0, min(1.0, float(current_hi)))
+
+        alpha = getattr(self._health_calculator.config, "ewma_alpha", 0.15)
+
+        projected_health: List[float] = []
+        for k in range(horizon):
+            step_residuals: Dict[str, float] = {}
+            for ch in self._health_calculator.config.channel_weights:
+                if ch in isolated_channels:
+                    step_residuals[ch] = float("nan")
+                elif ch in predicted_telemetry and k < len(predicted_telemetry[ch]):
+                    val = predicted_telemetry[ch][k]
+                    if val is None or not isinstance(val, (int, float)) or math.isnan(val) or math.isinf(val):
+                        step_residuals[ch] = float("nan")
+                    else:
+                        exp_val = expected_dict.get(ch, DEFAULT_NOMINAL_EXPECTED.get(ch, 0.0))
+                        scale = max(1e-6, scale_factors.get(ch, 1.0))
+                        step_residuals[ch] = float((val - exp_val) / scale)
+                else:
+                    step_residuals[ch] = float("nan")
+
+            raw_hi, _, _, _, _, _, _, _, _, _ = self._health_calculator.compute(
+                timestamp=forecast_timestamps[k],
+                residuals=step_residuals,
+                upstream_fault_type=fault_type,
+                upstream_confidence=diag_conf,
+                upstream_suspect_channel=suspect_ch,
+                engine_id=engine_id,
+                mission_id=mission_id,
+            )
+
+            if math.isnan(raw_hi):
+                step_smooth = smoothed_val if smoothed_val is not None else 1.0
+            else:
+                if smoothed_val is None:
+                    step_smooth = raw_hi
+                else:
+                    step_smooth = alpha * raw_hi + (1.0 - alpha) * smoothed_val
+                smoothed_val = step_smooth
+
+            step_smooth = max(0.0, min(1.0, float(step_smooth)))
+            projected_health.append(round(step_smooth, 4))
+
+        return projected_health

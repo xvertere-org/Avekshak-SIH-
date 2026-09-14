@@ -20,7 +20,7 @@ from dashboard.components.data_quality_view import (
 
 def render_system_status_page(vm: DashboardViewModel):
     """Render 5. DATA QUALITY / SYSTEM STATUS section."""
-    st.markdown("### Telemetry Stream Quality & System Status")
+    st.markdown("### System Status & Data Quality")
 
     render_quality_summary(vm.data_quality)
 

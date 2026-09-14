@@ -49,6 +49,9 @@ htmlcov/
 
 # Logs & ML artifacts
 *.log
+*.tmp
+.cache/
+.streamlit/secrets.toml
 mlruns/
 .mlflow/
 
@@ -65,9 +68,9 @@ data/external/*
 # OS specific
 .DS_Store
 Thumbs.db
+.ipynb_checkpoints/
 
 # Reports & audits
 audit_report.html
 AUDIT_REPORT.md
 graphify-out/
-

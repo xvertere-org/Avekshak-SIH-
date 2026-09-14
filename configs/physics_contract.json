@@ -1,0 +1,253 @@
+{
+  "contract_metadata": {
+    "title": "SIH26054 Aero Piston Engine Digital Twin - Physics Contract",
+    "version": "1.0.0",
+    "reference_engine": "Rotax 914 UL/F",
+    "governing_document": "Phase 1 Engineering Identity & Physics Contract Correction",
+    "taxonomy_definitions": {
+      "IMPLEMENTED": "Executable functionality exists in the repository codebase.",
+      "PARTIALLY_IMPLEMENTED": "A simplified, reduced-order, lumped-parameter, or proxy model exists in executable code, but key physical sub-phenomena are omitted.",
+      "NOT_IMPLEMENTED": "No executable equations, mathematical representations, or physical states exist in the codebase."
+    }
+  },
+  "subsystems": {
+    "subsystem_a_environment": {
+      "name": "Environment & Atmosphere",
+      "status": "PARTIALLY_IMPLEMENTED",
+      "implemented_features": [
+        "International Standard Atmosphere (ISA) pressure calculation as a function of altitude",
+        "ISA ambient temperature calculation with standard tropospheric lapse rate (0.0065 K/m)",
+        "Air density computation via ideal gas law (rho = P / (R * T))",
+        "Density ratio (sigma = rho / rho0) calculation"
+      ],
+      "missing_or_unmodeled_features": [
+        "Non-ISA temperature offsets (ISA +/- delta T)",
+        "Humidity and moisture vapor pressure effects on intake density",
+        "Dynamic ram-air recovery pressure as a function of flight Mach/airspeed",
+        "Turbulence and gust wind velocity vectors"
+      ],
+      "evidence_references": [
+        "simulator/engine_simulator.py: ISA altitude calculation",
+        "simulator/config.py: TierAParameters ISA constants"
+      ]
+    },
+    "subsystem_b_intake_boost": {
+      "name": "Intake & Turbocharger Boost",
+      "status": "NOT_IMPLEMENTED",
+      "implemented_features": [],
+      "missing_or_unmodeled_features": [
+        "Exhaust gas turbocharger thermodynamic equations",
+        "Centrifugal compressor pressure ratio and efficiency maps",
+        "Radial turbine mass flow expansion and enthalpy extraction",
+        "Electronic Turbo Control Unit (TCU) closed-loop wastegate servo positioning",
+        "Wastegate bypass valve mass flow dynamics",
+        "Airbox manifold absolute pressure (MAP) state variable",
+        "Charge-air compression heating and airbox temperature dynamics",
+        "Critical altitude boost-control threshold (~4572 m / 15,000 ft)"
+      ],
+      "current_simplification_note": "Current simulator uses naturally aspirated density derating (power proportional to ambient density ratio sigma). No turbocharger or boost physics exist in code.",
+      "evidence_references": [
+        "simulator/engine_simulator.py: power = power_max * density_ratio * (throttle / 100)"
+      ]
+    },
+    "subsystem_c_combustion": {
+      "name": "Combustion & Fuel Consumption",
+      "status": "PARTIALLY_IMPLEMENTED",
+      "implemented_features": [
+        "Willans-line affine fuel mass flow approximation as a function of mechanical power",
+        "Lumped fuel lower heating value (LHV = 43.5 MJ/kg) energy conversion",
+        "Parametric combustion power loss multipliers for simulated lean and rich fault conditions"
+      ],
+      "missing_or_unmodeled_features": [
+        "Chemical equilibrium / air-fuel equivalence ratio (lambda / phi) computation",
+        "In-cylinder pressure-volume (P-V) thermodynamic cycle (Otto cycle)",
+        "Spark ignition timing and spark-advance curves",
+        "Individual carburetor (Bing 64) jet metering and float bowl dynamics",
+        "Dual electric fuel pump pressure delivery and return line hydraulic loop",
+        "Combustion incomplete burn / knock / detonation phenomena"
+      ],
+      "evidence_references": [
+        "simulator/engine_simulator.py: fuel_mass_flow = a_fuel * power + b_fuel",
+        "simulator/config.py: TierCParameters Willans slope and idle intercept"
+      ]
+    },
+    "subsystem_d_crankshaft_dynamics": {
+      "name": "Crankshaft Rotational Dynamics",
+      "status": "IMPLEMENTED",
+      "implemented_features": [
+        "1-DOF rotational equation of motion: J * (d_omega/dt) = T_comb - T_fric - T_load",
+        "Viscous friction torque linear with rotational speed (k_fric_linear)",
+        "Coulomb / pumping static friction torque (torque_fric_static)",
+        "Forward Euler numerical ODE integration with configurable time step (default dt = 0.1 s)",
+        "Idle governor closed-loop RPM stabilization at 1400 RPM"
+      ],
+      "missing_or_unmodeled_features": [
+        "Torsional crankshaft elasticity and cyclic angular velocity variations per firing event",
+        "Multi-mass rotating assembly (crank, counterweights, connecting rods, pistons)",
+        "High-order numerical integrator (e.g. RK4) with adaptive step size"
+      ],
+      "evidence_references": [
+        "simulator/engine_simulator.py: _step_dynamics() rotational ODE",
+        "simulator/config.py: TierCParameters inertia_kg_m2, friction parameters"
+      ]
+    },
+    "subsystem_e_gearbox_propeller": {
+      "name": "Reduction Gearbox & Propeller Drivetrain",
+      "status": "NOT_IMPLEMENTED",
+      "implemented_features": [],
+      "missing_or_unmodeled_features": [
+        "Rotax 914 UL/F integrated spur reduction gearbox with 2.4286:1 (51:21) reduction ratio",
+        "Propeller-side rotational speed telemetry (prop_rpm = engine_rpm / 2.4286)",
+        "Torsional dog-clutch vibration damper dynamics and backlash",
+        "Gear mesh mechanical transmission efficiency and heat generation",
+        "Variable-pitch / constant-speed propeller governor aerodynamics and blade pitch angle"
+      ],
+      "current_simplification_note": "Current simulator integrates crankshaft directly against a lumped inertia (J=0.28 kg*m^2) with 1:1 direct propeller load torque (T_load = k_load * omega^2). Gearbox reduction is omitted.",
+      "evidence_references": [
+        "simulator/engine_simulator.py: direct torque load calculation",
+        "simulator/config.py: TierCParameters k_load, inertia_kg_m2"
+      ]
+    },
+    "subsystem_f_thermal_system": {
+      "name": "Thermal System (CHT & EGT)",
+      "status": "PARTIALLY_IMPLEMENTED",
+      "implemented_features": [
+        "Lumped 1-node thermal capacitance ODE for Cylinder Head Temperature (CHT)",
+        "Convective cooling conductance scaling with engine RPM and flight airspeed proxy",
+        "Empirical algebraic Exhaust Gas Temperature (EGT) formulation with load and density dependencies",
+        "First-order dynamic thermocouple lag filter (tau = 2.5 s) for EGT telemetry"
+      ],
+      "missing_or_unmodeled_features": [
+        "4 individual cylinder head thermal nodes (CHT cyl 1..4)",
+        "4 individual exhaust runner thermocouples (EGT cyl 1..4)",
+        "Liquid cooling closed circuit: water pump impeller flow, coolant radiator, expansion tank, thermostat valve",
+        "Distinction between ram-air cooled cylinder barrels and liquid-cooled cylinder heads",
+        "Waterless vs water/glycol coolant phase change or boiling dynamics"
+      ],
+      "evidence_references": [
+        "simulator/engine_simulator.py: _step_thermal() CHT ODE and EGT filter",
+        "simulator/config.py: TierCParameters c_th_cht, q_gen_fraction, tau_egt_s"
+      ]
+    },
+    "subsystem_g_lubrication": {
+      "name": "Lubrication System (Oil Temp & Pressure)",
+      "status": "PARTIALLY_IMPLEMENTED",
+      "implemented_features": [
+        "Lumped 1-node thermal capacitance ODE for engine oil temperature",
+        "Thermal conduction coupling between cylinder head (CHT) and oil circuit",
+        "Oil cooler convective heat rejection",
+        "Algebraic oil pressure model with linear RPM pump gain and empirical temperature-viscosity proxy drop"
+      ],
+      "missing_or_unmodeled_features": [
+        "Dry sump hydraulic circuit: camshaft-driven trochoid pump, crankcase scavenge, external oil tank",
+        "Oil pressure relief / bypass valve opening dynamics",
+        "True viscosity-temperature curve (e.g. SAE 10W-40 / ASTM D341 Walther equation)",
+        "Oil filter differential pressure and bypass mode",
+        "Oil foaming, aeration, or oil consumption rate"
+      ],
+      "evidence_references": [
+        "simulator/engine_simulator.py: _step_lubrication() oil thermal ODE and pressure equation",
+        "simulator/config.py: TierCParameters c_oil, q_oil_fraction, h_oil_cool, k_oil_p_temp"
+      ]
+    },
+    "subsystem_h_vibration": {
+      "name": "Vibration Dynamics",
+      "status": "PARTIALLY_IMPLEMENTED",
+      "implemented_features": [
+        "Analytical synthesis of 1x (fundamental crankshaft rotational speed) harmonic amplitude",
+        "Analytical synthesis of 2x (half-engine order / second harmonic) harmonic amplitude",
+        "Vibration amplitude scaling with engine mechanical load",
+        "Broadband Gaussian process noise addition (std = 0.06 g)",
+        "Mechanical degradation fault scaling on 1x/2x harmonics and noise variance"
+      ],
+      "missing_or_unmodeled_features": [
+        "Multi-axis (tri-axial X/Y/Z) physical casing acceleration kinematics",
+        "Structural transmission paths, mount compliance, and airframe modal resonances",
+        "High-frequency combustion pressure knock vibrations (>5 kHz)",
+        "Gear mesh vibration frequencies (propeller reduction gear tooth-passing frequency)"
+      ],
+      "evidence_references": [
+        "simulator/engine_simulator.py: _step_vibration() order synthesis",
+        "simulator/config.py: TierCParameters vib_order1_base_g, vib_order2_base_g"
+      ]
+    },
+    "subsystem_i_electrical": {
+      "name": "Electrical & Ignition System",
+      "status": "NOT_IMPLEMENTED",
+      "implemented_features": [],
+      "missing_or_unmodeled_features": [
+        "Dual capacitive discharge ignition (CDI) circuits with dual spark plugs per cylinder (8 total)",
+        "Internal 250 W Ducati / Denso AC generator with external rectifier-regulator",
+        "Optional external 40 A alternator with mechanical belt drive and engine parasitic load torque",
+        "12 V aircraft lead-acid / lithium battery state of charge (SoC) dynamics",
+        "TCU power supply bus voltage monitoring and low-voltage shutdown protection"
+      ],
+      "current_simplification_note": "No electrical, ignition, or generator equations exist in the simulator.",
+      "evidence_references": []
+    },
+    "subsystem_multi_cylinder": {
+      "name": "Multi-Cylinder Thermodynamics & Mechanics",
+      "status": "NOT_IMPLEMENTED",
+      "implemented_features": [],
+      "missing_or_unmodeled_features": [
+        "4 individual thermodynamic cylinder control volumes with 1-4-3-2 firing sequence",
+        "Per-cylinder compression ratio variations and ring wear degradation",
+        "Per-cylinder fuel/air delivery distribution disparity between carburetors",
+        "Per-cylinder CHT sensors (CHT_1, CHT_2, CHT_3, CHT_4)",
+        "Per-cylinder EGT thermocouples (EGT_1, EGT_2, EGT_3, EGT_4)"
+      ],
+      "current_simplification_note": "Current simulator is a 0D single-node lumped model. All multi-cylinder spatial distribution is unmodeled.",
+      "evidence_references": [
+        "simulator/engine_simulator.py: scalar cht and egt states"
+      ]
+    }
+  },
+  "phase_2_contracts": {
+    "phase_title": "Phase 2: Turbocharged Intake, Drivetrain & Multi-Cylinder Physics",
+    "verification_status": "NUMERICALLY_VERIFIED",
+    "experimental_validation_claim": "NONE",
+    "subsystems": {
+      "subsystem_b_intake_boost": {
+        "status": "PARTIALLY_IMPLEMENTED",
+        "model_type": "REDUCED_ORDER_TCU_SURROGATE",
+        "implemented_features": [
+          "Physically coupled exhaust conditions -> turbine work -> compressor work loop",
+          "Centrifugal compressor pressure ratio and isentropic heating ODE",
+          "TCU closed-loop rate-limited wastegate servo actuator",
+          "Downstream intake manifold pressure lag dynamics with throttle restriction",
+          "Altitude saturation ceiling at continuous critical altitude (4572 m)"
+        ],
+        "surrogate_disclosure": "Exhaust manifold pressure, turbine expansion, and pressure ratio are modeled quantities (MODEL_ASSUMPTION / MODEL_CALIBRATION) rather than OEM compressor/turbine maps."
+      },
+      "subsystem_d_e_gearbox_propeller": {
+        "status": "PARTIALLY_IMPLEMENTED",
+        "implemented_features": [
+          "Integrated spur reduction gearbox with 2.4286:1 (51:21) ratio",
+          "Propeller speed telemetry: omega_prop = omega_eng / 2.4286",
+          "Propeller aerodynamic torque load reflection with gearbox efficiency",
+          "Strict mechanical power conservation: P_eng_out >= P_prop"
+        ]
+      },
+      "subsystem_f_multi_cylinder_thermal": {
+        "status": "PARTIALLY_IMPLEMENTED",
+        "implemented_features": [
+          "4 discrete cylinders with 1-4-3-2 firing sequence",
+          "Deterministic geometric/airflow bank variations",
+          "Per-cylinder CHT (cht_cyl1..4) and EGT (egt_cyl1..4) states",
+          "Local cylinder-state independence with shared-system coupling (crankshaft, exhaust enthalpy, cooling loop)",
+          "Documented arithmetic mean aggregations for backward compatibility"
+        ]
+      },
+      "subsystem_g_liquid_cooling": {
+        "status": "PARTIALLY_IMPLEMENTED",
+        "model_type": "REDUCED_ORDER_COOLING_SURROGATE",
+        "implemented_features": [
+          "Effective lumped liquid coolant loop thermal mass (C_coolant = 4500 J/K, MODEL_CALIBRATION)",
+          "Heat transfer from 4 cylinder heads into liquid loop",
+          "Thermostat regulation opening above 80 deg C",
+          "Radiator forced convection cooling scaling with airspeed"
+        ]
+      }
+    }
+  }
+}

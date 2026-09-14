@@ -43,7 +43,7 @@ def render_xai_evidence(diag: DiagnosticsViewModel):
 
     # 1. Deterministic Physics Consistency
     with col1:
-        st.markdown("##### Deterministic Physics Evidence")
+        st.markdown("#### Physics Evidence")
         if diag.physics_evidence:
             phys = diag.physics_evidence
             p_status = phys.get("status", diag.physics_evidence_status or "Unavailable")
@@ -91,7 +91,7 @@ def render_xai_evidence(diag: DiagnosticsViewModel):
 
     # 2. Local TreeSHAP Model Attribution
     with col2:
-        st.markdown("##### ML Feature Attribution (TreeSHAP)")
+        st.markdown("#### Prediction Evidence (SHAP)")
         if diag.shap_top_features:
             names = [f.get("feature_name") or f.get("feature") or "unknown" for f in diag.shap_top_features]
             weights = [float(f.get("relative_weight", 0.0)) * 100.0 for f in diag.shap_top_features]
