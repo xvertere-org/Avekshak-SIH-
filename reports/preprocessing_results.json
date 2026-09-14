@@ -1,0 +1,1351 @@
+{
+  "timestamp": "2026-09-14T11:49:37.664115",
+  "datasets": {
+    "cmapss": {
+      "subsets_processed": [
+        "FD001",
+        "FD002",
+        "FD003",
+        "FD004"
+      ],
+      "total_train_rows": 160359,
+      "total_test_rows": 104897,
+      "files": [
+        {
+          "file": "cmapss_FD001_train.parquet",
+          "rows": 20631,
+          "columns": [
+            "unit_number",
+            "time_cycles",
+            "op_setting_1",
+            "op_setting_2",
+            "op_setting_3",
+            "cmapss_s_2",
+            "cmapss_s_3",
+            "cmapss_s_4",
+            "cmapss_s_6",
+            "cmapss_s_7",
+            "cmapss_s_8",
+            "cmapss_s_9",
+            "cmapss_s_11",
+            "cmapss_s_12",
+            "cmapss_s_13",
+            "cmapss_s_14",
+            "cmapss_s_15",
+            "cmapss_s_17",
+            "cmapss_s_20",
+            "cmapss_s_21",
+            "subset",
+            "split",
+            "rul_label",
+            "dataset_name",
+            "preprocessing_version"
+          ],
+          "subset": "FD001",
+          "split": "train"
+        },
+        {
+          "file": "cmapss_FD001_test.parquet",
+          "rows": 13096,
+          "columns": [
+            "unit_number",
+            "time_cycles",
+            "op_setting_1",
+            "op_setting_2",
+            "op_setting_3",
+            "cmapss_s_2",
+            "cmapss_s_3",
+            "cmapss_s_4",
+            "cmapss_s_6",
+            "cmapss_s_7",
+            "cmapss_s_8",
+            "cmapss_s_9",
+            "cmapss_s_11",
+            "cmapss_s_12",
+            "cmapss_s_13",
+            "cmapss_s_14",
+            "cmapss_s_15",
+            "cmapss_s_17",
+            "cmapss_s_20",
+            "cmapss_s_21",
+            "subset",
+            "split",
+            "rul_label",
+            "dataset_name",
+            "preprocessing_version"
+          ],
+          "subset": "FD001",
+          "split": "test"
+        },
+        {
+          "file": "cmapss_FD002_train.parquet",
+          "rows": 53759,
+          "columns": [
+            "unit_number",
+            "time_cycles",
+            "op_setting_1",
+            "op_setting_2",
+            "op_setting_3",
+            "cmapss_s_1",
+            "cmapss_s_2",
+            "cmapss_s_3",
+            "cmapss_s_4",
+            "cmapss_s_5",
+            "cmapss_s_6",
+            "cmapss_s_7",
+            "cmapss_s_8",
+            "cmapss_s_9",
+            "cmapss_s_10",
+            "cmapss_s_11",
+            "cmapss_s_12",
+            "cmapss_s_13",
+            "cmapss_s_14",
+            "cmapss_s_15",
+            "cmapss_s_16",
+            "cmapss_s_17",
+            "cmapss_s_18",
+            "cmapss_s_19",
+            "cmapss_s_20",
+            "cmapss_s_21",
+            "subset",
+            "split",
+            "rul_label",
+            "dataset_name",
+            "preprocessing_version"
+          ],
+          "subset": "FD002",
+          "split": "train"
+        },
+        {
+          "file": "cmapss_FD002_test.parquet",
+          "rows": 33991,
+          "columns": [
+            "unit_number",
+            "time_cycles",
+            "op_setting_1",
+            "op_setting_2",
+            "op_setting_3",
+            "cmapss_s_1",
+            "cmapss_s_2",
+            "cmapss_s_3",
+            "cmapss_s_4",
+            "cmapss_s_5",
+            "cmapss_s_6",
+            "cmapss_s_7",
+            "cmapss_s_8",
+            "cmapss_s_9",
+            "cmapss_s_10",
+            "cmapss_s_11",
+            "cmapss_s_12",
+            "cmapss_s_13",
+            "cmapss_s_14",
+            "cmapss_s_15",
+            "cmapss_s_16",
+            "cmapss_s_17",
+            "cmapss_s_18",
+            "cmapss_s_19",
+            "cmapss_s_20",
+            "cmapss_s_21",
+            "subset",
+            "split",
+            "rul_label",
+            "dataset_name",
+            "preprocessing_version"
+          ],
+          "subset": "FD002",
+          "split": "test"
+        },
+        {
+          "file": "cmapss_FD003_train.parquet",
+          "rows": 24720,
+          "columns": [
+            "unit_number",
+            "time_cycles",
+            "op_setting_1",
+            "op_setting_2",
+            "op_setting_3",
+            "cmapss_s_2",
+            "cmapss_s_3",
+            "cmapss_s_4",
+            "cmapss_s_6",
+            "cmapss_s_7",
+            "cmapss_s_8",
+            "cmapss_s_9",
+            "cmapss_s_11",
+            "cmapss_s_12",
+            "cmapss_s_13",
+            "cmapss_s_14",
+            "cmapss_s_15",
+            "cmapss_s_17",
+            "cmapss_s_20",
+            "cmapss_s_21",
+            "subset",
+            "split",
+            "rul_label",
+            "dataset_name",
+            "preprocessing_version"
+          ],
+          "subset": "FD003",
+          "split": "train"
+        },
+        {
+          "file": "cmapss_FD003_test.parquet",
+          "rows": 16596,
+          "columns": [
+            "unit_number",
+            "time_cycles",
+            "op_setting_1",
+            "op_setting_2",
+            "op_setting_3",
+            "cmapss_s_2",
+            "cmapss_s_3",
+            "cmapss_s_4",
+            "cmapss_s_6",
+            "cmapss_s_7",
+            "cmapss_s_8",
+            "cmapss_s_9",
+            "cmapss_s_11",
+            "cmapss_s_12",
+            "cmapss_s_13",
+            "cmapss_s_14",
+            "cmapss_s_15",
+            "cmapss_s_17",
+            "cmapss_s_20",
+            "cmapss_s_21",
+            "subset",
+            "split",
+            "rul_label",
+            "dataset_name",
+            "preprocessing_version"
+          ],
+          "subset": "FD003",
+          "split": "test"
+        },
+        {
+          "file": "cmapss_FD004_train.parquet",
+          "rows": 61249,
+          "columns": [
+            "unit_number",
+            "time_cycles",
+            "op_setting_1",
+            "op_setting_2",
+            "op_setting_3",
+            "cmapss_s_1",
+            "cmapss_s_2",
+            "cmapss_s_3",
+            "cmapss_s_4",
+            "cmapss_s_5",
+            "cmapss_s_6",
+            "cmapss_s_7",
+            "cmapss_s_8",
+            "cmapss_s_9",
+            "cmapss_s_10",
+            "cmapss_s_11",
+            "cmapss_s_12",
+            "cmapss_s_13",
+            "cmapss_s_14",
+            "cmapss_s_15",
+            "cmapss_s_16",
+            "cmapss_s_17",
+            "cmapss_s_18",
+            "cmapss_s_19",
+            "cmapss_s_20",
+            "cmapss_s_21",
+            "subset",
+            "split",
+            "rul_label",
+            "dataset_name",
+            "preprocessing_version"
+          ],
+          "subset": "FD004",
+          "split": "train"
+        },
+        {
+          "file": "cmapss_FD004_test.parquet",
+          "rows": 41214,
+          "columns": [
+            "unit_number",
+            "time_cycles",
+            "op_setting_1",
+            "op_setting_2",
+            "op_setting_3",
+            "cmapss_s_1",
+            "cmapss_s_2",
+            "cmapss_s_3",
+            "cmapss_s_4",
+            "cmapss_s_5",
+            "cmapss_s_6",
+            "cmapss_s_7",
+            "cmapss_s_8",
+            "cmapss_s_9",
+            "cmapss_s_10",
+            "cmapss_s_11",
+            "cmapss_s_12",
+            "cmapss_s_13",
+            "cmapss_s_14",
+            "cmapss_s_15",
+            "cmapss_s_16",
+            "cmapss_s_17",
+            "cmapss_s_18",
+            "cmapss_s_19",
+            "cmapss_s_20",
+            "cmapss_s_21",
+            "subset",
+            "split",
+            "rul_label",
+            "dataset_name",
+            "preprocessing_version"
+          ],
+          "subset": "FD004",
+          "split": "test"
+        }
+      ]
+    },
+    "cwru": {
+      "dataset_name": "cwru",
+      "total_raw_files_discovered": 3,
+      "supported_files_discovered": 3,
+      "files_processed": 3,
+      "files_skipped": [],
+      "total_rows": 1179,
+      "columns": [
+        "dataset_name",
+        "source_file",
+        "source_id",
+        "record_id",
+        "bearing_id",
+        "window_id",
+        "sensor_location",
+        "sampling_frequency",
+        "RPM",
+        "load_condition",
+        "fault_label",
+        "fault_size",
+        "window_start",
+        "window_end",
+        "window_length",
+        "mean",
+        "std",
+        "variance",
+        "RMS",
+        "minimum",
+        "maximum",
+        "peak_to_peak",
+        "absolute_mean",
+        "skewness",
+        "kurtosis",
+        "crest_factor",
+        "shape_factor",
+        "impulse_factor",
+        "clearance_factor",
+        "rms",
+        "peak",
+        "energy",
+        "dominant_frequency",
+        "spectral_energy",
+        "spectral_centroid",
+        "frequency_band_energy",
+        "band_energy_0_1500hz",
+        "band_energy_1500_3000hz",
+        "band_energy_3000_4500hz",
+        "band_energy_4500_6000hz",
+        "source_channel",
+        "fault_size_mils",
+        "motor_load_hp",
+        "original_sampling_rate",
+        "source_checksum",
+        "preprocessing_version",
+        "feature_version"
+      ],
+      "output_files": [
+        {
+          "file": "cwru_features.parquet",
+          "rows": 1179
+        },
+        {
+          "file": "cwru_features_sample.csv",
+          "rows": 50
+        },
+        {
+          "file": "cwru_metadata.json",
+          "type": "json_metadata"
+        },
+        {
+          "file": "cwru_processing_manifest.json",
+          "type": "json_manifest"
+        }
+      ],
+      "fault_distribution": {
+        "normal": 474,
+        "outer_race": 354,
+        "inner_race": 351
+      },
+      "sensor_distribution": {
+        "drive_end": 472,
+        "fan_end": 472,
+        "base": 235
+      },
+      "sampling_frequencies": [
+        12000.0
+      ],
+      "operating_conditions": {
+        "loads": [
+          "0HP"
+        ],
+        "rpms": [
+          1797.0,
+          1796.0
+        ]
+      },
+      "output_parquet_path": "data/processed/cwru\\cwru_features.parquet",
+      "limitations": "The available raw CWRU subset contains 3 files representing distinct fault conditions (97.mat=normal, 105.mat=inner race 7mil, 130.mat=outer race 7mil). Because each fault class exists in only one file, train/test splitting across files would cause zero-shot evaluation or class omission. Therefore, a single unified, validated feature table is published for baseline methodology verification."
+    },
+    "nust": {
+      "files_processed": 134,
+      "files_skipped": [],
+      "total_rows": 390263,
+      "output_files": [
+        {
+          "file": "nust_processed.parquet",
+          "rows": 390263
+        }
+      ],
+      "quality_issues": [
+        {
+          "file": "1st at -10 2022Jun04-2239-0005.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "1st at -10c 2022May26-2336-0006.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "2nd at 0c 2022Jun04-2243-0005.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "2nd at 0c 2022May26-2304-0046.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "3rd at 15c 2022Jun04-2302-0006.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "3th at 15c 2022May26-2304-0037.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "4th at 30c 2022Jun05-2302-0006.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "4th at 30c 2022May26-2304-0026.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "5th at 45c 2022May26-2304-0001.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT 45C 2022Jun13-2259-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "1st at -10c 2022May27-0007-0024.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT -10C 2022Jun13-2332-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "2ND AT 0C 2022Jun05-2156-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "5th at 0c 2022May27-0007-0015.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "3rd at 15c 2022May27-0007-0003.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT 15C 2022Jun13-2318-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "4th at 30c 2022May26-2336-0055.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT 30C 2022Jun13-2251-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "5th at 45c 2022May26-2336-0046.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT 45C 2022Jun13-2311-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "1st at -10c 2022May26-2336-0014.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT -10C 2022Jun13-2328-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "2ND AT 0C 2022Jun05-2148-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "2nd at 0c 2022May26-2336-0018.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "3rd at 15c 2022May26-2336-0024.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT 15C 2022Jun13-2324-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "4th at 30c 2022May26-2336-0031.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT 30C 2022Jun13-2244-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "5th at 45c 2nd at -0c 2022May26-2336-0018.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT 45C 2022Jun13-2306-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "1st at -10c 2022May27-0007-0030.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT -10C 2022Jun07-0021-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "2nd at 0c 2022May27-0007-0038.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT 0C 2022Jun06-2245-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "3rd at 15c 2022May27-0007-0044.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT 15C 2022Jun07-0045-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "4th at 30c 2022May27-0007-0030.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT 30C 2022Jun07-0052-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "5th at 45c 2022May27-0007-0058.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT 45C 2022Jun07-0117-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "1st at -10c 2022May27-0109-0049.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT -10C 2022Jun07-0030-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "2ND AT 0C 2022Jun05-2203-0003.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "2nd at 0c 2022May27-0109-0055.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "3rd at 15c 2022May27-0109-0060.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT 15C 2022Jun07-0034-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "4th at 30c 2022May27-0141-0007.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT 30C 2022Jun07-0103-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "5th at 45c 2022May27-0141-0012.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT 45C 2022Jun07-0107-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "1st at -10c 2022May27-0109-0039.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT -10C 2022Jun07-0026-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "2nd at 0c 2022May27-0109-0030.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT 0C 2022Jun06-2256-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "3rd at 15c 2022May27-0109-0018.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT 15C 2022Jun07-0040-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "4th at 30c 2022May27-0109-0013.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT 30C 2022Jun07-0058-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "5th at 45c 2022May27-0109-0007.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT 45C 2022Jun07-0112-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "1st at -10c 2022May27-0219-0014.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT -10C 2022Jun07-0015-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "2nd at 0c 2022May27-0141-0043.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT 0C 2022Jun06-2306-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "3rd at 15c 2022May27-0141-0021.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT 15C 2022Jun06-2313-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "4th at 30c 2022May27-0141-0021.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT 30C 2022Jun06-2341-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "5th at 45c 2022May27-0141-0021.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT 45C 2022Jun06-2345-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "1st at-10c 2022May27-0219-0043.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT -10C 2022Jun07-0006-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "2ND AT 0C 2022Jun05-2211-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "2nd at 0c 2022May27-0309-0012.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "3rd at 15c 2022May27-0219-0058.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT 15C 2022Jun06-2323-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "4th at 30c 2022May27-0219-0048.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT 30C 2022Jun06-2328-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "5th at 45c 2022May27-0219-0043.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT 45C 2022Jun06-2355-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "1st at -10c 2022May27-0219-0013.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT -10C 2022Jun07-0010-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "2nd at 0c 2022May27-0219-0019.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT 0C 2022Jun06-2301-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "3rd at 15c 2022May27-0219-0024.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT 15C 2022Jun06-2318-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "4th at 30c 2022May27-0219-0032.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT 30C 2022Jun06-2334-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "5th at 45c 2022May27-0219-0019.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "AT 45C 2022Jun06-2350-0002.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "1ST AT -10 c 2022May27-0325-0011.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "2nd  at 0c 2022May27-0325-0018.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "3 rd  at 15 c 2022May27-0338-0010.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "4th at 30 c 2022May27-0338-0015.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "5th at 45 c  2022May27-0325-0011.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "1st at -10c 2022May27-0338-0064.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "2nd at 0c 2022May27-0338-0068.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "3rd at 15c 2022May27-0421-0005.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "4th at 30c 2022May27-0421-0011.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "5th at 45c 2022May27-0421-0017.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "1st at -10c 2022May27-0338-0059.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "2nd at 0c 2022May27-0338-0041.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "3rd at 15c 2022May27-0338-0046.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "4th at 30c 2022May27-0338-0041.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "5th at 45 c 2022May27-0338-0035.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "1st at -10c 2022May27-0421-0053.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "2nd at 0c 2022May27-0421-0045.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "3rd at 15c 2022May27-0421-0038.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "4th at 30c 2022May27-0421-0028.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "5th at 45c 2022May27-0421-0020.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "1st at -10c 2022May27-0528-0015.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "2nd at 0c 2022May27-0528-0007.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "3rd at 15c 2022May27-0456-0043.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "4th at 30c 2022May27-0456-0032.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "5th at 45c 2022May27-0456-0024.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "2nd at 0c 2022May27-0421-0062.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "3rd at 15c 2022May27-0456-0008.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "4th at 30c 2022May27-0456-0013.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "5th at 45c 2022May27-0421-0062.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "1st at -10c 2022May27-2221-0031.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "2nd at 0c 2022May27-2221-0022.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "3rd at 15c 2022May27-2221-0014.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "4th at 30c 2022May27-2221-0009.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "5th at 45c 2022May27-2221-0043.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "1st at -10c 2022May27-0528-0021.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "2nd at 0c 2022May27-2254-0027.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "3rd at 15c 2022May27-2254-0032.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "4th at 30c 2022May27-2254-0037.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "5th at 15c 2022May27-2254-0040.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "2nd at -10c 2022May27-2254-0015.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "1st at 0c 2022May27-2254-0013.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "3rd at 15c 2022May27-2254-0008.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "4th at 30c 2022May27-2221-0052.csv",
+          "duplicates": 1,
+          "missing": {}
+        },
+        {
+          "file": "5th at 45c 2022May27-2221-0048.csv",
+          "duplicates": 1,
+          "missing": {}
+        }
+      ],
+      "operating_regions": {
+        "steady_state": 0,
+        "transient": 134
+      },
+      "conditions": {
+        "healthy": 44,
+        "faulty": 90
+      },
+      "columns": [
+        "Time",
+        "Demand 1",
+        "Control 1",
+        "Output Drive 1",
+        "Channel 1",
+        "Channel 2",
+        "Channel 3",
+        "Channel 4",
+        "Channel 1 Kurtosis",
+        "Channel 2 Kurtosis",
+        "Channel 3 Kurtosis",
+        "Channel 4 Kurtosis",
+        "Rear Input 1",
+        "Rear Input 2",
+        "Rear Input 3",
+        "Rear Input 4",
+        "Rear Input 5",
+        "Rear Input 6",
+        "Rear Input 7",
+        "Rear Input 8",
+        "dataset_name",
+        "source_file",
+        "bearing_condition",
+        "rpm",
+        "humidity_pct",
+        "temperature_celsius",
+        "dataset_variant",
+        "operating_region",
+        "preprocessing_version",
+        "source_checksum"
+      ]
+    },
+    "nasa_battery": {
+      "status": "PROCESSED",
+      "total_cycles_extracted": 7565,
+      "batteries_processed": 34,
+      "discharge_cycles_with_capacity": 2750,
+      "cycle_types": {
+        "charge": 2815,
+        "discharge": 2794,
+        "impedance": 1956
+      },
+      "nominal_reference_capacity_ah": 2.0,
+      "capacity_stats_ah": {
+        "min": 0.03255841710834194,
+        "max": 2.6401491157387014,
+        "mean": 1.3357084526378808
+      },
+      "soh_stats": {
+        "min": 0.01627920855417097,
+        "max": 1.3200745578693507,
+        "mean": 0.6678542263189404
+      },
+      "output_files": [
+        {
+          "file": "battery_cycles.parquet",
+          "rows": 7565
+        },
+        {
+          "file": "battery_cycles_sample.csv",
+          "rows": 100
+        },
+        {
+          "file": "battery_metadata.json"
+        },
+        {
+          "file": "extraction_manifest.json"
+        }
+      ],
+      "validation": {
+        "duplicates_detected": 0,
+        "infinite_values_detected": 0,
+        "negative_capacities_rejected": 0,
+        "schema_columns": [
+          "dataset_name",
+          "source_file",
+          "source_id",
+          "record_id",
+          "battery_id",
+          "cycle",
+          "cycle_type",
+          "ambient_temperature",
+          "duration_s",
+          "voltage_mean",
+          "voltage_min",
+          "voltage_max",
+          "current_mean",
+          "current_min",
+          "current_max",
+          "temperature_mean",
+          "temperature_min",
+          "temperature_max",
+          "discharge_capacity",
+          "reference_capacity",
+          "soh",
+          "capacity_loss",
+          "re_electrolyte_resistance",
+          "rct_charge_transfer_resistance"
+        ]
+      },
+      "integration_role": "RUL_METHODOLOGY_BENCHMARK"
+    },
+    "paderborn": {
+      "status": "PROCESSED",
+      "mat_files_processed": 240,
+      "total_windows_extracted": 29792,
+      "bearings_processed": 3,
+      "bearing_ids": [
+        "K001",
+        "KA01",
+        "KI04"
+      ],
+      "sampling_frequency_hz": 64000.0,
+      "window_parameters": {
+        "window_size_samples": 4096,
+        "window_duration_ms": 64.0,
+        "overlap_samples": 2048,
+        "overlap_percent": 50.0
+      },
+      "fault_label_distribution": {
+        "outer_race_fault": 9935,
+        "inner_race_fault": 9931,
+        "healthy": 9926
+      },
+      "output_files": [
+        {
+          "file": "paderborn_features.parquet",
+          "rows": 29792
+        },
+        {
+          "file": "paderborn_features_sample.csv",
+          "rows": 100
+        },
+        {
+          "file": "paderborn_metadata.json"
+        },
+        {
+          "file": "paderborn_processing_manifest.json"
+        }
+      ],
+      "validation": {
+        "duplicates_removed": 0,
+        "infinite_values_detected": 0,
+        "schema_column_count": 30
+      },
+      "integration_role": "VIBRATION_FEATURE_SOURCE"
+    },
+    "basic": {
+      "status": "UNAVAILABLE",
+      "usage": "none"
+    },
+    "femto": {
+      "train_bearings": [
+        {
+          "bearing": "Bearing1_1",
+          "files": 2803,
+          "features_rows": 2803
+        },
+        {
+          "bearing": "Bearing1_2",
+          "files": 871,
+          "features_rows": 871
+        },
+        {
+          "bearing": "Bearing2_1",
+          "files": 911,
+          "features_rows": 911
+        },
+        {
+          "bearing": "Bearing2_2",
+          "files": 797,
+          "features_rows": 797
+        },
+        {
+          "bearing": "Bearing3_1",
+          "files": 515,
+          "features_rows": 515
+        },
+        {
+          "bearing": "Bearing3_2",
+          "files": 1637,
+          "features_rows": 1637
+        }
+      ],
+      "test_bearings": [
+        {
+          "bearing": "Bearing1_3",
+          "files": 1802,
+          "features_rows": 1802
+        },
+        {
+          "bearing": "Bearing1_4",
+          "files": 1139,
+          "features_rows": 1139
+        },
+        {
+          "bearing": "Bearing1_5",
+          "files": 2302,
+          "features_rows": 2302
+        },
+        {
+          "bearing": "Bearing1_6",
+          "files": 2302,
+          "features_rows": 2302
+        },
+        {
+          "bearing": "Bearing1_7",
+          "files": 1502,
+          "features_rows": 1502
+        },
+        {
+          "bearing": "Bearing2_3",
+          "files": 1202,
+          "features_rows": 1202
+        },
+        {
+          "bearing": "Bearing2_4",
+          "files": 612,
+          "features_rows": 612
+        },
+        {
+          "bearing": "Bearing2_5",
+          "files": 2002,
+          "features_rows": 2002
+        },
+        {
+          "bearing": "Bearing2_6",
+          "files": 572,
+          "features_rows": 572
+        },
+        {
+          "bearing": "Bearing2_7",
+          "files": 172,
+          "features_rows": 172
+        },
+        {
+          "bearing": "Bearing3_3",
+          "files": 352,
+          "features_rows": 352
+        }
+      ],
+      "total_train_rows": 7534,
+      "total_test_rows": 13959,
+      "files_loaded": 21493,
+      "output_files": [
+        {
+          "file": "femto_train_features.parquet",
+          "rows": 7534
+        },
+        {
+          "file": "femto_test_features.parquet",
+          "rows": 13959
+        }
+      ],
+      "skipped": []
+    }
+  }
+}
