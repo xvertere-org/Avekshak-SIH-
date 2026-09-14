@@ -14,7 +14,7 @@ def render_header(overview: OverviewViewModel):
     if overview.is_synthetic_demo or overview.simulation_mode == "SYNTHETIC_SIMULATION":
         st.markdown(
             '<div class="demo-watermark-compact">'
-            'DEMO MODE · SYNTHETIC TELEMETRY · NOT LIVE AIRCRAFT DATA'
+            'DEMONSTRATION MODE · SIMULATED TELEMETRY · NOT LIVE AIRCRAFT DATA'
             '</div>',
             unsafe_allow_html=True,
         )
@@ -26,7 +26,7 @@ def render_header(overview: OverviewViewModel):
             '<div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px;">'
             '<span style="font-size: 18px; font-weight: 700; color: #f0f6fc; letter-spacing: -0.3px;">Aero-Piston Engine Digital Twin</span>'
             '<span style="font-size: 11px; font-weight: 700; color: #58a6ff; font-family: monospace; background: #161b22; border: 1px solid #21262d; border-radius: 3px; padding: 2px 6px;">SIH26054</span>'
-            '<span style="font-size: 12px; color: #8b949e;">Rotax 914 UL/F Reference Architecture · MALE UAV Digital Twin</span>'
+            '<span style="font-size: 12px; color: #8b949e;">Rotax 914 UL/F reference model · MALE UAV propulsion system</span>'
 
             '</div>',
             unsafe_allow_html=True,
@@ -57,8 +57,8 @@ def render_header(overview: OverviewViewModel):
     st.markdown(
         """
         <div style="background-color: #161b22; border: 1px solid #30363d; border-radius: 4px; padding: 5px 12px; margin-top: -4px; margin-bottom: 12px; font-size: 11px; color: #8b949e;">
-            <b style="color: #58a6ff;">Operational Mode:</b> Synthetic Simulation / Ground Station Decision Support
-            <span style="color: #6e7681; margin-left: 8px;">(Displaying real-time inferred PHM outputs; scenario configurations are isolated in demo controls)</span>
+            <b style="color: #58a6ff;">Operating context:</b> Simulated mission / ground-station decision support
+            <span style="color: #6e7681; margin-left: 8px;">(Displays inferred condition-monitoring outputs; scenario settings are available in the sidebar.)</span>
         </div>
         """,
         unsafe_allow_html=True,

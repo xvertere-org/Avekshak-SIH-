@@ -170,7 +170,7 @@ def main():
         st.markdown(
             '<div style="text-align: center; margin-bottom: 20px; padding: 10px 0; border-bottom: 1px solid #21262d;">'
             '<h3 style="margin: 0; color: #58a6ff; font-weight: 700; letter-spacing: 1px;">SIH26054</h3>'
-            '<div style="font-size: 11px; color: #8b949e; margin-top: 4px;">MALE UAV Aero-Piston Engine Twin</div>'
+            '<div style="font-size: 11px; color: #8b949e; margin-top: 4px;">MALE UAV Propulsion Digital Twin</div>'
             '</div>',
             unsafe_allow_html=True,
         )
@@ -200,7 +200,7 @@ def main():
 
         # Simulation Controls
         st.markdown(
-            '<div style="font-size: 11px; font-weight: 700; color: #8b949e; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;">OPERATIONAL FEED</div>',
+            '<div style="font-size: 11px; font-weight: 700; color: #8b949e; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;">DATA SOURCE</div>',
             unsafe_allow_html=True,
         )
 
@@ -211,7 +211,7 @@ def main():
                 "Pre-Packaged Demo Scenarios",
             ],
             index=0,
-            help="Select live end-to-end backend orchestrator or pre-packaged static demo.",
+            help="Choose the end-to-end simulator or a preconfigured demonstration scenario.",
         )
 
         history_data = None
@@ -220,7 +220,7 @@ def main():
 
         if feed_mode == "Phase 13 Live Pipeline Orchestrator":
             st.markdown("---")
-            st.markdown("#### Live Mission Scenarios")
+            st.markdown("#### Simulated Mission Scenario")
             live_scenarios = [
                 "1. Nominal Healthy Cruise",
                 "2. Cooling Degradation (Thermal Conductance Loss)",
@@ -231,7 +231,7 @@ def main():
             ]
             selected_scenario = st.selectbox("Scenario", live_scenarios, index=1)
 
-            with st.expander("⚙️ Mission & Fault Settings", expanded=False):
+            with st.expander("⚙️ Mission and fault settings", expanded=False):
                 duration = st.slider("Duration (s)", min_value=15, max_value=90, value=35, step=5)
                 fault_start = st.slider("Fault Injection Time (s)", min_value=5, max_value=max(6, duration - 5), value=15, step=1)
                 severity = st.slider("Fault Severity", min_value=0.1, max_value=1.0, value=0.7, step=0.05)
@@ -254,12 +254,12 @@ def main():
             default_step = min(max_step, 25)
 
             step_slider = st.slider(
-                "Mission Elapsed Time (s)",
+                "Mission time (s)",
                 min_value=0,
                 max_value=max_step,
                 value=default_step,
                 step=1,
-                help="Scrub flight time to observe causal real-time pipeline inference.",
+                help="Move through the mission timeline to inspect the current inferred state.",
             )
 
             current_payload = payloads[step_slider]
@@ -268,17 +268,17 @@ def main():
 
         else:
             st.markdown("---")
-            st.markdown("#### Test Scenarios")
+            st.markdown("#### Demonstration Scenario")
             scenarios = DemoScenarioProvider.get_available_scenarios()
             selected_scenario = st.selectbox("Scenario", scenarios, index=0)
 
             step_slider = st.slider(
-                "Mission Elapsed Time (s)",
+                "Mission time (s)",
                 min_value=5,
                 max_value=120,
                 value=35,
                 step=1,
-                help="Advance flight time step to observe progressive degradation.",
+                help="Move through the simulated mission to observe the inferred condition over time.",
             )
 
             contract, history_data = DemoScenarioProvider.generate_scenario_payload(
@@ -307,7 +307,7 @@ def main():
             except Exception:
                 payloads = []
 
-        if st.button("Reset Simulation", use_container_width=True):
+        if st.button("Reset mission", use_container_width=True):
             st.session_state.sim_time = 35
             st.session_state.scenario_idx = 0
             st.rerun()
@@ -316,9 +316,9 @@ def main():
         st.markdown(
             '<div style="font-size: 11px; color: #8b949e; line-height: 1.5; background: #161b22; '
             'border: 1px solid #21262d; border-radius: 4px; padding: 8px 10px;">'
-            '<b style="color: #c9d1d9;">Engineering Reference Architecture:</b><br/>'
+            '<b style="color: #c9d1d9;">Reference model:</b><br/>'
             'Rotax 914 UL/F (Reduced-Order Grey-Box Prototype).<br/>'
-            '<span style="color: #6e7681;">Strict non-fabrication presentation layer.</span>'
+            '<span style="color: #6e7681;">Simulation outputs for decision support; not a certified flight-control system.</span>'
 
             '</div>',
             unsafe_allow_html=True,

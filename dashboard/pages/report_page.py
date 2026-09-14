@@ -23,19 +23,18 @@ def render_report_page(
     scenario_metadata: Optional[Dict[str, Any]] = None,
 ):
     """Render 7. MISSION REPORT section."""
-    st.markdown("### Engineering Mission Report Generator")
+    st.markdown("### Mission report")
     st.markdown(
         """
         <div style="font-size: 13px; color: #8b949e; margin-bottom: 16px;">
-            Synthesize an authoritative post-mission engineering report from Phase 13 telemetry,
-            diagnostics, health index trajectories, and advisory recommendations.
+            Generate a post-mission summary of telemetry, diagnostics, health trends, and suggested actions.
         </div>
         """,
         unsafe_allow_html=True,
     )
 
     if not payloads:
-        st.warning("No mission telemetry data available to generate report. Run a mission from the sidebar.")
+        st.warning("No mission data is available yet. Run a scenario from the sidebar to create a report.")
         return
 
     # Generate Report
@@ -44,27 +43,27 @@ def render_report_page(
             payloads, scenario_metadata=scenario_metadata
         )
     except Exception as e:
-        st.error(f"Failed to compile mission report: {e}")
+        st.error(f"Unable to create the mission report: {e}")
         return
 
     # Download Buttons Bar
     col_dl1, col_dl2, col_meta = st.columns([1.5, 1.5, 3])
     with col_dl1:
         st.download_button(
-            label="📥 Download Report (.MD)",
+            label="📥 Download report (.md)",
             data=report.to_markdown(),
             file_name=f"mission_report_{report.mission_id}.md",
             mime="text/markdown",
-            help="Download complete Markdown formatted engineering report.",
+            help="Download the complete report in Markdown format.",
             use_container_width=True,
         )
     with col_dl2:
         st.download_button(
-            label="📥 Download Data (.JSON)",
+            label="📥 Download data (.json)",
             data=report.to_json(),
             file_name=f"mission_report_{report.mission_id}.json",
             mime="application/json",
-            help="Download structured JSON report data.",
+            help="Download the report data in JSON format.",
             use_container_width=True,
         )
     with col_meta:
@@ -93,7 +92,7 @@ def render_report_page(
         <div style="background-color: #161b22; border-left: 5px solid {adv_col}; border: 1px solid #30363d; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                 <div style="font-size: 11px; font-weight: 700; color: #8b949e; text-transform: uppercase;">
-                    POST-FLIGHT ADVISORY ASSESSMENT — ACTION CODE: <code>{report.advisory_action_code}</code>
+                    POST-MISSION ADVISORY ASSESSMENT — ACTION CODE: <code>{report.advisory_action_code}</code>
                 </div>
                 <span style="background-color: {adv_col}22; color: {adv_col}; border: 1px solid {adv_col}; padding: 2px 10px; border-radius: 4px; font-size: 12px; font-weight: 700;">
                     {report.advisory_assessment} (Urgency: {report.advisory_urgency})
@@ -103,7 +102,7 @@ def render_report_page(
                 {report.advisory_headline}
             </div>
             <div style="font-size: 13px; color: #c9d1d9;">
-                <b>Recommended Operator Action:</b> {report.recommended_operator_action}
+                <b>Suggested action:</b> {report.recommended_operator_action}
             </div>
             <div style="font-size: 10px; color: #8b949e; border-top: 1px solid #21262d; padding-top: 8px; margin-top: 8px;">
                 ℹ️ <i>{report.disclaimer}</i>
