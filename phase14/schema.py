@@ -38,7 +38,14 @@ class MissionReplaySession:
             self.total_duration_s = 0.0
         else:
             self.total_steps = len(self.payloads)
-            self.total_duration_s = max(0.0, self.payloads[-1].timestamp - self.payloads[0].timestamp)
+            finite_ts = [
+                p.timestamp for p in self.payloads
+                if p.timestamp is not None and not np.isnan(p.timestamp) and not np.isinf(p.timestamp)
+            ]
+            if len(finite_ts) >= 2:
+                self.total_duration_s = max(0.0, finite_ts[-1] - finite_ts[0])
+            else:
+                self.total_duration_s = 0.0
 
     def get_step(self, step_idx: int) -> DashboardStatePayload:
         """Retrieve payload at a specific chronological index."""

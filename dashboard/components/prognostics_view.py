@@ -13,6 +13,7 @@ from dashboard.utils.formatters import (
     format_health_index,
     format_rul,
     format_percent,
+    format_forecast_assisted_mode,
     map_health_to_status,
     map_rul_status_to_status,
 )
@@ -89,7 +90,12 @@ def render_rul_panel(prog: PrognosticsViewModel):
 
     cols = st.columns(4)
     with cols[0]:
-        rul_display = f"{prog.rul_hours:.1f} hrs ({prog.point_rul_seconds:.0f}s)" if prog.rul_hours is not None else prog.rul_state
+        if prog.rul_state == "CRITICAL_EOL_REACHED" or (prog.point_rul_seconds is not None and prog.point_rul_seconds <= 0.0):
+            rul_display = "0.0 hrs (EOL Reached)"
+        elif prog.rul_hours is not None:
+            rul_display = f"{prog.rul_hours:.1f} hrs ({prog.point_rul_seconds:.0f}s)"
+        else:
+            rul_display = prog.rul_state
         st.metric(
             label="Median RUL Estimate",
             value=rul_display,
@@ -110,7 +116,7 @@ def render_rul_panel(prog: PrognosticsViewModel):
     with cols[3]:
         st.metric(
             label="Forecast-Assisted Mode",
-            value="ACTIVE" if prog.forecast_assisted_mode else "OFF (Causal Trend)",
+            value=format_forecast_assisted_mode(prog.forecast_assisted_mode, getattr(prog, "forecast_mode_status", None)),
         )
 
     # EOL Provenance & Disclaimer box
@@ -194,6 +200,8 @@ def render_forecast_panel(prog: PrognosticsViewModel):
             yaxis=dict(gridcolor=PLOT_COLORS["grid"], title="Forecast Sensor Value"),
         )
         st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+        if prog.projected_health_trajectory and len(prog.projected_health_trajectory) > 0:
+            st.caption(f"Projected End-of-Horizon Health Index: **{prog.projected_health_trajectory[-1]:.3f}** (Horizon: {prog.forecast_horizon}s)")
     else:
         st.caption("Telemetry trajectory forecast arrays buffering or currently unavailable.")
 

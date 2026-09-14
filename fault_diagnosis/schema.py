@@ -62,6 +62,16 @@ class FaultDiagnosisResult:
     anomaly_status: Optional[str] = None
     anomaly_score: Optional[float] = None
 
+    # Sensor fault identification outputs (populated when predicted_fault_type == "sensor_fault")
+    suspect_sensor: Optional[str] = None
+    suspect_sensors: List[str] = field(default_factory=list)
+    sensor_isolation_status: str = "NONE"  # "CONFIRMED", "UNCERTAIN", "NONE"
+
+    @property
+    def suspect_channel(self) -> Optional[str]:
+        """Backward-compatible alias for suspect_sensor."""
+        return self.suspect_sensor
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary representation."""
         return {
@@ -76,4 +86,8 @@ class FaultDiagnosisResult:
             "model_feature_importance": dict(self.model_feature_importance),
             "anomaly_status": self.anomaly_status,
             "anomaly_score": self.anomaly_score,
+            "suspect_sensor": self.suspect_sensor,
+            "suspect_channel": self.suspect_sensor,
+            "suspect_sensors": list(self.suspect_sensors),
+            "sensor_isolation_status": self.sensor_isolation_status,
         }

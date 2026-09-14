@@ -137,6 +137,7 @@ class HealthIndexPipeline:
             upstream_fault_type = None
             upstream_confidence = None
             upstream_suspect_channel = None
+            upstream_suspect_channels = None
             anomaly_status = None
             anomaly_score = None
 
@@ -144,6 +145,7 @@ class HealthIndexPipeline:
                 upstream_fault_type = ctx.get("predicted_fault_type") or ctx.get("diagnosed_fault")
                 upstream_confidence = ctx.get("diagnostic_confidence")
                 upstream_suspect_channel = ctx.get("sensor_channel") or ctx.get("suspect_channel")
+                upstream_suspect_channels = ctx.get("suspect_channels")
                 anomaly_status = ctx.get("anomaly_status")
                 anomaly_score = ctx.get("anomaly_score")
             else:
@@ -171,6 +173,7 @@ class HealthIndexPipeline:
                 upstream_fault_type=upstream_fault_type,
                 upstream_confidence=upstream_confidence,
                 upstream_suspect_channel=upstream_suspect_channel,
+                upstream_suspect_channels=upstream_suspect_channels,
                 engine_id=engine_id,
                 mission_id=mission_id,
             )

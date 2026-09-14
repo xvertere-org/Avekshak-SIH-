@@ -20,6 +20,9 @@ class RULStatus(str, Enum):
     EXCEEDS_HORIZON = "EXCEEDS_HORIZON"             # Projected RUL > reporting horizon (reported as >24h)
 
 
+DEFAULT_HI_EOL_TOLERANCE: float = 1e-5  # Numerical tolerance for HI EOL threshold boundary
+
+
 @dataclass
 class EOLCriterion:
     """
@@ -31,15 +34,17 @@ class EOLCriterion:
     comparison: str                       # "<=" or ">="
     source: str                           # Provenance tag
     rationale: str
+    tolerance: float = 0.0                # Numerical tolerance for boundary evaluation
 
     def is_breached(self, value: float) -> bool:
         """Check if a measured or forecasted value breaches this EOL criterion."""
         if value is None or (isinstance(value, float) and (value != value)):  # NaN check
             return False
+        v = float(value)
         if self.comparison == "<=":
-            return float(value) <= self.threshold_value
+            return v <= (self.threshold_value + self.tolerance)
         elif self.comparison == ">=":
-            return float(value) >= self.threshold_value
+            return v >= (self.threshold_value - self.tolerance)
         return False
 
 
@@ -57,6 +62,7 @@ class EOLCriteriaConfig:
             comparison="<=",
             source="phase_9_critical_state_boundary",
             rationale="Phase 9 boundary for CRITICAL health state; multi-subsystem divergence beyond 4-5 sigma.",
+            tolerance=DEFAULT_HI_EOL_TOLERANCE,
         )
     )
     cht_redline: EOLCriterion = field(
@@ -147,3 +153,39 @@ class RULResult:
     handoff_horizon_s: float                     # 0.0, 16.0, or 32.0 s
     trajectory_type: str                         # "ROBUST_LINEAR_PRIMARY", "ACCELERATED_STRESS", "BASELINE_EWMA"
     provenance: Dict[str, Any] = field(default_factory=dict)
+    forecast_assisted: bool = False              # True only if forecast trajectory or redline crossing was actually used
+    forecast_mode_status: str = "OFF"            # "ACTIVE", "OFF", "BLOCKED", or "UNAVAILABLE"
+
+    @property
+    def forecast_assisted_mode(self) -> bool:
+        """Alias for forecast_assisted for full naming consistency."""
+        return self.forecast_assisted
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert RULResult to standard dictionary representation."""
+        return {
+            "engine_id": self.engine_id,
+            "mission_id": self.mission_id,
+            "timestamp": self.timestamp,
+            "status": self.status.value if hasattr(self.status, "value") else str(self.status),
+            "state": self.status.value if hasattr(self.status, "value") else str(self.status),
+            "rul_seconds_median": self.rul_seconds_median,
+            "median": self.rul_seconds_median,
+            "rul_seconds": self.rul_seconds_median,
+            "point_rul_seconds": self.rul_seconds_median,
+            "rul_seconds_p05": self.rul_seconds_p05,
+            "p05": self.rul_seconds_p05,
+            "rul_seconds_p95": self.rul_seconds_p95,
+            "p95": self.rul_seconds_p95,
+            "limiting_factor": self.limiting_factor,
+            "confidence_score": self.confidence_score,
+            "active_flight_phase": self.active_flight_phase,
+            "handoff_horizon_s": self.handoff_horizon_s,
+            "trajectory_type": self.trajectory_type,
+            "forecast_assisted": self.forecast_assisted,
+            "forecast_assisted_mode": self.forecast_assisted,
+            "forecast_mode_status": self.forecast_mode_status,
+            "eol_provenance": dict(self.provenance),
+            "provenance": dict(self.provenance),
+        }
+

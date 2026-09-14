@@ -73,11 +73,12 @@ class DegradationTracker:
             health_state = HealthState.INSUFFICIENT_DATA.value
             return float("nan"), DegradationTrend.INSUFFICIENT_DATA.value, health_state
 
+        crit_bound = self.config.severely_degraded_threshold + getattr(self.config, "tolerance", 1e-5)
         if smoothed_hi >= self.config.healthy_threshold:
             health_state = HealthState.HEALTHY.value
         elif smoothed_hi >= self.config.degraded_threshold:
             health_state = HealthState.DEGRADED.value
-        elif smoothed_hi >= self.config.severely_degraded_threshold:
+        elif smoothed_hi > crit_bound:
             health_state = HealthState.SEVERELY_DEGRADED.value
         else:
             health_state = HealthState.CRITICAL.value

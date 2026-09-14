@@ -304,7 +304,16 @@ def main():
                     fault_severity=mapped[2],
                     throttle_pct=75.0,
                 )
-            except Exception:
+            except Exception as _exc:
+                # AUDIT-008 FIX: Surface pipeline failure to the operator.
+                # Silent payloads=[] masked crashes with no error indicator.
+                import traceback as _tb
+                st.error(
+                    f"⚠️ **Pipeline execution failed.** The simulation could not be completed.\n\n"
+                    f"**Reason:** `{type(_exc).__name__}: {_exc}`\n\n"
+                    f"Check system logs for the full stack trace.",
+                    icon="🚨",
+                )
                 payloads = []
 
         if st.button("Reset mission", use_container_width=True):

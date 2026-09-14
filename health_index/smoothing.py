@@ -73,10 +73,15 @@ class CausalEWMASmoother:
 
         key = _make_key(engine_id, mission_id)
 
-        # Gap detection
+        # Gap & Monotonicity detection
         if timestamp is not None and key in self._last_timestamps:
             last_t = self._last_timestamps[key]
             gap = timestamp - last_t
+            if gap <= 0.0:
+                # Duplicate (gap == 0) or out-of-order (gap < 0) observation:
+                # Do NOT advance EWMA filter state or corrupt timestamp tracking.
+                prev = self._states.get(key, None)
+                return prev if prev is not None else raw_hi
             if gap > self.max_timestamp_gap_s:
                 # Telemetry continuity broken by large gap: reset state
                 self._states.pop(key, None)

@@ -67,6 +67,11 @@ class MonteCarloTrajectoryPropagator:
 
         # 3. Perturb EOL threshold: HI_EOL ~ U(base - width, base + width)
         base_eol = self.config.eol_criteria.hi_eol.threshold_value
+        eol_tol = getattr(self.config.eol_criteria.hi_eol, "tolerance", 1e-5)
+        if anchor_hi <= (base_eol + eol_tol):
+            # Already at or below EOL threshold within numerical tolerance
+            return 0.0, 0.0, 0.0, np.zeros(M, dtype=np.float64)
+
         half_w = self.config.assumed_threshold_half_width
         sampled_eol = self.rng.uniform(base_eol - half_w, base_eol + half_w, size=M)
 

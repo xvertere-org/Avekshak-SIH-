@@ -86,16 +86,151 @@ class TheilSenExtrapolator:
                 slopes = dhi[valid_dt] / dt[valid_dt]
                 pairwise_slopes.extend(slopes)
 
-        if len(pairwise_slopes) < self.min_samples:
+        min_pairs = max(1, self.min_samples * (self.min_samples - 1) // 2) if self.min_samples > 2 else 1
+        if len(pairwise_slopes) < min_pairs:
             return float("nan"), float("nan")
 
-        slopes_arr = np.asarray(pairwise_slopes, dtype=np.float64)
+        slopes_arr = np.sort(np.asarray(pairwise_slopes, dtype=np.float64))
         median_slope = round(float(np.median(slopes_arr)), 7)
-        # Estimate slope standard error via Normalized Median Absolute Deviation (MAD)
-        mad = float(np.median(np.abs(slopes_arr - median_slope)))
-        slope_se = round(1.4826 * mad / np.sqrt(len(ts)), 7)
+
+        N = len(slopes_arr)
+        n_eff = (1.0 + np.sqrt(1.0 + 8.0 * N)) / 2.0
+        # Sen (1968) exact Kendall rank variance accounting for pairwise dependencies
+        # V = (1 / 18) * [n_eff * (n_eff - 1) * (2*n_eff + 5) - sum_t t * (t - 1) * (2t + 5)]
+        _, tie_counts = np.unique(hi, return_counts=True)
+        tie_sum = np.sum(tie_counts * (tie_counts - 1) * (2 * tie_counts + 5))
+        var_k = (n_eff * (n_eff - 1.0) * (2.0 * n_eff + 5.0) - tie_sum) / 18.0
+        sigma_k = np.sqrt(max(0.0, var_k))
+
+        # Standard error estimation via 1-sigma rank inversion (z = 1.0)
+        z_1sig = 1.0
+        margin_1sig = z_1sig * sigma_k
+        m1_1sig = max(0, int(np.floor((N - margin_1sig) / 2.0)))
+        m2_1sig = min(N - 1, int(np.ceil((N + margin_1sig) / 2.0)))
+
+        rank_diff = slopes_arr[m2_1sig] - slopes_arr[m1_1sig]
+        if rank_diff > 0.0:
+            slope_se = round(float(rank_diff / (2.0 * z_1sig)), 7)
+        else:
+            # When slopes are identical, fall back to robust residual dispersion
+            alpha_res = float(np.median(hi - median_slope * ts))
+            residuals = hi - (alpha_res + median_slope * ts)
+            mad_resid = float(np.median(np.abs(residuals - np.median(residuals))))
+            s_tt = float(np.sum((ts - np.mean(ts)) ** 2))
+            if s_tt > 1e-6 and mad_resid > 0.0:
+                resid_se = np.sqrt(np.pi / 3.0) * (1.4826 * mad_resid) / np.sqrt(s_tt)
+                slope_se = round(float(resid_se), 7)
+            else:
+                slope_se = 1e-6
 
         return median_slope, max(1e-6, slope_se)
+
+    def estimate_slope_interval(
+        self,
+        timestamps: np.ndarray,
+        health_values: np.ndarray,
+        alpha: float = 0.90,
+    ) -> Tuple[float, float, float, float]:
+        """
+        Estimate robust Theil-Sen slope, empirical confidence bounds, and standard error.
+        Derived from Sen (1968) nonparametric rank inversion over pairwise slope combinations.
+
+        Args:
+            timestamps: 1D array of actual telemetry timestamps (s)
+            health_values: 1D array of smoothed Health Index values
+            alpha: Nominal confidence level (default 0.90 for P05 / P95 bounds)
+
+        Returns:
+            Tuple of (median_slope: float, p05_slope: float, p95_slope: float, slope_se: float).
+            Returns (NaN, NaN, NaN, NaN) if points are insufficient.
+        """
+        if len(timestamps) < self.min_samples or len(health_values) < self.min_samples:
+            return float("nan"), float("nan"), float("nan"), float("nan")
+
+        ts = np.asarray(timestamps, dtype=np.float64)
+        hi = np.asarray(health_values, dtype=np.float64)
+
+        valid = np.isfinite(ts) & np.isfinite(hi)
+        ts = ts[valid]
+        hi = hi[valid]
+
+        if len(ts) < self.min_samples:
+            return float("nan"), float("nan"), float("nan"), float("nan")
+
+        t_current = ts[-1]
+        t_cutoff = t_current - self.window_s
+        in_window = ts >= t_cutoff
+        ts = ts[in_window]
+        hi = hi[in_window]
+
+        if len(ts) < self.min_samples:
+            return float("nan"), float("nan"), float("nan"), float("nan")
+
+        gaps = np.diff(ts)
+        large_gaps = np.where(gaps > self.max_gap_s)[0]
+        if len(large_gaps) > 0:
+            last_break_idx = large_gaps[-1] + 1
+            ts = ts[last_break_idx:]
+            hi = hi[last_break_idx:]
+
+        if len(ts) < self.min_samples:
+            return float("nan"), float("nan"), float("nan"), float("nan")
+
+        pairwise_slopes = []
+        n = len(ts)
+        for i in range(n - 1):
+            dt = ts[i + 1:] - ts[i]
+            dhi = hi[i + 1:] - hi[i]
+            valid_dt = dt > 1e-4
+            if np.any(valid_dt):
+                slopes = dhi[valid_dt] / dt[valid_dt]
+                pairwise_slopes.extend(slopes)
+
+        min_pairs = max(1, self.min_samples * (self.min_samples - 1) // 2) if self.min_samples > 2 else 1
+        if len(pairwise_slopes) < min_pairs:
+            return float("nan"), float("nan"), float("nan"), float("nan")
+
+        slopes_arr = np.sort(np.asarray(pairwise_slopes, dtype=np.float64))
+        median_slope = round(float(np.median(slopes_arr)), 7)
+
+        N = len(slopes_arr)
+        n_eff = (1.0 + np.sqrt(1.0 + 8.0 * N)) / 2.0
+        _, tie_counts = np.unique(hi, return_counts=True)
+        tie_sum = np.sum(tie_counts * (tie_counts - 1) * (2 * tie_counts + 5))
+        var_k = (n_eff * (n_eff - 1.0) * (2.0 * n_eff + 5.0) - tie_sum) / 18.0
+        sigma_k = np.sqrt(max(0.0, var_k))
+
+        # Nominal confidence bounds (alpha=0.90 -> z_alpha = 1.6448536 for P05 / P95)
+        # or general z = sqrt(2) * erfinv(alpha)
+        from scipy.special import erfinv
+        z_alpha = float(np.sqrt(2.0) * erfinv(alpha)) if 0.0 < alpha < 1.0 else 1.6448536
+        margin_alpha = z_alpha * sigma_k
+        m1_alpha = max(0, int(np.floor((N - margin_alpha) / 2.0)))
+        m2_alpha = min(N - 1, int(np.ceil((N + margin_alpha) / 2.0)))
+        p05_slope = round(float(slopes_arr[m1_alpha]), 7)
+        p95_slope = round(float(slopes_arr[m2_alpha]), 7)
+
+        # 1-sigma standard error
+        z_1sig = 1.0
+        margin_1sig = z_1sig * sigma_k
+        m1_1sig = max(0, int(np.floor((N - margin_1sig) / 2.0)))
+        m2_1sig = min(N - 1, int(np.ceil((N + margin_1sig) / 2.0)))
+
+        rank_diff = slopes_arr[m2_1sig] - slopes_arr[m1_1sig]
+        if rank_diff > 0.0:
+            slope_se = round(float(rank_diff / (2.0 * z_1sig)), 7)
+        else:
+            alpha_res = float(np.median(hi - median_slope * ts))
+            residuals = hi - (alpha_res + median_slope * ts)
+            mad_resid = float(np.median(np.abs(residuals - np.median(residuals))))
+            s_tt = float(np.sum((ts - np.mean(ts)) ** 2))
+            if s_tt > 1e-6 and mad_resid > 0.0:
+                resid_se = np.sqrt(np.pi / 3.0) * (1.4826 * mad_resid) / np.sqrt(s_tt)
+                slope_se = round(float(resid_se), 7)
+            else:
+                slope_se = 1e-6
+
+        return median_slope, p05_slope, p95_slope, max(1e-6, slope_se)
 
 
 class DualHorizonSynthesizer:
@@ -169,13 +304,19 @@ class DualHorizonSynthesizer:
             # In forecast-assisted mode, calculate projected HI at t + H
             # If Phase 10 provides projected health, use it; otherwise project using slope
             proj_hi = getattr(forecast, "projected_health_trajectory", None) or getattr(forecast, "projected_health_index", None)
-            if proj_hi and len(proj_hi) > 0:
-                anchor_hi = float(proj_hi[-1])
+            if proj_hi and len(proj_hi) > 0 and np.isfinite(proj_hi[-1]):
+                candidate_anchor = float(proj_hi[-1])
+                # Physical consistency guard: if engine is actively degrading (slope < -0.0005),
+                # anchor HI cannot spontaneously jump higher than current_hi unless recovering
+                if slope < -0.0005 and candidate_anchor > current_hi:
+                    anchor_hi = max(0.0, min(1.0, current_hi + slope * H))
+                else:
+                    anchor_hi = max(0.0, min(1.0, candidate_anchor))
             else:
-                anchor_hi = current_hi + (slope if np.isfinite(slope) else 0.0) * H
+                anchor_hi = max(0.0, min(1.0, current_hi + (slope if np.isfinite(slope) else 0.0) * H))
         else:
             anchor_t = current_time
-            anchor_hi = current_hi
+            anchor_hi = max(0.0, min(1.0, current_hi))
             H = 0.0
 
         return {
@@ -194,6 +335,7 @@ class DualHorizonSynthesizer:
         slope: float,
         target_hi: float = 0.35,
         current_time: float = 0.0,
+        tolerance: float = 1e-5,
     ) -> Optional[float]:
         """
         Analytically solve for time-to-crossing:
@@ -203,11 +345,11 @@ class DualHorizonSynthesizer:
             return None
 
         # slope is negative
-        delta_hi = target_hi - anchor_hi
+        delta_hi = (target_hi + tolerance) - anchor_hi
         if delta_hi >= 0.0:
-            # Already at or below target
+            # Already at or below target within numerical tolerance
             return max(0.0, anchor_time - current_time)
 
-        tau_from_anchor = delta_hi / slope  # (negative / negative = positive)
+        tau_from_anchor = (target_hi - anchor_hi) / slope  # (negative / negative = positive)
         t_cross = anchor_time + tau_from_anchor
         return max(0.0, t_cross - current_time)

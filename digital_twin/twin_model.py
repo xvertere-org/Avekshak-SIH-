@@ -432,11 +432,16 @@ class DigitalTwin:
             }
 
         # Calculate dynamic time increment dt
-        if self.last_timestamp is not None and telemetry.timestamp > self.last_timestamp:
-            dt = telemetry.timestamp - self.last_timestamp
+        if self.last_timestamp is not None:
+            if telemetry.timestamp > self.last_timestamp:
+                dt = telemetry.timestamp - self.last_timestamp
+                self.last_timestamp = telemetry.timestamp
+            else:
+                # Non-positive dt (duplicate or out-of-order): do not advance internal states
+                dt = 0.0
         else:
             dt = self.sim_config.default_dt
-        self.last_timestamp = telemetry.timestamp
+            self.last_timestamp = telemetry.timestamp
 
         # Compute raw residuals (observed - expected)
         # Note: If observed is NaN (sensor dropout), residual is float('nan')

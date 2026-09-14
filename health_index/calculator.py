@@ -94,14 +94,15 @@ class SensorIsolationTracker:
         upstream_fault_type: Optional[str] = None,
         upstream_confidence: Optional[float] = None,
         upstream_suspect_channel: Optional[str] = None,
+        upstream_suspect_channels: Optional[List[str]] = None,
         engine_id: str = "ENG_001",
         mission_id: Optional[str] = None,
-    ) -> Optional[str]:
+    ) -> List[str]:
         """
-        Determine if any channel should be isolated as an observation-layer sensor fault.
+        Determine if any channel(s) should be isolated as an observation-layer sensor fault.
 
         Returns:
-            Name of isolated channel if isolation condition is met, else None.
+            List of isolated channel names if isolation condition is met, else empty list.
         """
         key = _make_key(engine_id, mission_id)
 
@@ -111,20 +112,35 @@ class SensorIsolationTracker:
             and upstream_confidence is not None
             and upstream_confidence >= 0.60
         ):
-            if upstream_suspect_channel and upstream_suspect_channel in residuals:
-                return upstream_suspect_channel
-            # If specific channel not passed, identify channel with maximum absolute residual
-            valid_items = [(ch, abs(r)) for ch, r in residuals.items() if not math.isnan(r)]
-            if valid_items:
-                max_ch, max_val = max(valid_items, key=lambda x: x[1])
-                if max_val >= self.config.tau_nominal:
-                    return max_ch
+            # Prioritize explicit suspect_sensors list
+            if upstream_suspect_channels:
+                valid_suspects = [
+                    s for s in upstream_suspect_channels
+                    if s in residuals and s not in ("unknown", "uncertain", "NONE", None)
+                ]
+                if valid_suspects:
+                    valid_res_count = sum(1 for r in residuals.values() if math.isfinite(float(r)))
+                    max_isolatable = max(0, valid_res_count - self.config.min_valid_channels)
+                    return valid_suspects[:max_isolatable]
+
+            if upstream_suspect_channel and upstream_suspect_channel not in ("unknown", "uncertain", "NONE"):
+                if upstream_suspect_channel in residuals:
+                    return [upstream_suspect_channel]
+            elif upstream_suspect_channel in ("unknown", "uncertain", "NONE"):
+                return []
+            else:
+                # If specific channel not passed, identify channel with maximum absolute residual
+                valid_items = [(ch, abs(r)) for ch, r in residuals.items() if math.isfinite(float(r))]
+                if valid_items:
+                    max_ch, max_val = max(valid_items, key=lambda x: x[1])
+                    if max_val >= self.config.tau_nominal:
+                        return [max_ch]
 
         # Case B: Deterministic Multi-Channel Disconnect Heuristic
-        valid_res = {ch: abs(r) for ch, r in residuals.items() if not math.isnan(r)}
+        valid_res = {ch: abs(r) for ch, r in residuals.items() if math.isfinite(float(r))}
         if len(valid_res) < self.config.min_valid_channels:
             self.reset(engine_id=engine_id, mission_id=mission_id)
-            return None
+            return []
 
         # Find candidates exceeding outlier_sigma
         outliers = [
@@ -148,10 +164,13 @@ class SensorIsolationTracker:
                 # Continuity check
                 if suspect == candidate and last_t is not None:
                     gap = timestamp - last_t
-                    if gap <= self.config.sensor_isolation_max_gap_s and gap >= 0.0:
+                    if gap == 0.0:
+                        # Duplicate timestamp: preserve persistence window and tracking state
+                        pass
+                    elif 0.0 < gap <= self.config.sensor_isolation_max_gap_s:
                         self._last_timestamp[key] = timestamp
                     else:
-                        # Gap exceeded: reset persistence window
+                        # Gap exceeded or negative: reset persistence window
                         self._persist_start_time[key] = timestamp
                         self._last_timestamp[key] = timestamp
                 else:
@@ -165,12 +184,12 @@ class SensorIsolationTracker:
                     persist_start is not None
                     and (timestamp - persist_start) >= self.config.sensor_isolation_persist_s
                 ):
-                    return candidate
-                return None
+                    return [candidate]
+                return []
 
         # Condition not met: reset tracker for this key
         self.reset(engine_id=engine_id, mission_id=mission_id)
-        return None
+        return []
 
 
 class HealthCalculator:
@@ -189,6 +208,7 @@ class HealthCalculator:
         upstream_fault_type: Optional[str] = None,
         upstream_confidence: Optional[float] = None,
         upstream_suspect_channel: Optional[str] = None,
+        upstream_suspect_channels: Optional[List[str]] = None,
         engine_id: str = "ENG_001",
         mission_id: Optional[str] = None,
     ) -> Tuple[float, float, Dict[str, float], Dict[str, float], List[str], List[str], List[str], List[str], Dict[str, float], str]:
@@ -210,7 +230,7 @@ class HealthCalculator:
 
         for ch in all_configured_channels:
             val = residuals.get(ch, float("nan"))
-            if val is not None and not math.isnan(val):
+            if val is not None and math.isfinite(float(val)):
                 valid_channels.append(ch)
                 clean_residuals[ch] = float(val)
             else:
@@ -218,17 +238,20 @@ class HealthCalculator:
                 clean_residuals[ch] = float("nan")
 
         # 2. Check sensor isolation
-        isolated_ch = self.sensor_tracker.evaluate_isolation(
+        isolated_list = self.sensor_tracker.evaluate_isolation(
             timestamp=timestamp,
             residuals=clean_residuals,
             upstream_fault_type=upstream_fault_type,
             upstream_confidence=upstream_confidence,
             upstream_suspect_channel=upstream_suspect_channel,
+            upstream_suspect_channels=upstream_suspect_channels,
             engine_id=engine_id,
             mission_id=mission_id,
         )
 
-        excluded_channels: List[str] = [isolated_ch] if isolated_ch else []
+        if isinstance(isolated_list, str):
+            isolated_list = [isolated_list]
+        excluded_channels: List[str] = list(isolated_list) if isolated_list else []
         active_channels = [ch for ch in valid_channels if ch not in excluded_channels]
 
         # 3. Check sufficiency of physical evidence

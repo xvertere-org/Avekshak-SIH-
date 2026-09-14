@@ -84,16 +84,19 @@ class SyntheticBootstrapManager:
         # 2. Phase 8 Supervised XGBoost Multiclass Diagnosis Calibration
         # =========================================================================
         # Reuses exact fault_diagnosis.dataset.generate_fault_diagnosis_dataset
+        # AUDIT-FD-001 FIX: Use >=20s per class run (was 2s, giving only ~242 total rows).
+        # Altitude changed from 1000m to 2000m to match live simulation conditions
+        # and eliminate the domain shift that caused systematic healthy-data misclassification.
         fast_profile = MissionProfile(
             mission_id="BOOTSTRAP_DIAGNOSIS_PROFILE",
             segments=[
                 PhaseSegment(
                     phase=FlightPhase.CRUISE,
-                    duration_s=2.0 if fast_mode else 4.0,
+                    duration_s=20.0 if fast_mode else 40.0,
                     throttle_start_pct=75.0,
                     throttle_end_pct=75.0,
-                    altitude_start_m=1000.0,
-                    altitude_end_m=1000.0,
+                    altitude_start_m=2000.0,
+                    altitude_end_m=2000.0,
                 )
             ],
         )
