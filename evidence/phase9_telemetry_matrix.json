@@ -1,8 +1,8 @@
 {
   "metadata": {
-    "source_commit": "f4238ed1d63e46e85bfdc633a5bed6a0e47e54e1",
+    "source_commit": "6bbc8e866d5912b6ef4184146ff02e5aa810a9e4",
     "phase": "PHASE_9_REAL_TELEMETRY_READINESS",
-    "generated_at": "2026-09-14T21:05:00Z",
+    "generated_at": "2026-09-14T21:35:00Z",
     "simulator_version": "0.2.0-phase2b-physics",
     "schema_version": "1.0",
     "deterministic_mode": true,
