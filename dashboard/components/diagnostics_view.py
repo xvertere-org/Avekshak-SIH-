@@ -87,7 +87,7 @@ def render_anomaly_diagnostics(diag: DiagnosticsViewModel):
     if diag.contributing_channels:
         channels_clean = [format_channel(c) for c in diag.contributing_channels]
         st.markdown(
-            f"**Contributing Channels:** {', '.join(channels_clean)}"
+            f"**Contributing Degradation Channels:** {', '.join(channels_clean)}"
         )
 
 

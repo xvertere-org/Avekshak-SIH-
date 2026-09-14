@@ -4,7 +4,7 @@ Renders Health Index, degradation rate/trend, Remaining Useful Life (RUL),
 engineering uncertainty bounds, and future trajectory forecasts.
 """
 
-from typing import List, Optional
+from typing import Dict, Any, List, Optional
 import streamlit as st
 import plotly.graph_objects as go
 from dashboard.schemas.view_model import PrognosticsViewModel, StatusLevel, AvailabilityStatus
@@ -54,12 +54,12 @@ def render_health_prognostics(
         st.metric(
             label="Decline Rate",
             value=rate_str,
-            help="Rate at which the Health Indicator is decreasing. Positive slope indicates degradation.",
+            help="Estimated rate of health decline per minute of mission operation.",
         )
     with cols[3]:
         st.metric(
             label="Degradation Trend",
-            value=format_health_trend(prog.degradation_trend) or trend_display,
+            value=format_health_trend(prog.degradation_trend),
         )
 
     # Subsystem Health Breakdown if present
@@ -129,7 +129,7 @@ def render_rul_panel(prog: PrognosticsViewModel):
         )
     with cols[2]:
         st.metric(
-            label="Life prediction status",
+            label="Life Prediction Status",
             value=format_rul_state(prog.rul_state),
         )
     with cols[3]:
@@ -146,8 +146,8 @@ def render_rul_panel(prog: PrognosticsViewModel):
     eol_html = (
         f'<div style="background-color: #11151c; border: 1px solid #21262d; '
         f'border-radius: 4px; padding: 12px 14px; margin-top: 10px; font-size: 12px; color: #8b949e;">'
-        f'<b>Life prediction status:</b> <span style="color: #f0f6fc;">{format_rul_state(prog.rul_state)}</span> | '
-        f'<b>Limiting Factor:</b> <code style="color: #f0f6fc;">{format_limiting_factor(prog.limiting_factor)}</code>{eol_info}'
+        f'<b>Prognostic Condition:</b> <b style="color: #f0f6fc;">{format_rul_state(prog.rul_state)}</b> | '
+        f'<b>Limiting Threshold:</b> <b style="color: #58a6ff;">{format_limiting_factor(prog.limiting_factor)}</b>{eol_info}'
         f'<div style="margin-top: 6px; color: #d29922;">'
         f'⚠️ <b>Simulation Disclaimer:</b> Time-to-threshold calculations are engineering demonstrations on simulated degradation scenarios. These are not certified OEM or regulatory airworthiness limits.'
         f'</div>'
@@ -158,7 +158,7 @@ def render_rul_panel(prog: PrognosticsViewModel):
 
 def render_forecast_panel(prog: PrognosticsViewModel):
     """Render telemetry forecasting status, source, and forecast trajectories."""
-    st.markdown("#### Telemetry Forecast (TimesFM / Baseline)")
+    st.markdown("#### Telemetry Forecast")
 
     # Status / Source callout box distinguishing LOADED_PRETRAINED vs BLOCKED_UNAUTHENTICATED_GATED
     if prog.forecast_status == "BLOCKED_UNAUTHENTICATED_GATED":
@@ -176,7 +176,7 @@ def render_forecast_panel(prog: PrognosticsViewModel):
         )
     elif prog.forecast_status == "BUFFERING":
         st.info(
-            f"ℹ️ **Insufficient history for a reliable forecast.** Collecting the required context before generating a prediction."
+            f"ℹ️ **Preparing forecast.** Accumulating {prog.forecast_horizon} timesteps before generating trajectory predictions."
         )
     else:
         st.info(f"Forecast method: `{prog.forecast_source}` (Status: `{format_forecast_status(prog.forecast_status)}`)")

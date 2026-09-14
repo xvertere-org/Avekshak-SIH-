@@ -1,0 +1,6509 @@
+{
+  "phase": "PHASE 10 \u2014 MISSION RELIABILITY & WHAT-IF SIMULATION",
+  "git": {
+    "branch": "rotax-914-greybox-engine",
+    "source_commit": "0cd0087e4a213335bc213455f46685b460efefc9",
+    "head_sha": "a702c41d2214f4bf14d98a6234c20ea8f24acf84",
+    "origin_head": "a702c41d2214f4bf14d98a6234c20ea8f24acf84",
+    "main_sha": "a5353143cf7e7d89b562e7d0abffc9f87a077292",
+    "origin_main_sha": "53aa795794f5328ffe2bc7d7424ae464bce15e70",
+    "merge_base": "a5353143cf7e7d89b562e7d0abffc9f87a077292",
+    "working_tree": "## rotax-914-greybox-engine...origin/rotax-914-greybox-engine\n M scripts/generate_phase10_evidence.py"
+  },
+  "classification": "MODEL_SCENARIO_RESULTS",
+  "authoritative_thresholds": [
+    {
+      "channel": "rpm",
+      "numeric_value": 5800.0,
+      "unit": "RPM",
+      "direction": "MAX",
+      "classification": "OEM_REFERENCE_LIMIT",
+      "source_doc": "EASA TCDS E.122 Issue 06",
+      "source_section": "Section IV Operating Limitations",
+      "notes": "Takeoff speed limit (max 5 minutes)"
+    },
+    {
+      "channel": "rpm",
+      "numeric_value": 5500.0,
+      "unit": "RPM",
+      "direction": "MAX",
+      "classification": "OEM_REFERENCE_LIMIT",
+      "source_doc": "EASA TCDS E.122 Issue 06",
+      "source_section": "Section IV Operating Limitations",
+      "notes": "Maximum continuous engine speed"
+    },
+    {
+      "channel": "rpm",
+      "numeric_value": 1400.0,
+      "unit": "RPM",
+      "direction": "MIN",
+      "classification": "MODEL_ENVELOPE",
+      "source_doc": "Rotax 914 Operators Manual Ed. 4 / Rev. 0",
+      "source_section": "Section 2.1 Operating Limits",
+      "notes": "Nominal idle speed floor"
+    },
+    {
+      "channel": "map",
+      "numeric_value": 1.35,
+      "unit": "bar",
+      "direction": "MAX",
+      "classification": "OEM_REFERENCE_LIMIT",
+      "source_doc": "EASA TCDS E.122 Issue 06",
+      "source_section": "Section IV Operating Limitations",
+      "notes": "Maximum takeoff manifold pressure (39.9 inHg / 1350 hPa)"
+    },
+    {
+      "channel": "map",
+      "numeric_value": 1.2,
+      "unit": "bar",
+      "direction": "MAX",
+      "classification": "OEM_REFERENCE_LIMIT",
+      "source_doc": "EASA TCDS E.122 Issue 06",
+      "source_section": "Section IV Operating Limitations",
+      "notes": "Maximum continuous manifold pressure (35.4 inHg / 1200 hPa)"
+    },
+    {
+      "channel": "cht",
+      "numeric_value": 135.0,
+      "unit": "deg_C",
+      "direction": "MAX",
+      "classification": "OEM_REFERENCE_LIMIT",
+      "source_doc": "EASA TCDS E.122 Issue 06",
+      "source_section": "Section IV Operating Limitations",
+      "notes": "Maximum cylinder head temperature with conventional 50/50 water-glycol coolant"
+    },
+    {
+      "channel": "coolant_temp",
+      "numeric_value": 120.0,
+      "unit": "deg_C",
+      "direction": "MAX",
+      "classification": "OEM_REFERENCE_LIMIT",
+      "source_doc": "EASA TCDS E.122 Issue 06",
+      "source_section": "Section IV Operating Limitations",
+      "notes": "Maximum coolant exit temperature"
+    },
+    {
+      "channel": "oil_temp",
+      "numeric_value": 130.0,
+      "unit": "deg_C",
+      "direction": "MAX",
+      "classification": "OEM_REFERENCE_LIMIT",
+      "source_doc": "EASA TCDS E.122 Issue 06",
+      "source_section": "Section IV Operating Limitations",
+      "notes": "Maximum oil inlet temperature"
+    },
+    {
+      "channel": "oil_temp",
+      "numeric_value": 50.0,
+      "unit": "deg_C",
+      "direction": "MIN",
+      "classification": "OEM_REFERENCE_LIMIT",
+      "source_doc": "Rotax 914 Operators Manual Ed. 4 / Rev. 0",
+      "source_section": "Section 2.1 Operating Limits",
+      "notes": "Minimum operational oil temperature before takeoff power"
+    },
+    {
+      "channel": "oil_pressure",
+      "numeric_value": 0.8,
+      "unit": "bar",
+      "direction": "MIN",
+      "classification": "OEM_REFERENCE_LIMIT",
+      "source_doc": "EASA TCDS E.122 Issue 06",
+      "source_section": "Section IV Operating Limitations",
+      "notes": "Minimum permissible oil pressure at idle"
+    },
+    {
+      "channel": "oil_pressure",
+      "numeric_value": 2.0,
+      "unit": "bar",
+      "direction": "MIN",
+      "classification": "OEM_REFERENCE_LIMIT",
+      "source_doc": "EASA TCDS E.122 Issue 06",
+      "source_section": "Section IV Operating Limitations",
+      "notes": "Minimum normal operational oil pressure"
+    },
+    {
+      "channel": "oil_pressure",
+      "numeric_value": 5.0,
+      "unit": "bar",
+      "direction": "MAX",
+      "classification": "OEM_REFERENCE_LIMIT",
+      "source_doc": "EASA TCDS E.122 Issue 06",
+      "source_section": "Section IV Operating Limitations",
+      "notes": "Maximum normal operational oil pressure"
+    },
+    {
+      "channel": "egt",
+      "numeric_value": 950.0,
+      "unit": "deg_C",
+      "direction": "MAX",
+      "classification": "OEM_REFERENCE_LIMIT",
+      "source_doc": "Rotax 914 Operators Manual Ed. 4 / Rev. 0",
+      "source_section": "Section 2.1 Operating Limits",
+      "notes": "Maximum exhaust gas temperature at takeoff rating (5 min)"
+    },
+    {
+      "channel": "egt",
+      "numeric_value": 910.0,
+      "unit": "deg_C",
+      "direction": "MAX",
+      "classification": "OEM_REFERENCE_LIMIT",
+      "source_doc": "Rotax 914 Operators Manual Ed. 4 / Rev. 0",
+      "source_section": "Section 2.1 Operating Limits",
+      "notes": "Maximum continuous exhaust gas temperature"
+    },
+    {
+      "channel": "vibration",
+      "numeric_value": 1.2,
+      "unit": "g_rms",
+      "direction": "MAX",
+      "classification": "MODEL_ENVELOPE",
+      "source_doc": "SIH26054 Grey-Box Propulsion Contract",
+      "source_section": "Section 3.5 Dynamic Limits",
+      "notes": "Simulated overall engine vibration envelope warning; NOT a certified OEM limit."
+    }
+  ],
+  "golden_scenarios": {
+    "NOMINAL_CRUISE": {
+      "mission_id": "NOMINAL_CRUISE",
+      "scenario_id": "NOMINAL_CRUISE",
+      "provenance": {
+        "engine_variant": "Rotax 914 UL/F",
+        "atmosphere_source": "ISA Troposphere Model",
+        "envelope_source": "EASA TCDS E.122 / Rotax OM 914",
+        "claim_class": "MODEL_SCENARIO_RESULT",
+        "full_trajectory": true
+      },
+      "metrics": {
+        "duration_s": 150.0,
+        "step_count": 151,
+        "valid_telemetry_fraction": 1.0,
+        "min_hi": 0.9042,
+        "mean_hi": 0.9938,
+        "final_hi": 1.0,
+        "min_subsystem_health": {
+          "thermal": 1.0,
+          "lubrication": 1.0,
+          "fuel": 0.8029,
+          "mechanical": 1.0,
+          "combustion": 0.9083
+        },
+        "max_cht_c": 82.44,
+        "max_egt_c": 706.71,
+        "min_oil_pressure_bar": 2.64,
+        "max_oil_temp_c": 107.05,
+        "max_vibration_g": 0.657,
+        "mean_fuel_flow_l_h": 15.11,
+        "max_fuel_flow_l_h": 15.72,
+        "time_below_watch_s": 0.0,
+        "time_below_degraded_s": 0.0,
+        "time_below_critical_s": 0.0,
+        "time_in_diagnostic_state_s": 8.0,
+        "min_estimated_rul_h": null,
+        "final_estimated_rul_h": null,
+        "envelope_event_count": 0,
+        "total_envelope_excursion_duration_s": 0.0,
+        "risk_index": {
+          "score": 0.0383,
+          "health_component": 0.0958,
+          "envelope_component": 0.0,
+          "duration_component": 0.0,
+          "rul_component": 0.0,
+          "type": "ENGINEERING_HEURISTIC",
+          "disclaimer": "Engineering heuristic index for comparative scenario analysis only. Strictly NOT a statistical failure probability or certified airworthiness metric."
+        }
+      },
+      "envelope_events_summary": []
+    },
+    "HIGH_ALTITUDE": {
+      "mission_id": "HIGH_ALTITUDE",
+      "scenario_id": "HIGH_ALTITUDE",
+      "provenance": {
+        "engine_variant": "Rotax 914 UL/F",
+        "atmosphere_source": "ISA Troposphere Model",
+        "envelope_source": "EASA TCDS E.122 / Rotax OM 914",
+        "claim_class": "MODEL_SCENARIO_RESULT",
+        "full_trajectory": true
+      },
+      "metrics": {
+        "duration_s": 150.0,
+        "step_count": 151,
+        "valid_telemetry_fraction": 1.0,
+        "min_hi": 0.888,
+        "mean_hi": 0.9926,
+        "final_hi": 1.0,
+        "min_subsystem_health": {
+          "thermal": 1.0,
+          "lubrication": 1.0,
+          "fuel": 1.0,
+          "mechanical": 1.0,
+          "combustion": 0.9134
+        },
+        "max_cht_c": 80.85,
+        "max_egt_c": 766.26,
+        "min_oil_pressure_bar": 2.32,
+        "max_oil_temp_c": 88.08,
+        "max_vibration_g": 0.763,
+        "mean_fuel_flow_l_h": 15.23,
+        "max_fuel_flow_l_h": 15.96,
+        "time_below_watch_s": 0.0,
+        "time_below_degraded_s": 0.0,
+        "time_below_critical_s": 0.0,
+        "time_in_diagnostic_state_s": 9.0,
+        "min_estimated_rul_h": null,
+        "final_estimated_rul_h": null,
+        "envelope_event_count": 0,
+        "total_envelope_excursion_duration_s": 0.0,
+        "risk_index": {
+          "score": 0.0448,
+          "health_component": 0.112,
+          "envelope_component": 0.0,
+          "duration_component": 0.0,
+          "rul_component": 0.0,
+          "type": "ENGINEERING_HEURISTIC",
+          "disclaimer": "Engineering heuristic index for comparative scenario analysis only. Strictly NOT a statistical failure probability or certified airworthiness metric."
+        }
+      },
+      "envelope_events_summary": []
+    },
+    "HOT_DAY": {
+      "mission_id": "HOT_DAY",
+      "scenario_id": "HOT_DAY",
+      "provenance": {
+        "engine_variant": "Rotax 914 UL/F",
+        "atmosphere_source": "ISA Troposphere Model",
+        "envelope_source": "EASA TCDS E.122 / Rotax OM 914",
+        "claim_class": "MODEL_SCENARIO_RESULT",
+        "full_trajectory": true
+      },
+      "metrics": {
+        "duration_s": 150.0,
+        "step_count": 151,
+        "valid_telemetry_fraction": 1.0,
+        "min_hi": 0.9084,
+        "mean_hi": 0.994,
+        "final_hi": 1.0,
+        "min_subsystem_health": {
+          "thermal": 1.0,
+          "lubrication": 1.0,
+          "fuel": 0.9214,
+          "mechanical": 1.0,
+          "combustion": 0.9175
+        },
+        "max_cht_c": 90.33,
+        "max_egt_c": 690.18,
+        "min_oil_pressure_bar": 2.544,
+        "max_oil_temp_c": 112.62,
+        "max_vibration_g": 0.627,
+        "mean_fuel_flow_l_h": 13.08,
+        "max_fuel_flow_l_h": 13.68,
+        "time_below_watch_s": 0.0,
+        "time_below_degraded_s": 0.0,
+        "time_below_critical_s": 0.0,
+        "time_in_diagnostic_state_s": 8.0,
+        "min_estimated_rul_h": null,
+        "final_estimated_rul_h": null,
+        "envelope_event_count": 0,
+        "total_envelope_excursion_duration_s": 0.0,
+        "risk_index": {
+          "score": 0.0366,
+          "health_component": 0.0916,
+          "envelope_component": 0.0,
+          "duration_component": 0.0,
+          "rul_component": 0.0,
+          "type": "ENGINEERING_HEURISTIC",
+          "disclaimer": "Engineering heuristic index for comparative scenario analysis only. Strictly NOT a statistical failure probability or certified airworthiness metric."
+        }
+      },
+      "envelope_events_summary": []
+    },
+    "HOT_DAY_HIGH_ALTITUDE": {
+      "mission_id": "HOT_DAY_HIGH_ALTITUDE",
+      "scenario_id": "HOT_DAY_HIGH_ALTITUDE",
+      "provenance": {
+        "engine_variant": "Rotax 914 UL/F",
+        "atmosphere_source": "ISA Troposphere Model",
+        "envelope_source": "EASA TCDS E.122 / Rotax OM 914",
+        "claim_class": "MODEL_SCENARIO_RESULT",
+        "full_trajectory": true
+      },
+      "metrics": {
+        "duration_s": 150.0,
+        "step_count": 151,
+        "valid_telemetry_fraction": 1.0,
+        "min_hi": 0.9065,
+        "mean_hi": 0.9936,
+        "final_hi": 1.0,
+        "min_subsystem_health": {
+          "thermal": 1.0,
+          "lubrication": 1.0,
+          "fuel": 1.0,
+          "mechanical": 1.0,
+          "combustion": 0.9407
+        },
+        "max_cht_c": 81.88,
+        "max_egt_c": 761.93,
+        "min_oil_pressure_bar": 2.247,
+        "max_oil_temp_c": 92.47,
+        "max_vibration_g": 0.763,
+        "mean_fuel_flow_l_h": 12.93,
+        "max_fuel_flow_l_h": 13.72,
+        "time_below_watch_s": 0.0,
+        "time_below_degraded_s": 0.0,
+        "time_below_critical_s": 0.0,
+        "time_in_diagnostic_state_s": 149.0,
+        "min_estimated_rul_h": null,
+        "final_estimated_rul_h": null,
+        "envelope_event_count": 0,
+        "total_envelope_excursion_duration_s": 0.0,
+        "risk_index": {
+          "score": 0.0374,
+          "health_component": 0.0935,
+          "envelope_component": 0.0,
+          "duration_component": 0.0,
+          "rul_component": 0.0,
+          "type": "ENGINEERING_HEURISTIC",
+          "disclaimer": "Engineering heuristic index for comparative scenario analysis only. Strictly NOT a statistical failure probability or certified airworthiness metric."
+        }
+      },
+      "envelope_events_summary": []
+    },
+    "HIGH_LOAD": {
+      "mission_id": "HIGH_LOAD",
+      "scenario_id": "HIGH_LOAD",
+      "provenance": {
+        "engine_variant": "Rotax 914 UL/F",
+        "atmosphere_source": "ISA Troposphere Model",
+        "envelope_source": "EASA TCDS E.122 / Rotax OM 914",
+        "claim_class": "MODEL_SCENARIO_RESULT",
+        "full_trajectory": true
+      },
+      "metrics": {
+        "duration_s": 150.0,
+        "step_count": 151,
+        "valid_telemetry_fraction": 1.0,
+        "min_hi": 0.7383,
+        "mean_hi": 0.9823,
+        "final_hi": 0.9963,
+        "min_subsystem_health": {
+          "thermal": 0.9679,
+          "lubrication": 0.504,
+          "fuel": 0.0,
+          "mechanical": 1.0,
+          "combustion": 0.6025
+        },
+        "max_cht_c": 122.68,
+        "max_egt_c": 781.79,
+        "min_oil_pressure_bar": 3.371,
+        "max_oil_temp_c": 206.04,
+        "max_vibration_g": 0.763,
+        "mean_fuel_flow_l_h": 31.81,
+        "max_fuel_flow_l_h": 32.86,
+        "time_below_watch_s": 6.0,
+        "time_below_degraded_s": 0.0,
+        "time_below_critical_s": 0.0,
+        "time_in_diagnostic_state_s": 8.0,
+        "min_estimated_rul_h": null,
+        "final_estimated_rul_h": null,
+        "envelope_event_count": 301,
+        "total_envelope_excursion_duration_s": 119.0,
+        "risk_index": {
+          "score": 0.3047,
+          "health_component": 0.2617,
+          "envelope_component": 1.0,
+          "duration_component": 0.0,
+          "rul_component": 0.0,
+          "type": "ENGINEERING_HEURISTIC",
+          "disclaimer": "Engineering heuristic index for comparative scenario analysis only. Strictly NOT a statistical failure probability or certified airworthiness metric."
+        }
+      },
+      "envelope_events_summary": [
+        {
+          "timestamp": 1.0,
+          "channel": "map",
+          "observed": 1.32,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 1.0,
+          "channel": "oil_pressure",
+          "observed": 5.027,
+          "threshold": 5.0,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 2.0,
+          "channel": "rpm",
+          "observed": 5667.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 3.0,
+          "channel": "rpm",
+          "observed": 5766.6,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 3.0,
+          "channel": "map",
+          "observed": 1.313,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 4.0,
+          "channel": "rpm",
+          "observed": 5787.1,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 4.0,
+          "channel": "map",
+          "observed": 1.315,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 5.0,
+          "channel": "rpm",
+          "observed": 5785.0,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 5.0,
+          "channel": "map",
+          "observed": 1.308,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 6.0,
+          "channel": "rpm",
+          "observed": 5776.2,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 6.0,
+          "channel": "map",
+          "observed": 1.306,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 7.0,
+          "channel": "rpm",
+          "observed": 5777.0,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 7.0,
+          "channel": "map",
+          "observed": 1.304,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 8.0,
+          "channel": "rpm",
+          "observed": 5770.9,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 8.0,
+          "channel": "map",
+          "observed": 1.302,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 9.0,
+          "channel": "rpm",
+          "observed": 5767.5,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 9.0,
+          "channel": "map",
+          "observed": 1.302,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 10.0,
+          "channel": "rpm",
+          "observed": 5761.5,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 10.0,
+          "channel": "map",
+          "observed": 1.301,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 11.0,
+          "channel": "rpm",
+          "observed": 5764.9,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 11.0,
+          "channel": "map",
+          "observed": 1.301,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 12.0,
+          "channel": "rpm",
+          "observed": 5758.5,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 12.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 13.0,
+          "channel": "rpm",
+          "observed": 5761.3,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 13.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 14.0,
+          "channel": "rpm",
+          "observed": 5756.1,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 14.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 15.0,
+          "channel": "rpm",
+          "observed": 5762.4,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 15.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 16.0,
+          "channel": "rpm",
+          "observed": 5757.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 16.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 17.0,
+          "channel": "rpm",
+          "observed": 5764.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 17.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 18.0,
+          "channel": "rpm",
+          "observed": 5759.7,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 18.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 19.0,
+          "channel": "rpm",
+          "observed": 5759.4,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 19.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 20.0,
+          "channel": "rpm",
+          "observed": 5758.4,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 20.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 21.0,
+          "channel": "rpm",
+          "observed": 5761.2,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 21.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 22.0,
+          "channel": "rpm",
+          "observed": 5762.0,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 22.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 23.0,
+          "channel": "rpm",
+          "observed": 5767.4,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 23.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 24.0,
+          "channel": "rpm",
+          "observed": 5767.1,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 24.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 25.0,
+          "channel": "rpm",
+          "observed": 5766.9,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 25.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 26.0,
+          "channel": "rpm",
+          "observed": 5760.0,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 26.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 27.0,
+          "channel": "rpm",
+          "observed": 5766.6,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 27.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 28.0,
+          "channel": "rpm",
+          "observed": 5762.2,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 28.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 29.0,
+          "channel": "rpm",
+          "observed": 5766.1,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 29.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 30.0,
+          "channel": "rpm",
+          "observed": 5760.9,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 30.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 31.0,
+          "channel": "rpm",
+          "observed": 5756.6,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 31.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 32.0,
+          "channel": "rpm",
+          "observed": 5759.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 32.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 33.0,
+          "channel": "rpm",
+          "observed": 5765.3,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 33.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 34.0,
+          "channel": "rpm",
+          "observed": 5769.7,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 34.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 34.0,
+          "channel": "oil_temp",
+          "observed": 131.05,
+          "threshold": 130.0,
+          "unit": "deg_C",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 35.0,
+          "channel": "rpm",
+          "observed": 5754.3,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 35.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 36.0,
+          "channel": "rpm",
+          "observed": 5760.9,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 36.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 37.0,
+          "channel": "rpm",
+          "observed": 5759.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 37.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 38.0,
+          "channel": "rpm",
+          "observed": 5757.1,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 38.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 39.0,
+          "channel": "rpm",
+          "observed": 5763.0,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 39.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 40.0,
+          "channel": "rpm",
+          "observed": 5760.5,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 40.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 41.0,
+          "channel": "rpm",
+          "observed": 5759.2,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 41.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 42.0,
+          "channel": "rpm",
+          "observed": 5762.5,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 42.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 43.0,
+          "channel": "rpm",
+          "observed": 5753.0,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 43.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 44.0,
+          "channel": "rpm",
+          "observed": 5764.5,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 44.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 45.0,
+          "channel": "rpm",
+          "observed": 5762.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 45.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 46.0,
+          "channel": "rpm",
+          "observed": 5764.7,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 46.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 47.0,
+          "channel": "rpm",
+          "observed": 5753.3,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 47.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 48.0,
+          "channel": "rpm",
+          "observed": 5758.1,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 48.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 49.0,
+          "channel": "rpm",
+          "observed": 5763.1,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 49.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 50.0,
+          "channel": "rpm",
+          "observed": 5762.1,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 50.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 51.0,
+          "channel": "rpm",
+          "observed": 5756.1,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 51.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 52.0,
+          "channel": "rpm",
+          "observed": 5766.6,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 52.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 53.0,
+          "channel": "rpm",
+          "observed": 5759.9,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 53.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 54.0,
+          "channel": "rpm",
+          "observed": 5754.0,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 54.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 55.0,
+          "channel": "rpm",
+          "observed": 5762.6,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 55.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 56.0,
+          "channel": "rpm",
+          "observed": 5762.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 56.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 57.0,
+          "channel": "rpm",
+          "observed": 5757.9,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 57.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 58.0,
+          "channel": "rpm",
+          "observed": 5759.5,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 58.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 59.0,
+          "channel": "rpm",
+          "observed": 5762.0,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 59.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 60.0,
+          "channel": "rpm",
+          "observed": 5767.0,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 60.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 61.0,
+          "channel": "rpm",
+          "observed": 5764.0,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 61.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 61.0,
+          "channel": "oil_pressure",
+          "observed": 5.004,
+          "threshold": 5.0,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 62.0,
+          "channel": "rpm",
+          "observed": 5759.9,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 62.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 63.0,
+          "channel": "rpm",
+          "observed": 5759.1,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 63.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 64.0,
+          "channel": "rpm",
+          "observed": 5760.9,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 64.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 65.0,
+          "channel": "rpm",
+          "observed": 5757.7,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 65.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 66.0,
+          "channel": "rpm",
+          "observed": 5767.5,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 66.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 67.0,
+          "channel": "rpm",
+          "observed": 5765.9,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 67.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 68.0,
+          "channel": "rpm",
+          "observed": 5760.7,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 68.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 69.0,
+          "channel": "rpm",
+          "observed": 5769.4,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 69.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 70.0,
+          "channel": "rpm",
+          "observed": 5762.6,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 70.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 71.0,
+          "channel": "rpm",
+          "observed": 5762.0,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 71.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 72.0,
+          "channel": "rpm",
+          "observed": 5766.3,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 72.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 73.0,
+          "channel": "rpm",
+          "observed": 5769.3,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 73.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 74.0,
+          "channel": "rpm",
+          "observed": 5754.7,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 74.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 75.0,
+          "channel": "rpm",
+          "observed": 5759.0,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 75.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 76.0,
+          "channel": "rpm",
+          "observed": 5763.4,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 76.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 77.0,
+          "channel": "rpm",
+          "observed": 5762.3,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 77.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 78.0,
+          "channel": "rpm",
+          "observed": 5759.2,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 78.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 79.0,
+          "channel": "rpm",
+          "observed": 5753.5,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 79.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 80.0,
+          "channel": "rpm",
+          "observed": 5764.1,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 80.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 81.0,
+          "channel": "rpm",
+          "observed": 5759.7,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 81.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 82.0,
+          "channel": "rpm",
+          "observed": 5762.0,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 82.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 83.0,
+          "channel": "rpm",
+          "observed": 5754.5,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 83.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 84.0,
+          "channel": "rpm",
+          "observed": 5756.0,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 84.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 85.0,
+          "channel": "rpm",
+          "observed": 5763.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 85.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 86.0,
+          "channel": "rpm",
+          "observed": 5759.6,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 86.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 87.0,
+          "channel": "rpm",
+          "observed": 5757.4,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 87.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 88.0,
+          "channel": "rpm",
+          "observed": 5757.4,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 88.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 89.0,
+          "channel": "rpm",
+          "observed": 5761.2,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 89.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 90.0,
+          "channel": "rpm",
+          "observed": 5765.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 90.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 91.0,
+          "channel": "rpm",
+          "observed": 5756.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 91.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 92.0,
+          "channel": "rpm",
+          "observed": 5764.5,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 92.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 93.0,
+          "channel": "rpm",
+          "observed": 5765.0,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 93.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 94.0,
+          "channel": "rpm",
+          "observed": 5769.5,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 94.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 95.0,
+          "channel": "rpm",
+          "observed": 5763.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 95.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 96.0,
+          "channel": "rpm",
+          "observed": 5768.0,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 96.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 97.0,
+          "channel": "rpm",
+          "observed": 5762.9,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 97.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 98.0,
+          "channel": "rpm",
+          "observed": 5762.3,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 98.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 99.0,
+          "channel": "rpm",
+          "observed": 5762.9,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 99.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 100.0,
+          "channel": "rpm",
+          "observed": 5757.0,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 100.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 101.0,
+          "channel": "rpm",
+          "observed": 5762.2,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 101.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 102.0,
+          "channel": "rpm",
+          "observed": 5762.3,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 102.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 103.0,
+          "channel": "rpm",
+          "observed": 5761.4,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 103.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 104.0,
+          "channel": "rpm",
+          "observed": 5759.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 104.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 105.0,
+          "channel": "rpm",
+          "observed": 5761.4,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 105.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 106.0,
+          "channel": "rpm",
+          "observed": 5765.2,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 106.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 107.0,
+          "channel": "rpm",
+          "observed": 5763.0,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 107.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 108.0,
+          "channel": "rpm",
+          "observed": 5764.6,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 108.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 109.0,
+          "channel": "rpm",
+          "observed": 5761.5,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 109.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 110.0,
+          "channel": "rpm",
+          "observed": 5765.1,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 110.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 111.0,
+          "channel": "rpm",
+          "observed": 5754.5,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 111.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 112.0,
+          "channel": "rpm",
+          "observed": 5757.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 112.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 113.0,
+          "channel": "rpm",
+          "observed": 5769.5,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 113.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 114.0,
+          "channel": "rpm",
+          "observed": 5758.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 114.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 115.0,
+          "channel": "rpm",
+          "observed": 5757.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 115.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 116.0,
+          "channel": "rpm",
+          "observed": 5761.6,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 116.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 117.0,
+          "channel": "rpm",
+          "observed": 5760.9,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 117.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 118.0,
+          "channel": "rpm",
+          "observed": 5759.9,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 118.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 119.0,
+          "channel": "rpm",
+          "observed": 5756.6,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 119.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 120.0,
+          "channel": "rpm",
+          "observed": 5761.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 120.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 121.0,
+          "channel": "rpm",
+          "observed": 5761.4,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 121.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 122.0,
+          "channel": "rpm",
+          "observed": 5759.6,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 122.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 123.0,
+          "channel": "rpm",
+          "observed": 5763.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 123.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 124.0,
+          "channel": "rpm",
+          "observed": 5766.5,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 124.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 125.0,
+          "channel": "rpm",
+          "observed": 5758.4,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 125.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 126.0,
+          "channel": "rpm",
+          "observed": 5762.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 126.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 127.0,
+          "channel": "rpm",
+          "observed": 5760.2,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 127.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 128.0,
+          "channel": "rpm",
+          "observed": 5759.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 128.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 129.0,
+          "channel": "rpm",
+          "observed": 5763.2,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 129.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 130.0,
+          "channel": "rpm",
+          "observed": 5765.2,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 130.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 131.0,
+          "channel": "rpm",
+          "observed": 5763.0,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 131.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 132.0,
+          "channel": "rpm",
+          "observed": 5762.9,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 132.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 133.0,
+          "channel": "rpm",
+          "observed": 5761.0,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 133.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 134.0,
+          "channel": "rpm",
+          "observed": 5754.9,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 134.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 135.0,
+          "channel": "rpm",
+          "observed": 5760.7,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 135.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 136.0,
+          "channel": "rpm",
+          "observed": 5760.2,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 136.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 137.0,
+          "channel": "rpm",
+          "observed": 5763.3,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 137.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 138.0,
+          "channel": "rpm",
+          "observed": 5764.1,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 138.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 139.0,
+          "channel": "rpm",
+          "observed": 5760.3,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 139.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 140.0,
+          "channel": "rpm",
+          "observed": 5761.3,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 140.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 141.0,
+          "channel": "rpm",
+          "observed": 5752.9,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 141.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 142.0,
+          "channel": "rpm",
+          "observed": 5761.4,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 142.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 143.0,
+          "channel": "rpm",
+          "observed": 5764.0,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 143.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 144.0,
+          "channel": "rpm",
+          "observed": 5759.0,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 144.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 145.0,
+          "channel": "rpm",
+          "observed": 5759.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 145.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 146.0,
+          "channel": "rpm",
+          "observed": 5759.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 146.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 147.0,
+          "channel": "rpm",
+          "observed": 5761.9,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 147.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 148.0,
+          "channel": "rpm",
+          "observed": 5755.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 148.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 149.0,
+          "channel": "rpm",
+          "observed": 5764.3,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 149.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 150.0,
+          "channel": "rpm",
+          "observed": 5759.3,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 150.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        }
+      ]
+    },
+    "AGGRESSIVE_THROTTLE": {
+      "mission_id": "AGGRESSIVE_THROTTLE",
+      "scenario_id": "AGGRESSIVE_THROTTLE",
+      "provenance": {
+        "engine_variant": "Rotax 914 UL/F",
+        "atmosphere_source": "ISA Troposphere Model",
+        "envelope_source": "EASA TCDS E.122 / Rotax OM 914",
+        "claim_class": "MODEL_SCENARIO_RESULT",
+        "full_trajectory": true
+      },
+      "metrics": {
+        "duration_s": 150.0,
+        "step_count": 151,
+        "valid_telemetry_fraction": 1.0,
+        "min_hi": 0.7383,
+        "mean_hi": 0.9841,
+        "final_hi": 0.9992,
+        "min_subsystem_health": {
+          "thermal": 0.999,
+          "lubrication": 0.504,
+          "fuel": 0.0,
+          "mechanical": 1.0,
+          "combustion": 0.6025
+        },
+        "max_cht_c": 118.92,
+        "max_egt_c": 781.79,
+        "min_oil_pressure_bar": 3.149,
+        "max_oil_temp_c": 149.41,
+        "max_vibration_g": 0.763,
+        "mean_fuel_flow_l_h": 20.83,
+        "max_fuel_flow_l_h": 32.86,
+        "time_below_watch_s": 6.0,
+        "time_below_degraded_s": 0.0,
+        "time_below_critical_s": 0.0,
+        "time_in_diagnostic_state_s": 11.0,
+        "min_estimated_rul_h": null,
+        "final_estimated_rul_h": null,
+        "envelope_event_count": 160,
+        "total_envelope_excursion_duration_s": 26.0,
+        "risk_index": {
+          "score": 0.3047,
+          "health_component": 0.2617,
+          "envelope_component": 1.0,
+          "duration_component": 0.0,
+          "rul_component": 0.0,
+          "type": "ENGINEERING_HEURISTIC",
+          "disclaimer": "Engineering heuristic index for comparative scenario analysis only. Strictly NOT a statistical failure probability or certified airworthiness metric."
+        }
+      },
+      "envelope_events_summary": [
+        {
+          "timestamp": 1.0,
+          "channel": "map",
+          "observed": 1.32,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 1.0,
+          "channel": "oil_pressure",
+          "observed": 5.027,
+          "threshold": 5.0,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 2.0,
+          "channel": "rpm",
+          "observed": 5667.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 3.0,
+          "channel": "rpm",
+          "observed": 5766.6,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 3.0,
+          "channel": "map",
+          "observed": 1.313,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 4.0,
+          "channel": "rpm",
+          "observed": 5787.1,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 4.0,
+          "channel": "map",
+          "observed": 1.315,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 5.0,
+          "channel": "rpm",
+          "observed": 5785.0,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 5.0,
+          "channel": "map",
+          "observed": 1.308,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 6.0,
+          "channel": "rpm",
+          "observed": 5776.2,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 6.0,
+          "channel": "map",
+          "observed": 1.306,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 7.0,
+          "channel": "rpm",
+          "observed": 5777.0,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 7.0,
+          "channel": "map",
+          "observed": 1.304,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 8.0,
+          "channel": "rpm",
+          "observed": 5770.9,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 8.0,
+          "channel": "map",
+          "observed": 1.302,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 9.0,
+          "channel": "rpm",
+          "observed": 5767.5,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 9.0,
+          "channel": "map",
+          "observed": 1.302,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 10.0,
+          "channel": "rpm",
+          "observed": 5761.5,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 10.0,
+          "channel": "map",
+          "observed": 1.301,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 11.0,
+          "channel": "rpm",
+          "observed": 5764.9,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 11.0,
+          "channel": "map",
+          "observed": 1.301,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 12.0,
+          "channel": "rpm",
+          "observed": 5758.5,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 12.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 13.0,
+          "channel": "rpm",
+          "observed": 5761.3,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 13.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 14.0,
+          "channel": "rpm",
+          "observed": 5756.1,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 14.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 15.0,
+          "channel": "rpm",
+          "observed": 5762.4,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 15.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 16.0,
+          "channel": "rpm",
+          "observed": 5757.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 16.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 17.0,
+          "channel": "rpm",
+          "observed": 5764.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 17.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 18.0,
+          "channel": "rpm",
+          "observed": 5759.7,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 18.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 19.0,
+          "channel": "rpm",
+          "observed": 5759.4,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 19.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 40.0,
+          "channel": "map",
+          "observed": 1.365,
+          "threshold": 1.35,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 0.0
+        },
+        {
+          "timestamp": 40.0,
+          "channel": "oil_pressure",
+          "observed": 5.043,
+          "threshold": 5.0,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 41.0,
+          "channel": "rpm",
+          "observed": 5713.9,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 41.0,
+          "channel": "map",
+          "observed": 1.343,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 42.0,
+          "channel": "rpm",
+          "observed": 5780.6,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 42.0,
+          "channel": "map",
+          "observed": 1.314,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 43.0,
+          "channel": "rpm",
+          "observed": 5781.9,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 43.0,
+          "channel": "map",
+          "observed": 1.314,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 44.0,
+          "channel": "rpm",
+          "observed": 5784.6,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 44.0,
+          "channel": "map",
+          "observed": 1.308,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 45.0,
+          "channel": "rpm",
+          "observed": 5776.5,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 45.0,
+          "channel": "map",
+          "observed": 1.305,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 46.0,
+          "channel": "rpm",
+          "observed": 5773.7,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 46.0,
+          "channel": "map",
+          "observed": 1.303,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 47.0,
+          "channel": "rpm",
+          "observed": 5759.2,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 47.0,
+          "channel": "map",
+          "observed": 1.302,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 48.0,
+          "channel": "rpm",
+          "observed": 5762.0,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 48.0,
+          "channel": "map",
+          "observed": 1.301,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 49.0,
+          "channel": "rpm",
+          "observed": 5765.7,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 49.0,
+          "channel": "map",
+          "observed": 1.301,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 50.0,
+          "channel": "rpm",
+          "observed": 5763.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 50.0,
+          "channel": "map",
+          "observed": 1.301,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 51.0,
+          "channel": "rpm",
+          "observed": 5757.3,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 51.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 52.0,
+          "channel": "rpm",
+          "observed": 5767.4,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 52.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 53.0,
+          "channel": "rpm",
+          "observed": 5760.4,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 53.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 54.0,
+          "channel": "rpm",
+          "observed": 5754.3,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 54.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 55.0,
+          "channel": "rpm",
+          "observed": 5762.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 55.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 56.0,
+          "channel": "rpm",
+          "observed": 5763.0,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 56.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 57.0,
+          "channel": "rpm",
+          "observed": 5758.0,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 57.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 58.0,
+          "channel": "rpm",
+          "observed": 5759.5,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 58.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 59.0,
+          "channel": "rpm",
+          "observed": 5762.1,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 59.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 59.0,
+          "channel": "oil_temp",
+          "observed": 130.75,
+          "threshold": 130.0,
+          "unit": "deg_C",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 80.0,
+          "channel": "map",
+          "observed": 1.365,
+          "threshold": 1.35,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 0.0
+        },
+        {
+          "timestamp": 81.0,
+          "channel": "rpm",
+          "observed": 5714.4,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 81.0,
+          "channel": "map",
+          "observed": 1.343,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 81.0,
+          "channel": "oil_pressure",
+          "observed": 5.3,
+          "threshold": 5.0,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 82.0,
+          "channel": "rpm",
+          "observed": 5780.0,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 82.0,
+          "channel": "map",
+          "observed": 1.314,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 83.0,
+          "channel": "rpm",
+          "observed": 5783.3,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 83.0,
+          "channel": "map",
+          "observed": 1.314,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 84.0,
+          "channel": "rpm",
+          "observed": 5776.1,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 84.0,
+          "channel": "map",
+          "observed": 1.308,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 85.0,
+          "channel": "rpm",
+          "observed": 5777.4,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 85.0,
+          "channel": "map",
+          "observed": 1.305,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 86.0,
+          "channel": "rpm",
+          "observed": 5768.6,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 86.0,
+          "channel": "map",
+          "observed": 1.303,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 87.0,
+          "channel": "rpm",
+          "observed": 5763.4,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 87.0,
+          "channel": "map",
+          "observed": 1.302,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 88.0,
+          "channel": "rpm",
+          "observed": 5761.3,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 88.0,
+          "channel": "map",
+          "observed": 1.301,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 89.0,
+          "channel": "rpm",
+          "observed": 5763.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 89.0,
+          "channel": "map",
+          "observed": 1.301,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 90.0,
+          "channel": "rpm",
+          "observed": 5767.5,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 90.0,
+          "channel": "map",
+          "observed": 1.301,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 90.0,
+          "channel": "oil_temp",
+          "observed": 130.24,
+          "threshold": 130.0,
+          "unit": "deg_C",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 91.0,
+          "channel": "rpm",
+          "observed": 5758.0,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 91.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 92.0,
+          "channel": "rpm",
+          "observed": 5765.3,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 92.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 93.0,
+          "channel": "rpm",
+          "observed": 5765.5,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 93.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 94.0,
+          "channel": "rpm",
+          "observed": 5769.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 94.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 95.0,
+          "channel": "rpm",
+          "observed": 5764.1,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 95.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 96.0,
+          "channel": "rpm",
+          "observed": 5768.2,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 96.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 97.0,
+          "channel": "rpm",
+          "observed": 5763.0,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 97.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 98.0,
+          "channel": "rpm",
+          "observed": 5762.4,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 98.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 99.0,
+          "channel": "rpm",
+          "observed": 5762.9,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 99.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 120.0,
+          "channel": "map",
+          "observed": 1.365,
+          "threshold": 1.35,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 0.0
+        },
+        {
+          "timestamp": 121.0,
+          "channel": "rpm",
+          "observed": 5716.1,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 121.0,
+          "channel": "map",
+          "observed": 1.343,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 121.0,
+          "channel": "oil_pressure",
+          "observed": 5.275,
+          "threshold": 5.0,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 122.0,
+          "channel": "rpm",
+          "observed": 5777.7,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 122.0,
+          "channel": "map",
+          "observed": 1.314,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 123.0,
+          "channel": "rpm",
+          "observed": 5792.7,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 123.0,
+          "channel": "map",
+          "observed": 1.314,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 124.0,
+          "channel": "rpm",
+          "observed": 5786.6,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 124.0,
+          "channel": "map",
+          "observed": 1.308,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 125.0,
+          "channel": "rpm",
+          "observed": 5772.0,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 125.0,
+          "channel": "map",
+          "observed": 1.305,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 125.0,
+          "channel": "oil_temp",
+          "observed": 130.91,
+          "threshold": 130.0,
+          "unit": "deg_C",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 126.0,
+          "channel": "rpm",
+          "observed": 5771.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 126.0,
+          "channel": "map",
+          "observed": 1.303,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 127.0,
+          "channel": "rpm",
+          "observed": 5766.1,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 127.0,
+          "channel": "map",
+          "observed": 1.302,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 128.0,
+          "channel": "rpm",
+          "observed": 5763.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 128.0,
+          "channel": "map",
+          "observed": 1.301,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 129.0,
+          "channel": "rpm",
+          "observed": 5765.8,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 129.0,
+          "channel": "map",
+          "observed": 1.301,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 130.0,
+          "channel": "rpm",
+          "observed": 5766.9,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 130.0,
+          "channel": "map",
+          "observed": 1.301,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 131.0,
+          "channel": "rpm",
+          "observed": 5764.2,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 131.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 132.0,
+          "channel": "rpm",
+          "observed": 5763.7,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 132.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 133.0,
+          "channel": "rpm",
+          "observed": 5761.6,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 133.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 134.0,
+          "channel": "rpm",
+          "observed": 5755.3,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 134.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 135.0,
+          "channel": "rpm",
+          "observed": 5760.9,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 135.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 136.0,
+          "channel": "rpm",
+          "observed": 5760.3,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 136.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 137.0,
+          "channel": "rpm",
+          "observed": 5763.4,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 137.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 138.0,
+          "channel": "rpm",
+          "observed": 5764.2,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 138.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 139.0,
+          "channel": "rpm",
+          "observed": 5760.4,
+          "threshold": 5500.0,
+          "unit": "RPM",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        },
+        {
+          "timestamp": 139.0,
+          "channel": "map",
+          "observed": 1.3,
+          "threshold": 1.2,
+          "unit": "bar",
+          "classification": "OEM_REFERENCE_LIMIT",
+          "duration_s": 1.0
+        }
+      ]
+    },
+    "F1_INJECTOR": {
+      "mission_id": "F1_INJECTOR",
+      "scenario_id": "F1_INJECTOR",
+      "provenance": {
+        "engine_variant": "Rotax 914 UL/F",
+        "atmosphere_source": "ISA Troposphere Model",
+        "envelope_source": "EASA TCDS E.122 / Rotax OM 914",
+        "claim_class": "MODEL_SCENARIO_RESULT",
+        "full_trajectory": true
+      },
+      "metrics": {
+        "duration_s": 150.0,
+        "step_count": 151,
+        "valid_telemetry_fraction": 1.0,
+        "min_hi": 0.9042,
+        "mean_hi": 0.9938,
+        "final_hi": 1.0,
+        "min_subsystem_health": {
+          "thermal": 1.0,
+          "lubrication": 1.0,
+          "fuel": 0.8029,
+          "mechanical": 1.0,
+          "combustion": 0.9083
+        },
+        "max_cht_c": 82.44,
+        "max_egt_c": 710.42,
+        "min_oil_pressure_bar": 2.64,
+        "max_oil_temp_c": 105.12,
+        "max_vibration_g": 0.657,
+        "mean_fuel_flow_l_h": 14.92,
+        "max_fuel_flow_l_h": 15.52,
+        "time_below_watch_s": 0.0,
+        "time_below_degraded_s": 0.0,
+        "time_below_critical_s": 0.0,
+        "time_in_diagnostic_state_s": 8.0,
+        "min_estimated_rul_h": null,
+        "final_estimated_rul_h": null,
+        "envelope_event_count": 0,
+        "total_envelope_excursion_duration_s": 0.0,
+        "risk_index": {
+          "score": 0.0383,
+          "health_component": 0.0958,
+          "envelope_component": 0.0,
+          "duration_component": 0.0,
+          "rul_component": 0.0,
+          "type": "ENGINEERING_HEURISTIC",
+          "disclaimer": "Engineering heuristic index for comparative scenario analysis only. Strictly NOT a statistical failure probability or certified airworthiness metric."
+        }
+      },
+      "envelope_events_summary": []
+    },
+    "F2_LUBRICATION": {
+      "mission_id": "F2_LUBRICATION",
+      "scenario_id": "F2_LUBRICATION",
+      "provenance": {
+        "engine_variant": "Rotax 914 UL/F",
+        "atmosphere_source": "ISA Troposphere Model",
+        "envelope_source": "EASA TCDS E.122 / Rotax OM 914",
+        "claim_class": "MODEL_SCENARIO_RESULT",
+        "full_trajectory": true
+      },
+      "metrics": {
+        "duration_s": 150.0,
+        "step_count": 151,
+        "valid_telemetry_fraction": 1.0,
+        "min_hi": 0.9042,
+        "mean_hi": 0.9875,
+        "final_hi": 0.977,
+        "min_subsystem_health": {
+          "thermal": 1.0,
+          "lubrication": 0.8223,
+          "fuel": 0.8029,
+          "mechanical": 1.0,
+          "combustion": 0.9083
+        },
+        "max_cht_c": 82.44,
+        "max_egt_c": 706.71,
+        "min_oil_pressure_bar": 2.64,
+        "max_oil_temp_c": 115.19,
+        "max_vibration_g": 0.657,
+        "mean_fuel_flow_l_h": 15.09,
+        "max_fuel_flow_l_h": 15.67,
+        "time_below_watch_s": 0.0,
+        "time_below_degraded_s": 0.0,
+        "time_below_critical_s": 0.0,
+        "time_in_diagnostic_state_s": 60.0,
+        "min_estimated_rul_h": 3.58,
+        "final_estimated_rul_h": 3.58,
+        "envelope_event_count": 0,
+        "total_envelope_excursion_duration_s": 0.0,
+        "risk_index": {
+          "score": 0.1382,
+          "health_component": 0.0958,
+          "envelope_component": 0.0,
+          "duration_component": 0.0,
+          "rul_component": 0.9982,
+          "type": "ENGINEERING_HEURISTIC",
+          "disclaimer": "Engineering heuristic index for comparative scenario analysis only. Strictly NOT a statistical failure probability or certified airworthiness metric."
+        }
+      },
+      "envelope_events_summary": []
+    },
+    "F3_COOLING": {
+      "mission_id": "F3_COOLING",
+      "scenario_id": "F3_COOLING",
+      "provenance": {
+        "engine_variant": "Rotax 914 UL/F",
+        "atmosphere_source": "ISA Troposphere Model",
+        "envelope_source": "EASA TCDS E.122 / Rotax OM 914",
+        "claim_class": "MODEL_SCENARIO_RESULT",
+        "full_trajectory": true
+      },
+      "metrics": {
+        "duration_s": 150.0,
+        "step_count": 151,
+        "valid_telemetry_fraction": 1.0,
+        "min_hi": 0.9042,
+        "mean_hi": 0.9938,
+        "final_hi": 0.9999,
+        "min_subsystem_health": {
+          "thermal": 0.996,
+          "lubrication": 1.0,
+          "fuel": 0.8029,
+          "mechanical": 1.0,
+          "combustion": 0.9083
+        },
+        "max_cht_c": 98.51,
+        "max_egt_c": 706.71,
+        "min_oil_pressure_bar": 2.64,
+        "max_oil_temp_c": 107.95,
+        "max_vibration_g": 0.657,
+        "mean_fuel_flow_l_h": 15.11,
+        "max_fuel_flow_l_h": 15.72,
+        "time_below_watch_s": 0.0,
+        "time_below_degraded_s": 0.0,
+        "time_below_critical_s": 0.0,
+        "time_in_diagnostic_state_s": 9.0,
+        "min_estimated_rul_h": null,
+        "final_estimated_rul_h": null,
+        "envelope_event_count": 0,
+        "total_envelope_excursion_duration_s": 0.0,
+        "risk_index": {
+          "score": 0.0383,
+          "health_component": 0.0958,
+          "envelope_component": 0.0,
+          "duration_component": 0.0,
+          "rul_component": 0.0,
+          "type": "ENGINEERING_HEURISTIC",
+          "disclaimer": "Engineering heuristic index for comparative scenario analysis only. Strictly NOT a statistical failure probability or certified airworthiness metric."
+        }
+      },
+      "envelope_events_summary": []
+    },
+    "F4_MISFIRE": {
+      "mission_id": "F4_MISFIRE",
+      "scenario_id": "F4_MISFIRE",
+      "provenance": {
+        "engine_variant": "Rotax 914 UL/F",
+        "atmosphere_source": "ISA Troposphere Model",
+        "envelope_source": "EASA TCDS E.122 / Rotax OM 914",
+        "claim_class": "MODEL_SCENARIO_RESULT",
+        "full_trajectory": true
+      },
+      "metrics": {
+        "duration_s": 150.0,
+        "step_count": 151,
+        "valid_telemetry_fraction": 1.0,
+        "min_hi": 0.8791,
+        "mean_hi": 0.9593,
+        "final_hi": 0.8815,
+        "min_subsystem_health": {
+          "thermal": 0.996,
+          "lubrication": 1.0,
+          "fuel": 0.8029,
+          "mechanical": 1.0,
+          "combustion": 0.5831
+        },
+        "max_cht_c": 82.44,
+        "max_egt_c": 706.71,
+        "min_oil_pressure_bar": 2.64,
+        "max_oil_temp_c": 101.85,
+        "max_vibration_g": 0.76,
+        "mean_fuel_flow_l_h": 14.02,
+        "max_fuel_flow_l_h": 15.52,
+        "time_below_watch_s": 0.0,
+        "time_below_degraded_s": 0.0,
+        "time_below_critical_s": 0.0,
+        "time_in_diagnostic_state_s": 60.0,
+        "min_estimated_rul_h": 0.4,
+        "final_estimated_rul_h": 0.41,
+        "envelope_event_count": 0,
+        "total_envelope_excursion_duration_s": 0.0,
+        "risk_index": {
+          "score": 0.1483,
+          "health_component": 0.1209,
+          "envelope_component": 0.0,
+          "duration_component": 0.0,
+          "rul_component": 0.9998,
+          "type": "ENGINEERING_HEURISTIC",
+          "disclaimer": "Engineering heuristic index for comparative scenario analysis only. Strictly NOT a statistical failure probability or certified airworthiness metric."
+        }
+      },
+      "envelope_events_summary": []
+    },
+    "F5_MECHANICAL": {
+      "mission_id": "F5_MECHANICAL",
+      "scenario_id": "F5_MECHANICAL",
+      "provenance": {
+        "engine_variant": "Rotax 914 UL/F",
+        "atmosphere_source": "ISA Troposphere Model",
+        "envelope_source": "EASA TCDS E.122 / Rotax OM 914",
+        "claim_class": "MODEL_SCENARIO_RESULT",
+        "full_trajectory": true
+      },
+      "metrics": {
+        "duration_s": 150.0,
+        "step_count": 151,
+        "valid_telemetry_fraction": 1.0,
+        "min_hi": 0.9042,
+        "mean_hi": 0.979,
+        "final_hi": 0.9526,
+        "min_subsystem_health": {
+          "thermal": 1.0,
+          "lubrication": 1.0,
+          "fuel": 0.8029,
+          "mechanical": 0.6743,
+          "combustion": 0.9083
+        },
+        "max_cht_c": 82.44,
+        "max_egt_c": 706.71,
+        "min_oil_pressure_bar": 2.64,
+        "max_oil_temp_c": 106.83,
+        "max_vibration_g": 1.145,
+        "mean_fuel_flow_l_h": 15.09,
+        "max_fuel_flow_l_h": 15.66,
+        "time_below_watch_s": 0.0,
+        "time_below_degraded_s": 0.0,
+        "time_below_critical_s": 0.0,
+        "time_in_diagnostic_state_s": 60.0,
+        "min_estimated_rul_h": 1.68,
+        "final_estimated_rul_h": 2.3,
+        "envelope_event_count": 0,
+        "total_envelope_excursion_duration_s": 0.0,
+        "risk_index": {
+          "score": 0.1382,
+          "health_component": 0.0958,
+          "envelope_component": 0.0,
+          "duration_component": 0.0,
+          "rul_component": 0.9988,
+          "type": "ENGINEERING_HEURISTIC",
+          "disclaimer": "Engineering heuristic index for comparative scenario analysis only. Strictly NOT a statistical failure probability or certified airworthiness metric."
+        }
+      },
+      "envelope_events_summary": []
+    },
+    "COMBINED_ENVIRONMENT_FAULT": {
+      "mission_id": "COMBINED_ENVIRONMENT_FAULT",
+      "scenario_id": "COMBINED_ENVIRONMENT_FAULT",
+      "provenance": {
+        "engine_variant": "Rotax 914 UL/F",
+        "atmosphere_source": "ISA Troposphere Model",
+        "envelope_source": "EASA TCDS E.122 / Rotax OM 914",
+        "claim_class": "MODEL_SCENARIO_RESULT",
+        "full_trajectory": true
+      },
+      "metrics": {
+        "duration_s": 150.0,
+        "step_count": 151,
+        "valid_telemetry_fraction": 1.0,
+        "min_hi": 0.9065,
+        "mean_hi": 0.9932,
+        "final_hi": 0.9961,
+        "min_subsystem_health": {
+          "thermal": 0.9676,
+          "lubrication": 1.0,
+          "fuel": 1.0,
+          "mechanical": 1.0,
+          "combustion": 0.9407
+        },
+        "max_cht_c": 89.81,
+        "max_egt_c": 761.93,
+        "min_oil_pressure_bar": 2.247,
+        "max_oil_temp_c": 93.29,
+        "max_vibration_g": 0.763,
+        "mean_fuel_flow_l_h": 12.93,
+        "max_fuel_flow_l_h": 13.72,
+        "time_below_watch_s": 0.0,
+        "time_below_degraded_s": 0.0,
+        "time_below_critical_s": 0.0,
+        "time_in_diagnostic_state_s": 149.0,
+        "min_estimated_rul_h": null,
+        "final_estimated_rul_h": null,
+        "envelope_event_count": 0,
+        "total_envelope_excursion_duration_s": 0.0,
+        "risk_index": {
+          "score": 0.0374,
+          "health_component": 0.0935,
+          "envelope_component": 0.0,
+          "duration_component": 0.0,
+          "rul_component": 0.0,
+          "type": "ENGINEERING_HEURISTIC",
+          "disclaimer": "Engineering heuristic index for comparative scenario analysis only. Strictly NOT a statistical failure probability or certified airworthiness metric."
+        }
+      },
+      "envelope_events_summary": []
+    }
+  },
+  "comparative_deltas": {
+    "HIGH_ALTITUDE": {
+      "baseline_id": "NOMINAL_CRUISE",
+      "scenario_id": "HIGH_ALTITUDE",
+      "delta_min_hi": -0.0162,
+      "delta_mean_hi": -0.0012,
+      "delta_final_hi": 0.0,
+      "delta_time_below_watch_s": 0.0,
+      "delta_time_below_degraded_s": 0.0,
+      "delta_time_below_critical_s": 0.0,
+      "delta_min_rul_h": null,
+      "delta_final_rul_h": null,
+      "delta_max_cht_c": -1.59,
+      "delta_max_egt_c": 59.55,
+      "delta_min_oil_pressure_bar": -0.32,
+      "delta_max_vibration_g": 0.106,
+      "delta_envelope_events": 0,
+      "delta_risk_score": 0.0065,
+      "qualitative_interpretation": "Within grey-box simulation, scenario 'HIGH_ALTITUDE' showed: oil pressure dropped by 0.32 bar; vibration elevated by 0.11 g. Model scenario result; not an empirical fleet reliability finding."
+    },
+    "HOT_DAY": {
+      "baseline_id": "NOMINAL_CRUISE",
+      "scenario_id": "HOT_DAY",
+      "delta_min_hi": 0.0042,
+      "delta_mean_hi": 0.0002,
+      "delta_final_hi": 0.0,
+      "delta_time_below_watch_s": 0.0,
+      "delta_time_below_degraded_s": 0.0,
+      "delta_time_below_critical_s": 0.0,
+      "delta_min_rul_h": null,
+      "delta_final_rul_h": null,
+      "delta_max_cht_c": 7.89,
+      "delta_max_egt_c": -16.53,
+      "delta_min_oil_pressure_bar": -0.096,
+      "delta_max_vibration_g": -0.03,
+      "delta_envelope_events": 0,
+      "delta_risk_score": -0.0017,
+      "qualitative_interpretation": "Within grey-box simulation, scenario 'HOT_DAY' showed: CHT increased by 7.9\u00b0C. Model scenario result; not an empirical fleet reliability finding."
+    },
+    "HOT_DAY_HIGH_ALTITUDE": {
+      "baseline_id": "NOMINAL_CRUISE",
+      "scenario_id": "HOT_DAY_HIGH_ALTITUDE",
+      "delta_min_hi": 0.0023,
+      "delta_mean_hi": -0.0002,
+      "delta_final_hi": 0.0,
+      "delta_time_below_watch_s": 0.0,
+      "delta_time_below_degraded_s": 0.0,
+      "delta_time_below_critical_s": 0.0,
+      "delta_min_rul_h": null,
+      "delta_final_rul_h": null,
+      "delta_max_cht_c": -0.56,
+      "delta_max_egt_c": 55.22,
+      "delta_min_oil_pressure_bar": -0.393,
+      "delta_max_vibration_g": 0.106,
+      "delta_envelope_events": 0,
+      "delta_risk_score": -0.0009,
+      "qualitative_interpretation": "Within grey-box simulation, scenario 'HOT_DAY_HIGH_ALTITUDE' showed: oil pressure dropped by 0.39 bar; vibration elevated by 0.11 g. Model scenario result; not an empirical fleet reliability finding."
+    },
+    "HIGH_LOAD": {
+      "baseline_id": "NOMINAL_CRUISE",
+      "scenario_id": "HIGH_LOAD",
+      "delta_min_hi": -0.1659,
+      "delta_mean_hi": -0.0115,
+      "delta_final_hi": -0.0037,
+      "delta_time_below_watch_s": 6.0,
+      "delta_time_below_degraded_s": 0.0,
+      "delta_time_below_critical_s": 0.0,
+      "delta_min_rul_h": null,
+      "delta_final_rul_h": null,
+      "delta_max_cht_c": 40.24,
+      "delta_max_egt_c": 75.08,
+      "delta_min_oil_pressure_bar": 0.731,
+      "delta_max_vibration_g": 0.106,
+      "delta_envelope_events": 301,
+      "delta_risk_score": 0.2664,
+      "qualitative_interpretation": "Within grey-box simulation, scenario 'HIGH_LOAD' showed: HI degraded by 0.166; CHT increased by 40.2\u00b0C; vibration elevated by 0.11 g; 301 additional envelope excursion events. Model scenario result; not an empirical fleet reliability finding."
+    },
+    "AGGRESSIVE_THROTTLE": {
+      "baseline_id": "NOMINAL_CRUISE",
+      "scenario_id": "AGGRESSIVE_THROTTLE",
+      "delta_min_hi": -0.1659,
+      "delta_mean_hi": -0.0097,
+      "delta_final_hi": -0.0008,
+      "delta_time_below_watch_s": 6.0,
+      "delta_time_below_degraded_s": 0.0,
+      "delta_time_below_critical_s": 0.0,
+      "delta_min_rul_h": null,
+      "delta_final_rul_h": null,
+      "delta_max_cht_c": 36.48,
+      "delta_max_egt_c": 75.08,
+      "delta_min_oil_pressure_bar": 0.509,
+      "delta_max_vibration_g": 0.106,
+      "delta_envelope_events": 160,
+      "delta_risk_score": 0.2664,
+      "qualitative_interpretation": "Within grey-box simulation, scenario 'AGGRESSIVE_THROTTLE' showed: HI degraded by 0.166; CHT increased by 36.5\u00b0C; vibration elevated by 0.11 g; 160 additional envelope excursion events. Model scenario result; not an empirical fleet reliability finding."
+    },
+    "F1_INJECTOR": {
+      "baseline_id": "NOMINAL_CRUISE",
+      "scenario_id": "F1_INJECTOR",
+      "delta_min_hi": 0.0,
+      "delta_mean_hi": 0.0,
+      "delta_final_hi": 0.0,
+      "delta_time_below_watch_s": 0.0,
+      "delta_time_below_degraded_s": 0.0,
+      "delta_time_below_critical_s": 0.0,
+      "delta_min_rul_h": null,
+      "delta_final_rul_h": null,
+      "delta_max_cht_c": 0.0,
+      "delta_max_egt_c": 3.71,
+      "delta_min_oil_pressure_bar": 0.0,
+      "delta_max_vibration_g": 0.0,
+      "delta_envelope_events": 0,
+      "delta_risk_score": 0.0,
+      "qualitative_interpretation": "Within grey-box simulation, scenario 'F1_INJECTOR' showed: minimal physical deviation from baseline. Model scenario result; not an empirical fleet reliability finding."
+    },
+    "F2_LUBRICATION": {
+      "baseline_id": "NOMINAL_CRUISE",
+      "scenario_id": "F2_LUBRICATION",
+      "delta_min_hi": 0.0,
+      "delta_mean_hi": -0.0063,
+      "delta_final_hi": -0.023,
+      "delta_time_below_watch_s": 0.0,
+      "delta_time_below_degraded_s": 0.0,
+      "delta_time_below_critical_s": 0.0,
+      "delta_min_rul_h": null,
+      "delta_final_rul_h": null,
+      "delta_max_cht_c": 0.0,
+      "delta_max_egt_c": 0.0,
+      "delta_min_oil_pressure_bar": 0.0,
+      "delta_max_vibration_g": 0.0,
+      "delta_envelope_events": 0,
+      "delta_risk_score": 0.0999,
+      "qualitative_interpretation": "Within grey-box simulation, scenario 'F2_LUBRICATION' showed: minimal physical deviation from baseline. Model scenario result; not an empirical fleet reliability finding."
+    },
+    "F3_COOLING": {
+      "baseline_id": "NOMINAL_CRUISE",
+      "scenario_id": "F3_COOLING",
+      "delta_min_hi": 0.0,
+      "delta_mean_hi": 0.0,
+      "delta_final_hi": -0.0001,
+      "delta_time_below_watch_s": 0.0,
+      "delta_time_below_degraded_s": 0.0,
+      "delta_time_below_critical_s": 0.0,
+      "delta_min_rul_h": null,
+      "delta_final_rul_h": null,
+      "delta_max_cht_c": 16.07,
+      "delta_max_egt_c": 0.0,
+      "delta_min_oil_pressure_bar": 0.0,
+      "delta_max_vibration_g": 0.0,
+      "delta_envelope_events": 0,
+      "delta_risk_score": 0.0,
+      "qualitative_interpretation": "Within grey-box simulation, scenario 'F3_COOLING' showed: CHT increased by 16.1\u00b0C. Model scenario result; not an empirical fleet reliability finding."
+    },
+    "F4_MISFIRE": {
+      "baseline_id": "NOMINAL_CRUISE",
+      "scenario_id": "F4_MISFIRE",
+      "delta_min_hi": -0.0251,
+      "delta_mean_hi": -0.0345,
+      "delta_final_hi": -0.1185,
+      "delta_time_below_watch_s": 0.0,
+      "delta_time_below_degraded_s": 0.0,
+      "delta_time_below_critical_s": 0.0,
+      "delta_min_rul_h": null,
+      "delta_final_rul_h": null,
+      "delta_max_cht_c": 0.0,
+      "delta_max_egt_c": 0.0,
+      "delta_min_oil_pressure_bar": 0.0,
+      "delta_max_vibration_g": 0.103,
+      "delta_envelope_events": 0,
+      "delta_risk_score": 0.11,
+      "qualitative_interpretation": "Within grey-box simulation, scenario 'F4_MISFIRE' showed: vibration elevated by 0.10 g. Model scenario result; not an empirical fleet reliability finding."
+    },
+    "F5_MECHANICAL": {
+      "baseline_id": "NOMINAL_CRUISE",
+      "scenario_id": "F5_MECHANICAL",
+      "delta_min_hi": 0.0,
+      "delta_mean_hi": -0.0148,
+      "delta_final_hi": -0.0474,
+      "delta_time_below_watch_s": 0.0,
+      "delta_time_below_degraded_s": 0.0,
+      "delta_time_below_critical_s": 0.0,
+      "delta_min_rul_h": null,
+      "delta_final_rul_h": null,
+      "delta_max_cht_c": 0.0,
+      "delta_max_egt_c": 0.0,
+      "delta_min_oil_pressure_bar": 0.0,
+      "delta_max_vibration_g": 0.488,
+      "delta_envelope_events": 0,
+      "delta_risk_score": 0.0999,
+      "qualitative_interpretation": "Within grey-box simulation, scenario 'F5_MECHANICAL' showed: vibration elevated by 0.49 g. Model scenario result; not an empirical fleet reliability finding."
+    },
+    "COMBINED_ENVIRONMENT_FAULT": {
+      "baseline_id": "NOMINAL_CRUISE",
+      "scenario_id": "COMBINED_ENVIRONMENT_FAULT",
+      "delta_min_hi": 0.0023,
+      "delta_mean_hi": -0.0006,
+      "delta_final_hi": -0.0039,
+      "delta_time_below_watch_s": 0.0,
+      "delta_time_below_degraded_s": 0.0,
+      "delta_time_below_critical_s": 0.0,
+      "delta_min_rul_h": null,
+      "delta_final_rul_h": null,
+      "delta_max_cht_c": 7.37,
+      "delta_max_egt_c": 55.22,
+      "delta_min_oil_pressure_bar": -0.393,
+      "delta_max_vibration_g": 0.106,
+      "delta_envelope_events": 0,
+      "delta_risk_score": -0.0009,
+      "qualitative_interpretation": "Within grey-box simulation, scenario 'COMBINED_ENVIRONMENT_FAULT' showed: CHT increased by 7.4\u00b0C; oil pressure dropped by 0.39 bar; vibration elevated by 0.11 g. Model scenario result; not an empirical fleet reliability finding."
+    }
+  },
+  "causal_propagation_matrix": {
+    "NOMINAL_CRUISE": {
+      "intervention": {
+        "throttle_pct": 75.0,
+        "altitude_m": 1000.0,
+        "temp_offset_k": 0.0,
+        "active_faults": []
+      },
+      "telemetry_delta_at_t125_vs_nominal": {
+        "delta_rpm": 0.0,
+        "delta_map_bar": 0.0,
+        "delta_fuel_flow_l_h": 0.0,
+        "delta_cht_c": 0.0,
+        "delta_coolant_temp_c": 0.0,
+        "delta_oil_pressure_bar": 0.0,
+        "delta_oil_temp_c": 0.0,
+        "delta_egt_c": 0.0,
+        "delta_vibration_g": 0.0,
+        "delta_egt_cyl1_c": 0.0,
+        "delta_egt_cyl2_c": 0.0,
+        "delta_cht_cyl1_c": 0.0,
+        "delta_cht_cyl2_c": 0.0
+      },
+      "residuals_at_t125": {
+        "cht_residual": -2.17,
+        "egt_residual": 1.91,
+        "oil_temp_residual": 0.3,
+        "rpm_residual": 3.4,
+        "fuel_flow_residual": 0.15
+      },
+      "normalized_z_scores_at_t125": {
+        "cht": -0.217,
+        "cht_cyl1": -0.247,
+        "cht_cyl2": -0.168,
+        "cht_cyl4": -0.207,
+        "egt_cyl1": -0.442,
+        "egt_cyl3": 0.727,
+        "egt_cyl4": -0.208,
+        "charge_air_temp": -0.106
+      },
+      "subsystem_health_scores_at_t125": {
+        "THERMAL": 1.0,
+        "LUBRICATION": 1.0,
+        "FUEL": 1.0,
+        "COMBUSTION": 1.0,
+        "MECHANICAL": 1.0,
+        "ROTATIONAL": 1.0
+      },
+      "subsystem_health_deltas_at_t125": {
+        "THERMAL": 0.0,
+        "LUBRICATION": 0.0,
+        "FUEL": 0.0,
+        "COMBUSTION": 0.0,
+        "MECHANICAL": 0.0,
+        "ROTATIONAL": 0.0
+      },
+      "hi_at_t125": {
+        "HI_raw": 1.0,
+        "HI_smooth": 1.0
+      },
+      "hi_deltas_at_t125": {
+        "delta_HI_raw": 0.0,
+        "delta_HI_smooth": 0.0
+      },
+      "whole_mission_hi_metrics": {
+        "min_hi": 0.9042,
+        "mean_hi": 0.9938,
+        "final_hi": 1.0,
+        "min_hi_startup_transient_masked": false
+      },
+      "anomaly_and_diagnosis_at_t125": {
+        "anomaly_detected": false,
+        "anomaly_score": 0.0,
+        "primary_fault": "HEALTHY",
+        "status": "NOMINAL",
+        "confidence": 1.0
+      },
+      "causal_explanation": "Baseline healthy cruise. Residuals near zero (|z| < 0.1). All subsystems at 1.0. HI is 1.0000."
+    },
+    "HIGH_ALTITUDE": {
+      "intervention": {
+        "throttle_pct": 75.0,
+        "altitude_m": 4500.0,
+        "temp_offset_k": 0.0,
+        "active_faults": []
+      },
+      "telemetry_delta_at_t125_vs_nominal": {
+        "delta_rpm": 26.4,
+        "delta_map_bar": 0.0,
+        "delta_fuel_flow_l_h": 0.24,
+        "delta_cht_c": -17.56,
+        "delta_coolant_temp_c": -10.4,
+        "delta_oil_pressure_bar": 0.169,
+        "delta_oil_temp_c": -18.28,
+        "delta_egt_c": 59.9,
+        "delta_vibration_g": 0.107,
+        "delta_egt_cyl1_c": 58.7,
+        "delta_egt_cyl2_c": 59.9,
+        "delta_cht_cyl1_c": -17.6,
+        "delta_cht_cyl2_c": -17.5
+      },
+      "residuals_at_t125": {
+        "cht_residual": 2.17,
+        "egt_residual": 1.27,
+        "oil_temp_residual": 0.8,
+        "rpm_residual": 4.4,
+        "fuel_flow_residual": 0.17
+      },
+      "normalized_z_scores_at_t125": {
+        "cht": 0.217,
+        "coolant_temp": 0.387,
+        "cht_cyl1": 0.113,
+        "cht_cyl2": 0.195,
+        "cht_cyl3": 0.317,
+        "cht_cyl4": 0.154,
+        "egt_cyl1": -0.503,
+        "egt_cyl3": 0.766,
+        "egt_cyl4": -0.25,
+        "charge_air_temp": -0.122
+      },
+      "subsystem_health_scores_at_t125": {
+        "THERMAL": 1.0,
+        "LUBRICATION": 1.0,
+        "FUEL": 1.0,
+        "COMBUSTION": 1.0,
+        "MECHANICAL": 1.0,
+        "ROTATIONAL": 1.0
+      },
+      "subsystem_health_deltas_at_t125": {
+        "THERMAL": 0.0,
+        "LUBRICATION": 0.0,
+        "FUEL": 0.0,
+        "COMBUSTION": 0.0,
+        "MECHANICAL": 0.0,
+        "ROTATIONAL": 0.0
+      },
+      "hi_at_t125": {
+        "HI_raw": 1.0,
+        "HI_smooth": 1.0
+      },
+      "hi_deltas_at_t125": {
+        "delta_HI_raw": 0.0,
+        "delta_HI_smooth": 0.0
+      },
+      "whole_mission_hi_metrics": {
+        "min_hi": 0.888,
+        "mean_hi": 0.9926,
+        "final_hi": 1.0,
+        "min_hi_startup_transient_masked": false
+      },
+      "anomaly_and_diagnosis_at_t125": {
+        "anomaly_detected": false,
+        "anomaly_score": 0.0,
+        "primary_fault": "HEALTHY",
+        "status": "NOMINAL",
+        "confidence": 1.0
+      },
+      "causal_explanation": "4500m synthetic atmosphere lowers ambient density (0.634) and temperature (-14.3\u00b0C). Lower inlet air density increases continuous turbocharger boost work, shifting EGT up (+60\u00b0C) while colder air cools CHT (-17.5\u00b0C). Engine-level HI remains healthy (1.0000)."
+    },
+    "HOT_DAY": {
+      "intervention": {
+        "throttle_pct": 75.0,
+        "altitude_m": 1000.0,
+        "temp_offset_k": 20.0,
+        "active_faults": []
+      },
+      "telemetry_delta_at_t125_vs_nominal": {
+        "delta_rpm": -242.0,
+        "delta_map_bar": 0.0,
+        "delta_fuel_flow_l_h": -2.04,
+        "delta_cht_c": 8.37,
+        "delta_coolant_temp_c": 2.08,
+        "delta_oil_pressure_bar": -0.248,
+        "delta_oil_temp_c": 5.33,
+        "delta_egt_c": -16.5,
+        "delta_vibration_g": -0.03,
+        "delta_egt_cyl1_c": -16.2,
+        "delta_egt_cyl2_c": -16.5,
+        "delta_cht_cyl1_c": 8.5,
+        "delta_cht_cyl2_c": 8.4
+      },
+      "residuals_at_t125": {
+        "cht_residual": -6.1,
+        "egt_residual": 13.57,
+        "oil_temp_residual": -0.12,
+        "rpm_residual": 3.0,
+        "fuel_flow_residual": 0.14
+      },
+      "normalized_z_scores_at_t125": {
+        "cht": -0.61,
+        "coolant_temp": -0.177,
+        "egt": 0.543,
+        "cht_cyl1": -0.566,
+        "cht_cyl2": -0.495,
+        "cht_cyl3": -0.388,
+        "cht_cyl4": -0.53,
+        "egt_cyl2": 0.414,
+        "egt_cyl3": 1.099,
+        "egt_cyl4": 0.186,
+        "charge_air_temp": -0.108
+      },
+      "subsystem_health_scores_at_t125": {
+        "THERMAL": 1.0,
+        "LUBRICATION": 1.0,
+        "FUEL": 1.0,
+        "COMBUSTION": 1.0,
+        "MECHANICAL": 1.0,
+        "ROTATIONAL": 1.0
+      },
+      "subsystem_health_deltas_at_t125": {
+        "THERMAL": 0.0,
+        "LUBRICATION": 0.0,
+        "FUEL": 0.0,
+        "COMBUSTION": 0.0,
+        "MECHANICAL": 0.0,
+        "ROTATIONAL": 0.0
+      },
+      "hi_at_t125": {
+        "HI_raw": 1.0,
+        "HI_smooth": 1.0
+      },
+      "hi_deltas_at_t125": {
+        "delta_HI_raw": 0.0,
+        "delta_HI_smooth": 0.0
+      },
+      "whole_mission_hi_metrics": {
+        "min_hi": 0.9084,
+        "mean_hi": 0.994,
+        "final_hi": 1.0,
+        "min_hi_startup_transient_masked": false
+      },
+      "anomaly_and_diagnosis_at_t125": {
+        "anomaly_detected": false,
+        "anomaly_score": 0.0,
+        "primary_fault": "HEALTHY",
+        "status": "NOMINAL",
+        "confidence": 1.0
+      },
+      "causal_explanation": "ISA + 20K offset raises ambient temperature to 28.5\u00b0C at 1000m. Heat exchanger radiator delta-T is reduced, elevating steady-state CHT (+8.4\u00b0C) and oil temperature (+5.3\u00b0C). Oil viscosity decreases, reducing oil pressure (-0.25 bar). Health index remains within nominal operating envelope (|z| < 1.5)."
+    },
+    "HOT_DAY_HIGH_ALTITUDE": {
+      "intervention": {
+        "throttle_pct": 75.0,
+        "altitude_m": 4500.0,
+        "temp_offset_k": 20.0,
+        "active_faults": []
+      },
+      "telemetry_delta_at_t125_vs_nominal": {
+        "delta_rpm": -236.4,
+        "delta_map_bar": 0.0,
+        "delta_fuel_flow_l_h": -1.99,
+        "delta_cht_c": -7.92,
+        "delta_coolant_temp_c": -3.69,
+        "delta_oil_pressure_bar": -0.088,
+        "delta_oil_temp_c": -14.1,
+        "delta_egt_c": 56.8,
+        "delta_vibration_g": 0.107,
+        "delta_egt_cyl1_c": 55.7,
+        "delta_egt_cyl2_c": 56.8,
+        "delta_cht_cyl1_c": -7.8,
+        "delta_cht_cyl2_c": -7.9
+      },
+      "residuals_at_t125": {
+        "cht_residual": 1.59,
+        "egt_residual": 24.96,
+        "oil_temp_residual": 2.68,
+        "rpm_residual": 49.1,
+        "fuel_flow_residual": 0.51
+      },
+      "normalized_z_scores_at_t125": {
+        "rpm": 0.491,
+        "map_bar": 0.36,
+        "fuel_flow": 0.255,
+        "cht": 0.159,
+        "coolant_temp": 0.273,
+        "oil_temp": 0.335,
+        "egt": 0.998,
+        "vibration": 0.2,
+        "cht_cyl2": 0.147,
+        "cht_cyl3": 0.253,
+        "cht_cyl4": 0.111,
+        "egt_cyl1": 0.288,
+        "egt_cyl2": 0.794,
+        "egt_cyl3": 1.552,
+        "egt_cyl4": 0.541
+      },
+      "subsystem_health_scores_at_t125": {
+        "THERMAL": 1.0,
+        "LUBRICATION": 1.0,
+        "FUEL": 1.0,
+        "COMBUSTION": 1.0,
+        "MECHANICAL": 1.0,
+        "ROTATIONAL": 1.0
+      },
+      "subsystem_health_deltas_at_t125": {
+        "THERMAL": 0.0,
+        "LUBRICATION": 0.0,
+        "FUEL": 0.0,
+        "COMBUSTION": 0.0,
+        "MECHANICAL": 0.0,
+        "ROTATIONAL": 0.0
+      },
+      "hi_at_t125": {
+        "HI_raw": 1.0,
+        "HI_smooth": 1.0
+      },
+      "hi_deltas_at_t125": {
+        "delta_HI_raw": 0.0,
+        "delta_HI_smooth": 0.0
+      },
+      "whole_mission_hi_metrics": {
+        "min_hi": 0.9065,
+        "mean_hi": 0.9936,
+        "final_hi": 1.0,
+        "min_hi_startup_transient_masked": false
+      },
+      "anomaly_and_diagnosis_at_t125": {
+        "anomaly_detected": false,
+        "anomaly_score": 0.0,
+        "primary_fault": "COOLING_DEGRADATION",
+        "status": "SUSPECTED",
+        "confidence": 0.485
+      },
+      "causal_explanation": "Orthogonal physical composition: 4500m synthetic altitude combines with +20K ambient offset (T_amb = +5.8\u00b0C vs -14.3\u00b0C in cold high alt). Ambient warming propagates to physical thermodynamics, raising CHT (+9.6\u00b0C) and oil temp (+4.2\u00b0C) relative to pure HIGH_ALTITUDE."
+    },
+    "HIGH_LOAD": {
+      "intervention": {
+        "throttle_pct": 95.0,
+        "altitude_m": 1000.0,
+        "temp_offset_k": 0.0,
+        "active_faults": []
+      },
+      "telemetry_delta_at_t125_vs_nominal": {
+        "delta_rpm": 1402.7,
+        "delta_map_bar": 0.142,
+        "delta_fuel_flow_l_h": 16.74,
+        "delta_cht_c": 40.7,
+        "delta_coolant_temp_c": 6.14,
+        "delta_oil_pressure_bar": 0.435,
+        "delta_oil_temp_c": 94.68,
+        "delta_egt_c": 75.1,
+        "delta_vibration_g": 0.107,
+        "delta_egt_cyl1_c": 73.6,
+        "delta_egt_cyl2_c": 75.1,
+        "delta_cht_cyl1_c": 39.9,
+        "delta_cht_cyl2_c": 40.7
+      },
+      "residuals_at_t125": {
+        "cht_residual": -17.57,
+        "egt_residual": 1.26,
+        "oil_temp_residual": -0.55,
+        "rpm_residual": 3.7,
+        "fuel_flow_residual": 0.2
+      },
+      "normalized_z_scores_at_t125": {
+        "cht": -1.757,
+        "coolant_temp": -0.357,
+        "cht_cyl1": -1.6,
+        "cht_cyl2": -1.45,
+        "cht_cyl3": -1.226,
+        "cht_cyl4": -1.525,
+        "egt_cyl1": -0.514,
+        "egt_cyl3": 0.781,
+        "egt_cyl4": -0.255,
+        "charge_air_temp": -0.108
+      },
+      "subsystem_health_scores_at_t125": {
+        "THERMAL": 0.9755,
+        "LUBRICATION": 1.0,
+        "FUEL": 1.0,
+        "COMBUSTION": 1.0,
+        "MECHANICAL": 1.0,
+        "ROTATIONAL": 1.0
+      },
+      "subsystem_health_deltas_at_t125": {
+        "THERMAL": -0.0245,
+        "LUBRICATION": 0.0,
+        "FUEL": 0.0,
+        "COMBUSTION": 0.0,
+        "MECHANICAL": 0.0,
+        "ROTATIONAL": 0.0
+      },
+      "hi_at_t125": {
+        "HI_raw": 0.9959,
+        "HI_smooth": 0.9959
+      },
+      "hi_deltas_at_t125": {
+        "delta_HI_raw": -0.0041,
+        "delta_HI_smooth": -0.0041
+      },
+      "whole_mission_hi_metrics": {
+        "min_hi": 0.7383,
+        "mean_hi": 0.9823,
+        "final_hi": 0.9963,
+        "min_hi_startup_transient_masked": false
+      },
+      "anomaly_and_diagnosis_at_t125": {
+        "anomaly_detected": false,
+        "anomaly_score": 0.0041,
+        "primary_fault": "UNKNOWN",
+        "status": "INSUFFICIENT_EVIDENCE",
+        "confidence": 0.2
+      },
+      "causal_explanation": "Sustained 95% throttle commands 5758 RPM (+1403 RPM), raising MAP to 1.30 bar, CHT to 121.6\u00b0C (+40.7\u00b0C), and fuel flow to 31.8 L/h (+16.5 L/h). 301 envelope events accumulate for continuous operating limits (RPM > 5500, MAP > 1.2 bar). Risk index rises to 0.3047."
+    },
+    "AGGRESSIVE_THROTTLE": {
+      "intervention": {
+        "throttle_pct": 95.0,
+        "altitude_m": 1000.0,
+        "temp_offset_k": 0.0,
+        "active_faults": []
+      },
+      "telemetry_delta_at_t125_vs_nominal": {
+        "delta_rpm": 1416.3,
+        "delta_map_bar": 0.147,
+        "delta_fuel_flow_l_h": 16.93,
+        "delta_cht_c": 19.88,
+        "delta_coolant_temp_c": 0.93,
+        "delta_oil_pressure_bar": 0.997,
+        "delta_oil_temp_c": 25.91,
+        "delta_egt_c": 59.4,
+        "delta_vibration_g": 0.107,
+        "delta_egt_cyl1_c": 58.2,
+        "delta_egt_cyl2_c": 59.4,
+        "delta_cht_cyl1_c": 19.5,
+        "delta_cht_cyl2_c": 19.9
+      },
+      "residuals_at_t125": {
+        "cht_residual": -2.2,
+        "egt_residual": 2.43,
+        "oil_temp_residual": 1.0,
+        "rpm_residual": 2.6,
+        "fuel_flow_residual": 0.2
+      },
+      "normalized_z_scores_at_t125": {
+        "cht": -0.22,
+        "coolant_temp": -0.112,
+        "oil_temp": 0.125,
+        "cht_cyl1": -0.283,
+        "cht_cyl2": -0.169,
+        "cht_cyl4": -0.227,
+        "egt_cyl1": -0.465,
+        "egt_cyl3": 0.804,
+        "egt_cyl4": -0.211,
+        "charge_air_temp": -0.104
+      },
+      "subsystem_health_scores_at_t125": {
+        "THERMAL": 1.0,
+        "LUBRICATION": 1.0,
+        "FUEL": 1.0,
+        "COMBUSTION": 1.0,
+        "MECHANICAL": 1.0,
+        "ROTATIONAL": 1.0
+      },
+      "subsystem_health_deltas_at_t125": {
+        "THERMAL": 0.0,
+        "LUBRICATION": 0.0,
+        "FUEL": 0.0,
+        "COMBUSTION": 0.0,
+        "MECHANICAL": 0.0,
+        "ROTATIONAL": 0.0
+      },
+      "hi_at_t125": {
+        "HI_raw": 1.0,
+        "HI_smooth": 0.999
+      },
+      "hi_deltas_at_t125": {
+        "delta_HI_raw": 0.0,
+        "delta_HI_smooth": -0.001
+      },
+      "whole_mission_hi_metrics": {
+        "min_hi": 0.7383,
+        "mean_hi": 0.9841,
+        "final_hi": 0.9992,
+        "min_hi_startup_transient_masked": false
+      },
+      "anomaly_and_diagnosis_at_t125": {
+        "anomaly_detected": false,
+        "anomaly_score": 0.0,
+        "primary_fault": "HEALTHY",
+        "status": "NOMINAL",
+        "confidence": 1.0
+      },
+      "causal_explanation": "Throttle cycling between 60% and 95% drives rapid dynamic RPM oscillations (3420 to 5772 RPM) and thermal swings. 160 envelope events accumulate during high-power excursions. Demonstrates rapid dynamic response of the grey-box rotational dynamics and turbocharger model."
+    },
+    "F1_INJECTOR": {
+      "intervention": {
+        "throttle_pct": 75.0,
+        "altitude_m": 1000.0,
+        "temp_offset_k": 0.0,
+        "active_faults": [
+          "injector_delivery_abnormality"
+        ]
+      },
+      "telemetry_delta_at_t125_vs_nominal": {
+        "delta_rpm": -24.8,
+        "delta_map_bar": 0.0,
+        "delta_fuel_flow_l_h": -0.54,
+        "delta_cht_c": -1.57,
+        "delta_coolant_temp_c": -0.18,
+        "delta_oil_pressure_bar": -0.011,
+        "delta_oil_temp_c": -1.27,
+        "delta_egt_c": 5.3,
+        "delta_vibration_g": -0.005,
+        "delta_egt_cyl1_c": 30.3,
+        "delta_egt_cyl2_c": -3.0,
+        "delta_cht_cyl1_c": -4.6,
+        "delta_cht_cyl2_c": -0.6
+      },
+      "residuals_at_t125": {
+        "cht_residual": -3.74,
+        "egt_residual": 7.2,
+        "oil_temp_residual": -0.97,
+        "rpm_residual": -21.4,
+        "fuel_flow_residual": -0.39
+      },
+      "normalized_z_scores_at_t125": {
+        "rpm": -0.214,
+        "fuel_flow": -0.195,
+        "cht": -0.374,
+        "oil_temp": -0.121,
+        "egt": 0.288,
+        "cht_cyl1": -0.627,
+        "cht_cyl2": -0.215,
+        "cht_cyl4": -0.255,
+        "egt_cyl1": 0.567,
+        "egt_cyl3": 0.623,
+        "egt_cyl4": -0.308,
+        "charge_air_temp": -0.106
+      },
+      "subsystem_health_scores_at_t125": {
+        "THERMAL": 1.0,
+        "LUBRICATION": 1.0,
+        "FUEL": 1.0,
+        "COMBUSTION": 1.0,
+        "MECHANICAL": 1.0,
+        "ROTATIONAL": 1.0
+      },
+      "subsystem_health_deltas_at_t125": {
+        "THERMAL": 0.0,
+        "LUBRICATION": 0.0,
+        "FUEL": 0.0,
+        "COMBUSTION": 0.0,
+        "MECHANICAL": 0.0,
+        "ROTATIONAL": 0.0
+      },
+      "hi_at_t125": {
+        "HI_raw": 1.0,
+        "HI_smooth": 1.0
+      },
+      "hi_deltas_at_t125": {
+        "delta_HI_raw": 0.0,
+        "delta_HI_smooth": 0.0
+      },
+      "whole_mission_hi_metrics": {
+        "min_hi": 0.9042,
+        "mean_hi": 0.9938,
+        "final_hi": 1.0,
+        "min_hi_startup_transient_masked": false
+      },
+      "anomaly_and_diagnosis_at_t125": {
+        "anomaly_detected": false,
+        "anomaly_score": 0.0,
+        "primary_fault": "HEALTHY",
+        "status": "NOMINAL",
+        "confidence": 1.0
+      },
+      "causal_explanation": "Single-cylinder lean injector abnormality (cyl 1) modulates fuel delivery. Cyl 1 EGT increases by +30.3\u00b0C (lean cylinder peak), shifting cyl 1 EGT z-score by +1.009. Average EGT shifts by +5.3\u00b0C. Because all channel residuals stay below tau_nom (1.5 sigma), Phase 5 health evaluates zero penalty and HI remains 1.0000."
+    },
+    "F2_LUBRICATION": {
+      "intervention": {
+        "throttle_pct": 75.0,
+        "altitude_m": 1000.0,
+        "temp_offset_k": 0.0,
+        "active_faults": [
+          "lubrication_degradation"
+        ]
+      },
+      "telemetry_delta_at_t125_vs_nominal": {
+        "delta_rpm": -11.9,
+        "delta_map_bar": 0.0,
+        "delta_fuel_flow_l_h": -0.05,
+        "delta_cht_c": -0.1,
+        "delta_coolant_temp_c": -0.01,
+        "delta_oil_pressure_bar": -0.978,
+        "delta_oil_temp_c": 5.12,
+        "delta_egt_c": -0.9,
+        "delta_vibration_g": -0.001,
+        "delta_egt_cyl1_c": -0.8,
+        "delta_egt_cyl2_c": -0.9,
+        "delta_cht_cyl1_c": -0.1,
+        "delta_cht_cyl2_c": -0.1
+      },
+      "residuals_at_t125": {
+        "cht_residual": -2.27,
+        "egt_residual": 1.06,
+        "oil_pressure_residual": -0.967,
+        "oil_temp_residual": 5.42,
+        "rpm_residual": -8.5,
+        "fuel_flow_residual": 0.1
+      },
+      "normalized_z_scores_at_t125": {
+        "cht": -0.227,
+        "oil_temp": 0.677,
+        "oil_pressure": -1.934,
+        "cht_cyl1": -0.256,
+        "cht_cyl2": -0.175,
+        "cht_cyl4": -0.215,
+        "egt_cyl1": -0.47,
+        "egt_cyl3": 0.698,
+        "egt_cyl4": -0.236,
+        "charge_air_temp": -0.106
+      },
+      "subsystem_health_scores_at_t125": {
+        "THERMAL": 1.0,
+        "LUBRICATION": 0.876,
+        "FUEL": 1.0,
+        "COMBUSTION": 1.0,
+        "MECHANICAL": 1.0,
+        "ROTATIONAL": 1.0
+      },
+      "subsystem_health_deltas_at_t125": {
+        "THERMAL": 0.0,
+        "LUBRICATION": -0.124,
+        "FUEL": 0.0,
+        "COMBUSTION": 0.0,
+        "MECHANICAL": 0.0,
+        "ROTATIONAL": 0.0
+      },
+      "hi_at_t125": {
+        "HI_raw": 0.9793,
+        "HI_smooth": 0.979
+      },
+      "hi_deltas_at_t125": {
+        "delta_HI_raw": -0.0207,
+        "delta_HI_smooth": -0.021
+      },
+      "whole_mission_hi_metrics": {
+        "min_hi": 0.9042,
+        "mean_hi": 0.9875,
+        "final_hi": 0.977,
+        "min_hi_startup_transient_masked": true
+      },
+      "anomaly_and_diagnosis_at_t125": {
+        "anomaly_detected": true,
+        "anomaly_score": 0.0207,
+        "primary_fault": "LUBRICATION_DEGRADATION",
+        "status": "CONFIRMED",
+        "confidence": 0.714
+      },
+      "causal_explanation": "Lubrication degradation reduces oil pressure by -0.98 bar to 3.295 bar (z = -1.934). Phase 5 LUBRICATION subsystem health drops to 0.8760 (t=125) and 0.8526 (t=150). With 20% lubrication subsystem weight, overall HI_raw drops to 0.9754 and HI_smooth to 0.9770. Diagnosis confirms LUBRICATION_DEGRADATION."
+    },
+    "F3_COOLING": {
+      "intervention": {
+        "throttle_pct": 75.0,
+        "altitude_m": 1000.0,
+        "temp_offset_k": 0.0,
+        "active_faults": [
+          "cooling_degradation"
+        ]
+      },
+      "telemetry_delta_at_t125_vs_nominal": {
+        "delta_rpm": 0.0,
+        "delta_map_bar": 0.0,
+        "delta_fuel_flow_l_h": 0.0,
+        "delta_cht_c": 15.44,
+        "delta_coolant_temp_c": 2.24,
+        "delta_oil_pressure_bar": -0.003,
+        "delta_oil_temp_c": 0.47,
+        "delta_egt_c": 0.0,
+        "delta_vibration_g": 0.0,
+        "delta_egt_cyl1_c": 0.0,
+        "delta_egt_cyl2_c": 0.0,
+        "delta_cht_cyl1_c": 15.2,
+        "delta_cht_cyl2_c": 15.5
+      },
+      "residuals_at_t125": {
+        "cht_residual": 13.27,
+        "egt_residual": 1.91,
+        "oil_temp_residual": 0.77,
+        "rpm_residual": 3.4,
+        "fuel_flow_residual": 0.15
+      },
+      "normalized_z_scores_at_t125": {
+        "cht": 1.327,
+        "coolant_temp": 0.325,
+        "cht_cyl1": 1.023,
+        "cht_cyl2": 1.12,
+        "cht_cyl3": 1.265,
+        "cht_cyl4": 1.072,
+        "egt_cyl1": -0.442,
+        "egt_cyl3": 0.727,
+        "egt_cyl4": -0.208,
+        "charge_air_temp": -0.106
+      },
+      "subsystem_health_scores_at_t125": {
+        "THERMAL": 1.0,
+        "LUBRICATION": 1.0,
+        "FUEL": 1.0,
+        "COMBUSTION": 1.0,
+        "MECHANICAL": 1.0,
+        "ROTATIONAL": 1.0
+      },
+      "subsystem_health_deltas_at_t125": {
+        "THERMAL": 0.0,
+        "LUBRICATION": 0.0,
+        "FUEL": 0.0,
+        "COMBUSTION": 0.0,
+        "MECHANICAL": 0.0,
+        "ROTATIONAL": 0.0
+      },
+      "hi_at_t125": {
+        "HI_raw": 1.0,
+        "HI_smooth": 1.0
+      },
+      "hi_deltas_at_t125": {
+        "delta_HI_raw": 0.0,
+        "delta_HI_smooth": 0.0
+      },
+      "whole_mission_hi_metrics": {
+        "min_hi": 0.9042,
+        "mean_hi": 0.9938,
+        "final_hi": 0.9999,
+        "min_hi_startup_transient_masked": false
+      },
+      "anomaly_and_diagnosis_at_t125": {
+        "anomaly_detected": false,
+        "anomaly_score": 0.0,
+        "primary_fault": "HEALTHY",
+        "status": "NOMINAL",
+        "confidence": 1.0
+      },
+      "causal_explanation": "Coolant pump degradation impairs heat rejection, driving CHT up by +15.5\u00b0C to 96.4\u00b0C (z = +1.327) and coolant temp to 77.8\u00b0C. Because z-score is just below tau_nom (1.50 sigma), Phase 5 thermal penalty is minimal (subsystem health 0.9960 at t=150). Full mission min HI was 0.9042 due to startup transient."
+    },
+    "F4_MISFIRE": {
+      "intervention": {
+        "throttle_pct": 75.0,
+        "altitude_m": 1000.0,
+        "temp_offset_k": 0.0,
+        "active_faults": [
+          "combustion_misfire"
+        ]
+      },
+      "telemetry_delta_at_t125_vs_nominal": {
+        "delta_rpm": -389.4,
+        "delta_map_bar": 0.0,
+        "delta_fuel_flow_l_h": -3.17,
+        "delta_cht_c": -12.09,
+        "delta_coolant_temp_c": -1.8,
+        "delta_oil_pressure_bar": -0.271,
+        "delta_oil_temp_c": -7.49,
+        "delta_egt_c": -69.5,
+        "delta_vibration_g": 0.115,
+        "delta_egt_cyl1_c": -43.4,
+        "delta_egt_cyl2_c": -145.1,
+        "delta_cht_cyl1_c": -7.9,
+        "delta_cht_cyl2_c": -24.2
+      },
+      "residuals_at_t125": {
+        "cht_residual": -14.26,
+        "egt_residual": -67.58,
+        "oil_pressure_residual": -0.26,
+        "oil_temp_residual": -7.19,
+        "rpm_residual": -386.0,
+        "fuel_flow_residual": -3.02,
+        "vibration_residual": 0.11
+      },
+      "normalized_z_scores_at_t125": {
+        "rpm": -3.86,
+        "fuel_flow": -1.51,
+        "cht": -1.426,
+        "coolant_temp": -0.348,
+        "oil_temp": -0.899,
+        "oil_pressure": -0.52,
+        "egt": -2.703,
+        "vibration": 0.55,
+        "cht_cyl1": -0.903,
+        "cht_cyl2": -2.188,
+        "cht_cyl3": -0.738,
+        "cht_cyl4": -0.87,
+        "egt_cyl1": -1.889,
+        "egt_cyl2": -4.811,
+        "egt_cyl3": -0.793,
+        "egt_cyl4": -1.67,
+        "charge_air_temp": -0.106
+      },
+      "subsystem_health_scores_at_t125": {
+        "THERMAL": 1.0,
+        "LUBRICATION": 1.0,
+        "FUEL": 0.9971,
+        "COMBUSTION": 0.6562,
+        "MECHANICAL": 1.0,
+        "ROTATIONAL": 0.6629
+      },
+      "subsystem_health_deltas_at_t125": {
+        "THERMAL": 0.0,
+        "LUBRICATION": 0.0,
+        "FUEL": -0.0029,
+        "COMBUSTION": -0.3438,
+        "MECHANICAL": 0.0,
+        "ROTATIONAL": -0.3371
+      },
+      "hi_at_t125": {
+        "HI_raw": 0.886,
+        "HI_smooth": 0.8851
+      },
+      "hi_deltas_at_t125": {
+        "delta_HI_raw": -0.114,
+        "delta_HI_smooth": -0.1149
+      },
+      "whole_mission_hi_metrics": {
+        "min_hi": 0.8791,
+        "mean_hi": 0.9593,
+        "final_hi": 0.8815,
+        "min_hi_startup_transient_masked": false
+      },
+      "anomaly_and_diagnosis_at_t125": {
+        "anomaly_detected": true,
+        "anomaly_score": 0.114,
+        "primary_fault": "COMBUSTION_MISFIRE",
+        "status": "SUSPECTED",
+        "confidence": 0.557
+      },
+      "causal_explanation": "Cylinder 2 combustion misfire (severity 0.60, aligned with Phase 6 validated baseline): cyl 2 EGT drops by -145.1\u00b0C (z = -4.15), engine RPM drops by -389 RPM (z = -3.86), and average EGT drops by -69.5\u00b0C (z = -2.70 < -2.00). COMBUSTION health drops to 0.6562 and ROTATIONAL health to 0.6629. Overall HI_smooth drops to 0.8851. Diagnosis confirms COMBUSTION_MISFIRE (confidence 0.56, suspected)."
+    },
+    "F5_MECHANICAL": {
+      "intervention": {
+        "throttle_pct": 75.0,
+        "altitude_m": 1000.0,
+        "temp_offset_k": 0.0,
+        "active_faults": [
+          "mechanical_degradation"
+        ]
+      },
+      "telemetry_delta_at_t125_vs_nominal": {
+        "delta_rpm": -13.4,
+        "delta_map_bar": 0.0,
+        "delta_fuel_flow_l_h": -0.06,
+        "delta_cht_c": -0.11,
+        "delta_coolant_temp_c": -0.01,
+        "delta_oil_pressure_bar": -0.01,
+        "delta_oil_temp_c": -0.14,
+        "delta_egt_c": -1.0,
+        "delta_vibration_g": 0.5,
+        "delta_egt_cyl1_c": -1.0,
+        "delta_egt_cyl2_c": -1.0,
+        "delta_cht_cyl1_c": -0.1,
+        "delta_cht_cyl2_c": -0.1
+      },
+      "residuals_at_t125": {
+        "cht_residual": -2.28,
+        "egt_residual": 0.95,
+        "oil_temp_residual": 0.16,
+        "rpm_residual": -10.0,
+        "fuel_flow_residual": 0.09,
+        "vibration_residual": 0.495
+      },
+      "normalized_z_scores_at_t125": {
+        "cht": -0.228,
+        "vibration": 2.475,
+        "cht_cyl1": -0.257,
+        "cht_cyl2": -0.177,
+        "cht_cyl4": -0.217,
+        "egt_cyl1": -0.474,
+        "egt_cyl3": 0.694,
+        "egt_cyl4": -0.24,
+        "charge_air_temp": -0.106
+      },
+      "subsystem_health_scores_at_t125": {
+        "THERMAL": 1.0,
+        "LUBRICATION": 1.0,
+        "FUEL": 1.0,
+        "COMBUSTION": 1.0,
+        "MECHANICAL": 0.7214,
+        "ROTATIONAL": 1.0
+      },
+      "subsystem_health_deltas_at_t125": {
+        "THERMAL": 0.0,
+        "LUBRICATION": 0.0,
+        "FUEL": 0.0,
+        "COMBUSTION": 0.0,
+        "MECHANICAL": -0.2786,
+        "ROTATIONAL": 0.0
+      },
+      "hi_at_t125": {
+        "HI_raw": 0.9536,
+        "HI_smooth": 0.9518
+      },
+      "hi_deltas_at_t125": {
+        "delta_HI_raw": -0.0464,
+        "delta_HI_smooth": -0.0482
+      },
+      "whole_mission_hi_metrics": {
+        "min_hi": 0.9042,
+        "mean_hi": 0.979,
+        "final_hi": 0.9526,
+        "min_hi_startup_transient_masked": true
+      },
+      "anomaly_and_diagnosis_at_t125": {
+        "anomaly_detected": true,
+        "anomaly_score": 0.0464,
+        "primary_fault": "MECHANICAL_DEGRADATION",
+        "status": "CONFIRMED",
+        "confidence": 0.714
+      },
+      "causal_explanation": "Mechanical degradation amplifies vibration from 0.612 g to 1.112 g (+0.500 g, z = +2.475). Phase 5 MECHANICAL subsystem health drops to 0.7214. Overall HI_smooth drops to 0.9518. Diagnosis confirms MECHANICAL_DEGRADATION (confidence 0.96)."
+    },
+    "COMBINED_ENVIRONMENT_FAULT": {
+      "intervention": {
+        "throttle_pct": 75.0,
+        "altitude_m": 4500.0,
+        "temp_offset_k": 20.0,
+        "active_faults": [
+          "cooling_degradation"
+        ]
+      },
+      "telemetry_delta_at_t125_vs_nominal": {
+        "delta_rpm": -236.4,
+        "delta_map_bar": 0.0,
+        "delta_fuel_flow_l_h": -1.99,
+        "delta_cht_c": 6.36,
+        "delta_coolant_temp_c": -0.85,
+        "delta_oil_pressure_bar": -0.091,
+        "delta_oil_temp_c": -13.67,
+        "delta_egt_c": 56.8,
+        "delta_vibration_g": 0.107,
+        "delta_egt_cyl1_c": 55.7,
+        "delta_egt_cyl2_c": 56.8,
+        "delta_cht_cyl1_c": 6.3,
+        "delta_cht_cyl2_c": 6.4
+      },
+      "residuals_at_t125": {
+        "cht_residual": 15.87,
+        "egt_residual": 24.96,
+        "oil_temp_residual": 3.11,
+        "rpm_residual": 49.1,
+        "fuel_flow_residual": 0.51
+      },
+      "normalized_z_scores_at_t125": {
+        "rpm": 0.491,
+        "map_bar": 0.36,
+        "fuel_flow": 0.255,
+        "cht": 1.587,
+        "coolant_temp": 0.747,
+        "oil_temp": 0.389,
+        "egt": 0.998,
+        "vibration": 0.2,
+        "cht_cyl1": 1.251,
+        "cht_cyl2": 1.337,
+        "cht_cyl3": 1.465,
+        "cht_cyl4": 1.293,
+        "egt_cyl1": 0.288,
+        "egt_cyl2": 0.794,
+        "egt_cyl3": 1.552,
+        "egt_cyl4": 0.541
+      },
+      "subsystem_health_scores_at_t125": {
+        "THERMAL": 0.9917,
+        "LUBRICATION": 1.0,
+        "FUEL": 1.0,
+        "COMBUSTION": 1.0,
+        "MECHANICAL": 1.0,
+        "ROTATIONAL": 1.0
+      },
+      "subsystem_health_deltas_at_t125": {
+        "THERMAL": -0.0083,
+        "LUBRICATION": 0.0,
+        "FUEL": 0.0,
+        "COMBUSTION": 0.0,
+        "MECHANICAL": 0.0,
+        "ROTATIONAL": 0.0
+      },
+      "hi_at_t125": {
+        "HI_raw": 0.9986,
+        "HI_smooth": 0.9995
+      },
+      "hi_deltas_at_t125": {
+        "delta_HI_raw": -0.0014,
+        "delta_HI_smooth": -0.0005
+      },
+      "whole_mission_hi_metrics": {
+        "min_hi": 0.9065,
+        "mean_hi": 0.9932,
+        "final_hi": 0.9961,
+        "min_hi_startup_transient_masked": false
+      },
+      "anomaly_and_diagnosis_at_t125": {
+        "anomaly_detected": false,
+        "anomaly_score": 0.0014,
+        "primary_fault": "COOLING_DEGRADATION",
+        "status": "SUSPECTED",
+        "confidence": 0.424
+      },
+      "causal_explanation": "Compound 3-factor stress (4500m synthetic + 20K hot-day offset + F3 cooling fault): elevated ambient temperature reduces heat exchanger efficiency, worsening cooling fault impact non-linearly (CHT reaches 87.3\u00b0C, +23.9\u00b0C higher than pure cold high altitude). Diagnosis confirms COOLING_DEGRADATION."
+    }
+  },
+  "causal_decomposition": {
+    "baseline": {
+      "mission_duration_s": 150.0,
+      "step_count": 151,
+      "valid_telemetry_fraction": 1.0,
+      "min_hi": 0.9042,
+      "mean_hi": 0.9938,
+      "final_hi": 1.0,
+      "min_subsystem_health": {
+        "thermal": 1.0,
+        "lubrication": 1.0,
+        "fuel": 0.8029,
+        "mechanical": 1.0,
+        "combustion": 0.9083
+      },
+      "max_cht_c": 82.44,
+      "max_egt_c": 706.71,
+      "min_oil_pressure_bar": 2.64,
+      "max_oil_temp_c": 107.05,
+      "max_vibration_g": 0.657,
+      "mean_fuel_flow_l_h": 15.11,
+      "max_fuel_flow_l_h": 15.72,
+      "time_below_watch_s": 0.0,
+      "time_below_degraded_s": 0.0,
+      "time_below_critical_s": 0.0,
+      "time_in_diagnostic_state_s": 8.0,
+      "min_estimated_rul_h": null,
+      "final_estimated_rul_h": null,
+      "envelope_event_count": 0,
+      "total_envelope_excursion_duration_s": 0.0,
+      "risk_index": {
+        "score": 0.0383,
+        "health_component": 0.0958,
+        "envelope_component": 0.0,
+        "duration_component": 0.0,
+        "rul_component": 0.0,
+        "risk_index_type": "ENGINEERING_HEURISTIC",
+        "claim_class": "MODEL_SCENARIO_RESULT",
+        "disclaimer": "Engineering heuristic index for comparative scenario analysis only. Strictly NOT a statistical failure probability or certified airworthiness metric."
+      }
+    },
+    "branches": {
+      "altitude_only": {
+        "metrics": {
+          "mission_duration_s": 150.0,
+          "step_count": 151,
+          "valid_telemetry_fraction": 1.0,
+          "min_hi": 0.888,
+          "mean_hi": 0.9926,
+          "final_hi": 1.0,
+          "min_subsystem_health": {
+            "thermal": 1.0,
+            "lubrication": 1.0,
+            "fuel": 1.0,
+            "mechanical": 1.0,
+            "combustion": 0.9134
+          },
+          "max_cht_c": 80.85,
+          "max_egt_c": 766.26,
+          "min_oil_pressure_bar": 2.32,
+          "max_oil_temp_c": 88.08,
+          "max_vibration_g": 0.763,
+          "mean_fuel_flow_l_h": 15.23,
+          "max_fuel_flow_l_h": 15.96,
+          "time_below_watch_s": 0.0,
+          "time_below_degraded_s": 0.0,
+          "time_below_critical_s": 0.0,
+          "time_in_diagnostic_state_s": 9.0,
+          "min_estimated_rul_h": null,
+          "final_estimated_rul_h": null,
+          "envelope_event_count": 0,
+          "total_envelope_excursion_duration_s": 0.0,
+          "risk_index": {
+            "score": 0.0448,
+            "health_component": 0.112,
+            "envelope_component": 0.0,
+            "duration_component": 0.0,
+            "rul_component": 0.0,
+            "risk_index_type": "ENGINEERING_HEURISTIC",
+            "claim_class": "MODEL_SCENARIO_RESULT",
+            "disclaimer": "Engineering heuristic index for comparative scenario analysis only. Strictly NOT a statistical failure probability or certified airworthiness metric."
+          }
+        },
+        "delta": {
+          "baseline_id": "NOMINAL_CRUISE",
+          "scenario_id": "HIGH_ALTITUDE",
+          "delta_min_hi": -0.0162,
+          "delta_mean_hi": -0.0012,
+          "delta_final_hi": 0.0,
+          "delta_time_below_watch_s": 0.0,
+          "delta_time_below_degraded_s": 0.0,
+          "delta_time_below_critical_s": 0.0,
+          "delta_min_rul_h": null,
+          "delta_final_rul_h": null,
+          "delta_max_cht_c": -1.59,
+          "delta_max_egt_c": 59.55,
+          "delta_min_oil_pressure_bar": -0.32,
+          "delta_max_vibration_g": 0.106,
+          "delta_envelope_events": 0,
+          "delta_risk_score": 0.0065,
+          "qualitative_interpretation": "Within grey-box simulation, scenario 'HIGH_ALTITUDE' showed: oil pressure dropped by 0.32 bar; vibration elevated by 0.11 g. Model scenario result; not an empirical fleet reliability finding.",
+          "claim_class": "MODEL_SCENARIO_RESULT"
+        }
+      },
+      "hot_day_only": {
+        "metrics": {
+          "mission_duration_s": 150.0,
+          "step_count": 151,
+          "valid_telemetry_fraction": 1.0,
+          "min_hi": 0.9084,
+          "mean_hi": 0.994,
+          "final_hi": 1.0,
+          "min_subsystem_health": {
+            "thermal": 1.0,
+            "lubrication": 1.0,
+            "fuel": 0.9214,
+            "mechanical": 1.0,
+            "combustion": 0.9175
+          },
+          "max_cht_c": 90.33,
+          "max_egt_c": 690.18,
+          "min_oil_pressure_bar": 2.544,
+          "max_oil_temp_c": 112.62,
+          "max_vibration_g": 0.627,
+          "mean_fuel_flow_l_h": 13.08,
+          "max_fuel_flow_l_h": 13.68,
+          "time_below_watch_s": 0.0,
+          "time_below_degraded_s": 0.0,
+          "time_below_critical_s": 0.0,
+          "time_in_diagnostic_state_s": 8.0,
+          "min_estimated_rul_h": null,
+          "final_estimated_rul_h": null,
+          "envelope_event_count": 0,
+          "total_envelope_excursion_duration_s": 0.0,
+          "risk_index": {
+            "score": 0.0366,
+            "health_component": 0.0916,
+            "envelope_component": 0.0,
+            "duration_component": 0.0,
+            "rul_component": 0.0,
+            "risk_index_type": "ENGINEERING_HEURISTIC",
+            "claim_class": "MODEL_SCENARIO_RESULT",
+            "disclaimer": "Engineering heuristic index for comparative scenario analysis only. Strictly NOT a statistical failure probability or certified airworthiness metric."
+          }
+        },
+        "delta": {
+          "baseline_id": "NOMINAL_CRUISE",
+          "scenario_id": "HOT_DAY",
+          "delta_min_hi": 0.0042,
+          "delta_mean_hi": 0.0002,
+          "delta_final_hi": 0.0,
+          "delta_time_below_watch_s": 0.0,
+          "delta_time_below_degraded_s": 0.0,
+          "delta_time_below_critical_s": 0.0,
+          "delta_min_rul_h": null,
+          "delta_final_rul_h": null,
+          "delta_max_cht_c": 7.89,
+          "delta_max_egt_c": -16.53,
+          "delta_min_oil_pressure_bar": -0.096,
+          "delta_max_vibration_g": -0.03,
+          "delta_envelope_events": 0,
+          "delta_risk_score": -0.0017,
+          "qualitative_interpretation": "Within grey-box simulation, scenario 'HOT_DAY' showed: CHT increased by 7.9\u00b0C. Model scenario result; not an empirical fleet reliability finding.",
+          "claim_class": "MODEL_SCENARIO_RESULT"
+        }
+      },
+      "altitude_plus_hot_day": {
+        "metrics": {
+          "mission_duration_s": 150.0,
+          "step_count": 151,
+          "valid_telemetry_fraction": 1.0,
+          "min_hi": 0.9065,
+          "mean_hi": 0.9936,
+          "final_hi": 1.0,
+          "min_subsystem_health": {
+            "thermal": 1.0,
+            "lubrication": 1.0,
+            "fuel": 1.0,
+            "mechanical": 1.0,
+            "combustion": 0.9407
+          },
+          "max_cht_c": 81.88,
+          "max_egt_c": 761.93,
+          "min_oil_pressure_bar": 2.247,
+          "max_oil_temp_c": 92.47,
+          "max_vibration_g": 0.763,
+          "mean_fuel_flow_l_h": 12.93,
+          "max_fuel_flow_l_h": 13.72,
+          "time_below_watch_s": 0.0,
+          "time_below_degraded_s": 0.0,
+          "time_below_critical_s": 0.0,
+          "time_in_diagnostic_state_s": 149.0,
+          "min_estimated_rul_h": null,
+          "final_estimated_rul_h": null,
+          "envelope_event_count": 0,
+          "total_envelope_excursion_duration_s": 0.0,
+          "risk_index": {
+            "score": 0.0374,
+            "health_component": 0.0935,
+            "envelope_component": 0.0,
+            "duration_component": 0.0,
+            "rul_component": 0.0,
+            "risk_index_type": "ENGINEERING_HEURISTIC",
+            "claim_class": "MODEL_SCENARIO_RESULT",
+            "disclaimer": "Engineering heuristic index for comparative scenario analysis only. Strictly NOT a statistical failure probability or certified airworthiness metric."
+          }
+        },
+        "delta": {
+          "baseline_id": "NOMINAL_CRUISE",
+          "scenario_id": "HOT_DAY_HIGH_ALTITUDE",
+          "delta_min_hi": 0.0023,
+          "delta_mean_hi": -0.0002,
+          "delta_final_hi": 0.0,
+          "delta_time_below_watch_s": 0.0,
+          "delta_time_below_degraded_s": 0.0,
+          "delta_time_below_critical_s": 0.0,
+          "delta_min_rul_h": null,
+          "delta_final_rul_h": null,
+          "delta_max_cht_c": -0.56,
+          "delta_max_egt_c": 55.22,
+          "delta_min_oil_pressure_bar": -0.393,
+          "delta_max_vibration_g": 0.106,
+          "delta_envelope_events": 0,
+          "delta_risk_score": -0.0009,
+          "qualitative_interpretation": "Within grey-box simulation, scenario 'HOT_DAY_HIGH_ALTITUDE' showed: oil pressure dropped by 0.39 bar; vibration elevated by 0.11 g. Model scenario result; not an empirical fleet reliability finding.",
+          "claim_class": "MODEL_SCENARIO_RESULT"
+        }
+      },
+      "f3_cooling_only": {
+        "metrics": {
+          "mission_duration_s": 150.0,
+          "step_count": 151,
+          "valid_telemetry_fraction": 1.0,
+          "min_hi": 0.9042,
+          "mean_hi": 0.9938,
+          "final_hi": 0.9999,
+          "min_subsystem_health": {
+            "thermal": 0.996,
+            "lubrication": 1.0,
+            "fuel": 0.8029,
+            "mechanical": 1.0,
+            "combustion": 0.9083
+          },
+          "max_cht_c": 98.51,
+          "max_egt_c": 706.71,
+          "min_oil_pressure_bar": 2.64,
+          "max_oil_temp_c": 107.95,
+          "max_vibration_g": 0.657,
+          "mean_fuel_flow_l_h": 15.11,
+          "max_fuel_flow_l_h": 15.72,
+          "time_below_watch_s": 0.0,
+          "time_below_degraded_s": 0.0,
+          "time_below_critical_s": 0.0,
+          "time_in_diagnostic_state_s": 9.0,
+          "min_estimated_rul_h": null,
+          "final_estimated_rul_h": null,
+          "envelope_event_count": 0,
+          "total_envelope_excursion_duration_s": 0.0,
+          "risk_index": {
+            "score": 0.0383,
+            "health_component": 0.0958,
+            "envelope_component": 0.0,
+            "duration_component": 0.0,
+            "rul_component": 0.0,
+            "risk_index_type": "ENGINEERING_HEURISTIC",
+            "claim_class": "MODEL_SCENARIO_RESULT",
+            "disclaimer": "Engineering heuristic index for comparative scenario analysis only. Strictly NOT a statistical failure probability or certified airworthiness metric."
+          }
+        },
+        "delta": {
+          "baseline_id": "NOMINAL_CRUISE",
+          "scenario_id": "F3_COOLING",
+          "delta_min_hi": 0.0,
+          "delta_mean_hi": 0.0,
+          "delta_final_hi": -0.0001,
+          "delta_time_below_watch_s": 0.0,
+          "delta_time_below_degraded_s": 0.0,
+          "delta_time_below_critical_s": 0.0,
+          "delta_min_rul_h": null,
+          "delta_final_rul_h": null,
+          "delta_max_cht_c": 16.07,
+          "delta_max_egt_c": 0.0,
+          "delta_min_oil_pressure_bar": 0.0,
+          "delta_max_vibration_g": 0.0,
+          "delta_envelope_events": 0,
+          "delta_risk_score": 0.0,
+          "qualitative_interpretation": "Within grey-box simulation, scenario 'F3_COOLING' showed: CHT increased by 16.1\u00b0C. Model scenario result; not an empirical fleet reliability finding.",
+          "claim_class": "MODEL_SCENARIO_RESULT"
+        }
+      },
+      "combined_all": {
+        "metrics": {
+          "mission_duration_s": 150.0,
+          "step_count": 151,
+          "valid_telemetry_fraction": 1.0,
+          "min_hi": 0.9065,
+          "mean_hi": 0.9932,
+          "final_hi": 0.9961,
+          "min_subsystem_health": {
+            "thermal": 0.9676,
+            "lubrication": 1.0,
+            "fuel": 1.0,
+            "mechanical": 1.0,
+            "combustion": 0.9407
+          },
+          "max_cht_c": 89.81,
+          "max_egt_c": 761.93,
+          "min_oil_pressure_bar": 2.247,
+          "max_oil_temp_c": 93.29,
+          "max_vibration_g": 0.763,
+          "mean_fuel_flow_l_h": 12.93,
+          "max_fuel_flow_l_h": 13.72,
+          "time_below_watch_s": 0.0,
+          "time_below_degraded_s": 0.0,
+          "time_below_critical_s": 0.0,
+          "time_in_diagnostic_state_s": 149.0,
+          "min_estimated_rul_h": null,
+          "final_estimated_rul_h": null,
+          "envelope_event_count": 0,
+          "total_envelope_excursion_duration_s": 0.0,
+          "risk_index": {
+            "score": 0.0374,
+            "health_component": 0.0935,
+            "envelope_component": 0.0,
+            "duration_component": 0.0,
+            "rul_component": 0.0,
+            "risk_index_type": "ENGINEERING_HEURISTIC",
+            "claim_class": "MODEL_SCENARIO_RESULT",
+            "disclaimer": "Engineering heuristic index for comparative scenario analysis only. Strictly NOT a statistical failure probability or certified airworthiness metric."
+          }
+        },
+        "delta": {
+          "baseline_id": "NOMINAL_CRUISE",
+          "scenario_id": "COMBINED_ENVIRONMENT_FAULT",
+          "delta_min_hi": 0.0023,
+          "delta_mean_hi": -0.0006,
+          "delta_final_hi": -0.0039,
+          "delta_time_below_watch_s": 0.0,
+          "delta_time_below_degraded_s": 0.0,
+          "delta_time_below_critical_s": 0.0,
+          "delta_min_rul_h": null,
+          "delta_final_rul_h": null,
+          "delta_max_cht_c": 7.37,
+          "delta_max_egt_c": 55.22,
+          "delta_min_oil_pressure_bar": -0.393,
+          "delta_max_vibration_g": 0.106,
+          "delta_envelope_events": 0,
+          "delta_risk_score": -0.0009,
+          "qualitative_interpretation": "Within grey-box simulation, scenario 'COMBINED_ENVIRONMENT_FAULT' showed: CHT increased by 7.4\u00b0C; oil pressure dropped by 0.39 bar; vibration elevated by 0.11 g. Model scenario result; not an empirical fleet reliability finding.",
+          "claim_class": "MODEL_SCENARIO_RESULT"
+        }
+      }
+    },
+    "coupling_notes": "Thermal response exhibits non-linear grey-box coupling: elevated ambient temperature reduces heat exchanger delta-T, exacerbating cooling pump degradation non-additively."
+  },
+  "state_isolation_verified": true,
+  "performance": {
+    "1_mission_full_trajectory_s": 0.3743,
+    "1_mission_streaming_s": 0.3704,
+    "10_missions_streaming_total_s": 3.763,
+    "mean_mission_time_streaming_s": 0.3763,
+    "mean_step_latency_ms": 2.477,
+    "streaming_memory_mode": "O(1) historical trajectory retention; bounded summary aggregators"
+  },
+  "non_claims": [
+    "No certification or airworthiness compliance (DO-178C, FAA, EASA) is claimed.",
+    "No statistical failure probability, mission success rate, or MTBF is inferred.",
+    "No empirical fleet reliability dataset was fitted.",
+    "4500m scenario is strictly a SYNTHETIC MODEL SCENARIO, not an operating envelope.",
+    "MissionRiskIndex is an engineering heuristic, NOT a probability of failure."
+  ]
+}

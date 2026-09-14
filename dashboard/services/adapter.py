@@ -1017,10 +1017,10 @@ class DashboardAdapter:
         )
 
         # 5. Data Quality Card
-        dq_val = data_quality_vm.quality_status
+        dq_val = format_data_quality_status(data_quality_vm.quality_status)
         if is_total_sensor_blackout or data_quality_vm.quality_status.upper() in ("MISSING", "SENSOR_BLACKOUT"):
             dq_status = StatusLevel.DEGRADED
-            if is_total_sensor_blackout and dq_val == "NOMINAL":
+            if is_total_sensor_blackout:
                 dq_val = "MISSING"
         elif data_quality_vm.quality_status in ("NOMINAL", "VALID"):
             dq_status = StatusLevel.HEALTHY

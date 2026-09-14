@@ -82,7 +82,7 @@ def build_channel_figure(
             x=history_timestamps,
             y=history_expected,
             mode="lines",
-            name="Physics estimate",
+            name="Digital Twin Expected",
             line=dict(color=PLOT_COLORS["expected"], width=2, dash="dash"),
         ))
     elif model.physics_estimate is not None or model.expected_value is not None:
