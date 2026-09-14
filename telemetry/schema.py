@@ -167,6 +167,8 @@ class DigitalTwinState:
     nominal_estimates: Dict[str, float] = field(default_factory=dict)
     residuals: Dict[str, float] = field(default_factory=dict)
     state_confidence: float = 1.0
+    health_assessment: Optional[Any] = None
+    residual_vector: Optional[Any] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 

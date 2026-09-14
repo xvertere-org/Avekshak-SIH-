@@ -18,7 +18,20 @@ import pandas as pd
 
 from telemetry.schema import TelemetryRecord, DigitalTwinState, EngineConfig
 from telemetry.ingestion import CanonicalTelemetryFrame
-from digital_twin.residuals import ResidualGenerator, ResidualFrame, SUPPORTED_RESIDUAL_CHANNELS
+from digital_twin.residuals import (
+    ResidualGenerator,
+    ResidualFrame,
+    SUPPORTED_RESIDUAL_CHANNELS,
+    QualityAwareResidualGenerator,
+    ResidualVector,
+    FrozenScaleCalibration,
+)
+from digital_twin.health import (
+    HealthEvaluator,
+    HealthIndicatorConfig,
+    ModelObservationHealthAssessment,
+    HealthState,
+)
 from digital_twin.state import (
     CanonicalTwinState,
     QuantityStatus,
@@ -32,11 +45,10 @@ from digital_twin.quality import (
 )
 from digital_twin.observability import ObservabilityRegistry, ObservabilityType
 from digital_twin.synchronizer import StateEstimator, EstimatorConfig
-from simulator.config import SimulatorConfig, TierAParameters, TierCParameters, TierDParameters
+from simulator.config import SimulatorConfig
 from simulator.subsystems.atmosphere import Atmosphere
 from simulator.subsystems.turbocharger import TurbochargerSubsystem
-
-
+from simulator.subsystems.cooling import CoolingSubsystem
 from simulator.subsystems.dynamics import EngineDynamics, OperatingPoint
 
 
@@ -64,6 +76,10 @@ class DigitalTwinModel:
         self.turbocharger = TurbochargerSubsystem(
             tier_a=self.tier_a,
             config=self.sim_config.tier_c_turbo,
+        )
+        self.cooling = CoolingSubsystem(
+            tier_a=self.tier_a,
+            config=self.sim_config.tier_c_cooling,
         )
 
         # Internal state variables (initialized to healthy nominal baseline)
@@ -107,6 +123,7 @@ class DigitalTwinModel:
         self.expected_egt = initial_egt
         self.expected_oil_temp = initial_oil_temp
         self.turbocharger.reset(1.013)
+        self.cooling.set_temperature(75.0)
         self._last_m_air = 0.045
         self._last_m_fuel = 0.003
         self.last_timestamp = None
@@ -267,6 +284,15 @@ class DigitalTwinModel:
         f_order1 = self.expected_rpm / 60.0
         f_order2 = 2.0 * f_order1
 
+        # 7. Expected Cooling (liquid coolant loop)
+        cooling_state = self.cooling.step(
+            cylinder_cht_temps_c=[self.expected_cht] * 4,
+            ambient_temp_c=amb_safe,
+            airspeed_ms=v_air,
+            dt=dt_safe,
+            cooling_fault_severity=0.0,
+        )
+
         return {
             "rpm_expected": round(self.expected_rpm, 1),
             "cht_expected": round(self.expected_cht, 2),
@@ -279,6 +305,17 @@ class DigitalTwinModel:
             "power_expected_kw": round(p_target / 1000.0, 2),
             "order_1x_freq_hz": round(f_order1, 2),
             "order_2x_freq_hz": round(f_order2, 2),
+            "map_bar_expected": round(turbo_state.map_bar, 3),
+            "charge_air_temp_expected": round(turbo_state.charge_air_temp_c, 2),
+            "coolant_temp_expected": round(cooling_state.coolant_temp_c, 2),
+            "cht_cyl1_expected": round(self.expected_cht, 2),
+            "cht_cyl2_expected": round(self.expected_cht, 2),
+            "cht_cyl3_expected": round(self.expected_cht, 2),
+            "cht_cyl4_expected": round(self.expected_cht, 2),
+            "egt_cyl1_expected": round(self.expected_egt, 2),
+            "egt_cyl2_expected": round(self.expected_egt, 2),
+            "egt_cyl3_expected": round(self.expected_egt, 2),
+            "egt_cyl4_expected": round(self.expected_egt, 2),
         }
 
 
@@ -295,13 +332,19 @@ class DigitalTwin:
         engine_config: Optional[EngineConfig] = None,
         sim_config: Optional[SimulatorConfig] = None,
         estimator_config: Optional[EstimatorConfig] = None,
+        health_config: Optional[HealthIndicatorConfig] = None,
+        calibration: Optional[FrozenScaleCalibration] = None,
     ):
         self.engine_config = engine_config or EngineConfig()
         self.sim_config = sim_config or SimulatorConfig()
         self.estimator_config = estimator_config or EstimatorConfig()
+        self.health_config = health_config or HealthIndicatorConfig()
+        self.calibration = calibration
 
         self.model = DigitalTwinModel(sim_config=self.sim_config, engine_config=self.engine_config)
         self.residual_generator = ResidualGenerator()
+        self.quality_residual_generator = QualityAwareResidualGenerator(calibration=self.calibration)
+        self.health_evaluator = HealthEvaluator(config=self.health_config)
         self.estimator = StateEstimator(
             config=self.estimator_config,
             sim_config=self.sim_config,
@@ -316,6 +359,7 @@ class DigitalTwin:
         """Reset Digital Twin internal dynamic states."""
         self.model.reset()
         self.estimator.reset()
+        self.health_evaluator.reset()
         self.history.clear()
         self.canonical_history.clear()
         self.canonical_state = None
@@ -347,6 +391,17 @@ class DigitalTwin:
                 "power_expected_kw": 0.0,
                 "order_1x_freq_hz": 25.0,
                 "order_2x_freq_hz": 50.0,
+                "map_bar_expected": 1.013,
+                "charge_air_temp_expected": 30.0,
+                "coolant_temp_expected": 75.0,
+                "cht_cyl1_expected": 85.0,
+                "cht_cyl2_expected": 85.0,
+                "cht_cyl3_expected": 85.0,
+                "cht_cyl4_expected": 85.0,
+                "egt_cyl1_expected": 580.0,
+                "egt_cyl2_expected": 580.0,
+                "egt_cyl3_expected": 580.0,
+                "egt_cyl4_expected": 580.0,
             }
 
         # Calculate dynamic time increment dt
@@ -376,6 +431,20 @@ class DigitalTwin:
             "vibration_residual": round(vib_res, 4) if not math.isnan(vib_res) else float("nan"),
         }
 
+        # Quality-aware residual generation and physics health assessment
+        q_report = canonical_state.metadata.get("quality_report")
+        residual_vector = self.quality_residual_generator.generate(
+            telemetry=telemetry,
+            expected=expected,
+            quality_report=q_report,
+        )
+        health_assessment = self.health_evaluator.evaluate(
+            residual_vector=residual_vector,
+            data_confidence=canonical_state.heuristic_confidence,
+            dt=dt,
+            engine_id=telemetry.engine_id,
+        )
+
         nominal_estimates = {
             # Tier A reference anchor for audit compatibility (test_audit_cleanup.py)
             "nominal_cht": self.sim_config.tier_a.cht_nominal_c,
@@ -403,13 +472,17 @@ class DigitalTwin:
             nominal_estimates=nominal_estimates,
             residuals=residuals,
             state_confidence=round(canonical_state.heuristic_confidence, 4),
+            health_assessment=health_assessment,
+            residual_vector=residual_vector,
             metadata={
                 "power_expected_kw": expected.get("power_expected_kw", 0.0),
                 "order_1x_freq_hz": expected.get("order_1x_freq_hz", 25.0),
                 "order_2x_freq_hz": expected.get("order_2x_freq_hz", 50.0),
                 "canonical_state": canonical_state,
                 "sync_status": canonical_state.sync_status.value,
-                "quality_report": canonical_state.metadata.get("quality_report"),
+                "quality_report": q_report,
+                "residual_vector": residual_vector,
+                "health_assessment": health_assessment,
             },
         )
         self.history.append(twin_state)
