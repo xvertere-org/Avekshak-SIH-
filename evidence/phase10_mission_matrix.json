@@ -2,12 +2,13 @@
   "phase": "PHASE 10 \u2014 MISSION RELIABILITY & WHAT-IF SIMULATION",
   "git": {
     "branch": "rotax-914-greybox-engine",
-    "head_sha": "0cd0087e4a213335bc213455f46685b460efefc9",
-    "origin_head": "0cd0087e4a213335bc213455f46685b460efefc9",
+    "source_commit": "9c852b055ef32884c0a3aac012da259b688958a6",
+    "head_sha": "9c852b055ef32884c0a3aac012da259b688958a6",
+    "origin_head": "9c852b055ef32884c0a3aac012da259b688958a6",
     "main_sha": "a5353143cf7e7d89b562e7d0abffc9f87a077292",
     "origin_main_sha": "53aa795794f5328ffe2bc7d7424ae464bce15e70",
     "merge_base": "a5353143cf7e7d89b562e7d0abffc9f87a077292",
-    "working_tree": "## rotax-914-greybox-engine...origin/rotax-914-greybox-engine\n M evidence/phase10_mission_matrix.json"
+    "working_tree": "## rotax-914-greybox-engine...origin/rotax-914-greybox-engine\n M evidence/phase10_mission_matrix.json\n M scripts/generate_phase10_evidence.py"
   },
   "classification": "MODEL_SCENARIO_RESULTS",
   "authoritative_thresholds": [
@@ -6491,11 +6492,11 @@
   },
   "state_isolation_verified": true,
   "performance": {
-    "1_mission_full_trajectory_s": 0.4049,
-    "1_mission_streaming_s": 0.4346,
-    "10_missions_streaming_total_s": 4.2021,
-    "mean_mission_time_streaming_s": 0.4202,
-    "mean_step_latency_ms": 2.839,
+    "1_mission_full_trajectory_s": 0.4105,
+    "1_mission_streaming_s": 0.4142,
+    "10_missions_streaming_total_s": 3.9821,
+    "mean_mission_time_streaming_s": 0.3982,
+    "mean_step_latency_ms": 2.545,
     "streaming_memory_mode": "O(1) historical trajectory retention; bounded summary aggregators"
   },
   "non_claims": [

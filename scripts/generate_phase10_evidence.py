@@ -38,6 +38,7 @@ def get_git_info() -> Dict[str, str]:
 
     return {
         "branch": run_cmd("git rev-parse --abbrev-ref HEAD"),
+        "source_commit": run_cmd("git rev-parse HEAD"),
         "head_sha": run_cmd("git rev-parse HEAD"),
         "origin_head": run_cmd("git rev-parse origin/rotax-914-greybox-engine"),
         "main_sha": run_cmd("git rev-parse main"),
