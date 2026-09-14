@@ -1,5 +1,5 @@
 """
-NIRVANAA — SIH26054 Aero Engine Digital Twin Dashboard.
+Avekshak — SIH26054 Aero Engine Digital Twin Dashboard.
 
 Authoritative Operator Presentation & Interaction Layer.
 Consumes outputs from Phase 13 via DashboardAdapter.
@@ -169,8 +169,8 @@ def main():
     with st.sidebar:
         st.markdown(
             '<div style="text-align: center; margin-bottom: 20px; padding: 10px 0; border-bottom: 1px solid #21262d;">'
-            '<h3 style="margin: 0; color: #58a6ff; font-weight: 700; letter-spacing: 1px;">Avekshak</h3>'
-            '<div style="font-size: 10px; color: #c9d1d9; margin-top: 2px; font-weight: 600;">AI-Enabled Real-Time Digital Twin</div>'
+            '<h3 style="margin: 0; color: #58a6ff; font-weight: 800; letter-spacing: 1px;">AVEKSHAK</h3>'
+            '<div style="font-size: 11px; color: #c9d1d9; margin-top: 2px; font-weight: 600;">AI-Enabled Real-Time Digital Twin</div>'
             '<div style="font-size: 10px; color: #8b949e; margin-top: 2px;">SIH26054 · Aero-Piston Engine Health</div>'
             '</div>',
             unsafe_allow_html=True,

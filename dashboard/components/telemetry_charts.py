@@ -82,7 +82,7 @@ def build_channel_figure(
             x=history_timestamps,
             y=history_expected,
             mode="lines",
-            name="Physics estimate",
+            name="Digital Twin Expected",
             line=dict(color=PLOT_COLORS["expected"], width=2, dash="dash"),
         ))
     elif model.physics_estimate is not None or model.expected_value is not None:
@@ -231,7 +231,7 @@ def render_canonical_telemetry_grid(
                 st.markdown(hdr_html, unsafe_allow_html=True)
 
             with hdr_col2:
-                status_text = "ISOLATED" if ch_model.is_isolated else ch_model.status.value
+                status_text = "Isolated" if ch_model.is_isolated else ch_model.status.value.title()
                 st.markdown(
                     f"<div style='text-align: right;'>{render_status_badge(ch_model.status, status_text)}</div>",
                     unsafe_allow_html=True,

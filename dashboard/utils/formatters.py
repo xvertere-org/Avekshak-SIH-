@@ -100,12 +100,253 @@ def format_timestamp(ts: Optional[Union[float, int]]) -> str:
     return f"T+{float(ts):.1f} s"
 
 
-def format_fault_name(fault: Optional[str]) -> str:
-    """Format snake_case fault identifiers into clear operational titles."""
+# =============================================================================
+# Avekshak Centralized User-Facing Terminology Mappings
+# =============================================================================
+
+ADVISORY_ACTION_MAP = {
+    "NORMAL_MONITORING": "Routine Monitoring",
+    "ADVISORY_CAUTION": "Operational Caution",
+    "MAINTENANCE_INSPECTION": "Maintenance Inspection Recommended",
+    "CRITICAL_ABORT_ACTION": "Immediate Operational Intervention",
+    "INSUFFICIENT_DATA": "Insufficient Telemetry Data",
+}
+
+HEALTH_STATE_MAP = {
+    "HEALTHY": "Healthy Condition",
+    "NORMAL": "Healthy Condition",
+    "NOT_DEGRADING": "Stable Condition",
+    "ACTIVE_DEGRADATION": "Active Degradation",
+    "DEGRADED": "Degraded Condition",
+    "SEVERELY_DEGRADED": "Severe Degradation",
+    "RAPIDLY_DEGRADING": "Rapid Health Decline",
+    "CRITICAL": "Critical Condition",
+    "CRITICAL_EOL_REACHED": "Critical Limit Reached",
+    "INSUFFICIENT_HISTORY": "Insufficient Flight History",
+    "INSUFFICIENT_DATA": "Insufficient Data",
+}
+
+HEALTH_TREND_MAP = {
+    "STABLE": "Stable Trend",
+    "NOT_DEGRADING": "Stable Condition",
+    "ACTIVE_DEGRADATION": "Active Degradation",
+    "RAPIDLY_DEGRADING": "Rapid Health Decline",
+    "RECOVERING": "Recovering Trend",
+    "INDETERMINATE": "Indeterminate Trend",
+    "INDETERMINATE_TREND": "Indeterminate Trend",
+    "INSUFFICIENT_HISTORY": "Insufficient Flight History",
+}
+
+RUL_STATE_MAP = {
+    "NOT_DEGRADING": "Stable Condition",
+    "ACTIVE_DEGRADATION": "Active Degradation",
+    "SEVERELY_DEGRADED": "Severe Degradation",
+    "RAPIDLY_DEGRADING": "Rapid Health Decline",
+    "CRITICAL_EOL_REACHED": "Critical Limit Reached",
+    "INSUFFICIENT_HISTORY": "Insufficient Flight History",
+    "INSUFFICIENT_DATA": "Insufficient Telemetry Data",
+    "EXCEEDS_HORIZON": "Exceeds Prediction Horizon",
+    "DEGRADED_PROGNOSTIC": "Degraded Prognostic State",
+    "RECOVERING": "Recovering",
+}
+
+LIMITING_FACTOR_MAP = {
+    "REDLINE_CHT": "CHT Thermal Limit",
+    "REDLINE_OIL_PRESSURE": "Oil Pressure Limit",
+    "REDLINE_OIL_TEMP": "Oil Temperature Limit",
+    "REDLINE_RPM": "Engine Speed Limit",
+    "GLOBAL_HEALTH_INDEX": "Overall Health Limit",
+    "NONE": "None (Nominal)",
+    "NULL": "None (Nominal)",
+}
+
+FORECAST_STATUS_MAP = {
+    "LOADED_PRETRAINED": "Forecast Model Active",
+    "BLOCKED_UNAUTHENTICATED_GATED": "Advanced Forecast Unavailable",
+    "LOCAL_UNCHECKPOINTED_GRAPH": "Local Model Active (Uncheckpointed)",
+    "BUFFERING": "Preparing Forecast",
+    "BASELINE": "Baseline Model Active",
+    "UNAVAILABLE": "Forecast Unavailable",
+}
+
+FORECAST_QUALITY_MAP = {
+    "VALID": "Valid Quality",
+    "DEGRADED_INPUT": "Degraded Input Data",
+    "INSUFFICIENT_DATA": "Insufficient History",
+    "LOW_CONFIDENCE": "Low Confidence",
+}
+
+DATA_QUALITY_MAP = {
+    "NOMINAL": "Nominal Stream",
+    "VALID": "Nominal Stream",
+    "DEGRADED": "Degraded Stream",
+    "OUT_OF_ORDER_REJECTED": "Out-of-Order Timestamp",
+    "MISSING": "Signal Missing",
+    "DROPOUT": "Signal Dropout",
+    "PHYSICALLY_INVALID": "Outside Physical Bounds",
+    "WARNING_ENVELOPE": "Caution Range",
+    "ISOLATED_BY_PHM": "Sensor Channel Isolated",
+    "ISOLATED": "Sensor Channel Isolated",
+    "INVALID": "Invalid Signal",
+}
+
+CHANNEL_MAP = {
+    "rpm": "Engine Speed (RPM)",
+    "cht": "Cylinder Head Temperature (CHT)",
+    "egt": "Exhaust Gas Temperature (EGT)",
+    "oil_pressure": "Oil Pressure",
+    "oil_temp": "Oil Temperature",
+    "fuel_flow": "Fuel Flow",
+    "vibration": "Vibration",
+    "throttle": "Throttle",
+    "load": "Engine Load",
+    "engine_load": "Engine Load",
+    "altitude": "Altitude",
+    "ambient_temp": "Ambient Temperature",
+    "oat": "Ambient Temperature",
+}
+
+FAULT_MAP = {
+    "none": "Nominal / None",
+    "normal": "Nominal / None",
+    "cooling_degradation": "Cooling Degradation",
+    "lubrication_degradation": "Lubrication Degradation",
+    "fuel_injection_abnormality": "Fuel Injection Abnormality",
+    "mechanical_degradation": "Mechanical Degradation",
+    "sensor_fault": "Sensor Signal Dropout",
+}
+
+EVIDENCE_STATUS_MAP = {
+    "SUPPORTED": "Physically Consistent",
+    "CONSISTENT": "Physically Consistent",
+    "PARTIALLY_SUPPORTED": "Partially Supported",
+    "CONFLICTING": "Physics Conflict",
+    "INSUFFICIENT_DATA": "Insufficient Data",
+    "UNAVAILABLE": "Unavailable",
+}
+
+
+def format_action(action_code: Optional[str]) -> str:
+    """Format an advisory action code to clear operational English."""
+    if not action_code:
+        return "Routine Monitoring"
+    norm = str(action_code).strip().upper()
+    return ADVISORY_ACTION_MAP.get(norm, norm.replace("_", " ").title())
+
+
+def format_health_state(state: Optional[str]) -> str:
+    """Format health state string to clear operational English."""
+    if not state:
+        return "Unavailable"
+    norm = str(state).strip().upper()
+    return HEALTH_STATE_MAP.get(norm, norm.replace("_", " ").title())
+
+
+def format_health_trend(trend: Optional[str]) -> str:
+    """Format degradation trend string to clear operational English."""
+    if not trend:
+        return "Stable Trend"
+    norm = str(trend).strip().upper()
+    return HEALTH_TREND_MAP.get(norm, norm.replace("_", " ").title())
+
+
+def format_rul_state(state: Optional[str]) -> str:
+    """Format Remaining Useful Life status state."""
+    if not state:
+        return "Unavailable"
+    norm = str(state).strip().upper()
+    return RUL_STATE_MAP.get(norm, norm.replace("_", " ").title())
+
+
+def format_limiting_factor(factor: Optional[str]) -> str:
+    """Format prognostic limit / threshold identifier."""
+    if not factor or str(factor).strip().upper() in ("NONE", "NULL", ""):
+        return "None (Nominal)"
+    norm = str(factor).strip().upper()
+    return LIMITING_FACTOR_MAP.get(norm, norm.replace("_", " ").title())
+
+
+def format_forecast_status(status: Optional[str]) -> str:
+    """Format telemetry forecasting runtime status."""
+    if not status:
+        return "Unavailable"
+    norm = str(status).strip().upper()
+    return FORECAST_STATUS_MAP.get(norm, norm.replace("_", " ").title())
+
+
+def format_forecast_quality(quality: Optional[str]) -> str:
+    """Format telemetry forecasting confidence/quality."""
+    if not quality:
+        return "Unavailable"
+    norm = str(quality).strip().upper()
+    return FORECAST_QUALITY_MAP.get(norm, norm.replace("_", " ").title())
+
+
+def format_data_quality_status(status: Optional[str]) -> str:
+    """Format telemetry data quality condition."""
+    if not status:
+        return "Unavailable"
+    norm = str(status).strip().upper()
+    return DATA_QUALITY_MAP.get(norm, norm.replace("_", " ").title())
+
+
+def format_channel(channel: Optional[str]) -> str:
+    """Format sensor channel identifier to standard operational label."""
+    if not channel:
+        return ""
+    norm = str(channel).strip().lower()
+    return CHANNEL_MAP.get(norm, channel.replace("_", " ").title())
+
+
+def format_fault(fault: Optional[str]) -> str:
+    """Format fault classification into clear operational failure title."""
     if not fault or fault.strip() == "" or fault.lower() in ("none", "normal"):
         return "Nominal / None"
-    clean = fault.replace("_", " ").title()
-    return clean
+    norm = str(fault).strip().lower()
+    return FAULT_MAP.get(norm, fault.replace("_", " ").title())
+
+
+def format_fault_name(fault: Optional[str]) -> str:
+    """Backward-compatible alias for format_fault."""
+    return format_fault(fault)
+
+
+def format_evidence_status(status: Optional[str]) -> str:
+    """Format physics consistency or temporal evidence status."""
+    if not status:
+        return "Unavailable"
+    norm = str(status).strip().upper()
+    return EVIDENCE_STATUS_MAP.get(norm, norm.replace("_", " ").title())
+
+
+def format_status(status: Optional[str]) -> str:
+    """Format generic status string."""
+    if not status:
+        return "Unavailable"
+    norm = str(status).strip().upper()
+    if norm in HEALTH_STATE_MAP:
+        return HEALTH_STATE_MAP[norm]
+    if norm in RUL_STATE_MAP:
+        return RUL_STATE_MAP[norm]
+    if norm in DATA_QUALITY_MAP:
+        return DATA_QUALITY_MAP[norm]
+    return norm.replace("_", " ").title()
+
+
+def format_error(error: Union[Exception, str], context: str = "") -> str:
+    """Sanitize technical exceptions into clear operational descriptions."""
+    msg = str(error)
+    if "KeyError" in msg or "IndexError" in msg:
+        detail = "Data payload is missing required telemetry fields."
+    elif "Connection" in msg or "Timeout" in msg:
+        detail = "Connection to telemetry stream timed out or was interrupted."
+    elif "Memory" in msg or "OOM" in msg:
+        detail = "Buffer capacity exceeded during calculation."
+    else:
+        detail = "An unexpected processing error occurred."
+
+    ctx_prefix = f"**{context} failed.** " if context else ""
+    return f"{ctx_prefix}{detail} Please try refreshing or restarting the simulation."
 
 
 def map_health_to_status(state: Optional[str]) -> StatusLevel:

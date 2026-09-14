@@ -39,6 +39,15 @@ from dashboard.utils.formatters import (
     format_percent,
     format_health_index,
     format_fault_name,
+    format_fault,
+    format_action,
+    format_channel,
+    format_health_state,
+    format_health_trend,
+    format_rul_state,
+    format_limiting_factor,
+    format_forecast_status,
+    format_data_quality_status,
     map_health_to_status,
     map_anomaly_to_status,
     map_rul_status_to_status,
@@ -888,7 +897,7 @@ class DashboardAdapter:
         if prognostics_vm.smoothed_health_index is not None:
             hi_val = format_health_index(prognostics_vm.smoothed_health_index)
             hi_status = map_health_to_status(prognostics_vm.health_state)
-            hi_subtext = f"{prognostics_vm.health_state} ({prognostics_vm.degradation_trend})"
+            hi_subtext = f"{format_health_state(prognostics_vm.health_state)} · {format_health_trend(prognostics_vm.degradation_trend)}"
             hi_avail = AvailabilityStatus.AVAILABLE
         else:
             hi_val = "Unavailable"
@@ -911,12 +920,12 @@ class DashboardAdapter:
             bounds = ""
             if prognostics_vm.rul_p05_hours is not None and prognostics_vm.rul_p95_hours is not None:
                 bounds = f" [{prognostics_vm.rul_p05_hours:.1f} - {prognostics_vm.rul_p95_hours:.1f} hrs]"
-            rul_subtext = f"State: {prognostics_vm.rul_state}{bounds}"
+            rul_subtext = f"Condition: {format_rul_state(prognostics_vm.rul_state)}{bounds}"
             rul_avail = AvailabilityStatus.AVAILABLE
         elif prognostics_vm.rul_state in ("NOT_DEGRADING", "INDETERMINATE_TREND", "EXCEEDS_HORIZON"):
-            rul_val = prognostics_vm.rul_state.replace("_", " ").title()
+            rul_val = format_rul_state(prognostics_vm.rul_state)
             rul_status = StatusLevel.HEALTHY if prognostics_vm.rul_state == "NOT_DEGRADING" else StatusLevel.WARNING
-            rul_subtext = f"State: {prognostics_vm.rul_state} | Limiting: {prognostics_vm.limiting_factor}"
+            rul_subtext = f"Condition: {format_rul_state(prognostics_vm.rul_state)} · Limiting: {format_limiting_factor(prognostics_vm.limiting_factor)}"
             rul_avail = AvailabilityStatus.AVAILABLE
         elif prognostics_vm.rul_state in ("INSUFFICIENT_DATA", "Unavailable") or len(data_quality_vm.missing_sensors) == len(CANONICAL_CHANNELS):
             rul_val = "Unavailable"
@@ -924,9 +933,9 @@ class DashboardAdapter:
             rul_subtext = "Data insufficient for prognostics"
             rul_avail = AvailabilityStatus.UNAVAILABLE
         elif prognostics_vm.rul_state != "Unavailable":
-            rul_val = prognostics_vm.rul_state
+            rul_val = format_rul_state(prognostics_vm.rul_state)
             rul_status = StatusLevel.WARNING if prognostics_vm.rul_state == "INSUFFICIENT_HISTORY" else StatusLevel.DEGRADED
-            rul_subtext = f"State: {prognostics_vm.rul_state} | Limiting: {prognostics_vm.limiting_factor}"
+            rul_subtext = f"Condition: {format_rul_state(prognostics_vm.rul_state)} · Limiting: {format_limiting_factor(prognostics_vm.limiting_factor)}"
             rul_avail = AvailabilityStatus.AVAILABLE
         else:
             rul_val = "Unavailable"
@@ -944,9 +953,9 @@ class DashboardAdapter:
 
         # 3. Anomaly Status Card
         if diagnostics_vm.anomaly_status != "Unavailable":
-            anom_val = diagnostics_vm.anomaly_status
+            anom_val = diagnostics_vm.anomaly_status.title()
             anom_status = map_anomaly_to_status(diagnostics_vm.anomaly_status)
-            score_str = f"Score: {diagnostics_vm.anomaly_score:.2f} | Persist: {diagnostics_vm.persistence_count}" if diagnostics_vm.anomaly_score is not None else f"Persist: {diagnostics_vm.persistence_count}"
+            score_str = f"Score: {diagnostics_vm.anomaly_score:.2f} · Persistence: {diagnostics_vm.persistence_count} cycles" if diagnostics_vm.anomaly_score is not None else f"Persistence: {diagnostics_vm.persistence_count} cycles"
             anom_subtext = score_str
             anom_avail = AvailabilityStatus.AVAILABLE
         else:
@@ -982,7 +991,7 @@ class DashboardAdapter:
             fault_subtext = "Insufficient telemetry for diagnosis"
             fault_avail = AvailabilityStatus.UNAVAILABLE
         else:
-            fault_val = format_fault_name(diagnostics_vm.predicted_fault_class)
+            fault_val = format_fault(diagnostics_vm.predicted_fault_class)
             if diagnostics_vm.predicted_fault_class.lower() in ("none", "normal"):
                 fault_status = StatusLevel.HEALTHY
             elif diagnostics_vm.sensor_fault_indicated:
@@ -1008,11 +1017,11 @@ class DashboardAdapter:
         )
 
         # 5. Data Quality Card
-        dq_val = data_quality_vm.quality_status
+        dq_val = format_data_quality_status(data_quality_vm.quality_status)
         if is_total_sensor_blackout or data_quality_vm.quality_status.upper() in ("MISSING", "SENSOR_BLACKOUT"):
             dq_status = StatusLevel.DEGRADED
-            if is_total_sensor_blackout and dq_val == "NOMINAL":
-                dq_val = "MISSING"
+            if is_total_sensor_blackout and dq_val in ("Nominal", "NOMINAL"):
+                dq_val = "Missing"
         elif data_quality_vm.quality_status in ("NOMINAL", "VALID"):
             dq_status = StatusLevel.HEALTHY
         elif data_quality_vm.quality_status in (
@@ -1026,7 +1035,7 @@ class DashboardAdapter:
             dq_status = StatusLevel.DEGRADED
         else:
             dq_status = StatusLevel.WARNING
-        dq_subtext = f"Latency: {data_quality_vm.execution_latency_ms:.1f} ms"
+        dq_subtext = f"Processing Latency: {data_quality_vm.execution_latency_ms:.1f} ms"
 
         data_quality_card = MetricCardModel(
             label="Data Quality Status",
