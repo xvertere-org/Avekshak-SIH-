@@ -19,7 +19,7 @@ ENERGY & POWER INVARIANTS:
 """
 
 import math
-from typing import NamedTuple, Optional, Any
+from typing import NamedTuple, Optional, Any, List
 from simulator.config import (
     TierAParameters,
     TierCParameters,
@@ -139,6 +139,7 @@ class RotationalDynamics:
         combustion_efficiency_factor: float = 1.0,
         map_bar: Optional[float] = None,
         charge_air_temp_c: Optional[float] = None,
+        per_cylinder_combustion_efficiencies: Optional[List[float]] = None,
     ) -> tuple:
         """
         First-principles causal power chain:
@@ -150,6 +151,10 @@ class RotationalDynamics:
         """
         eff_rpm = self.compute_rpm_efficiency(rpm)
         comb_eff = max(0.1, min(1.0, float(combustion_efficiency_factor)))
+        if per_cylinder_combustion_efficiencies is not None and len(per_cylinder_combustion_efficiencies) == 4:
+            mean_comb = sum(max(0.0, min(1.0, float(x))) for x in per_cylinder_combustion_efficiencies) / 4.0
+            comb_eff = comb_eff * mean_comb
+
         thr_norm = max(0.0, min(100.0, float(throttle_pct))) / 100.0
 
         # Effective manifold pressure (bar)
@@ -215,6 +220,7 @@ class RotationalDynamics:
         friction_factor: float = 1.0,
         map_bar: Optional[float] = None,
         charge_air_temp_c: Optional[float] = None,
+        per_cylinder_combustion_efficiencies: Optional[List[float]] = None,
     ) -> tuple:
         """
         Calculate instantaneous torques and domega/dt at given state.
@@ -231,6 +237,7 @@ class RotationalDynamics:
             combustion_efficiency_factor=combustion_efficiency_factor,
             map_bar=map_bar,
             charge_air_temp_c=charge_air_temp_c,
+            per_cylinder_combustion_efficiencies=per_cylinder_combustion_efficiencies,
         )
 
         # Crankshaft brake torque
@@ -287,34 +294,35 @@ class RotationalDynamics:
         friction_factor: float = 1.0,
         map_bar: Optional[float] = None,
         charge_air_temp_c: Optional[float] = None,
+        per_cylinder_combustion_efficiencies: Optional[List[float]] = None,
     ) -> None:
         """Internal single RK4 integration step."""
         omega_0 = self.omega
 
         # k1
         res1 = self._torque_derivatives(
-            omega_0, throttle_pct, density_factor, combustion_efficiency_factor, friction_factor, map_bar, charge_air_temp_c
+            omega_0, throttle_pct, density_factor, combustion_efficiency_factor, friction_factor, map_bar, charge_air_temp_c, per_cylinder_combustion_efficiencies
         )
         k1 = res1[5]
 
         # k2
         omega_k2 = max(0.0, omega_0 + 0.5 * dt * k1)
         res2 = self._torque_derivatives(
-            omega_k2, throttle_pct, density_factor, combustion_efficiency_factor, friction_factor, map_bar, charge_air_temp_c
+            omega_k2, throttle_pct, density_factor, combustion_efficiency_factor, friction_factor, map_bar, charge_air_temp_c, per_cylinder_combustion_efficiencies
         )
         k2 = res2[5]
 
         # k3
         omega_k3 = max(0.0, omega_0 + 0.5 * dt * k2)
         res3 = self._torque_derivatives(
-            omega_k3, throttle_pct, density_factor, combustion_efficiency_factor, friction_factor, map_bar, charge_air_temp_c
+            omega_k3, throttle_pct, density_factor, combustion_efficiency_factor, friction_factor, map_bar, charge_air_temp_c, per_cylinder_combustion_efficiencies
         )
         k3 = res3[5]
 
         # k4
         omega_k4 = max(0.0, omega_0 + dt * k3)
         res4 = self._torque_derivatives(
-            omega_k4, throttle_pct, density_factor, combustion_efficiency_factor, friction_factor, map_bar, charge_air_temp_c
+            omega_k4, throttle_pct, density_factor, combustion_efficiency_factor, friction_factor, map_bar, charge_air_temp_c, per_cylinder_combustion_efficiencies
         )
         k4 = res4[5]
 
@@ -330,6 +338,7 @@ class RotationalDynamics:
         friction_factor: float = 1.0,
         map_bar: Optional[float] = None,
         charge_air_temp_c: Optional[float] = None,
+        per_cylinder_combustion_efficiencies: Optional[List[float]] = None,
     ) -> OperatingPoint:
         """
         Advance rotational dynamics using sub-stepped 4th-Order Runge-Kutta (RK4) integration.
@@ -348,6 +357,7 @@ class RotationalDynamics:
                 friction_factor,
                 map_bar,
                 charge_air_temp_c,
+                per_cylinder_combustion_efficiencies,
             )
             remaining_time -= sub_dt
 
@@ -378,6 +388,7 @@ class RotationalDynamics:
             friction_factor,
             map_bar,
             charge_air_temp_c,
+            per_cylinder_combustion_efficiencies,
         )
 
         # Engine load percentage proxy based on power output relative to density-adjusted max continuous

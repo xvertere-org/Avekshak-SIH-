@@ -48,6 +48,7 @@ class VibrationSystem:
         dt: float,
         mechanical_condition: Optional[float] = None,
         mechanical_noise_factor: float = 1.0,
+        misfire_imbalance_factor: float = 0.0,
     ) -> VibrationState:
         """
         Advance vibration state and calculate RMS & instantaneous vibration metrics.
@@ -57,17 +58,22 @@ class VibrationSystem:
                 1.0 = nominal. Values > 1.0 model increased broadband vibration
                 from mechanical degradation without affecting deterministic harmonic
                 frequencies. (Tier C/D calibration assumption.)
+            misfire_imbalance_factor: Combustion misfire torque deficit factor [0.0 to 1.0]
+                causing 1X rotational torque ripple pulsation. (Tier C/D calibration assumption.)
         """
         load_norm = max(0.0, min(100.0, load_pct)) / 100.0
         m_cond = mechanical_condition if mechanical_condition is not None else self.tier_d.mechanical_condition
 
-        # Fundamental rotational frequencies (deterministic, NOT affected by noise factor)
+        # Fundamental rotational frequencies (deterministic, strictly tied to crankshaft RPM)
         f_rot = max(0.0, rpm) / 60.0
         f_order1 = f_rot
         f_order2 = 2.0 * f_rot
 
-        # Amplitudes scaled with engine load and mechanical condition
+        # Amplitudes scaled with engine load, mechanical condition, and misfire torque ripple
         amp_1x = (self.tier_c.vib_order1_base_g + self.tier_c.vib_load_gain * load_norm) * m_cond
+        if misfire_imbalance_factor > 0.0:
+            amp_1x += 0.55 * max(0.0, min(1.0, float(misfire_imbalance_factor)))
+
         amp_2x = (self.tier_c.vib_order2_base_g + self.tier_c.vib_load_gain * load_norm) * m_cond
 
         # Advance harmonic phase
