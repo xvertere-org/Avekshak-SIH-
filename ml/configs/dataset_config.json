@@ -1,0 +1,151 @@
+{
+  "version": "1.0.0",
+  "project": "SIH26054 Aero-Piston Engine Grey-Box Digital Twin",
+  "datasets": {
+    "cmapss": {
+      "name": "C-MAPSS Turbofan Degradation Dataset",
+      "display_name": "NASA C-MAPSS",
+      "availability": "AVAILABLE",
+      "integration_role": "RUL_METHODOLOGY_BENCHMARK",
+      "target_tasks": [
+        "DEGRADATION_TREND_BENCHMARK",
+        "RUL_BENCHMARK"
+      ],
+      "processed_path": "data/processed/cmapss",
+      "file_pattern": "cmapss_FD*.parquet",
+      "candidate_grouping_columns": ["unit_number", "unit_id"],
+      "target_columns": ["rul_label"],
+      "feature_types": ["degradation", "operating_condition", "sensor_measurement"],
+      "is_direct_rotax_telemetry": false,
+      "limitations": [
+        "Simulated turbofan engine (gas turbine) physics, not spark-ignition aero-piston engine.",
+        "Must not be used as direct Rotax 914 engine telemetry.",
+        "Sensor channels (cmapss_s_1..21) are normalized gas turbine parameters; must never be mapped to piston channels (e.g. CHT, EGT, MAP)."
+      ]
+    },
+    "femto": {
+      "name": "FEMTO / PRONOSTIA Bearing Degradation Dataset",
+      "display_name": "FEMTO Bearing",
+      "availability": "AVAILABLE",
+      "integration_role": "BEARING_DEGRADATION_RUL",
+      "target_tasks": [
+        "BEARING_DEGRADATION_MODELING",
+        "RUL_MODELING"
+      ],
+      "processed_path": "data/processed/femto",
+      "file_pattern": "femto_*_features.parquet",
+      "candidate_grouping_columns": ["bearing_id"],
+      "target_columns": ["rul_label"],
+      "feature_types": ["vibration", "degradation"],
+      "is_direct_rotax_telemetry": false,
+      "limitations": [
+        "Run-to-failure bearing test bench under constant operating loads (artificial accelerated wear).",
+        "Test set does not include ground-truth RUL targets in feature table.",
+        "Must not be confused with complete aero-engine mechanical assembly."
+      ]
+    },
+    "cwru": {
+      "name": "Case Western Reserve University Bearing Dataset",
+      "display_name": "CWRU Bearing",
+      "availability": "AVAILABLE",
+      "integration_role": "BEARING_FAULT_CLASSIFICATION",
+      "target_tasks": [
+        "BEARING_FAULT_CLASSIFICATION",
+        "FEATURE_VALIDATION",
+        "CONTROLLED_DEMONSTRATION"
+      ],
+      "processed_path": "data/processed/cwru",
+      "file_pattern": "cwru_features.parquet",
+      "candidate_grouping_columns": ["source_file", "bearing_id"],
+      "target_columns": ["fault_label"],
+      "feature_types": ["vibration"],
+      "is_direct_rotax_telemetry": false,
+      "limitations": [
+        "CRITICAL LIMITATION: Current processed dataset contains only 3 independent source files (105.mat, 130.mat, 97.mat).",
+        "Conventional random train/validation/test splitting across records from the same file creates catastrophic data leakage.",
+        "Must be used primarily for vibration feature validation, baseline feature extraction verification, and controlled fault-pattern demonstrations until more independent source files are acquired.",
+        "Not representative of piston engine reciprocating dynamics."
+      ]
+    },
+    "paderborn": {
+      "name": "Paderborn University Bearing Dataset",
+      "display_name": "Paderborn Bearing",
+      "availability": "AVAILABLE",
+      "integration_role": "BEARING_FAULT_DIAGNOSIS",
+      "target_tasks": [
+        "BEARING_FAULT_DIAGNOSIS",
+        "VIBRATION_FEATURE_VALIDATION"
+      ],
+      "processed_path": "data/processed/paderborn",
+      "file_pattern": "paderborn_features.parquet",
+      "candidate_grouping_columns": ["bearing_id", "source_file", "measurement_id"],
+      "target_columns": ["fault_label"],
+      "feature_types": ["vibration"],
+      "is_direct_rotax_telemetry": false,
+      "limitations": [
+        "Laboratory motor-bearing test rig under controlled speed/torque/radial force conditions.",
+        "Artificially damaged and accelerated fatigue bearings; not a whole-engine vibroacoustic profile."
+      ]
+    },
+    "nasa_battery": {
+      "name": "NASA PCoE Battery Aging Dataset",
+      "display_name": "NASA Battery",
+      "availability": "AVAILABLE",
+      "integration_role": "SOH_RUL_BENCHMARK",
+      "target_tasks": [
+        "SOH_BENCHMARK",
+        "RUL_BENCHMARK"
+      ],
+      "processed_path": "data/processed/nasa_battery",
+      "file_pattern": "battery_cycles.parquet",
+      "candidate_grouping_columns": ["battery_id", "source_file"],
+      "target_columns": ["soh", "capacity_loss", "discharge_capacity"],
+      "feature_types": ["degradation", "electrochemical"],
+      "is_direct_rotax_telemetry": false,
+      "limitations": [
+        "Electrochemical lithium-ion cell degradation benchmark, not thermo-mechanical piston engine data.",
+        "Used strictly for testing SOH and RUL methodology and filtering algorithms.",
+        "Must never be treated as Rotax engine electrical system telemetry."
+      ]
+    },
+    "nust": {
+      "name": "NUST Bearing and Fault Dataset",
+      "display_name": "NUST Vibration",
+      "availability": "AVAILABLE",
+      "integration_role": "VIBRATION_FAULT_FEATURE_LEARNING",
+      "target_tasks": [
+        "VIBRATION_FAULT_FEATURE_LEARNING",
+        "ANOMALY_DETECTION_VALIDATION"
+      ],
+      "processed_path": "data/processed/nust",
+      "file_pattern": "nust_processed.parquet",
+      "candidate_grouping_columns": ["source_file"],
+      "target_columns": ["bearing_condition"],
+      "feature_types": ["vibration", "operating_condition"],
+      "is_direct_rotax_telemetry": false,
+      "limitations": [
+        "Multi-channel industrial test rig with variable temperature and humidity conditions.",
+        "Used for vibration feature representation learning across diverse environmental conditions."
+      ]
+    },
+    "basic": {
+      "name": "BASiC: Biomisa Arducopter Sensory Critique Dataset",
+      "display_name": "BASiC UAV Telemetry",
+      "availability": "UNAVAILABLE",
+      "integration_role": "UNAVAILABLE",
+      "target_tasks": [
+        "UNAVAILABLE"
+      ],
+      "processed_path": "data/processed/basic",
+      "file_pattern": "basic_*.parquet",
+      "candidate_grouping_columns": [],
+      "target_columns": [],
+      "feature_types": [],
+      "is_direct_rotax_telemetry": false,
+      "limitations": [
+        "DATASET UNAVAILABLE: Requires manual download of DataFlash Text Logs (Zenodo DOI 10.5281/zenodo.8195068) into data/raw/basic/.",
+        "No processed parquet files currently exist in data/processed/basic/."
+      ]
+    }
+  }
+}
