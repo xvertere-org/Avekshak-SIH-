@@ -526,6 +526,7 @@ class SystemPipelineOrchestrator:
             )
 
         # 2. Configure Mission Profile
+        airspeed = getattr(sc, "airspeed_ms", 40.0)
         seg = PhaseSegment(
             phase=FlightPhase.CRUISE,
             duration_s=sim_duration,
@@ -533,6 +534,8 @@ class SystemPipelineOrchestrator:
             throttle_end_pct=sc.throttle_pct,
             altitude_start_m=sc.altitude_m,
             altitude_end_m=sc.altitude_m,
+            airspeed_start_ms=airspeed,
+            airspeed_end_ms=airspeed,
         )
         profile = MissionProfile(
             mission_id=sc.mission_id,

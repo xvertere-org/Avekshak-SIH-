@@ -33,3 +33,14 @@ def load_engine_config(filepath: Union[str, Path] = CONFIG_DIR / "default_engine
 def load_telemetry_settings(filepath: Union[str, Path] = CONFIG_DIR / "telemetry_settings.json") -> Dict[str, Any]:
     """Load telemetry channel settings and metadata."""
     return load_json(filepath)
+
+
+def load_engine_reference(filepath: Union[str, Path] = CONFIG_DIR / "engine_reference" / "rotax_914_ul_f.json") -> Dict[str, Any]:
+    """Load authoritative Rotax 914 UL/F engine reference specification."""
+    return load_json(filepath)
+
+
+def load_physics_contract(filepath: Union[str, Path] = CONFIG_DIR / "physics_contract.json") -> Dict[str, Any]:
+    """Load system-wide physics contract defining implemented vs unmodeled subsystems."""
+    return load_json(filepath)
+

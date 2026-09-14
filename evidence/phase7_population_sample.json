@@ -1,0 +1,678 @@
+{
+  "population_id": "ROTAX_914_PHASE7",
+  "total_engines": 100,
+  "seed": 42,
+  "splits": {
+    "train": 70,
+    "val": 15,
+    "test": 15
+  },
+  "validation": {
+    "is_fully_valid": true,
+    "valid_count": 100,
+    "invalid_count": 0
+  },
+  "parameter_statistics": {
+    "c_th_cht": {
+      "mean": 923.4889318694554,
+      "std": 41.23997162662839,
+      "min": 840.0443255972185,
+      "max": 1010.886609702951,
+      "p05": 858.0368040422712,
+      "p95": 996.5265145821353
+    },
+    "h_cool_base": {
+      "mean": 16.021108395776306,
+      "std": 0.9156773081157127,
+      "min": 13.670927468951332,
+      "max": 18.38473235362147,
+      "p05": 14.342016525572108,
+      "p95": 17.378067590388177
+    },
+    "q_gen_fraction": {
+      "mean": 0.04807728388599411,
+      "std": 0.002104972193211866,
+      "min": 0.04282864710517488,
+      "max": 0.05231501190821088,
+      "p05": 0.0445124260873591,
+      "p95": 0.051618545124539075
+    },
+    "t_egt_base_c": {
+      "mean": 519.3793214292492,
+      "std": 10.694318924977463,
+      "min": 495.42165629765,
+      "max": 543.7084351749334,
+      "p05": 500.9637657487662,
+      "p95": 536.692199703714
+    },
+    "k_egt_load": {
+      "mean": 208.66724783872633,
+      "std": 7.850054668620674,
+      "min": 190.48803993348372,
+      "max": 227.14780242162334,
+      "p05": 197.78532498240745,
+      "p95": 222.26993679856903
+    },
+    "tau_egt_s": {
+      "mean": 2.5062195219253227,
+      "std": 0.20862714813863464,
+      "min": 2.0326920085301805,
+      "max": 2.9824390170862225,
+      "p05": 2.1748013161712354,
+      "p95": 2.864081507793625
+    },
+    "c_coolant_j_per_k": {
+      "mean": 4464.297942246445,
+      "std": 252.66284918939473,
+      "min": 3963.2003629009378,
+      "max": 5051.313079270633,
+      "p05": 4070.442250016969,
+      "p95": 4927.5652509885385
+    },
+    "h_rad_base": {
+      "mean": 18.097527625253235,
+      "std": 1.0899721435288032,
+      "min": 15.721597675598163,
+      "max": 20.497165655590223,
+      "p05": 16.259357621823515,
+      "p95": 19.830636708956554
+    },
+    "c_oil": {
+      "mean": 1339.9008239106124,
+      "std": 63.62201365046209,
+      "min": 1194.5733144688095,
+      "max": 1494.4281189683275,
+      "p05": 1235.6718138994856,
+      "p95": 1440.8246128607927
+    },
+    "h_oil_cool": {
+      "mean": 20.003407951964487,
+      "std": 1.3185430511193217,
+      "min": 17.0,
+      "max": 22.827298574645944,
+      "p05": 17.532279479373734,
+      "p95": 22.056852797065936
+    },
+    "oil_press_base_bar": {
+      "mean": 1.0043539865138016,
+      "std": 0.05368617570916604,
+      "min": 0.8669448199744852,
+      "max": 1.1408948925327809,
+      "p05": 0.9146531128952929,
+      "p95": 1.10278908565102
+    },
+    "k_oil_p_rpm": {
+      "mean": 0.0008486451303446815,
+      "std": 3.9636139309202186e-05,
+      "min": 0.0007582870538198348,
+      "max": 0.000935392831156509,
+      "p05": 0.0007705508132586446,
+      "p95": 0.0009151430790937138
+    },
+    "k_oil_p_temp": {
+      "mean": 0.008019220463251289,
+      "std": 0.0008223030350733368,
+      "min": 0.006091445765684088,
+      "max": 0.009928798162292947,
+      "p05": 0.0067833659269970195,
+      "p95": 0.00951589190040264
+    },
+    "a_fuel_kg_per_j": {
+      "mean": 6.841835194846035e-08,
+      "std": 2.2315777289704437e-09,
+      "min": 6.357685696525966e-08,
+      "max": 7.4e-08,
+      "p05": 6.517026580542804e-08,
+      "p95": 7.252183196284312e-08
+    },
+    "b_fuel_kg_per_s": {
+      "mean": 0.0003206712805878499,
+      "std": 1.5817245284856402e-05,
+      "min": 0.0002812327022707336,
+      "max": 0.000359422198148252,
+      "p05": 0.0002934539316512317,
+      "p95": 0.0003442657119026087
+    },
+    "combustion_efficiency_multiplier": {
+      "mean": 0.9971066479755624,
+      "std": 0.01867739430813388,
+      "min": 0.9521360587766712,
+      "max": 1.0413033672389609,
+      "p05": 0.9690126923406296,
+      "p95": 1.0260534035006714
+    },
+    "tcu_continuous_map_target_bar": {
+      "mean": 1.2003167555475571,
+      "std": 0.011838650246537933,
+      "min": 1.1756466736728466,
+      "max": 1.2287459189856302,
+      "p05": 1.1814576035130164,
+      "p95": 1.2218786046918748
+    },
+    "tau_map_s": {
+      "mean": 0.3525497511558834,
+      "std": 0.0299567428414284,
+      "min": 0.28776076095746544,
+      "max": 0.43770697673879194,
+      "p05": 0.30133898110867113,
+      "p95": 0.4038555938375586
+    },
+    "eta_turb_nominal": {
+      "mean": 0.6533984551914872,
+      "std": 0.019871850779624473,
+      "min": 0.6018988557207806,
+      "max": 0.6982181260093615,
+      "p05": 0.6215934624521287,
+      "p95": 0.6867502283561313
+    },
+    "eta_comp_nominal": {
+      "mean": 0.7002900959551357,
+      "std": 0.0181184857332924,
+      "min": 0.6582786696990256,
+      "max": 0.7433944553115859,
+      "p05": 0.6702784459875045,
+      "p95": 0.73196477086106
+    },
+    "intercooler_efficiency": {
+      "mean": 0.5940720825071477,
+      "std": 0.029800332423168183,
+      "min": 0.5301014725413711,
+      "max": 0.6557632629892647,
+      "p05": 0.5473515333044813,
+      "p95": 0.6416651704161083
+    },
+    "inertia_kg_m2": {
+      "mean": 0.2807029509627765,
+      "std": 0.011087274011693722,
+      "min": 0.2530778426167974,
+      "max": 0.31048492782676385,
+      "p05": 0.2624307236926854,
+      "p95": 0.29890353284873045
+    },
+    "k_load": {
+      "mean": 0.00030588716793055474,
+      "std": 1.2391588955402463e-05,
+      "min": 0.0002712458908941503,
+      "max": 0.00033262408632420506,
+      "p05": 0.00028291931579272576,
+      "p95": 0.0003267373933806983
+    },
+    "k_fric_linear": {
+      "mean": 0.015151549715318654,
+      "std": 0.0010850683740143128,
+      "min": 0.012643571200428881,
+      "max": 0.0174330259475329,
+      "p05": 0.013115895528315068,
+      "p95": 0.01684469391351802
+    },
+    "torque_fric_static": {
+      "mean": 3.481309809739129,
+      "std": 0.26113792156599747,
+      "min": 2.8579441162851253,
+      "max": 4.16679238566632,
+      "p05": 3.0269277834613963,
+      "p95": 3.8770881267034736
+    },
+    "vib_order1_base_g": {
+      "mean": 0.31914740581634415,
+      "std": 0.025223054939563443,
+      "min": 0.2664074228863963,
+      "max": 0.37711774499040374,
+      "p05": 0.2799973934226911,
+      "p95": 0.36059857379402194
+    },
+    "vib_order2_base_g": {
+      "mean": 0.2215473554947746,
+      "std": 0.01542319980928811,
+      "min": 0.18673841796031487,
+      "max": 0.2575170779456845,
+      "p05": 0.1972621923750773,
+      "p95": 0.24857277969113165
+    },
+    "vib_noise_std_g": {
+      "mean": 0.06036788997430402,
+      "std": 0.005982170128430092,
+      "min": 0.04652416065207632,
+      "max": 0.07465963401563921,
+      "p05": 0.050080750361488936,
+      "p95": 0.0706655457842067
+    },
+    "sensor_noise_rpm": {
+      "mean": 4.094010506775035,
+      "std": 0.5359219347989791,
+      "min": 2.727496261976225,
+      "max": 5.933348453686687,
+      "p05": 3.332303817548738,
+      "p95": 4.97557768326558
+    },
+    "sensor_noise_cht": {
+      "mean": 0.4138979285943737,
+      "std": 0.06246052976888225,
+      "min": 0.2737896270758133,
+      "max": 0.5499153320609323,
+      "p05": 0.3136642758419774,
+      "p95": 0.5145144799561058
+    },
+    "sensor_noise_egt": {
+      "mean": 1.8384651028708823,
+      "std": 0.30912298079921513,
+      "min": 1.1272151205994518,
+      "max": 2.586677214859552,
+      "p05": 1.25048616877965,
+      "p95": 2.3148745099571877
+    },
+    "sensor_noise_oil_temp": {
+      "mean": 0.3047511760367836,
+      "std": 0.0485153377511913,
+      "min": 0.19087948597954543,
+      "max": 0.42572939120996145,
+      "p05": 0.22509327182424255,
+      "p95": 0.3937152953061666
+    },
+    "sensor_noise_oil_press": {
+      "mean": 0.02444889918304587,
+      "std": 0.004267280422063484,
+      "min": 0.015785594371305306,
+      "max": 0.033870176602074975,
+      "p05": 0.017209946310141333,
+      "p95": 0.031257495307077623
+    },
+    "sensor_noise_fuel_flow": {
+      "mean": 0.15340738833179052,
+      "std": 0.02381497913325154,
+      "min": 0.10770763809988036,
+      "max": 0.21494082442787496,
+      "p05": 0.11551722047986748,
+      "p95": 0.1944704911642389
+    },
+    "sensor_noise_vibration": {
+      "mean": 0.015410732734432976,
+      "std": 0.0025316135780965067,
+      "min": 0.009054665878634759,
+      "max": 0.02066278032872908,
+      "p05": 0.011710402922105166,
+      "p95": 0.019847933095928024
+    }
+  },
+  "clipping_counts": {
+    "c_th_cht": 0,
+    "h_cool_base": 0,
+    "q_gen_fraction": 0,
+    "t_egt_base_c": 0,
+    "k_egt_load": 0,
+    "tau_egt_s": 0,
+    "c_coolant_j_per_k": 0,
+    "h_rad_base": 0,
+    "c_oil": 0,
+    "h_oil_cool": 1,
+    "oil_press_base_bar": 0,
+    "k_oil_p_rpm": 0,
+    "k_oil_p_temp": 0,
+    "a_fuel_kg_per_j": 100,
+    "b_fuel_kg_per_s": 1,
+    "combustion_efficiency_multiplier": 0,
+    "tcu_continuous_map_target_bar": 0,
+    "tau_map_s": 0,
+    "eta_turb_nominal": 0,
+    "eta_comp_nominal": 0,
+    "intercooler_efficiency": 0,
+    "inertia_kg_m2": 0,
+    "k_load": 0,
+    "k_fric_linear": 0,
+    "torque_fric_static": 0,
+    "vib_order1_base_g": 0,
+    "vib_order2_base_g": 0,
+    "vib_noise_std_g": 0,
+    "sensor_noise_rpm": 0,
+    "sensor_noise_cht": 0,
+    "sensor_noise_egt": 0,
+    "sensor_noise_oil_temp": 0,
+    "sensor_noise_oil_press": 0,
+    "sensor_noise_fuel_flow": 0,
+    "sensor_noise_vibration": 0
+  },
+  "sample_profiles": [
+    {
+      "population_id": "ROTAX_914_PHASE7",
+      "engine_instance_id": "ENG_ROTAX_914_PHASE7_0000",
+      "seed": 191664963,
+      "split": "train",
+      "thermal": {
+        "c_th_cht": 873.2007152191777,
+        "h_cool_base": 16.750451195806455,
+        "q_gen_fraction": 0.04988112943278243,
+        "t_egt_base_c": 496.58757773615395,
+        "k_egt_load": 199.58256394510147,
+        "tau_egt_s": 2.528124888696803,
+        "c_coolant_j_per_k": 4357.562204684804,
+        "h_rad_base": 17.979838610994854
+      },
+      "lubrication": {
+        "c_oil": 1286.0217054319814,
+        "h_oil_cool": 18.90695653945648,
+        "oil_press_base_bar": 1.0466675161257368,
+        "k_oil_p_rpm": 0.0008526412279024486,
+        "k_oil_p_temp": 0.008901792965574426
+      },
+      "turbocharger": {
+        "tcu_continuous_map_target_bar": 1.188493408790052,
+        "tau_map_s": 0.37635350903921816,
+        "eta_turb_nominal": 0.649001481780275,
+        "eta_comp_nominal": 0.6963027527290947,
+        "intercooler_efficiency": 0.5795721136678817
+      },
+      "combustion": {
+        "a_fuel_kg_per_j": 6.58366512663555e-08,
+        "b_fuel_kg_per_s": 0.00030711061305675145,
+        "combustion_efficiency_multiplier": 1.0073750156816499
+      },
+      "mechanical": {
+        "rpm_idle": 1400.0,
+        "inertia_kg_m2": 0.2946704960640884,
+        "k_load": 0.0003014365872510368,
+        "k_fric_linear": 0.014528839395620581,
+        "torque_fric_static": 3.4119666123779426,
+        "vib_order1_base_g": 0.3327754204532804,
+        "vib_order2_base_g": 0.22584710502982525,
+        "vib_noise_std_g": 0.062476395669575926
+      },
+      "sensors": {
+        "sensor_noise_rpm": 4.25849260180473,
+        "sensor_noise_cht": 0.5499153320609323,
+        "sensor_noise_egt": 1.669947194756923,
+        "sensor_noise_oil_temp": 0.27438786354642314,
+        "sensor_noise_oil_press": 0.02174490908700849,
+        "sensor_noise_fuel_flow": 0.16601546498696287,
+        "sensor_noise_vibration": 0.017935327961074318,
+        "sensor_bias_rpm": 0.7807113453896413,
+        "sensor_bias_cht": 0.11148812568051635,
+        "sensor_bias_egt": 0.325892560983117,
+        "sensor_bias_oil_temp": -0.07986116487464331,
+        "sensor_bias_oil_press": 0.0018572905845337581,
+        "sensor_bias_fuel_flow": 0.004667432365629129,
+        "sensor_bias_vibration": 0.0008747543869160518
+      },
+      "cylinders": {
+        "num_cylinders": 4,
+        "firing_order": "1-4-3-2",
+        "bank_variation_factors": [
+          0.9832883963050181,
+          0.9981057304716301,
+          1.0317482745860078,
+          0.9868575986373437
+        ],
+        "combustion_factors": [
+          1.0040257940128887,
+          1.0067631446300773,
+          0.9900555922645236,
+          0.9991554690925105
+        ]
+      },
+      "provenance_map": {
+        "c_th_cht": "MODEL_CALIBRATION",
+        "h_cool_base": "MODEL_CALIBRATION",
+        "q_gen_fraction": "MODEL_CALIBRATION",
+        "t_egt_base_c": "MODEL_CALIBRATION",
+        "k_egt_load": "MODEL_CALIBRATION",
+        "tau_egt_s": "MODEL_CALIBRATION",
+        "c_coolant_j_per_k": "MODEL_CALIBRATION",
+        "h_rad_base": "MODEL_CALIBRATION",
+        "c_oil": "MODEL_CALIBRATION",
+        "h_oil_cool": "MODEL_CALIBRATION",
+        "oil_press_base_bar": "MODEL_CALIBRATION",
+        "k_oil_p_rpm": "MODEL_CALIBRATION",
+        "k_oil_p_temp": "MODEL_CALIBRATION",
+        "a_fuel_kg_per_j": "MODEL_CALIBRATION",
+        "b_fuel_kg_per_s": "MODEL_CALIBRATION",
+        "combustion_efficiency_multiplier": "SYNTHETIC_VARIATION",
+        "tcu_continuous_map_target_bar": "MODEL_CALIBRATION",
+        "tau_map_s": "MODEL_CALIBRATION",
+        "eta_turb_nominal": "MODEL_CALIBRATION",
+        "eta_comp_nominal": "MODEL_CALIBRATION",
+        "intercooler_efficiency": "MODEL_CALIBRATION",
+        "inertia_kg_m2": "MODEL_CALIBRATION",
+        "k_load": "MODEL_CALIBRATION",
+        "k_fric_linear": "MODEL_CALIBRATION",
+        "torque_fric_static": "MODEL_CALIBRATION",
+        "vib_order1_base_g": "MODEL_CALIBRATION",
+        "vib_order2_base_g": "MODEL_CALIBRATION",
+        "vib_noise_std_g": "MODEL_CALIBRATION",
+        "sensor_noise_rpm": "SYNTHETIC_VARIATION",
+        "sensor_noise_cht": "SYNTHETIC_VARIATION",
+        "sensor_noise_egt": "SYNTHETIC_VARIATION",
+        "sensor_noise_oil_temp": "SYNTHETIC_VARIATION",
+        "sensor_noise_oil_press": "SYNTHETIC_VARIATION",
+        "sensor_noise_fuel_flow": "SYNTHETIC_VARIATION",
+        "sensor_noise_vibration": "SYNTHETIC_VARIATION"
+      }
+    },
+    {
+      "population_id": "ROTAX_914_PHASE7",
+      "engine_instance_id": "ENG_ROTAX_914_PHASE7_0001",
+      "seed": 1370068125,
+      "split": "train",
+      "thermal": {
+        "c_th_cht": 967.077253074861,
+        "h_cool_base": 16.455880163973656,
+        "q_gen_fraction": 0.04824460321822572,
+        "t_egt_base_c": 540.0037149367874,
+        "k_egt_load": 201.80804890132993,
+        "tau_egt_s": 2.4452826840120774,
+        "c_coolant_j_per_k": 4921.310527904101,
+        "h_rad_base": 17.164271012628305
+      },
+      "lubrication": {
+        "c_oil": 1350.2066638618994,
+        "h_oil_cool": 20.756317626902195,
+        "oil_press_base_bar": 0.9905571046321077,
+        "k_oil_p_rpm": 0.0007582870538198348,
+        "k_oil_p_temp": 0.008160865550393902
+      },
+      "turbocharger": {
+        "tcu_continuous_map_target_bar": 1.1890355984124816,
+        "tau_map_s": 0.3229526171081587,
+        "eta_turb_nominal": 0.6698083837985349,
+        "eta_comp_nominal": 0.6652405188320931,
+        "intercooler_efficiency": 0.5851106778147402
+      },
+      "combustion": {
+        "a_fuel_kg_per_j": 6.524397993744595e-08,
+        "b_fuel_kg_per_s": 0.0003100094018148661,
+        "combustion_efficiency_multiplier": 0.9950491254516143
+      },
+      "mechanical": {
+        "rpm_idle": 1400.0,
+        "inertia_kg_m2": 0.284881605350628,
+        "k_load": 0.0002978908928724718,
+        "k_fric_linear": 0.012643571200428881,
+        "torque_fric_static": 3.785230264901427,
+        "vib_order1_base_g": 0.29012589677330836,
+        "vib_order2_base_g": 0.21412270135254652,
+        "vib_noise_std_g": 0.05997309918788051
+      },
+      "sensors": {
+        "sensor_noise_rpm": 4.502399790854626,
+        "sensor_noise_cht": 0.47668019578552545,
+        "sensor_noise_egt": 1.7827508461758812,
+        "sensor_noise_oil_temp": 0.3339523613698842,
+        "sensor_noise_oil_press": 0.02095426574962602,
+        "sensor_noise_fuel_flow": 0.15675067879891993,
+        "sensor_noise_vibration": 0.015154501823628257,
+        "sensor_bias_rpm": 1.0929473127104423,
+        "sensor_bias_cht": 0.09662639674482684,
+        "sensor_bias_egt": 1.1219898241025184,
+        "sensor_bias_oil_temp": -0.02833132207507951,
+        "sensor_bias_oil_press": 0.006790436232210389,
+        "sensor_bias_fuel_flow": 0.07095860928261918,
+        "sensor_bias_vibration": 0.0020926032791956646
+      },
+      "cylinders": {
+        "num_cylinders": 4,
+        "firing_order": "1-4-3-2",
+        "bank_variation_factors": [
+          0.9881919118940119,
+          1.0029074636965234,
+          1.028446945196153,
+          0.9804536792133115
+        ],
+        "combustion_factors": [
+          0.9897876602818605,
+          1.0074072630467492,
+          1.0007447211873588,
+          1.0020603554840315
+        ]
+      },
+      "provenance_map": {
+        "c_th_cht": "MODEL_CALIBRATION",
+        "h_cool_base": "MODEL_CALIBRATION",
+        "q_gen_fraction": "MODEL_CALIBRATION",
+        "t_egt_base_c": "MODEL_CALIBRATION",
+        "k_egt_load": "MODEL_CALIBRATION",
+        "tau_egt_s": "MODEL_CALIBRATION",
+        "c_coolant_j_per_k": "MODEL_CALIBRATION",
+        "h_rad_base": "MODEL_CALIBRATION",
+        "c_oil": "MODEL_CALIBRATION",
+        "h_oil_cool": "MODEL_CALIBRATION",
+        "oil_press_base_bar": "MODEL_CALIBRATION",
+        "k_oil_p_rpm": "MODEL_CALIBRATION",
+        "k_oil_p_temp": "MODEL_CALIBRATION",
+        "a_fuel_kg_per_j": "MODEL_CALIBRATION",
+        "b_fuel_kg_per_s": "MODEL_CALIBRATION",
+        "combustion_efficiency_multiplier": "SYNTHETIC_VARIATION",
+        "tcu_continuous_map_target_bar": "MODEL_CALIBRATION",
+        "tau_map_s": "MODEL_CALIBRATION",
+        "eta_turb_nominal": "MODEL_CALIBRATION",
+        "eta_comp_nominal": "MODEL_CALIBRATION",
+        "intercooler_efficiency": "MODEL_CALIBRATION",
+        "inertia_kg_m2": "MODEL_CALIBRATION",
+        "k_load": "MODEL_CALIBRATION",
+        "k_fric_linear": "MODEL_CALIBRATION",
+        "torque_fric_static": "MODEL_CALIBRATION",
+        "vib_order1_base_g": "MODEL_CALIBRATION",
+        "vib_order2_base_g": "MODEL_CALIBRATION",
+        "vib_noise_std_g": "MODEL_CALIBRATION",
+        "sensor_noise_rpm": "SYNTHETIC_VARIATION",
+        "sensor_noise_cht": "SYNTHETIC_VARIATION",
+        "sensor_noise_egt": "SYNTHETIC_VARIATION",
+        "sensor_noise_oil_temp": "SYNTHETIC_VARIATION",
+        "sensor_noise_oil_press": "SYNTHETIC_VARIATION",
+        "sensor_noise_fuel_flow": "SYNTHETIC_VARIATION",
+        "sensor_noise_vibration": "SYNTHETIC_VARIATION"
+      }
+    },
+    {
+      "population_id": "ROTAX_914_PHASE7",
+      "engine_instance_id": "ENG_ROTAX_914_PHASE7_0002",
+      "seed": 476981972,
+      "split": "train",
+      "thermal": {
+        "c_th_cht": 873.7974362149121,
+        "h_cool_base": 17.350783486148583,
+        "q_gen_fraction": 0.04608010504612376,
+        "t_egt_base_c": 514.3223461322741,
+        "k_egt_load": 197.8407834471769,
+        "tau_egt_s": 2.3381291643564297,
+        "c_coolant_j_per_k": 4396.625288143328,
+        "h_rad_base": 18.74727123479177
+      },
+      "lubrication": {
+        "c_oil": 1350.1657869321007,
+        "h_oil_cool": 20.3936073395681,
+        "oil_press_base_bar": 0.9712201870248495,
+        "k_oil_p_rpm": 0.0008481546237031047,
+        "k_oil_p_temp": 0.007311248742331497
+      },
+      "turbocharger": {
+        "tcu_continuous_map_target_bar": 1.20649669690103,
+        "tau_map_s": 0.2995578676175119,
+        "eta_turb_nominal": 0.6366511255255957,
+        "eta_comp_nominal": 0.7241452641463637,
+        "intercooler_efficiency": 0.6364825925774329
+      },
+      "combustion": {
+        "a_fuel_kg_per_j": 6.905258130661766e-08,
+        "b_fuel_kg_per_s": 0.00031064374903589086,
+        "combustion_efficiency_multiplier": 0.9864574754895894
+      },
+      "mechanical": {
+        "rpm_idle": 1400.0,
+        "inertia_kg_m2": 0.2951757637691948,
+        "k_load": 0.00029880739355602544,
+        "k_fric_linear": 0.01452097330126463,
+        "torque_fric_static": 3.594965544213894,
+        "vib_order1_base_g": 0.31466709648640834,
+        "vib_order2_base_g": 0.20866510605619124,
+        "vib_noise_std_g": 0.05942985387720684
+      },
+      "sensors": {
+        "sensor_noise_rpm": 4.10557017822005,
+        "sensor_noise_cht": 0.48850823290273193,
+        "sensor_noise_egt": 1.4213555584446207,
+        "sensor_noise_oil_temp": 0.3182569767458574,
+        "sensor_noise_oil_press": 0.0269127908532197,
+        "sensor_noise_fuel_flow": 0.18616044312678814,
+        "sensor_noise_vibration": 0.017374446487074827,
+        "sensor_bias_rpm": 1.2865662514618759,
+        "sensor_bias_cht": -0.4,
+        "sensor_bias_egt": 0.5913425893829061,
+        "sensor_bias_oil_temp": -0.061656322249485154,
+        "sensor_bias_oil_press": -0.011232610557868453,
+        "sensor_bias_fuel_flow": 0.021675873084129122,
+        "sensor_bias_vibration": -0.0028761264147274083
+      },
+      "cylinders": {
+        "num_cylinders": 4,
+        "firing_order": "1-4-3-2",
+        "bank_variation_factors": [
+          0.9680059707243323,
+          0.9988902641070304,
+          1.0407906547310928,
+          0.9923131104375451
+        ],
+        "combustion_factors": [
+          1.0017854180589276,
+          0.9908401686666699,
+          0.996349155628178,
+          1.011025257646224
+        ]
+      },
+      "provenance_map": {
+        "c_th_cht": "MODEL_CALIBRATION",
+        "h_cool_base": "MODEL_CALIBRATION",
+        "q_gen_fraction": "MODEL_CALIBRATION",
+        "t_egt_base_c": "MODEL_CALIBRATION",
+        "k_egt_load": "MODEL_CALIBRATION",
+        "tau_egt_s": "MODEL_CALIBRATION",
+        "c_coolant_j_per_k": "MODEL_CALIBRATION",
+        "h_rad_base": "MODEL_CALIBRATION",
+        "c_oil": "MODEL_CALIBRATION",
+        "h_oil_cool": "MODEL_CALIBRATION",
+        "oil_press_base_bar": "MODEL_CALIBRATION",
+        "k_oil_p_rpm": "MODEL_CALIBRATION",
+        "k_oil_p_temp": "MODEL_CALIBRATION",
+        "a_fuel_kg_per_j": "MODEL_CALIBRATION",
+        "b_fuel_kg_per_s": "MODEL_CALIBRATION",
+        "combustion_efficiency_multiplier": "SYNTHETIC_VARIATION",
+        "tcu_continuous_map_target_bar": "MODEL_CALIBRATION",
+        "tau_map_s": "MODEL_CALIBRATION",
+        "eta_turb_nominal": "MODEL_CALIBRATION",
+        "eta_comp_nominal": "MODEL_CALIBRATION",
+        "intercooler_efficiency": "MODEL_CALIBRATION",
+        "inertia_kg_m2": "MODEL_CALIBRATION",
+        "k_load": "MODEL_CALIBRATION",
+        "k_fric_linear": "MODEL_CALIBRATION",
+        "torque_fric_static": "MODEL_CALIBRATION",
+        "vib_order1_base_g": "MODEL_CALIBRATION",
+        "vib_order2_base_g": "MODEL_CALIBRATION",
+        "vib_noise_std_g": "MODEL_CALIBRATION",
+        "sensor_noise_rpm": "SYNTHETIC_VARIATION",
+        "sensor_noise_cht": "SYNTHETIC_VARIATION",
+        "sensor_noise_egt": "SYNTHETIC_VARIATION",
+        "sensor_noise_oil_temp": "SYNTHETIC_VARIATION",
+        "sensor_noise_oil_press": "SYNTHETIC_VARIATION",
+        "sensor_noise_fuel_flow": "SYNTHETIC_VARIATION",
+        "sensor_noise_vibration": "SYNTHETIC_VARIATION"
+      }
+    }
+  ]
+}

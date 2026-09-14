@@ -1,0 +1,390 @@
+{
+  "title": "SIH26054 Phase 2 Operating Matrix Numerical Verification Evidence",
+  "generated_at": "2026-09-13T19:02:52.113504+00:00",
+  "random_seed": 42,
+  "simulation_dt_s": 0.2,
+  "source_commit": "c218c88e085a18dd5b9513c54497e8fd0b773abf",
+  "working_tree_dirty": false,
+  "simulator_version": "0.2.0-phase2b-physics",
+  "engine_architecture": "BRP-Rotax 914 UL/F Series",
+  "simulation_fidelity": "Tier C / Tier D Coupled Grey-Box Aero-Piston Propulsion Model",
+  "verification_claim": "NUMERICALLY_VERIFIED",
+  "experimental_validation_claimed": false,
+  "gearbox_reduction_ratio": "2.42857:1 (51:21 teeth)",
+  "multi_cylinder_layout": "4-Cylinder Boxer (1-4-3-2 firing order) with local cylinder-state independence and shared-system coupling",
+  "turbocharger_model": "REDUCED_ORDER_TURBO_SURROGATE (coupled loop with TCU control surrogate)",
+  "cooling_model": "REDUCED_ORDER_COOLING_SURROGATE (4500 J/K effective lumped capacitance, 80\u00b0C thermostat)",
+  "power_hierarchy_invariant": "POWER_HIERARCHY_INVARIANT (P_chem > P_ind > P_brake >= 0)",
+  "num_operating_cases": 8,
+  "all_cases_passed": true,
+  "cases": [
+    {
+      "case_id": "CASE_1_GROUND_IDLE",
+      "name": "Ground Idle",
+      "parameters": {
+        "altitude_m": 0.0,
+        "throttle_pct": 0.0,
+        "flight_phase": "LOITER"
+      },
+      "actual_model_output": {
+        "engine_rpm": 1405.8,
+        "propeller_rpm": 576.5,
+        "manifold_pressure_bar": 0.579,
+        "turbo_pressure_ratio": 1.041,
+        "wastegate_position": 0.809,
+        "charge_air_temp_c": 16.9,
+        "coolant_temp_c": 75.2,
+        "cht_mean_c": 75.3,
+        "cht_cylinders_c": [
+          74.6,
+          75.8,
+          77.5,
+          75.2
+        ],
+        "egt_mean_c": 496.2,
+        "egt_cylinders_c": [
+          487.9,
+          497.9,
+          512.8,
+          492.9
+        ],
+        "fuel_flow_l_h": 1.6,
+        "oil_pressure_bar": 2.08,
+        "oil_temp_c": 62.6
+      },
+      "acceptance_criteria": {
+        "description": "Low intake manifold pressure (throttle plenum vacuum ~0.6-0.7 bar), idle RPM ~1400, PR >= 1.0.",
+        "finite_states_required": true,
+        "propeller_kinematics_ratio": 2.42857
+      },
+      "verification_status": {
+        "all_finite_numerical_stability": true,
+        "propeller_kinematics_verified": true,
+        "case_8_boost_vs_map_distinction": true,
+        "overall_case_verified": true
+      }
+    },
+    {
+      "case_id": "CASE_2_SEA_LEVEL_CRUISE",
+      "name": "Sea-Level Cruise",
+      "parameters": {
+        "altitude_m": 0.0,
+        "throttle_pct": 65.0,
+        "flight_phase": "CRUISE"
+      },
+      "actual_model_output": {
+        "engine_rpm": 3744.9,
+        "propeller_rpm": 1541.2,
+        "manifold_pressure_bar": 1.119,
+        "turbo_pressure_ratio": 1.21,
+        "wastegate_position": 0.406,
+        "charge_air_temp_c": 24.2,
+        "coolant_temp_c": 75.0,
+        "cht_mean_c": 75.8,
+        "cht_cylinders_c": [
+          74.5,
+          75.5,
+          76.9,
+          75.0
+        ],
+        "egt_mean_c": 615.5,
+        "egt_cylinders_c": [
+          603.0,
+          615.3,
+          633.7,
+          609.1
+        ],
+        "fuel_flow_l_h": 10.56,
+        "oil_pressure_bar": 4.05,
+        "oil_temp_c": 66.8
+      },
+      "acceptance_criteria": {
+        "description": "Moderate continuous boost, wastegate partly open, positive boost pressure ratio, stable CHT/EGT.",
+        "finite_states_required": true,
+        "propeller_kinematics_ratio": 2.42857
+      },
+      "verification_status": {
+        "all_finite_numerical_stability": true,
+        "propeller_kinematics_verified": true,
+        "case_8_boost_vs_map_distinction": true,
+        "overall_case_verified": true
+      }
+    },
+    {
+      "case_id": "CASE_3_MID_ALTITUDE_CRUISE",
+      "name": "Mid-Altitude Cruise",
+      "parameters": {
+        "altitude_m": 2500.0,
+        "throttle_pct": 75.0,
+        "flight_phase": "CRUISE"
+      },
+      "actual_model_output": {
+        "engine_rpm": 4385.9,
+        "propeller_rpm": 1805.2,
+        "manifold_pressure_bar": 1.161,
+        "turbo_pressure_ratio": 1.649,
+        "wastegate_position": 0.163,
+        "charge_air_temp_c": 22.6,
+        "coolant_temp_c": 74.9,
+        "cht_mean_c": 75.9,
+        "cht_cylinders_c": [
+          74.5,
+          75.6,
+          77.3,
+          75.1
+        ],
+        "egt_mean_c": 725.7,
+        "egt_cylinders_c": [
+          710.9,
+          725.5,
+          747.2,
+          718.2
+        ],
+        "fuel_flow_l_h": 15.53,
+        "oil_pressure_bar": 4.59,
+        "oil_temp_c": 68.4
+      },
+      "acceptance_criteria": {
+        "description": "Stable continuous boost, wastegate further closing than sea level, MAP maintained.",
+        "finite_states_required": true,
+        "propeller_kinematics_ratio": 2.42857
+      },
+      "verification_status": {
+        "all_finite_numerical_stability": true,
+        "propeller_kinematics_verified": true,
+        "case_8_boost_vs_map_distinction": true,
+        "overall_case_verified": true
+      }
+    },
+    {
+      "case_id": "CASE_4_CRITICAL_ALTITUDE_CONTINUOUS",
+      "name": "Critical Altitude Continuous (4572 m)",
+      "parameters": {
+        "altitude_m": 4572.0,
+        "throttle_pct": 85.0,
+        "flight_phase": "CRUISE"
+      },
+      "actual_model_output": {
+        "engine_rpm": 4962.4,
+        "propeller_rpm": 2043.0,
+        "manifold_pressure_bar": 1.201,
+        "turbo_pressure_ratio": 2.161,
+        "wastegate_position": 0.076,
+        "charge_air_temp_c": 21.6,
+        "coolant_temp_c": 74.8,
+        "cht_mean_c": 78.1,
+        "cht_cylinders_c": [
+          76.5,
+          77.8,
+          79.8,
+          77.2
+        ],
+        "egt_mean_c": 767.3,
+        "egt_cylinders_c": [
+          752.6,
+          767.9,
+          791.0,
+          760.2
+        ],
+        "fuel_flow_l_h": 21.35,
+        "oil_pressure_bar": 5.01,
+        "oil_temp_c": 72.5
+      },
+      "acceptance_criteria": {
+        "description": "Continuous rated boost (1.200 bar target), wastegate nearly fully closed to maintain MAP against low ambient pressure.",
+        "finite_states_required": true,
+        "propeller_kinematics_ratio": 2.42857
+      },
+      "verification_status": {
+        "all_finite_numerical_stability": true,
+        "propeller_kinematics_verified": true,
+        "case_8_boost_vs_map_distinction": true,
+        "overall_case_verified": true
+      }
+    },
+    {
+      "case_id": "CASE_5_TAKEOFF_POWER",
+      "name": "Takeoff Power (5 min rating)",
+      "parameters": {
+        "altitude_m": 500.0,
+        "throttle_pct": 100.0,
+        "flight_phase": "TAKEOFF"
+      },
+      "actual_model_output": {
+        "engine_rpm": 5920.6,
+        "propeller_rpm": 2437.1,
+        "manifold_pressure_bar": 1.352,
+        "turbo_pressure_ratio": 1.407,
+        "wastegate_position": 0.295,
+        "charge_air_temp_c": 28.4,
+        "coolant_temp_c": 77.2,
+        "cht_mean_c": 118.7,
+        "cht_cylinders_c": [
+          116.5,
+          118.4,
+          121.2,
+          117.5
+        ],
+        "egt_mean_c": 772.0,
+        "egt_cylinders_c": [
+          756.3,
+          771.7,
+          794.9,
+          764.0
+        ],
+        "fuel_flow_l_h": 34.51,
+        "oil_pressure_bar": 5.74,
+        "oil_temp_c": 87.5
+      },
+      "acceptance_criteria": {
+        "description": "Max takeoff boost (1.350 bar target), peak combustion power, RPM approaches 5800.",
+        "finite_states_required": true,
+        "propeller_kinematics_ratio": 2.42857
+      },
+      "verification_status": {
+        "all_finite_numerical_stability": true,
+        "propeller_kinematics_verified": true,
+        "case_8_boost_vs_map_distinction": true,
+        "overall_case_verified": true
+      }
+    },
+    {
+      "case_id": "CASE_6_THROTTLE_STEP_TRANSIENT",
+      "name": "Rapid Throttle Step Transient (20% -> 90%)",
+      "parameters": {
+        "altitude_m": 1193.3,
+        "throttle_pct": 87.7,
+        "flight_phase": "CLIMB"
+      },
+      "actual_model_output": {
+        "engine_rpm": 4160.9,
+        "propeller_rpm": 1711.3,
+        "manifold_pressure_bar": 1.241,
+        "turbo_pressure_ratio": 1.473,
+        "wastegate_position": 0.057,
+        "charge_air_temp_c": 26.0,
+        "coolant_temp_c": 75.0,
+        "cht_mean_c": 74.2,
+        "cht_cylinders_c": [
+          73.4,
+          74.5,
+          76.2,
+          73.9
+        ],
+        "egt_mean_c": 590.2,
+        "egt_cylinders_c": [
+          579.6,
+          591.4,
+          609.2,
+          585.5
+        ],
+        "fuel_flow_l_h": 17.58,
+        "oil_pressure_bar": 4.42,
+        "oil_temp_c": 62.9
+      },
+      "acceptance_criteria": {
+        "description": "Manifold lag ODE response, smooth RPM acceleration without numerical oscillations, wastegate rate-limiting.",
+        "finite_states_required": true,
+        "propeller_kinematics_ratio": 2.42857
+      },
+      "verification_status": {
+        "all_finite_numerical_stability": true,
+        "propeller_kinematics_verified": true,
+        "case_8_boost_vs_map_distinction": true,
+        "overall_case_verified": true
+      }
+    },
+    {
+      "case_id": "CASE_7_FULL_POWER_STEP_TRANSIENT",
+      "name": "Full Power Step Transient (Idle -> Takeoff)",
+      "parameters": {
+        "altitude_m": 243.8,
+        "throttle_pct": 97.5,
+        "flight_phase": "TAKEOFF"
+      },
+      "actual_model_output": {
+        "engine_rpm": 5000.0,
+        "propeller_rpm": 2058.1,
+        "manifold_pressure_bar": 1.314,
+        "turbo_pressure_ratio": 1.37,
+        "wastegate_position": 0.154,
+        "charge_air_temp_c": 28.8,
+        "coolant_temp_c": 75.1,
+        "cht_mean_c": 80.2,
+        "cht_cylinders_c": [
+          78.7,
+          79.8,
+          81.5,
+          79.3
+        ],
+        "egt_mean_c": 618.8,
+        "egt_cylinders_c": [
+          606.9,
+          619.3,
+          637.9,
+          613.1
+        ],
+        "fuel_flow_l_h": 27.32,
+        "oil_pressure_bar": 5.11,
+        "oil_temp_c": 64.6
+      },
+      "acceptance_criteria": {
+        "description": "Large-signal transient from idle vacuum to full 1.350 bar takeoff boost, positive net torque, zero NaN/Inf.",
+        "finite_states_required": true,
+        "propeller_kinematics_ratio": 2.42857
+      },
+      "verification_status": {
+        "all_finite_numerical_stability": true,
+        "propeller_kinematics_verified": true,
+        "case_8_boost_vs_map_distinction": true,
+        "overall_case_verified": true
+      }
+    },
+    {
+      "case_id": "CASE_8_RAPID_DESCENT_THROTTLED",
+      "name": "Rapid Descent Throttled (Case 8 Strict Verification)",
+      "parameters": {
+        "altitude_m": 1075.0,
+        "throttle_pct": 15.0,
+        "flight_phase": "DESCENT"
+      },
+      "actual_model_output": {
+        "engine_rpm": 1211.1,
+        "propeller_rpm": 497.9,
+        "manifold_pressure_bar": 0.849,
+        "turbo_pressure_ratio": 1.223,
+        "wastegate_position": 0.316,
+        "charge_air_temp_c": 17.5,
+        "coolant_temp_c": 74.3,
+        "cht_mean_c": 62.0,
+        "cht_cylinders_c": [
+          60.9,
+          61.7,
+          62.9,
+          61.3
+        ],
+        "egt_mean_c": 494.7,
+        "egt_cylinders_c": [
+          485.4,
+          495.3,
+          510.1,
+          490.3
+        ],
+        "fuel_flow_l_h": 1.83,
+        "oil_pressure_bar": 1.94,
+        "oil_temp_c": 59.0
+      },
+      "acceptance_criteria": {
+        "description": "Compressor boost ratio PR >= 1.0 confirmed simultaneously with intake manifold pressure MAP < P_amb (throttle butterfly vacuum).",
+        "finite_states_required": true,
+        "propeller_kinematics_ratio": 2.42857
+      },
+      "verification_status": {
+        "all_finite_numerical_stability": true,
+        "propeller_kinematics_verified": true,
+        "case_8_boost_vs_map_distinction": true,
+        "overall_case_verified": true
+      }
+    }
+  ]
+}

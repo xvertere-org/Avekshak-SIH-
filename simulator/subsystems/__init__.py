@@ -9,6 +9,14 @@ from simulator.subsystems.fuel import FuelSystem, FuelState
 from simulator.subsystems.thermal import ThermalSystem, ThermalState
 from simulator.subsystems.lubrication import LubricationSystem, LubricationState
 from simulator.subsystems.vibration import VibrationSystem, VibrationState
+from simulator.subsystems.turbocharger import (
+    TurbochargerSubsystem,
+    TurboState,
+    TCUSurrogate,
+    TurbineSurrogate,
+    CompressorSurrogate,
+)
+from simulator.subsystems.cooling import CoolingSubsystem, CoolingState
 
 __all__ = [
     "Atmosphere",
@@ -27,4 +35,12 @@ __all__ = [
     "LubricationState",
     "VibrationSystem",
     "VibrationState",
+    "TurbochargerSubsystem",
+    "TurboState",
+    "TCUSurrogate",
+    "TurbineSurrogate",
+    "CompressorSurrogate",
+    "CoolingSubsystem",
+    "CoolingState",
 ]
+

@@ -26,7 +26,8 @@ def render_header(overview: OverviewViewModel):
             '<div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px;">'
             '<span style="font-size: 18px; font-weight: 700; color: #f0f6fc; letter-spacing: -0.3px;">Aero-Piston Engine Digital Twin</span>'
             '<span style="font-size: 11px; font-weight: 700; color: #58a6ff; font-family: monospace; background: #161b22; border: 1px solid #21262d; border-radius: 3px; padding: 2px 6px;">SIH26054</span>'
-            '<span style="font-size: 12px; color: #8b949e;">Rotax 912/914 MALE UAV Propulsion Health Monitoring</span>'
+            '<span style="font-size: 12px; color: #8b949e;">Rotax 914 UL/F Reference Architecture · MALE UAV Digital Twin</span>'
+
             '</div>',
             unsafe_allow_html=True,
         )
