@@ -1190,3 +1190,64 @@ def test_sensor_dropout_quality_scenario_handling():
     # Telemetry should remain non-crashed and valid overall
     assert res.metrics.valid_telemetry_fraction > 0.0
 
+
+# =====================================================================
+# 28. DYNAMIC CAUSAL PROPAGATION & FRESH STATE VERIFICATION
+# =====================================================================
+
+def test_dynamic_causal_step_update_not_stale():
+    """
+    Verify that every timestep produces a fresh DigitalTwinState and that
+    telemetry perturbations dynamically propagate to residuals, subsystem
+    health scores, and diagnosis hypotheses without stale caching.
+    """
+    from simulator.engine_simulator import EngineSimulator
+    from digital_twin.twin_model import DigitalTwin
+    from digital_twin.what_if import get_golden_scenario_specs
+
+    specs = get_golden_scenario_specs(duration_s=150.0, dt_s=1.0)
+    spec = specs["F5_MECHANICAL"]
+
+    engine_sim = EngineSimulator(seed=spec.random_seed)
+    engine_sim.reset(seed=spec.random_seed)
+    twin = DigitalTwin()
+
+    state_history = []
+    for step in range(126):
+        t = float(step)
+        alt_m, t_amb_c, p_amb_pa, density_factor = spec.environment.get_conditions(t, MissionSimulator().atmosphere)
+        thr = spec.controls.get_throttle(t)
+        rec = engine_sim.step(
+            throttle_pct=thr,
+            altitude_m=alt_m,
+            temp_offset_k=spec.environment.temp_offset_k,
+            dt=1.0,
+            fault_state=spec.fault_schedule,
+        )
+        ts = twin.update(rec)
+        if t in [50.0, 125.0]:
+            state_history.append((t, rec, ts))
+
+    (t_50, rec_50, ts_50), (t_125, rec_125, ts_125) = state_history
+
+    # 1. State objects must be distinct instances (no stale reference reuse)
+    assert ts_50 is not ts_125
+    assert ts_50.residuals is not ts_125.residuals
+    assert ts_50.health_assessment is not ts_125.health_assessment
+
+    # 2. At t=50 (healthy cruise), mechanical health is 1.0 and diagnosis is healthy
+    assert ts_50.health_assessment.subsystems["MECHANICAL"].score == 1.0
+    assert ts_50.residuals.get("vibration_residual", 0.0) < 0.1
+
+    # 3. At t=125 (active F5 mechanical fault), vibration increases significantly
+    assert rec_125.vibration > rec_50.vibration + 0.3
+    assert ts_125.residuals.get("vibration_residual", 0.0) > 0.3
+    # Subsystem health must reflect degradation (< 0.80)
+    assert ts_125.health_assessment.subsystems["MECHANICAL"].score < 0.80
+    # Engine-level HI_smooth must be lower than healthy cruise
+    assert ts_125.health_assessment.HI_smooth < ts_50.health_assessment.HI_smooth
+    # Diagnosis must confirm mechanical degradation
+    assert ts_125.diagnosis_result is not None
+    assert ts_125.diagnosis_result.primary_fault == "MECHANICAL_DEGRADATION"
+
+

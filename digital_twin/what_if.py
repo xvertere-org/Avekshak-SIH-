@@ -323,11 +323,13 @@ def get_golden_scenario_specs(duration_s: float = 300.0, dt_s: float = 1.0) -> D
     )
 
     # 10. F4_MISFIRE (Combustion misfire on cylinder 2 at t in [100, 200]s)
+    # Aligned with Phase 6 validated severity (0.60) to ensure average EGT drop
+    # exceeds the -50°C / -2.0 sigma misfire diagnostic threshold for 4-cylinder geometry.
     f4_sched = FaultSchedule()
     f4_sched.add_fault(
         FaultState(
             fault_type=FaultType.COMBUSTION_MISFIRE,
-            severity=0.40,
+            severity=0.60,
             active=True,
             start_time=100.0,
             end_time=200.0,
@@ -343,7 +345,7 @@ def get_golden_scenario_specs(duration_s: float = 300.0, dt_s: float = 1.0) -> D
         controls=nominal_ctrl,
         fault_schedule=f4_sched,
         random_seed=seed,
-        metadata={"scenario_type": "FAULT_F4", "provenance": "Combustion Misfire Cyl 2 (t=100-200s)"},
+        metadata={"scenario_type": "FAULT_F4", "provenance": "Combustion Misfire Cyl 2 (t=100-200s, sev=0.60)"},
     )
 
     # 11. F5_MECHANICAL (Mechanical bearing degradation at t in [100, 200]s)

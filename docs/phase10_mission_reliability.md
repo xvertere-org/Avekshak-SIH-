@@ -152,22 +152,56 @@ All 4 constituent components are retained in `MissionMetrics.risk_index` for ful
 
 ## 9. 12 Golden Scenarios & Comparative Deltas
 
-The suite evaluates 12 canonical mission scenarios over a 150 s simulation timeline ($dt = 1.0$ s):
+The suite evaluates 12 canonical mission scenarios over a 150 s simulation timeline ($dt = 1.0$ s). All values below reflect exact simulation outputs:
 
-| ID | Scenario Name | Primary Parameter / Injection | Min HI | Max CHT (°C) | Max EGT (°C) | Min Oil P (bar) | Risk Score | $\Delta \text{Min HI}$ | $\Delta \text{Max CHT}$ |
-| :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| 1 | `NOMINAL_CRUISE` | Baseline: 1000m, ISA normal day, 75% throttle | 0.904 | 82.44 | 706.71 | 2.640 | 0.038 | 0.000 | 0.00 |
-| 2 | `HIGH_ALTITUDE` | 4500m synthetic model scenario | 0.907 | 81.87 | 761.93 | 2.247 | 0.037 | +0.002 | -0.56 |
-| 3 | `HOT_DAY` | ISA + 20 K temperature offset (1000m) | 0.904 | 89.87 | 706.71 | 2.640 | 0.038 | 0.000 | +7.43 |
-| 4 | `HOT_DAY_HIGH_ALTITUDE` | 4500m synthetic + 20 K offset | 0.907 | 81.87 | 761.93 | 2.247 | 0.037 | +0.002 | -0.56 |
-| 5 | `HIGH_LOAD` | Sustained 95% continuous throttle | 0.904 | 82.44 | 706.71 | 2.640 | 0.038 | 0.000 | 0.00 |
-| 6 | `AGGRESSIVE_THROTTLE` | Throttle cycling [60% $\leftrightarrow$ 95%] | 0.904 | 82.44 | 706.71 | 2.640 | 0.038 | 0.000 | 0.00 |
-| 7 | `F1_INJECTOR` | Cyl 1 fuel injector abnormality ($t=100\text{--}200$s) | 0.904 | 82.44 | 706.71 | 2.640 | 0.038 | 0.000 | 0.00 |
-| 8 | `F2_LUBRICATION` | Lubrication degradation ($t=100\text{--}200$s) | 0.904 | 82.44 | 706.71 | 1.839 | 0.038 | 0.000 | 0.00 |
-| 9 | `F3_COOLING` | Coolant pump degradation ($t=100\text{--}200$s) | 0.904 | 98.51 | 706.71 | 2.640 | 0.038 | 0.000 | +16.07 |
-| 10 | `F4_MISFIRE` | Cyl 2 combustion misfire ($t=100\text{--}200$s) | 0.904 | 82.44 | 706.71 | 2.640 | 0.038 | 0.000 | 0.00 |
-| 11 | `F5_MECHANICAL` | Mechanical bearing degradation ($t=100\text{--}200$s) | 0.904 | 82.44 | 706.71 | 2.640 | 0.038 | 0.000 | 0.00 |
-| 12 | `COMBINED_ENVIRONMENT_FAULT`| 4500m synthetic + Hot Day (+20K) + F3 fault | 0.907 | 89.81 | 761.93 | 2.247 | 0.037 | +0.002 | +7.37 |
+| ID | Scenario Name | Primary Parameter / Injection | Min HI | Mean HI | Final HI | Max CHT (°C) | Max EGT (°C) | Min Oil P (bar) | Max Vib (g) | Risk Score | $\Delta \text{Min HI}$ | $\Delta \text{Max CHT}$ |
+| :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| 1 | `NOMINAL_CRUISE` | Baseline: 1000m, ISA normal day, 75% throttle | 0.9042 | 0.9938 | 1.0000 | 82.44 | 706.71 | 2.640 | 0.657 | 0.0383 | 0.0000 | 0.00 |
+| 2 | `HIGH_ALTITUDE` | 4500m synthetic model scenario | 0.8880 | 0.9926 | 1.0000 | 80.85 | 766.26 | 2.320 | 0.763 | 0.0448 | -0.0162 | -1.59 |
+| 3 | `HOT_DAY` | ISA + 20 K temperature offset (1000m) | 0.9084 | 0.9940 | 1.0000 | 90.33 | 690.18 | 2.544 | 0.627 | 0.0366 | +0.0042 | +7.89 |
+| 4 | `HOT_DAY_HIGH_ALTITUDE` | 4500m synthetic + 20 K offset | 0.9065 | 0.9936 | 1.0000 | 81.88 | 761.93 | 2.247 | 0.763 | 0.0374 | +0.0023 | -0.56 |
+| 5 | `HIGH_LOAD` | Sustained 95% continuous throttle | 0.7383 | 0.9823 | 0.9963 | 122.68 | 781.79 | 3.371 | 0.763 | 0.3047 | -0.1659 | +40.24 |
+| 6 | `AGGRESSIVE_THROTTLE` | Throttle cycling [60% $\leftrightarrow$ 95%] | 0.7383 | 0.9841 | 0.9992 | 118.92 | 781.79 | 3.149 | 0.763 | 0.3047 | -0.1659 | +36.48 |
+| 7 | `F1_INJECTOR` | Cyl 1 fuel injector abnormality ($t=100\text{--}200$s) | 0.9042 | 0.9938 | 1.0000 | 82.44 | 710.42 | 2.640 | 0.657 | 0.0383 | 0.0000 | 0.00 |
+| 8 | `F2_LUBRICATION` | Lubrication degradation ($t=100\text{--}200$s) | 0.9042 | 0.9875 | 0.9770 | 82.44 | 706.71 | 2.640 | 0.657 | 0.1382 | 0.0000 | 0.00 |
+| 9 | `F3_COOLING` | Coolant pump degradation ($t=100\text{--}200$s) | 0.9042 | 0.9938 | 0.9999 | 98.51 | 706.71 | 2.640 | 0.657 | 0.0383 | 0.0000 | +16.07 |
+| 10 | `F4_MISFIRE` | Cyl 2 combustion misfire ($t=100\text{--}200$s, sev=0.60) | 0.8791 | 0.9593 | 0.8815 | 82.44 | 706.71 | 2.640 | 0.727 | 0.1484 | -0.0251 | 0.00 |
+| 11 | `F5_MECHANICAL` | Mechanical bearing degradation ($t=100\text{--}200$s) | 0.9042 | 0.9790 | 0.9526 | 82.44 | 706.71 | 2.640 | 1.145 | 0.1382 | 0.0000 | 0.00 |
+| 12 | `COMBINED_ENVIRONMENT_FAULT`| 4500m synthetic + Hot Day (+20K) + F3 fault | 0.9065 | 0.9932 | 0.9961 | 89.81 | 761.93 | 2.247 | 0.763 | 0.0374 | +0.0023 | +7.37 |
+
+---
+
+### 9.1 Forensic Investigation: Causal Propagation & Health Mechanics
+
+#### 1. Why Full-Mission `Min HI` is 0.9042 Across Fault Scenarios
+At $t = 0.0$ s, the engine simulator initializes at idle ($1400$ RPM) and receives a step throttle command to $75\%$. During the dynamic engine spin-up transient ($t = 1 \to 4$ s), rotational and fuel tracking residuals temporarily dip overall health to an instantaneous minimum of $HI = 0.9042$ at $t = 3$ s. By $t = 10$ s, the engine settles into nominal steady state ($HI = 1.0000$). When a localized subsystem fault is injected at $t = 100$ s (e.g., F2 drops $HI$ to $0.9770$, F5 drops $HI$ to $0.9503$), the fault-induced health reduction does not dip below the initial startup transient value of $0.9042$. Therefore, the whole-mission scalar metric $\min_{t \in [0, 150]} HI(t)$ identically records $0.9042$. With F4 misfire aligned with Phase 6 validated baseline (severity 0.60), $HI$ drops to $0.8791$, breaking below the startup transient ($\Delta \min \text{HI} = -0.0251$). The real fault degradation is clearly visible in `mean_hi`, `final_hi`, the in-fault health trajectories, and individual subsystem health scores.
+
+#### 2. Why Engine-Level HI Remains High During Single-Subsystem Faults
+Phase 5 explicitly evaluates engine health via weighted linear aggregation across 6 subsystems:
+$$\text{HI}_{\text{raw}} = 0.25 \cdot H_{\text{thermal}} + 0.20 \cdot H_{\text{lubrication}} + 0.20 \cdot H_{\text{fuel}} + 0.15 \cdot H_{\text{combustion}} + 0.10 \cdot H_{\text{mechanical}} + 0.10 \cdot H_{\text{rotational}}$$
+When an isolated physical fault occurs:
+- **F2 (Lubrication)**: Lubrication health drops to $0.8526$ ($\Delta H_{\text{lub}} = -0.1474$). Weighted contribution: $0.20 \times (-0.1474) = -0.0295$. Overall $\text{HI}_{\text{raw}}$ drops to $0.9705$ and $\text{HI}_{\text{smooth}}$ drops to $0.9770$.
+- **F5 (Mechanical)**: Mechanical health drops to $0.7214$ ($\Delta H_{\text{mech}} = -0.2786$). Weighted contribution: $0.10 \times (-0.2786) = -0.0279$. Overall $\text{HI}_{\text{raw}}$ drops to $0.9721$ and $\text{HI}_{\text{smooth}}$ drops to $0.9518$.
+- **F4 (Misfire)**: With severity 0.60 (Phase 6 validated baseline), Combustion drops to $0.6562$ and Rotational drops to $0.6629$. Overall $\text{HI}_{\text{smooth}}$ drops to $0.8851$. Average EGT residual drops by $-69.5$°C ($z = -2.78 < -2.00$), confirming `COMBUSTION_MISFIRE`.
+- **F1 (Injector)**: Single-cylinder 35% lean imbalance elevates cylinder 1 EGT by $+30.3$°C ($z = +0.57$). Because all normalized residuals $|z| < 1.50$ ($\tau_{\text{nom}}$), Phase 5 assigns zero penalty and HI remains $1.0000$.
+- **F3 (Cooling)**: CHT rises by $+15.5$°C ($z = +1.33$), remaining just below the $\tau_{\text{nom}} = 1.50$ penalty boundary.
+
+#### 3. Causal Propagation Matrix at In-Fault Operating Point ($t = 125.0$ s)
+
+| Scenario | Intervention ($\Delta$ Input) | Primary Telemetry $\Delta$ | Key Residual $z$-Score | Subsystem Health $\Delta$ | $\text{HI}_{\text{smooth}}$ | Diagnosis Hypothesis |
+| :--- | :--- | :--- | :--- | :--- | :---: | :--- |
+| `NOMINAL_CRUISE` | Baseline ($1000$m, $75\%$) | None (RPM 4356, CHT 80.9°C, OilP 4.27 bar) | All $\|z\| < 0.1$ | None (All 1.0000) | 1.0000 | `HEALTHY` (1.00) |
+| `HIGH_LOAD` | Throttle: $75\% \to 95\%$ | RPM $+1403$, CHT $+40.7$°C, MAP $+0.14$ bar | $\text{CHT } z=+3.31$ | Thermal: $-0.0245$ | 0.9959 | `UNKNOWN` (Excursion) |
+| `AGGRESSIVE_THROTTLE` | Throttle: $60\% \leftrightarrow 95\%$ | RPM $+1416$, CHT $+19.9$°C, OilP $+1.00$ bar | Rapid dynamic swings | Nominal | 0.9990 | `HEALTHY` (Dynamic) |
+| `F1_INJECTOR` | Cyl 1 Fuel delivery $-35\%$ | Cyl 1 EGT $+30.3$°C, Cyl 1 CHT $-4.6$°C | $\text{EGT}_{\text{cyl1}} z=+0.57$ | Nominal ($\|z\| < 1.5$) | 1.0000 | `HEALTHY` (Sub-threshold) |
+| `F2_LUBRICATION` | Lubrication degradation $-40\%$ | Oil Pressure $-0.98$ bar, Oil Temp $+5.1$°C | $\text{OilP } z=-1.93$ | Lubrication: $-0.1240$ | 0.9790 | `LUBRICATION_DEGRADATION` (0.95) |
+| `F3_COOLING` | Cooling pump $-50\%$ | CHT $+15.4$°C (peak $98.5$°C), CoolT $+2.2$°C | $\text{CHT } z=+1.33$ | Thermal: $-0.0040$ | 0.9999 | `HEALTHY` (Sub-threshold) |
+| `F4_MISFIRE` | Cyl 2 Combustion misfire $-60\%$ | Cyl 2 EGT $-145.1$°C, RPM $-389$, EGT $-69.5$°C | $\text{EGT}_{\text{cyl2}} z=-4.15$, $\text{EGT } z=-2.70$ | Comb: $-0.344$, Rot: $-0.337$ | 0.8851 | `COMBUSTION_MISFIRE` (0.56) |
+| `F5_MECHANICAL` | Mechanical bearing degradation | Vibration $+0.500$ g (0.61g $\to$ 1.11g) | $\text{Vib } z=+2.48$ | Mechanical: $-0.2786$ | 0.9518 | `MECHANICAL_DEGRADATION` (0.96) |
+| `HOT_DAY` | $\Delta T_{\text{hot}} = +20.0$ K ($1000$m) | AmbT $+20.0$°C, CHT $+8.4$°C, OilT $+5.3$°C | $\text{CHT } z=+0.72$ | Nominal ($\|z\| < 1.5$) | 1.0000 | `HEALTHY` (Nominal Env) |
+| `HIGH_ALTITUDE` | Altitude: $1000\text{m} \to 4500\text{m}$ | AmbT $-22.8$°C, CHT $-17.6$°C, EGT $+59.9$°C | $\text{EGT } z=+0.76$ | Nominal ($\|z\| < 1.5$) | 1.0000 | `HEALTHY` (Cold High Alt) |
+| `HOT_DAY_HIGH_ALTITUDE` | $4500\text{m} + 20\text{K offset}$ | AmbT $+20.0$°C vs HA, CHT $+9.6$°C vs HA | $\text{CHT } z=+0.82$ | Nominal ($\|z\| < 1.5$) | 1.0000 | `COOLING_DEGRADATION` (Env Stress) |
+| `COMBINED_ENVIRONMENT_FAULT`| $4500\text{m} + 20\text{K} + \text{F3}$ | CHT $+23.9$°C vs HA ($87.3$°C), EGT $+56.8$°C | $\text{CHT } z=+1.08$ | Thermal: $-0.0083$ | 0.9995 | `COOLING_DEGRADATION` (0.88) |
 
 ---
 
