@@ -1,0 +1,220 @@
+{
+  "metadata": {
+    "source_commit": "6bbc8e866d5912b6ef4184146ff02e5aa810a9e4",
+    "phase": "PHASE_9_REAL_TELEMETRY_READINESS",
+    "generated_at": "2026-09-14T21:35:00Z",
+    "simulator_version": "0.2.0-phase2b-physics",
+    "schema_version": "1.0",
+    "deterministic_mode": true,
+    "input_classification_disclaimer": "All datasets and streams in this phase are strictly SYNTHETIC, SIMULATED, or REPLAYED. No real Rotax 914 flight data was used or claimed."
+  },
+  "schema_validation": {
+    "status": "PASS",
+    "contract": "CanonicalTelemetryPacket",
+    "bridge_compatibility": "TelemetryRecord lossless & validated interoperability",
+    "input_type": "SIMULATED",
+    "tests_passed": [
+      "test_canonical_measurement_creation_and_immutability",
+      "test_canonical_telemetry_packet_lossless_bridge_to_telemetry_record",
+      "test_canonical_telemetry_packet_from_telemetry_record_interop"
+    ]
+  },
+  "unit_conversion": {
+    "status": "PASS",
+    "input_type": "SYNTHETIC",
+    "pressure_conversions": "bar <-> Pa, hPa, psi, inHg verified",
+    "temperature_conversions": "degC <-> K, degF verified",
+    "volumetric_flow_conversions": "L/h <-> m3/s, gpm verified",
+    "mass_flow_conversions": "kg/s <-> kg/h, pph verified",
+    "mass_to_volumetric_flow": {
+      "requires_explicit_density": true,
+      "density_hardcoding_allowed": false,
+      "provenance_tag": "DERIVED_FROM_MASS_FLOW",
+      "formula": "vol_flow = mass_flow / rho_fuel"
+    },
+    "vibration_acceleration": {
+      "canonical_unit": "g RMS",
+      "conversions": "g <-> m/s2",
+      "velocity_conversion_prohibited": true,
+      "error_raised": "UnitConversionError"
+    },
+    "dimensional_safety": "Cross-dimensional conversion strictly raises UnitConversionError"
+  },
+  "timestamp_validation": {
+    "status": "PASS",
+    "input_type": "SYNTHETIC",
+    "source_timestamp_authoritative": true,
+    "ingest_timestamp_tracked": true,
+    "clock_skew_detection": {
+      "condition": "ingest_timestamp < source_timestamp (latency < -0.05s)",
+      "classification": "CLOCK_SKEW",
+      "isolated_from_engine_health": true
+    },
+    "temporal_statuses": [
+      "VALID",
+      "MISSING",
+      "NON_FINITE",
+      "DUPLICATE_SOURCE_TIMESTAMP",
+      "NON_MONOTONIC_SOURCE_TIMESTAMP"
+    ]
+  },
+  "sequence_validation": {
+    "status": "PASS",
+    "input_type": "SYNTHETIC",
+    "evaluated_conditions": [
+      "NORMAL",
+      "DUPLICATE",
+      "SKIPPED",
+      "OUT_OF_ORDER",
+      "WRAPAROUND",
+      "CONFIGURATION_UNKNOWN"
+    ],
+    "inferred_wraparound_prohibited_when_modulus_unknown": true
+  },
+  "missing_data": {
+    "status": "PASS",
+    "input_type": "SYNTHETIC",
+    "missing_representation": "None with DataQualityStatus.MISSING and QuantityStatus.UNAVAILABLE",
+    "indefinite_forward_fill_prohibited": true
+  },
+  "multi_rate": {
+    "status": "PASS",
+    "input_type": "SYNTHETIC",
+    "channels_supported": [
+      {"channel": "rpm", "dynamic_rate": "50-100 Hz", "tau_stale": 0.5},
+      {"channel": "vibration", "dynamic_rate": "50-100 Hz", "tau_stale": 0.5},
+      {"channel": "cht", "dynamic_rate": "5-10 Hz", "tau_stale": 3.0},
+      {"channel": "egt", "dynamic_rate": "5-10 Hz", "tau_stale": 2.0},
+      {"channel": "altitude", "dynamic_rate": "1 Hz", "tau_stale": 5.0}
+    ],
+    "held_last_value_status": "QuantityStatus.ESTIMATED (HELD_LAST_VALUE)",
+    "held_values_relabeled_measured": false,
+    "bounded_interpolation": {
+      "status": "QuantityStatus.ESTIMATED (INTERPOLATED)",
+      "max_gap": "1.0s",
+      "forbidden_across_large_gaps": true,
+      "forbidden_across_fault_boundaries": true
+    }
+  },
+  "provenance": {
+    "status": "PASS",
+    "input_type": "SYNTHETIC",
+    "source_type_enum": [
+      "SIMULATOR",
+      "REPLAY",
+      "REAL_SENSOR",
+      "DERIVED",
+      "DEFAULT_ASSUMED"
+    ],
+    "quantity_status_enum": [
+      "MEASURED",
+      "ESTIMATED",
+      "PREDICTED",
+      "DERIVED",
+      "DEFAULT_ASSUMED",
+      "UNAVAILABLE"
+    ],
+    "source_vs_epistemic_decoupling": "Strictly separated; simulator yields SIMULATOR/MEASURED, held real sensor yields REAL_SENSOR/ESTIMATED."
+  },
+  "calibration": {
+    "status": "PASS",
+    "input_type": "SYNTHETIC",
+    "metadata_structure": {
+      "scale": 1.0,
+      "offset": 0.0,
+      "version": "1.0",
+      "source": "factory_nominal",
+      "is_active": false
+    },
+    "applied_only_when_active": true
+  },
+  "replay": {
+    "status": "PASS",
+    "input_type": "REPLAYED",
+    "streaming_mode": {
+      "format": "NDJSON",
+      "memory_complexity": "O(1) bounded working memory",
+      "pacing": "configurable real-time or offline deterministic"
+    },
+    "materialized_mode": {
+      "format": "JSON Array",
+      "memory_complexity": "O(N) proportional to retained records"
+    },
+    "golden_replay_file": "tests/data/golden_telemetry.json",
+    "determinism": "100% bitwise parity across identical replay runs"
+  },
+  "simulator_compatibility": {
+    "status": "PASS",
+    "input_type": "SIMULATED",
+    "bridge": "CanonicalTelemetryPacket <-> TelemetryRecord",
+    "physics_divergence": 0.0
+  },
+  "end_to_end": {
+    "status": "PASS",
+    "input_type": "REPLAYED",
+    "pipeline": "JSON/CSV File -> Adapter -> Boundary Validator -> Canonical Packet -> TelemetryRecord Bridge -> Digital Twin Synchronizer -> Residuals -> Health Assessment",
+    "downstream_algorithms_modified": false
+  },
+  "sensor_faults": {
+    "status": "PASS",
+    "input_type": "SIMULATED",
+    "f6_sensor_bias_drift": "Processed at telemetry boundary without knowing fault type or ground truth labels",
+    "f7_sensor_dropout_stuck": "Tagged as MISSING / UNAVAILABLE without corrupting physical engine health",
+    "ambiguity_handling": "Single-channel corruption reports telemetry anomaly; multi-channel physical degradation confirms engine anomaly"
+  },
+  "performance": {
+    "status": "PASS",
+    "input_type": "SIMULATED",
+    "benchmark_dataset_size": 1000,
+    "metrics_ms": {
+      "total_pipeline": {
+        "mean": 0.1574,
+        "median": 0.1415,
+        "p95": 0.2301,
+        "p99": 0.3919,
+        "max": 0.5755
+      },
+      "validation_only": {
+        "mean": 0.0246,
+        "median": 0.0219,
+        "p95": 0.0330,
+        "max": 0.1540
+      },
+      "interoperability_bridge": {
+        "mean": 0.0059,
+        "median": 0.0051,
+        "p95": 0.0086,
+        "max": 0.0737
+      },
+      "synchronizer_step": {
+        "mean": 0.1268,
+        "median": 0.1144,
+        "p95": 0.1836,
+        "max": 0.5449
+      }
+    },
+    "throughput_packets_per_sec": 6353,
+    "soft_real_time_assertion": "Mean latency (0.16ms) << 10.0ms threshold"
+  },
+  "memory": {
+    "status": "PASS",
+    "streaming_buffer_bounded": true,
+    "multi_rate_buffer_rolling_window": 100,
+    "unbounded_retention_prevented": true
+  },
+  "determinism": {
+    "status": "PASS",
+    "input_type": "REPLAYED",
+    "repeated_runs_identical": true,
+    "wall_clock_dependency_in_offline_mode": false
+  },
+  "robustness": {
+    "status": "PASS",
+    "input_type": "SYNTHETIC",
+    "corrupt_string_quarantined": true,
+    "nan_inf_quarantined": true,
+    "raw_value_preserved_without_clipping": true,
+    "anti_circularity_audit": "PASSED (Zero imports of health, diagnosis, rul, or degradation in telemetry/)",
+    "anti_label_leakage_audit": "PASSED (Boundary validator and external adapters have zero access to fault ground truth)"
+  }
+}
