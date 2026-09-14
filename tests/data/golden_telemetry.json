@@ -1,0 +1,202 @@
+[
+  {
+    "timestamp": 0.0,
+    "sequence": 1,
+    "engine_id": "ENGINE_UAV_01",
+    "mission_id": "GOLDEN_SYNTHETIC_01",
+    "mission_phase": "CRUISE",
+    "channels": {
+      "rpm": {"value": 5000.0, "unit": "RPM"},
+      "throttle": {"value": 75.0, "unit": "%"},
+      "altitude": {"value": 2000.0, "unit": "m"},
+      "ambient_temp": {"value": 15.0, "unit": "degC"},
+      "cht": {"value": 110.0, "unit": "degC"},
+      "egt": {"value": 800.0, "unit": "degC"},
+      "oil_temp": {"value": 95.0, "unit": "degC"},
+      "oil_pressure": {"value": 3.5, "unit": "bar"},
+      "fuel_flow": {"value": 22.0, "unit": "L/h"},
+      "vibration": {"value": 0.8, "unit": "g"}
+    },
+    "metadata": {"regime": "steady_cruise", "dataset_class": "SYNTHETIC", "provenance": "SYNTHETIC_REPLAY"}
+  },
+  {
+    "timestamp": 1.0,
+    "sequence": 2,
+    "engine_id": "ENGINE_UAV_01",
+    "mission_id": "GOLDEN_SYNTHETIC_01",
+    "mission_phase": "CRUISE",
+    "channels": {
+      "rpm": {"value": 5005.0, "unit": "RPM"},
+      "throttle": {"value": 75.0, "unit": "%"},
+      "altitude": {"value": 2000.0, "unit": "m"},
+      "ambient_temp": {"value": 15.0, "unit": "degC"},
+      "cht": {"value": 110.2, "unit": "degC"},
+      "egt": {"value": 802.0, "unit": "degC"},
+      "oil_temp": {"value": 95.1, "unit": "degC"},
+      "oil_pressure": {"value": 3.5, "unit": "bar"},
+      "fuel_flow": {"value": 22.1, "unit": "L/h"},
+      "vibration": {"value": 0.81, "unit": "g"}
+    },
+    "metadata": {"regime": "steady_cruise", "dataset_class": "SYNTHETIC", "provenance": "SYNTHETIC_REPLAY"}
+  },
+  {
+    "timestamp": 2.0,
+    "sequence": 3,
+    "engine_id": "ENGINE_UAV_01",
+    "mission_id": "GOLDEN_SYNTHETIC_01",
+    "mission_phase": "CRUISE",
+    "channels": {
+      "rpm": {"value": 4998.0, "unit": "RPM"},
+      "throttle": {"value": 75.0, "unit": "%"},
+      "altitude": {"value": 2000.0, "unit": "m"},
+      "ambient_temp": {"value": 15.0, "unit": "degC"},
+      "cht": {"value": 110.1, "unit": "degC"},
+      "egt": {"value": 799.0, "unit": "degC"},
+      "oil_temp": {"value": 95.0, "unit": "degC"},
+      "oil_pressure": {"value": 3.5, "unit": "bar"},
+      "fuel_flow": {"value": 22.0, "unit": "L/h"},
+      "vibration": {"value": 0.79, "unit": "g"}
+    },
+    "metadata": {"regime": "steady_cruise", "dataset_class": "SYNTHETIC", "provenance": "SYNTHETIC_REPLAY"}
+  },
+  {
+    "timestamp": 3.0,
+    "sequence": 4,
+    "engine_id": "ENGINE_UAV_01",
+    "mission_id": "GOLDEN_SYNTHETIC_01",
+    "mission_phase": "CLIMB",
+    "channels": {
+      "rpm": {"value": 5300.0, "unit": "RPM"},
+      "throttle": {"value": 90.0, "unit": "%"},
+      "altitude": {"value": 2015.0, "unit": "m"},
+      "ambient_temp": {"value": 14.9, "unit": "degC"},
+      "cht": {"value": 112.5, "unit": "degC"},
+      "egt": {"value": 820.0, "unit": "degC"},
+      "oil_temp": {"value": 96.0, "unit": "degC"},
+      "oil_pressure": {"value": 3.7, "unit": "bar"},
+      "fuel_flow": {"value": 26.5, "unit": "L/h"},
+      "vibration": {"value": 0.95, "unit": "g"}
+    },
+    "metadata": {"regime": "throttle_step_transient", "dataset_class": "SYNTHETIC", "provenance": "SYNTHETIC_REPLAY"}
+  },
+  {
+    "timestamp": 4.0,
+    "sequence": 5,
+    "engine_id": "ENGINE_UAV_01",
+    "mission_id": "GOLDEN_SYNTHETIC_01",
+    "mission_phase": "CLIMB",
+    "channels": {
+      "rpm": {"value": 5450.0, "unit": "RPM"},
+      "throttle": {"value": 95.0, "unit": "%"},
+      "altitude": {"value": 2040.0, "unit": "m"},
+      "ambient_temp": {"value": 14.7, "unit": "degC"},
+      "cht": {"value": 116.0, "unit": "degC"},
+      "egt": {"value": 835.0, "unit": "degC"},
+      "oil_temp": {"value": 97.5, "unit": "degC"},
+      "oil_pressure": {"value": 3.8, "unit": "bar"},
+      "fuel_flow": {"value": 28.0, "unit": "L/h"},
+      "vibration": {"value": 1.05, "unit": "g"}
+    },
+    "metadata": {"regime": "climb_transient", "dataset_class": "SYNTHETIC", "provenance": "SYNTHETIC_REPLAY"}
+  },
+  {
+    "timestamp": 5.0,
+    "sequence": 6,
+    "engine_id": "ENGINE_UAV_01",
+    "mission_id": "GOLDEN_SYNTHETIC_01",
+    "mission_phase": "CLIMB",
+    "channels": {
+      "rpm": {"value": 5500.0, "unit": "RPM"},
+      "throttle": {"value": 95.0, "unit": "%"},
+      "altitude": {"value": 2080.0, "unit": "m"},
+      "ambient_temp": {"value": 14.5, "unit": "degC"},
+      "cht": {"value": 120.0, "unit": "degC"},
+      "egt": {"value": 845.0, "unit": "degC"},
+      "oil_temp": {"value": 99.0, "unit": "degC"},
+      "oil_pressure": {"value": 3.8, "unit": "bar"},
+      "fuel_flow": {"value": 28.5, "unit": "L/h"},
+      "vibration": {"value": 1.1, "unit": "g"}
+    },
+    "metadata": {"regime": "thermal_lag_transient", "dataset_class": "SYNTHETIC", "provenance": "SYNTHETIC_REPLAY"}
+  },
+  {
+    "timestamp": 7.0,
+    "sequence": 8,
+    "engine_id": "ENGINE_UAV_01",
+    "mission_id": "GOLDEN_SYNTHETIC_01",
+    "mission_phase": "CLIMB",
+    "channels": {
+      "rpm": {"value": 5500.0, "unit": "RPM"},
+      "throttle": {"value": 95.0, "unit": "%"},
+      "altitude": {"value": 2150.0, "unit": "m"},
+      "ambient_temp": {"value": 14.0, "unit": "degC"},
+      "cht": {"value": 122.0, "unit": "degC"},
+      "egt": {"value": 848.0, "unit": "degC"},
+      "oil_temp": {"value": 100.2, "unit": "degC"},
+      "oil_pressure": {"value": 3.8, "unit": "bar"},
+      "fuel_flow": {"value": 28.5, "unit": "L/h"},
+      "vibration": {"value": 1.12, "unit": "g"}
+    },
+    "metadata": {"regime": "post_dropout_recovery", "note": "Packet at t=6.0 was dropped intentionally", "dataset_class": "SYNTHETIC", "provenance": "SYNTHETIC_REPLAY"}
+  },
+  {
+    "timestamp": 8.0,
+    "sequence": 9,
+    "engine_id": "ENGINE_UAV_01",
+    "mission_id": "GOLDEN_SYNTHETIC_01",
+    "mission_phase": "CRUISE",
+    "channels": {
+      "rpm": {"value": 5000.0, "unit": "RPM"},
+      "throttle": {"value": 75.0, "unit": "%"},
+      "altitude": {"value": 2160.0, "unit": "m"},
+      "ambient_temp": {"value": 14.0, "unit": "degC"},
+      "cht": {"value": 121.0, "unit": "degC"},
+      "egt": {"value": 805.0, "unit": "degC"},
+      "oil_temp": {"value": 99.5, "unit": "degC"},
+      "oil_pressure": {"value": 3.5, "unit": "bar"},
+      "fuel_flow": {"value": 22.0, "unit": "L/h"},
+      "vibration": {"value": 18.5, "unit": "g"}
+    },
+    "metadata": {"regime": "transient_spike_outlier", "note": "Vibration spike (18.5 g) for quality validation testing", "dataset_class": "SYNTHETIC", "provenance": "SYNTHETIC_REPLAY"}
+  },
+  {
+    "timestamp": 9.0,
+    "sequence": 10,
+    "engine_id": "ENGINE_UAV_01",
+    "mission_id": "GOLDEN_SYNTHETIC_01",
+    "mission_phase": "CRUISE",
+    "channels": {
+      "rpm": {"value": 5000.0, "unit": "RPM"},
+      "throttle": {"value": 75.0, "unit": "%"},
+      "altitude": {"value": 2160.0, "unit": "m"},
+      "ambient_temp": {"value": 14.0, "unit": "degC"},
+      "cht": {"value": 118.0, "unit": "degC"},
+      "egt": {"value": 800.0, "unit": "degC"},
+      "oil_temp": {"value": 98.0, "unit": "degC"},
+      "oil_pressure": {"value": 3.5, "unit": "bar"},
+      "fuel_flow": {"value": 22.0, "unit": "L/h"},
+      "vibration": {"value": 0.82, "unit": "g"}
+    },
+    "metadata": {"regime": "steady_recovery", "dataset_class": "SYNTHETIC", "provenance": "SYNTHETIC_REPLAY"}
+  },
+  {
+    "timestamp": 10.0,
+    "sequence": 11,
+    "engine_id": "ENGINE_UAV_01",
+    "mission_id": "GOLDEN_SYNTHETIC_01",
+    "mission_phase": "CRUISE",
+    "channels": {
+      "rpm": {"value": 5000.0, "unit": "RPM"},
+      "throttle": {"value": 75.0, "unit": "%"},
+      "altitude": {"value": 2160.0, "unit": "m"},
+      "ambient_temp": {"value": 14.0, "unit": "degC"},
+      "cht": {"value": 115.0, "unit": "degC"},
+      "egt": {"value": 800.0, "unit": "degC"},
+      "oil_temp": {"value": 97.0, "unit": "degC"},
+      "oil_pressure": {"value": 3.5, "unit": "bar"},
+      "fuel_flow": {"value": 22.0, "unit": "L/h"},
+      "vibration": {"value": 0.8, "unit": "g"}
+    },
+    "metadata": {"regime": "final_steady_cruise", "dataset_class": "SYNTHETIC", "provenance": "SYNTHETIC_REPLAY"}
+  }
+]

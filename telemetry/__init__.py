@@ -48,11 +48,38 @@ from telemetry.features import (
     TelemetryFeatureExtractor,
     LeakageSafeSplitter,
 )
+from telemetry.canonical import (
+    SourceType,
+    CalibrationStatus,
+    CalibrationMetadata,
+    CanonicalMeasurement,
+    CanonicalTelemetryPacket,
+)
+from telemetry.units import (
+    PhysicalDimension,
+    UnitConversionError,
+    convert_unit,
+    convert_mass_to_volumetric_flow,
+    get_unit_dimension,
+)
+from telemetry.validator import (
+    ClockStatus,
+    SequenceStatus,
+    ValidationReport,
+    BoundaryValidator,
+)
+from telemetry.multi_rate import (
+    ChannelSample,
+    MultiRateBuffer,
+)
+from telemetry.replay import DeterministicReplayEngine
 from telemetry.adapters import (
     ExternalDatasetAdapter,
     GenericCSVAdapter,
     VibrationBenchmarkAdapter,
     CMAPSSBenchmarkAdapter,
+    JSONReplayAdapter,
+    CSVReplayAdapter,
 )
 from telemetry.pipeline import (
     TelemetryPipeline,
@@ -70,6 +97,28 @@ __all__ = [
     "HealthAssessment",
     "RULPrediction",
     "ExplanationReport",
+    # Phase 9 Canonical Telemetry
+    "SourceType",
+    "CalibrationStatus",
+    "CalibrationMetadata",
+    "CanonicalMeasurement",
+    "CanonicalTelemetryPacket",
+    # Phase 9 Units
+    "PhysicalDimension",
+    "UnitConversionError",
+    "convert_unit",
+    "convert_mass_to_volumetric_flow",
+    "get_unit_dimension",
+    # Phase 9 Validator
+    "ClockStatus",
+    "SequenceStatus",
+    "ValidationReport",
+    "BoundaryValidator",
+    # Phase 9 Multi-Rate
+    "ChannelSample",
+    "MultiRateBuffer",
+    # Phase 9 Replay
+    "DeterministicReplayEngine",
     # Streamer
     "TelemetryStreamer",
     # Ingestion
@@ -98,7 +147,10 @@ __all__ = [
     "GenericCSVAdapter",
     "VibrationBenchmarkAdapter",
     "CMAPSSBenchmarkAdapter",
+    "JSONReplayAdapter",
+    "CSVReplayAdapter",
     # Pipeline
     "TelemetryPipeline",
     "PipelineResult",
 ]
+

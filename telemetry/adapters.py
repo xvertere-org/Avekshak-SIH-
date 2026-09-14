@@ -14,12 +14,20 @@ All adapters enforce explicit provenance tags (source_type='external_benchmark' 
 """
 
 from abc import ABC, abstractmethod
-from typing import Dict, Any, Optional, Union
+from typing import Dict, Any, Optional, Union, List
 from pathlib import Path
+import json
 import pandas as pd
 import numpy as np
 
 from telemetry.ingestion import CanonicalTelemetryFrame, TelemetryIngestor
+from telemetry.canonical import (
+    CanonicalTelemetryPacket,
+    CanonicalMeasurement,
+    SourceType,
+    CalibrationMetadata,
+)
+from telemetry.validator import BoundaryValidator
 
 
 class ExternalDatasetAdapter(ABC):
@@ -240,3 +248,183 @@ class CMAPSSBenchmarkAdapter(ExternalDatasetAdapter):
             "subset": self.subset_id,
         })
         return frame
+
+
+class JSONReplayAdapter:
+    """
+    Ingestion adapter for external versioned JSON / NDJSON telemetry interchange formats.
+    Enforces boundary validation and explicit provenance (SourceType.REPLAY / SIMULATOR).
+    """
+
+    def __init__(
+        self,
+        schema_version: str = "1.0",
+        source_id: str = "json_external_replay",
+        source_type: SourceType = SourceType.REPLAY,
+        validator: Optional[BoundaryValidator] = None,
+    ):
+        self.schema_version = schema_version
+        self.source_id = source_id
+        self.source_type = source_type
+        self.validator = validator or BoundaryValidator()
+
+    def parse_record(self, raw_record: Dict[str, Any], ingest_time: Optional[float] = None) -> Optional[CanonicalTelemetryPacket]:
+        """Parse a single JSON telemetry record."""
+        packet, report = self.validator.validate_packet(
+            raw_record,
+            ingest_time=ingest_time,
+            source_id=self.source_id,
+            source_type=self.source_type,
+        )
+        if packet and report.is_acceptable:
+            return packet
+        return None
+
+    def adapt_file(self, file_path: Union[str, Path]) -> List[CanonicalTelemetryPacket]:
+        """Parse an entire JSON or NDJSON file into a list of CanonicalTelemetryPackets."""
+        p = Path(file_path)
+        if not p.exists():
+            raise FileNotFoundError(f"File not found: {p}")
+
+        packets: List[CanonicalTelemetryPacket] = []
+        with open(p, "r", encoding="utf-8") as f:
+            content = f.read().strip()
+
+        # Check if NDJSON (lines) or JSON (array/object)
+        if content.startswith("["):
+            data = json.loads(content)
+            for item in data:
+                if isinstance(item, dict):
+                    pkt = self.parse_record(item)
+                    if pkt:
+                        packets.append(pkt)
+        elif content.startswith("{") and "\n{" not in content:
+            data = json.loads(content)
+            if "records" in data:
+                for item in data["records"]:
+                    pkt = self.parse_record(item)
+                    if pkt:
+                        packets.append(pkt)
+            else:
+                pkt = self.parse_record(data)
+                if pkt:
+                    packets.append(pkt)
+        else:
+            # Assume NDJSON
+            for line in content.splitlines():
+                l = line.strip()
+                if l and not l.startswith("#"):
+                    item = json.loads(l)
+                    if isinstance(item, dict):
+                        pkt = self.parse_record(item)
+                        if pkt:
+                            packets.append(pkt)
+
+        return packets
+
+
+class CSVReplayAdapter(ExternalDatasetAdapter):
+    """
+    Adapter for converting external CSV telemetry with explicit column, unit,
+    and sensor ID mappings into canonical representations.
+    """
+
+    def __init__(
+        self,
+        column_mapping: Optional[Dict[str, str]] = None,
+        unit_mapping: Optional[Dict[str, str]] = None,
+        sensor_id_mapping: Optional[Dict[str, str]] = None,
+        calibration_configs: Optional[Dict[str, CalibrationMetadata]] = None,
+        source_id: str = "csv_external_replay",
+        source_type: SourceType = SourceType.REPLAY,
+        default_engine_id: str = "ENGINE_UAV_01",
+        default_mission_id: str = "MISSION_EXT_01",
+        validator: Optional[BoundaryValidator] = None,
+    ):
+        self.column_mapping = column_mapping or {}
+        self.unit_mapping = unit_mapping or {}
+        self.sensor_id_mapping = sensor_id_mapping or {}
+        self.calibration_configs = calibration_configs or {}
+        self.source_id = source_id
+        self.source_type = source_type
+        self.default_engine_id = default_engine_id
+        self.default_mission_id = default_mission_id
+        self.validator = validator or BoundaryValidator()
+
+    def adapt_packets(self, source_data: Union[str, Path, pd.DataFrame]) -> List[CanonicalTelemetryPacket]:
+        """Convert CSV data into a list of validated CanonicalTelemetryPackets."""
+        if isinstance(source_data, (str, Path)):
+            df = pd.read_csv(source_data)
+        elif isinstance(source_data, pd.DataFrame):
+            df = source_data.copy()
+        else:
+            raise TypeError(f"Unsupported source_data type: {type(source_data)}")
+
+        packets: List[CanonicalTelemetryPacket] = []
+
+        # Ensure timestamp
+        ts_col = self.column_mapping.get("timestamp", "timestamp")
+        if ts_col not in df.columns:
+            df[ts_col] = np.arange(len(df), dtype=float)
+
+        for idx, row in df.iterrows():
+            row_dict = row.to_dict()
+            raw_ts = row_dict.get(ts_col, idx)
+
+            channel_dict: Dict[str, Any] = {}
+            for col_name, val in row_dict.items():
+                if col_name == ts_col:
+                    continue
+
+                # Map column name to canonical channel name
+                canon_ch = self.column_mapping.get(col_name, col_name)
+                raw_unit = self.unit_mapping.get(col_name, self.unit_mapping.get(canon_ch))
+                sensor_id = self.sensor_id_mapping.get(col_name)
+                cal_meta = self.calibration_configs.get(canon_ch, self.calibration_configs.get(col_name))
+
+                ch_payload = {
+                    "value": val,
+                    "unit": raw_unit,
+                    "sensor_id": sensor_id,
+                }
+                if cal_meta:
+                    ch_payload["calibration"] = cal_meta.to_dict()
+
+                channel_dict[canon_ch] = ch_payload
+
+            record_payload = {
+                "timestamp": raw_ts,
+                "engine_id": row_dict.get("engine_id", self.default_engine_id),
+                "mission_id": row_dict.get("mission_id", self.default_mission_id),
+                "mission_phase": row_dict.get("mission_phase", "CRUISE"),
+                "channels": channel_dict,
+            }
+
+            pkt, report = self.validator.validate_packet(
+                record_payload,
+                source_id=self.source_id,
+                source_type=self.source_type,
+            )
+            if pkt and report.is_acceptable:
+                packets.append(pkt)
+
+        return packets
+
+    def adapt(
+        self,
+        source_data: Union[str, Path, pd.DataFrame],
+        **kwargs,
+    ) -> CanonicalTelemetryFrame:
+        """Standard adapt method returning CanonicalTelemetryFrame."""
+        packets = self.adapt_packets(source_data)
+        records = [p.to_telemetry_record() for p in packets]
+        df = pd.DataFrame([r.to_dict() for r in records])
+        return TelemetryIngestor.ingest(
+            df,
+            default_source=self.source_id,
+            default_source_type=self.source_type.value.lower(),
+            default_engine_id=self.default_engine_id,
+            default_mission_id=self.default_mission_id,
+            strict=False,
+        )
+
