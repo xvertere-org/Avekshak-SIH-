@@ -171,6 +171,8 @@ class DigitalTwinState:
     residual_vector: Optional[Any] = None
     detection_result: Optional[Any] = None
     diagnosis_result: Optional[Any] = None
+    degradation_assessment: Optional[Any] = None
+    rul_assessment: Optional[Any] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
 
     @property
