@@ -18,7 +18,14 @@ import numpy as np
 from orchestrator.schema import DashboardStatePayload
 from dashboard.schemas.view_model import DashboardViewModel
 from dashboard.services.adapter import DashboardAdapter
-from dashboard.utils.formatters import format_value, format_rul
+from dashboard.utils.formatters import (
+    format_value,
+    format_rul,
+    format_action,
+    format_status,
+    format_channel,
+    format_error,
+)
 from dashboard.utils.styles import PLOT_COLORS, STATUS_COLORS
 from phase14.replay import MissionReplayManager
 
@@ -47,7 +54,7 @@ def render_replay_page(
     try:
         session = mgr.create_session_from_payloads(payloads, scenario_name=scenario_name)
     except Exception as e:
-        st.error(f"Mission replay could not be loaded. Try resetting the simulation and running it again.")
+        st.error(format_error("Mission replay session could not be initialized", e))
         return
 
     # Playback Controls Bar
@@ -81,11 +88,13 @@ def render_replay_page(
     vm: DashboardViewModel = adapter.adapt(current_payload)
 
     # Mission & Provenance Ribbon
+    clean_phase = str(current_payload.mission_phase).replace('_', ' ').title()
+    clean_anomaly = format_status(current_payload.anomaly_status)
     st.markdown(
         f"""
         <div style="background: linear-gradient(90deg, #161b22 0%, #21262d 100%); border: 1px solid #30363d; border-radius: 6px; padding: 8px 14px; margin-bottom: 15px; display: flex; justify-content: space-between; font-size: 12px; color: #c9d1d9;">
-            <div><b>Engine ID:</b> <code>{current_payload.engine_id}</code> | <b>Mission ID:</b> <code>{current_payload.mission_id}</code> | <b>Phase:</b> <code>{current_payload.mission_phase}</code></div>
-            <div><b>Anomaly:</b> <code style="color: {'#f85149' if current_payload.anomaly_status in ('WARNING', 'ANOMALY') else '#3fb950'};">{current_payload.anomaly_status}</code> | <b>Health Index:</b> <code>{current_payload.smoothed_health_index:.3f}</code></div>
+            <div><b>Engine ID:</b> <code>{current_payload.engine_id}</code> | <b>Mission ID:</b> <code>{current_payload.mission_id}</code> | <b>Phase:</b> <code>{clean_phase}</code></div>
+            <div><b>Anomaly Status:</b> <code style="color: {'#f85149' if current_payload.anomaly_status in ('WARNING', 'ANOMALY') else '#3fb950'};">{clean_anomaly}</code> | <b>Health Index:</b> <code>{current_payload.smoothed_health_index:.3f}</code></div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -95,13 +104,13 @@ def render_replay_page(
     c1, c2, c3, c4, c5 = st.columns(5)
     with c1:
         rpm_val = current_payload.observed_telemetry.get("rpm", float("nan"))
-        st.metric("RPM", format_value(rpm_val, decimals=0, unit=" rpm"))
+        st.metric("Engine Speed (RPM)", format_value(rpm_val, decimals=0, unit=" rpm"))
     with c2:
         cht_val = current_payload.observed_telemetry.get("cht", float("nan"))
-        st.metric("CHT", format_value(cht_val, decimals=1, unit=" °C"))
+        st.metric("Cylinder Head Temp (CHT)", format_value(cht_val, decimals=1, unit=" °C"))
     with c3:
         egt_val = current_payload.observed_telemetry.get("egt", float("nan"))
-        st.metric("EGT", format_value(egt_val, decimals=1, unit=" °C"))
+        st.metric("Exhaust Gas Temp (EGT)", format_value(egt_val, decimals=1, unit=" °C"))
     with c4:
         hi_val = current_payload.smoothed_health_index
         st.metric("Health Index", format_value(hi_val, decimals=3))
@@ -116,10 +125,11 @@ def render_replay_page(
     # Synchronized Advisory Banner
     if current_payload.advisory is not None:
         adv = current_payload.advisory
+        urgency_label = adv.urgency.title() if adv.urgency else "Routine"
         st.markdown(
             f"""
             <div style="background-color: #161b22; border-left: 4px solid #d29922; border: 1px solid #30363d; border-radius: 6px; padding: 10px 14px; margin: 15px 0;">
-                <div style="font-size: 11px; font-weight: 700; color: #8b949e;">DECISION SUPPORT: <code>{adv.action_code}</code> (Urgency: {adv.urgency})</div>
+                <div style="font-size: 11px; font-weight: 700; color: #8b949e;">DECISION SUPPORT: <code>{format_action(adv.action_code)}</code> (Urgency: {urgency_label})</div>
                 <div style="font-size: 14px; font-weight: 600; color: #f0f6fc; margin: 4px 0;">{adv.headline}</div>
                 <div style="font-size: 12px; color: #c9d1d9;"><b>Action:</b> {adv.recommended_action}</div>
             </div>

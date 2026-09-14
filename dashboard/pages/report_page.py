@@ -16,6 +16,17 @@ import streamlit as st
 from orchestrator.schema import DashboardStatePayload
 from phase14.reporting import MissionReportGenerator
 from phase14.schema import MissionReportSummary
+from dashboard.utils.formatters import (
+    format_action,
+    format_fault,
+    format_limiting_factor,
+    format_health_trend,
+    format_forecast_quality,
+    format_forecast_status,
+    format_evidence_status,
+    format_channel,
+    format_error,
+)
 
 
 def render_report_page(
@@ -43,7 +54,7 @@ def render_report_page(
             payloads, scenario_metadata=scenario_metadata
         )
     except Exception as e:
-        st.error(f"Mission report could not be compiled. Try resetting and re-running the mission.")
+        st.error(format_error("Mission report compilation failed", e))
         return
 
     # Download Buttons Bar
@@ -86,16 +97,18 @@ def render_report_page(
         "INSUFFICIENT_DATA": "#8b949e",
     }
     adv_col = adv_colors.get(report.advisory_assessment, "#8b949e")
+    clean_action = format_action(report.advisory_action_code)
+    clean_urgency = report.advisory_urgency.title() if report.advisory_urgency else "Routine"
 
     st.markdown(
         f"""
         <div style="background-color: #161b22; border-left: 5px solid {adv_col}; border: 1px solid #30363d; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                 <div style="font-size: 11px; font-weight: 700; color: #8b949e; text-transform: uppercase;">
-                    POST-MISSION ASSESSMENT — ACTION: <code>{report.advisory_action_code}</code>
+                    POST-MISSION ASSESSMENT — ACTION: <code>{clean_action}</code>
                 </div>
                 <span style="background-color: {adv_col}22; color: {adv_col}; border: 1px solid {adv_col}; padding: 2px 10px; border-radius: 4px; font-size: 12px; font-weight: 700;">
-                    {report.advisory_assessment} (Urgency: {report.advisory_urgency})
+                    {format_action(report.advisory_assessment)} (Urgency: {clean_urgency})
                 </span>
             </div>
             <div style="font-size: 16px; font-weight: 700; color: #f0f6fc; margin-bottom: 6px;">
@@ -138,10 +151,10 @@ def render_report_page(
             f"""
             <div style="background-color: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 12px;">
                 <div style="font-size: 11px; color: #8b949e; text-transform: uppercase;">Fault Diagnosis</div>
-                <div style="font-size: 16px; font-weight: 700; color: #58a6ff; margin: 4px 0;"><code>{report.final_diagnosis}</code></div>
+                <div style="font-size: 16px; font-weight: 700; color: #58a6ff; margin: 4px 0;">{format_fault(report.final_diagnosis)}</div>
                 <div style="font-size: 11px; color: #c9d1d9;">
                     <b>Probability:</b> {report.final_diagnosis_probability:.3f}<br/>
-                    <b>Evidence Quality:</b> {report.evidence_quality}
+                    <b>Evidence Quality:</b> {format_forecast_quality(report.evidence_quality)}
                 </div>
             </div>
             """,
@@ -152,10 +165,10 @@ def render_report_page(
             f"""
             <div style="background-color: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 12px;">
                 <div style="font-size: 11px; color: #8b949e; text-transform: uppercase;">Engine Health & Degradation</div>
-                <div style="font-size: 16px; font-weight: 700; color: #3fb950; margin: 4px 0;">HI: {report.final_health_index:.3f}</div>
+                <div style="font-size: 16px; font-weight: 700; color: #3fb950; margin: 4px 0;">Health Index: {report.final_health_index:.3f}</div>
                 <div style="font-size: 11px; color: #c9d1d9;">
-                    <b>Min HI:</b> {report.min_health_index:.3f}<br/>
-                    <b>Trend:</b> {report.degradation_trend}
+                    <b>Minimum Health Index:</b> {report.min_health_index:.3f}<br/>
+                    <b>Degradation Trend:</b> {format_health_trend(report.degradation_trend)}
                 </div>
             </div>
             """,
@@ -163,7 +176,7 @@ def render_report_page(
         )
     with col_p3:
         rul_text = f"{report.final_rul_seconds:.1f} s" if report.final_rul_seconds is not None else "Unavailable"
-        rul_desc = f"<b>Limiting Factor:</b> {report.limiting_factor}<br/><b>Forecaster:</b> {report.forecast_source}" if report.final_rul_seconds is not None else "<i>RUL unavailable — insufficient continuous history for a valid prognostic estimate. Withheld to prevent extrapolation.</i>"
+        rul_desc = f"<b>Limiting Factor:</b> {format_limiting_factor(report.limiting_factor)}<br/><b>Forecaster:</b> {format_forecast_status(report.forecast_source)}" if report.final_rul_seconds is not None else "<i>RUL unavailable — insufficient continuous history for a valid prognostic estimate. Withheld to prevent extrapolation.</i>"
         st.markdown(
             f"""
             <div style="background-color: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 12px;">
@@ -181,13 +194,14 @@ def render_report_page(
 
     # Multi-source Explainability Preview
     st.markdown("#### 3. Evidence & Explainability")
+    clean_anomaly_channels = ', '.join(format_channel(c) for c in report.dominant_anomaly_channels) if report.dominant_anomaly_channels else 'None'
     st.markdown(
         f"""
         <div style="background-color: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 12px; font-size: 12px; color: #c9d1d9; line-height: 1.6;">
             <b>Fused Synthesis:</b> {report.fused_evidence_headline}<br/>
-            <b>Physics Evidence:</b> <code>{report.physics_evidence_status}</code> ({report.physics_consistency_reason or 'Nominal dynamics'})<br/>
-            <b>Temporal Evidence:</b> <code>{report.temporal_evidence_status}</code><br/>
-            <b>Persistent Anomalies:</b> {report.anomaly_events_count} event(s) across {', '.join(report.dominant_anomaly_channels) if report.dominant_anomaly_channels else 'none'}.
+            <b>Physics Evidence:</b> <code>{format_evidence_status(report.physics_evidence_status)}</code> ({report.physics_consistency_reason or 'Nominal dynamics'})<br/>
+            <b>Temporal Evidence:</b> <code>{format_evidence_status(report.temporal_evidence_status)}</code><br/>
+            <b>Persistent Anomalies:</b> {report.anomaly_events_count} event(s) across {clean_anomaly_channels}.
         </div>
         """,
         unsafe_allow_html=True,

@@ -19,6 +19,11 @@ from orchestrator.schema import SimulationScenario, ScenarioFaultType, Dashboard
 from orchestrator.pipeline import SystemPipelineOrchestrator
 from phase14.what_if import WhatIfAnalyzer
 from phase14.schema import WhatIfComparisonResult
+from dashboard.utils.formatters import (
+    format_action,
+    format_limiting_factor,
+    format_error,
+)
 
 
 def render_what_if_page(
@@ -148,8 +153,12 @@ def render_what_if_page(
                     engine_id="UAV_AERO_01",
                     mission_id="MIS_WHATIF",
                 )
-                res = WhatIfAnalyzer.run_comparison(orchestrator, b_sc, w_sc)
-                st.session_state["last_whatif_result"] = res
+                try:
+                    res = WhatIfAnalyzer.run_comparison(orchestrator, b_sc, w_sc)
+                    st.session_state["last_whatif_result"] = res
+                except Exception as e:
+                    st.error(format_error("Scenario comparison could not be completed", e))
+                    return
         else:
             res = st.session_state["last_whatif_result"]
 
@@ -210,14 +219,17 @@ def render_what_if_page(
             )
 
         with c_adv:
+            clean_b_adv = format_action(res.baseline_advisory_assessment)
+            clean_w_adv = format_action(res.whatif_advisory_assessment)
+            clean_lim = format_limiting_factor(res.whatif_limiting_factor)
             st.markdown(
                 f"""
                 <div style="background-color: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 10px; text-align: center;">
-                    <div style="font-size: 11px; color: #8b949e; text-transform: uppercase;">Advisory Change</div>
-                    <div style="font-size: 14px; font-weight: 700; color: #f0f6fc; margin: 4px 0;">
-                        <code>{res.baseline_advisory_assessment}</code> ➔ <code>{res.whatif_advisory_assessment}</code>
+                    <div style="font-size: 11px; color: #8b949e; text-transform: uppercase;">Advisory Assessment</div>
+                    <div style="font-size: 13px; font-weight: 700; color: #f0f6fc; margin: 4px 0;">
+                        {clean_b_adv} ➔ {clean_w_adv}
                     </div>
-                    <div style="font-size: 10px; color: #8b949e;">Limiting: {res.whatif_limiting_factor}</div>
+                    <div style="font-size: 10px; color: #8b949e;">Limiting Factor: {clean_lim}</div>
                 </div>
                 """,
                 unsafe_allow_html=True,

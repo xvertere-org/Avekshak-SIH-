@@ -20,7 +20,17 @@ import streamlit as st
 import plotly.graph_objects as go
 from dashboard.schemas.view_model import DashboardViewModel, StatusLevel, CANONICAL_CHANNELS
 from dashboard.components.telemetry_charts import build_channel_figure
-from dashboard.utils.formatters import format_value, format_fault_name, format_health_index
+from dashboard.utils.formatters import (
+    format_value,
+    format_fault_name,
+    format_fault,
+    format_health_index,
+    format_health_state,
+    format_action,
+    format_channel,
+    format_limiting_factor,
+    format_rul_state,
+)
 from dashboard.utils.styles import STATUS_COLORS, PLOT_COLORS, render_status_badge
 
 
@@ -53,7 +63,7 @@ def render_overview_page(
         f'<div style="flex: 1 1 300px;">'
         f'<div style="font-size: 11px; font-weight: 700; color: #8b949e; text-transform: uppercase; letter-spacing: 0.8px;">ENGINE CONDITION</div>'
         f'<div style="display: flex; align-items: baseline; gap: 12px; margin: 4px 0;">'
-        f'<span style="font-size: 26px; font-weight: 800; color: {overall_color}; letter-spacing: -0.5px;">{vm.overview.overall_status.value}</span>'
+        f'<span style="font-size: 26px; font-weight: 800; color: {overall_color}; letter-spacing: -0.5px;">{format_health_state(vm.overview.overall_status.value)}</span>'
         f'<span style="font-size: 13px; color: #8b949e; font-family: monospace;">(Health Index: <b style="color: #f0f6fc;">{hi_card.value}</b>)</span>'
         f'</div>'
         f'<div style="font-size: 12px; color: #8b949e;">Operational State: <b style="color: #e6edf3;">{hi_card.subtext or "Nominal"}</b></div>'
@@ -62,8 +72,8 @@ def render_overview_page(
         f'<div style="flex: 1 1 380px; display: flex; gap: 24px; border-left: 1px solid #1e2430; padding-left: 20px;">'
         f'<div>'
         f'<div style="font-size: 11px; font-weight: 700; color: #8b949e; text-transform: uppercase; letter-spacing: 0.6px;">ANOMALY DETECTION</div>'
-        f'<div style="font-size: 16px; font-weight: 700; font-family: monospace; color: #f0f6fc; margin: 4px 0;">{anom_card.value}</div>'
-        f'<div style="font-size: 11px; color: #8b949e;">{anom_card.subtext or "Persistence: 0"}</div>'
+        f'<div style="font-size: 16px; font-weight: 700; color: #f0f6fc; margin: 4px 0;">{anom_card.value}</div>'
+        f'<div style="font-size: 11px; color: #8b949e;">{anom_card.subtext or "Persistence: 0 cycles"}</div>'
         f'</div>'
         f'<div>'
         f'<div style="font-size: 11px; font-weight: 700; color: #8b949e; text-transform: uppercase; letter-spacing: 0.6px;">FAULT DIAGNOSIS</div>'
@@ -89,21 +99,24 @@ def render_overview_page(
         }
         urg_color = urgency_colors.get(adv.urgency, "#8b949e")
 
+        subsystem_clean = format_channel(adv.affected_subsystem) if adv.affected_subsystem in CANONICAL_CHANNELS else (adv.affected_subsystem or "")
         subsystem_line = (
-            f'<span style="color: #8b949e; margin-left: 12px;">Affected Subsystem: <code>{adv.affected_subsystem}</code></span>'
-            if adv.affected_subsystem
+            f'<span style="color: #8b949e; margin-left: 12px;">Affected Subsystem: <b style="color: #c9d1d9;">{subsystem_clean}</b></span>'
+            if subsystem_clean
             else ""
         )
+
+        action_clean = format_action(adv.action_code)
 
         adv_html = (
             f'<div style="background-color: #11151c; border-left: 4px solid {urg_color}; border: 1px solid #21262d; '
             f'border-radius: 6px; padding: 12px 16px; margin-bottom: 16px;">'
             f'<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">'
             f'<div style="font-size: 11px; font-weight: 700; color: #8b949e; text-transform: uppercase; letter-spacing: 0.5px;">'
-            f'DECISION ADVISORY · ACTION: <code style="color: #58a6ff;">{adv.action_code}</code>'
+            f'OPERATIONAL DECISION ADVISORY · <span style="color: #58a6ff;">{action_clean}</span>'
             f'{subsystem_line}'
             f'</div>'
-            f'<span style="background-color: {urg_color}1a; color: {urg_color}; border: 1px solid {urg_color}44; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 700;">'
+            f'<span style="background-color: {urg_color}1a; color: {urg_color}; border: 1px solid {urg_color}44; padding: 1px 8px; border-radius: 3px; font-size: 10px; font-weight: 700;">'
             f'URGENCY: {adv.urgency}'
             f'</span>'
             f'</div>'
@@ -128,9 +141,10 @@ def render_overview_page(
         exp_val = format_value(ch_model.expected_value, decimals=1, unit=ch_model.unit)
         res_val = format_value(ch_model.residual, decimals=2, unit=ch_model.unit)
         st_badge = render_status_badge(ch_model.status)
+        channel_label = format_channel(ch)
         rows_html.append(
             f'<tr>'
-            f'<td><b>{ch_model.display_name}</b> <span style="color: #6e7681; font-size: 11px;">({ch.upper()})</span></td>'
+            f'<td><b>{channel_label}</b></td>'
             f'<td class="eng-num" style="color: {PLOT_COLORS["observed"]};">{obs_val}</td>'
             f'<td class="eng-num" style="color: {PLOT_COLORS["expected"]};">{exp_val}</td>'
             f'<td class="eng-num" style="color: #f0f6fc;">{res_val}</td>'
@@ -165,10 +179,10 @@ def render_overview_page(
         ctx_html = (
             f'<div class="console-panel" style="padding: 10px 14px; margin-bottom: 0;">'
             f'<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px;">'
-            f'<div><span style="font-size: 11px; color: #8b949e;">THROTTLE:</span> <b class="eng-num" style="color: #f0f6fc; margin-left: 6px;">{format_value(vm.telemetry.throttle, decimals=1, unit="%")}</b></div>'
-            f'<div><span style="font-size: 11px; color: #8b949e;">LOAD:</span> <b class="eng-num" style="color: #f0f6fc; margin-left: 6px;">{format_value(vm.telemetry.load, decimals=1, unit="%")}</b></div>'
-            f'<div><span style="font-size: 11px; color: #8b949e;">ALTITUDE:</span> <b class="eng-num" style="color: #f0f6fc; margin-left: 6px;">{format_value(vm.telemetry.altitude, decimals=0, unit="m")}</b></div>'
-            f'<div><span style="font-size: 11px; color: #8b949e;">AMBIENT TEMP:</span> <b class="eng-num" style="color: #f0f6fc; margin-left: 6px;">{format_value(vm.telemetry.ambient_temp, decimals=1, unit="°C")}</b></div>'
+            f'<div><span style="font-size: 11px; color: #8b949e;">Throttle:</span> <b class="eng-num" style="color: #f0f6fc; margin-left: 6px;">{format_value(vm.telemetry.throttle, decimals=1, unit="%")}</b></div>'
+            f'<div><span style="font-size: 11px; color: #8b949e;">Engine Load:</span> <b class="eng-num" style="color: #f0f6fc; margin-left: 6px;">{format_value(vm.telemetry.load, decimals=1, unit="%")}</b></div>'
+            f'<div><span style="font-size: 11px; color: #8b949e;">Altitude:</span> <b class="eng-num" style="color: #f0f6fc; margin-left: 6px;">{format_value(vm.telemetry.altitude, decimals=0, unit="m")}</b></div>'
+            f'<div><span style="font-size: 11px; color: #8b949e;">Ambient Temp:</span> <b class="eng-num" style="color: #f0f6fc; margin-left: 6px;">{format_value(vm.telemetry.ambient_temp, decimals=1, unit="°C")}</b></div>'
             f'</div>'
             f'</div>'
         )
@@ -177,14 +191,14 @@ def render_overview_page(
     with prog_col:
         st.markdown('<div class="section-label">HEALTH & PROGNOSTICS</div>', unsafe_allow_html=True)
         rul_card = vm.overview.rul_card
-        rul_detail = rul_card.subtext or f"Life Prediction Status: {vm.prognostics.rul_state}"
+        rul_detail = rul_card.subtext or f"Condition: {format_rul_state(vm.prognostics.rul_state)}"
         prog_html = (
             f'<div class="console-panel" style="padding: 10px 14px; margin-bottom: 0;">'
             f'<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px;">'
-            f'<div><span style="font-size: 11px; color: #8b949e;">MEDIAN RUL:</span> <b class="eng-num" style="color: #f0f6fc; margin-left: 6px;">{rul_card.value}</b></div>'
-            f'<div><span style="font-size: 11px; color: #8b949e;">LIMITING:</span> <code style="color: #58a6ff; margin-left: 6px;">{vm.prognostics.limiting_factor or "NONE"}</code></div>'
+            f'<div><span style="font-size: 11px; color: #8b949e;">Median Projected RUL:</span> <b class="eng-num" style="color: #f0f6fc; margin-left: 6px;">{rul_card.value}</b></div>'
+            f'<div><span style="font-size: 11px; color: #8b949e;">Limiting Factor:</span> <b style="color: #58a6ff; margin-left: 6px;">{format_limiting_factor(vm.prognostics.limiting_factor)}</b></div>'
             f'</div>'
-            f'<div style="font-size: 11px; color: #6e7681; margin-top: 6px; font-family: monospace;">Life Prediction Status: {rul_detail}</div>'
+            f'<div style="font-size: 11px; color: #8b949e; margin-top: 6px;">Status: {rul_detail}</div>'
             f'</div>'
         )
         st.markdown(prog_html, unsafe_allow_html=True)

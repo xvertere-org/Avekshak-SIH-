@@ -24,30 +24,34 @@ def render_header(overview: OverviewViewModel):
     with col_title:
         st.markdown(
             '<div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px;">'
-            '<span style="font-size: 20px; font-weight: 800; color: #f0f6fc; letter-spacing: -0.3px;">Avekshak</span>'
-            '<span style="font-size: 11px; font-weight: 700; color: #58a6ff; font-family: monospace; background: #161b22; border: 1px solid #21262d; border-radius: 3px; padding: 2px 6px;">SIH26054</span>'
+            '<span style="font-size: 20px; font-weight: 800; color: #f0f6fc; letter-spacing: -0.3px;">AVEKSHAK</span>'
+            '<span style="font-size: 12px; font-weight: 600; color: #58a6ff; font-style: italic;">AI-Enabled Real-Time Digital Twin</span>'
+            '<span style="font-size: 11px; font-weight: 700; color: #8b949e; font-family: monospace; background: #161b22; border: 1px solid #21262d; border-radius: 3px; padding: 2px 6px;">SIH26054</span>'
             '<span style="font-size: 12px; color: #8b949e;">Aero-Piston Engine Health & Prognostics</span>'
             '</div>',
             unsafe_allow_html=True,
         )
 
     with col_status:
-        status_html = render_status_badge(overview.overall_status, f"SYSTEM: {overview.overall_status.value}")
+        status_label = f"System: {overview.overall_status.value.title()}"
+        status_html = render_status_badge(overview.overall_status, status_label)
         st.markdown(
             f'<div style="text-align: right; padding-top: 2px;">{status_html}</div>',
             unsafe_allow_html=True,
         )
 
     # Compact Single-Line Operational Context Strip
+    feed_label = "Synthetic Bench Telemetry" if overview.is_synthetic_demo else "Live Aero Telemetry"
+    phase_label = overview.mission_phase.replace("_", " ").title() if overview.mission_phase else "Cruise"
     meta_strip = (
         f'<div style="background-color: #11151c; border: 1px solid #21262d; border-radius: 4px; '
-        f'padding: 6px 12px; font-size: 11px; color: #8b949e; font-family: monospace; display: flex; '
+        f'padding: 6px 12px; font-size: 11px; color: #8b949e; display: flex; '
         f'flex-wrap: wrap; gap: 16px; align-items: center; margin-top: 4px; margin-bottom: 12px;">'
-        f'<div><span style="color: #6e7681;">ENGINE:</span> <b style="color: #58a6ff;">{overview.engine_id}</b></div>'
-        f'<div><span style="color: #6e7681;">MISSION:</span> <b style="color: #f0f6fc;">{overview.mission_id or "NOT_ASSIGNED"}</b></div>'
-        f'<div><span style="color: #6e7681;">FLIGHT PHASE:</span> <b style="color: #f0f6fc;">{overview.mission_phase}</b></div>'
-        f'<div><span style="color: #6e7681;">MISSION TIME:</span> <b style="color: #f0f6fc;">{format_timestamp(overview.timestamp)}</b></div>'
-        f'<div><span style="color: #6e7681;">DATA SOURCE:</span> <b style="color: #8b949e;">{overview.simulation_mode}</b></div>'
+        f'<div><span style="color: #6e7681;">Engine:</span> <b style="color: #58a6ff;">{overview.engine_id}</b></div>'
+        f'<div><span style="color: #6e7681;">Mission:</span> <b style="color: #f0f6fc;">{overview.mission_id or "Unassigned Mission"}</b></div>'
+        f'<div><span style="color: #6e7681;">Flight Phase:</span> <b style="color: #f0f6fc;">{phase_label}</b></div>'
+        f'<div><span style="color: #6e7681;">Mission Time:</span> <b style="color: #f0f6fc;">{format_timestamp(overview.timestamp)}</b></div>'
+        f'<div><span style="color: #6e7681;">Data Source:</span> <b style="color: #8b949e;">{feed_label}</b></div>'
         f'</div>'
     )
     st.markdown(meta_strip, unsafe_allow_html=True)

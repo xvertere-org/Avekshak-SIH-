@@ -8,7 +8,14 @@ from typing import Dict, Any, List
 import streamlit as st
 import plotly.graph_objects as go
 from dashboard.schemas.view_model import DiagnosticsViewModel, StatusLevel, AvailabilityStatus
-from dashboard.utils.formatters import format_value, format_fault_name, format_percent
+from dashboard.utils.formatters import (
+    format_value,
+    format_fault_name,
+    format_fault,
+    format_percent,
+    format_channel,
+    format_data_quality_status,
+)
 from dashboard.utils.styles import PLOT_COLORS, STATUS_COLORS, render_status_badge
 
 
@@ -22,9 +29,10 @@ def render_anomaly_diagnostics(diag: DiagnosticsViewModel):
 
     r1_col1, r1_col2 = st.columns(2)
     with r1_col1:
+        anom_disp = diag.anomaly_status.title() if diag.anomaly_status else "Normal"
         st.metric(
             label="Anomaly Status",
-            value=diag.anomaly_status,
+            value=anom_disp,
         )
     with r1_col2:
         st.metric(
@@ -47,10 +55,9 @@ def render_anomaly_diagnostics(diag: DiagnosticsViewModel):
         )
 
     if diag.contributing_channels:
+        channels_clean = [format_channel(c) for c in diag.contributing_channels]
         st.markdown(
-            f"**Contributing Degradation Channels:** `"
-            + "`, `".join(diag.contributing_channels)
-            + "`"
+            f"**Contributing Degradation Channels:** {', '.join(channels_clean)}"
         )
 
 
@@ -70,13 +77,14 @@ def render_fault_classification(diag: DiagnosticsViewModel):
             if diag.sensor_fault_indicated
             else "✅ Engine behaviour is consistent with the Digital Twin's expected state"
         )
+        dq_label = format_data_quality_status(diag.diagnosis_data_quality)
         diag_card_html = (
             f'<div style="background-color: #11151c; border: 1px solid #21262d; '
             f'border-radius: 4px; padding: 14px 16px;">'
             f'<div style="font-size: 11px; font-weight: 700; color: #8b949e; text-transform: uppercase; letter-spacing: 0.5px;">FAULT DIAGNOSIS</div>'
-            f'<div style="font-size: 18px; font-weight: 700; color: #f0f6fc; margin: 6px 0;">{format_fault_name(diag.predicted_fault_class)}</div>'
-            f'<div style="font-size: 12px; color: #8b949e; margin-bottom: 4px;">Confidence: <b style="color: #58a6ff; font-family: monospace;">{format_percent(diag.diagnostic_confidence)}</b></div>'
-            f'<div style="font-size: 11px; color: #8b949e; margin-bottom: 8px;">Data Quality: <code style="color: #f0f6fc;">{diag.diagnosis_data_quality}</code></div>'
+            f'<div style="font-size: 18px; font-weight: 700; color: #f0f6fc; margin: 6px 0;">{format_fault(diag.predicted_fault_class)}</div>'
+            f'<div style="font-size: 12px; color: #8b949e; margin-bottom: 4px;">Diagnosis Probability: <b style="color: #58a6ff; font-family: monospace;">{format_percent(diag.diagnostic_confidence)}</b></div>'
+            f'<div style="font-size: 11px; color: #8b949e; margin-bottom: 8px;">Telemetry Stream Quality: <b style="color: #f0f6fc;">{dq_label}</b></div>'
             f'<div style="margin-top: 8px; border-top: 1px solid #21262d; padding-top: 8px; font-size: 11px; color: #c9d1d9;">{sensor_text}</div>'
             f'</div>'
         )
@@ -87,7 +95,7 @@ def render_fault_classification(diag: DiagnosticsViewModel):
         if diag.class_probabilities:
             # Horizontal bar chart of diagnosis probabilities
             sorted_probs = sorted(diag.class_probabilities.items(), key=lambda x: x[1], reverse=True)
-            labels = [format_fault_name(k) for k, v in sorted_probs]
+            labels = [format_fault(k) for k, v in sorted_probs]
             values = [v * 100.0 for k, v in sorted_probs]
 
             fig = go.Figure(go.Bar(
@@ -115,7 +123,6 @@ def render_residual_table(diag: DiagnosticsViewModel):
     """Render table of digital twin expected values, residuals, and normalized excursions."""
     st.markdown("#### Digital Twin Deviation Table")
 
-
     if not diag.residuals and not diag.expected_telemetry:
         st.info("ℹ️ Digital Twin state residuals currently unavailable.")
         return
@@ -125,16 +132,17 @@ def render_residual_table(diag: DiagnosticsViewModel):
     # Combine channel keys from residuals and expected
     all_channels = sorted(set(list(diag.residuals.keys()) + list(diag.expected_telemetry.keys())))
     for k in all_channels:
-        clean_name = k.replace("_residual", "").replace("_norm", "").replace("expected_", "").upper()
+        raw_key = k.replace("_residual", "").replace("_norm", "").replace("expected_", "").lower()
+        clean_name = format_channel(raw_key)
         exp_val = diag.expected_telemetry.get(f"expected_{k.lower()}", diag.expected_telemetry.get(k.lower()))
         res_val = diag.residuals.get(f"{k.lower()}_residual", diag.residuals.get(k.lower()))
         norm_val = diag.normalized_residuals.get(f"{k.lower()}_norm", diag.normalized_residuals.get(k.lower()))
 
         rows.append({
             "Sensor": clean_name,
-            "DT Expected": format_value(exp_val, decimals=2),
-            "Deviation": format_value(res_val, decimals=3),
-            "Deviation (σ)": format_value(norm_val, decimals=2),
+            "Digital Twin Expected": format_value(exp_val, decimals=2),
+            "Twin Deviation": format_value(res_val, decimals=3),
+            "Normalized Deviation (Z-Score)": format_value(norm_val, decimals=2),
         })
 
     st.dataframe(rows, use_container_width=True, hide_index=True)
