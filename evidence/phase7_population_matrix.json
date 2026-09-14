@@ -1,7 +1,7 @@
 {
   "phase": "PHASE_7_PHYSICS_CONSTRAINED_SYNTHETIC_ENGINE_POPULATION",
   "evidence_status": "SYNTHETICALLY_VALIDATED",
-  "timestamp_iso": "2026-09-14T11:20:30Z",
+  "timestamp_iso": "2026-09-14T11:35:21Z",
   "population_size": 15,
   "master_seed": 101,
   "benchmark_seed": 101,
@@ -170,9 +170,9 @@
     }
   },
   "performance": {
-    "profile_gen_ms_per_engine": 0.17506666481494904,
-    "simulator_step_ms": 0.3218882777663465,
-    "digital_twin_step_ms": 0.681989000036588,
-    "throughput_steps_per_sec": 996.1376974171382
+    "profile_gen_ms_per_engine": 0.18657333372781676,
+    "simulator_step_ms": 0.3208503332765152,
+    "digital_twin_step_ms": 0.6795805555237974,
+    "throughput_steps_per_sec": 999.569296784879
   }
 }

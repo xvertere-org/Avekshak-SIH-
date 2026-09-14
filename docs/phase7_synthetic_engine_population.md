@@ -140,29 +140,34 @@ The Digital Twin execution pipeline operates exclusively on observable telemetry
 
 ### Healthy Population Stability
 Evaluating 15 diverse engines across 1,800 healthy simulation steps revealed:
-- **Mean Health Index ($HI_{raw}$):** 0.9965 (5th percentile: 0.9647, median: 1.0000, 95th percentile: 1.0000)
-- **False Anomaly Rate:** **1.61%** (29 out of 1,800 steps)
-- **Mean Anomaly Score ($S_{anom} = 1 - HI_{raw}$):** 0.0035
+- **Mean Health Index ($HI_{raw}$):** 0.9969 (5th percentile: 0.9721, median: 1.0000, 95th percentile: 1.0000)
+- **Overall Per-Step False Alarm Rate (FAR):** **1.11%** (20 out of 1,800 steps)
+- **Steady-State Per-Step FAR ($t \ge 5.0\text{s}$):** **0.00%** (0 out of 1,650 steps)
+- **Per-Mission FAR:** **80.0%** overall (12/15 missions had $\ge 1$ startup transient alert) vs **0.0%** post-warmup ($t \ge 5.0\text{s}$)
+- **Mean Anomaly Score ($S_{anom} = 1 - HI_{raw}$):** 0.0031
 
-The healthy population does **NOT** collapse into false alarms despite substantial engine-to-engine diversity (e.g., CHT spread $\pm 6^\circ\text{C}$, oil pressure spread $\pm 0.35$ bar, fuel flow spread $\pm 1.0$ L/h).
+The healthy population does **NOT** collapse into false alarms in steady flight despite substantial engine-to-engine physical diversity (e.g., CHT spread $\pm 6^\circ\text{C}$, oil pressure spread $\pm 0.35$ bar, fuel flow spread $\pm 1.0$ L/h).
 
 ### Fault Population Detectability & Diagnosability
 Testing F1–F7 across varied engines exposed critical architectural insights:
 1. **F2 (Lubrication Degradation), F4 (Combustion Misfire), F5 (Mechanical Degradation):**
    - **Detection Rate:** **100.0%**
-   - **Detection Latency:** 2.50s (F2), 3.40s (F4), 2.50s (F5)
-   - **Top-1 / Top-2 Diagnosis:** 100% (F2), 60–100% (F5), 40% (F4)
+   - **Detection Latency:** 2.50s (F2), 3.20s (F4), 2.50s (F5)
+   - **Active-Window Top-1 Diagnosis:** 100.0% (F2), 100.0% (F4), 80.0% (F5)
 2. **F3 (Cooling Degradation):**
-   - **Detection Rate:** 20.0% under short test durations due to liquid coolant loop thermal inertia (the thermostat and 4500 J/K thermal mass require prolonged time to reach trip thresholds).
+   - **Detection Rate:** 20.0% under short test durations (60s).
+   - **Causal Mechanism:** Thermal inertia (the $4500\text{ J/K}$ liquid coolant mass and $920\text{ J/K}$ head capacitance) is a major modeled contributor to the observed detection delay; controlled sensitivity tests show latency decreasing from $>60\text{s}$ to steady detection only after extended durations ($60\text{s}+$ to $120\text{s}+$).
 3. **F1 (Injector Abnormality localized to Cylinder 1) & Single-Channel Sensor Faults (F6/F7):**
-   - In accordance with the Phase 6 architectural requirement, single-cylinder runner spread does **NOT** trigger engine-level anomaly votes ($S_{anom} = 1 - HI_{raw}$).
-   - When a sensor bias or localized cylinder lean condition affects only 1 channel, the arithmetic mean across 6 active subsystems produces an anomaly score below the generic engine-level trip threshold ($S_{anom} < 0.018$).
-   - **Engineering Principle:** Rather than masking or artificially retuning thresholds to force 100% detection, this honest trade-off is documented: engine-level health aggregation protects against false alarms at the cost of requiring localized subsystem-level alarms for minor isolated single-channel sensor errors.
+   - **Architectural Principle:** **Engine-level anomaly detection is intentionally not equivalent to channel-level fault observability.**
+   - In accordance with the Phase 6 architectural requirement, single-cylinder runner spread does **NOT** trigger engine-level anomaly votes ($S_{anom} = 1 - HI_{raw} < 0.018$).
+   - When a sensor bias or localized cylinder lean condition affects only 1 channel, the arithmetic mean across 6 active subsystems produces an engine-level anomaly score below the trip threshold ($S_{anom} \approx 0.015 < 0.018$).
+   - However, the physics-informed diagnoser successfully evaluates the runner spread and sensor quality status, achieving **80.0% Active Top-1 accuracy for F1 (injector delivery)** and **80.0% Active Top-1 accuracy for F7 (sensor dropout)** without inducing engine-level false alarms.
 
 ---
 
-## 9. Performance Benchmarks
-- **Engine Profile Generation:** **0.28 ms** per engine profile
-- **Simulator Step Time:** **0.341 ms** per step (**2,929 steps/sec**)
-- **Digital Twin Step Time:** **0.704 ms** per step (**1,420 steps/sec**)
-- **Streaming Generator:** Capable of generating 1,000+ engines without in-memory accumulation.
+## 9. Performance & Memory Benchmarks
+- **Engine Profile Generation:** **0.18 ms** per engine profile (>5,500 profiles/sec).
+- **Simulator Step Time:** **0.322 ms** per step (**3,106 steps/sec**).
+- **Digital Twin Step Time:** **0.682 ms** per step (**1,466 steps/sec**).
+- **Streaming Iterator Memory:** `iter_profiles()` operates with constant $O(1)$ memory scaling ($\approx 5\text{ KB}$ peak heap differential across 10,000 generated profiles).
+- **Dataset Accumulation Memory:** In-memory collection of complete simulated telemetry streams scales linearly $O(N)$ ($\approx 2.77\text{ KB}$ per telemetry record, or $\approx 26\text{ MB}$ per 100 full mission trajectories).
