@@ -180,6 +180,19 @@ class SensorFaultIdentifier:
             })
 
         # 5. Physical Decoupling Check
+        # A. Thermodynamic Cross-Validation
+        # If multiple highly correlated thermodynamic sensors deviate simultaneously,
+        # it is a physical fault (e.g., overheating), NOT simultaneous sensor faults.
+        thermal_group = {"cht", "egt", "oil_temp"}
+        thermal_candidates = [ch for ch in all_candidate_channels if ch in thermal_group]
+        if len(thermal_candidates) >= 2:
+            return SensorIdentificationResult({
+                "suspect_sensor": "unknown",
+                "suspect_sensors": [],
+                "sensor_isolation_status": "UNCERTAIN",
+            })
+
+        # B. General Subsystem Decoupling
         # Check non-candidate channels: in a genuine sensor fault, other channels should be within nominal bounds
         non_candidates = [ch for ch in CANONICAL_CHANNELS if ch not in all_candidate_channels]
         coupled_deviations = [

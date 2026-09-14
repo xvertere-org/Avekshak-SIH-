@@ -25,7 +25,13 @@ from forecasting.schema import ForecastingConfig, ForecastResult, ModelStatus
 from prognostics.pipeline import RULPipeline
 from prognostics.schema import RULConfig, RULResult
 from explainability.pipeline import ExplainabilityPipeline
-from explainability.schema import ExplainabilityResult
+from explainability.schema import (
+    ExplainabilityResult,
+    EvidenceQuality,
+    PhysicsEvidence,
+    EvidenceStatus,
+    EvidenceProvenance,
+)
 
 from orchestrator.schema import (
     DashboardStatePayload,
@@ -209,6 +215,20 @@ class SystemPipelineOrchestrator:
                 raw_dict=raw_dict,
                 latency_ms=latency_ms,
                 reason="Non-finite timestamp (NaN or Inf)",
+            )
+        # AUDIT-023 FIX: Reject negative timestamps before any session checks.
+        # A negative timestamp as the first observation would set last_timestamp<0,
+        # allowing t=0 to be accepted as valid (t=0 > t=-100), poisoning causal state.
+        if timestamp < 0.0:
+            latency_ms = (time.perf_counter() - start_time) * 1000.0
+            return self._build_invalid_timestamp_payload(
+                engine_id=engine_id,
+                mission_id=mission_id,
+                timestamp=timestamp,
+                mission_phase=mission_phase,
+                raw_dict=raw_dict,
+                latency_ms=latency_ms,
+                reason="Negative timestamp rejected (timestamps must be >= 0.0)",
             )
 
         # Check session boundary transition -> isolated reset if new mission/engine
@@ -519,8 +539,8 @@ class SystemPipelineOrchestrator:
             rul_uncertainty_p05=rul_result.rul_seconds_p05,
             rul_uncertainty_p95=rul_result.rul_seconds_p95,
             limiting_factor=rul_result.limiting_factor,
-            forecast_assisted_mode=False if is_blackout else getattr(rul_result, "forecast_assisted", (rul_result.handoff_horizon_s > 0.0)),
-            forecast_mode_status="UNAVAILABLE" if is_blackout else getattr(rul_result, "forecast_mode_status", ("ACTIVE" if rul_result.handoff_horizon_s > 0.0 else "OFF")),
+            forecast_assisted_mode=getattr(rul_result, "forecast_assisted", False),
+            forecast_mode_status=getattr(rul_result, "forecast_mode_status", "OFF"),
             eol_provenance=rul_result.provenance,
             summary_explanation=explainability_result.summary_explanation,
             shap_attribution=shap_attr,
@@ -544,6 +564,46 @@ class SystemPipelineOrchestrator:
             _explainability_result=explainability_result,
         )
 
+    @staticmethod
+    def _build_rejected_explainability_result(
+        engine_id: str,
+        mission_id: Optional[str],
+        timestamp: float,
+        reason: str,
+    ) -> ExplainabilityResult:
+        """Construct a structured, non-fabricated explainability result for rejected observations."""
+        return ExplainabilityResult(
+            engine_id=engine_id,
+            mission_id=mission_id,
+            timestamp=timestamp,
+            overall_quality=EvidenceQuality.INSUFFICIENT_DATA,
+            summary_explanation=f"Observation rejected: {reason}.",
+            shap_evidence=None,
+            physics_evidence=PhysicsEvidence(
+                status=EvidenceStatus.INSUFFICIENT_DATA,
+                diagnosed_fault="none",
+                evidence_channels=[],
+                observed_residual_directions={},
+                expected_residual_directions={},
+                consistency_reason=f"Observation rejected by causal sequence guard: {reason}.",
+                supporting_channels=[],
+                conflicting_channels=[],
+                missing_channels=[],
+            ),
+            health_evidence=None,
+            temporal_evidence=None,
+            rul_evidence=None,
+            provenance=EvidenceProvenance(
+                engine_id=engine_id,
+                mission_id=mission_id,
+                timestamp=timestamp,
+                phase8_present=False,
+                phase9_present=False,
+                phase10_present=False,
+                phase11_present=False,
+            ),
+        )
+
     def _build_out_of_order_payload(
         self,
         engine_id: str,
@@ -561,6 +621,12 @@ class SystemPipelineOrchestrator:
             health_state="INSUFFICIENT_DATA",
             rul_status="INSUFFICIENT_DATA",
             recommended_action_from_phase12="Out-of-order observation rejected by causal sequence guard.",
+        )
+        explainability_result = self._build_rejected_explainability_result(
+            engine_id=engine_id,
+            mission_id=mission_id,
+            timestamp=timestamp,
+            reason="timestamp earlier than last observed causal timestep",
         )
         return DashboardStatePayload(
             engine_id=engine_id,
@@ -587,6 +653,7 @@ class SystemPipelineOrchestrator:
             recommended_operator_action="Verify chronological integrity of telemetry source.",
             advisory=advisory,
             execution_latency_ms=round(latency_ms, 3),
+            _explainability_result=explainability_result,
         )
 
     def _build_duplicate_payload(
@@ -606,6 +673,12 @@ class SystemPipelineOrchestrator:
             health_state="INSUFFICIENT_DATA",
             rul_status="INSUFFICIENT_DATA",
             recommended_action_from_phase12="Duplicate observation rejected by causal sequence guard.",
+        )
+        explainability_result = self._build_rejected_explainability_result(
+            engine_id=engine_id,
+            mission_id=mission_id,
+            timestamp=timestamp,
+            reason="duplicate timestamp identical to last observed causal timestep",
         )
         return DashboardStatePayload(
             engine_id=engine_id,
@@ -632,6 +705,7 @@ class SystemPipelineOrchestrator:
             recommended_operator_action="Verify chronological uniqueness of telemetry source.",
             advisory=advisory,
             execution_latency_ms=round(latency_ms, 3),
+            _explainability_result=explainability_result,
         )
 
     def _build_invalid_timestamp_payload(
@@ -652,6 +726,12 @@ class SystemPipelineOrchestrator:
             health_state="INSUFFICIENT_DATA",
             rul_status="INSUFFICIENT_DATA",
             recommended_action_from_phase12=f"Invalid timestamp ({reason}) rejected by causal sequence guard.",
+        )
+        explainability_result = self._build_rejected_explainability_result(
+            engine_id=engine_id,
+            mission_id=mission_id,
+            timestamp=timestamp,
+            reason=reason,
         )
         return DashboardStatePayload(
             engine_id=engine_id,
@@ -678,6 +758,7 @@ class SystemPipelineOrchestrator:
             recommended_operator_action="Verify chronological and numeric integrity of telemetry timestamp.",
             advisory=advisory,
             execution_latency_ms=round(latency_ms, 3),
+            _explainability_result=explainability_result,
         )
 
     def run_simulation(
@@ -708,6 +789,7 @@ class SystemPipelineOrchestrator:
                 fault_type=sim_fault_type,
                 fault_start_s=sim_fault_start,
                 severity=sim_severity,
+                scenario_kwargs=sc.scenario_kwargs,
             )
 
         # 2. Configure Mission Profile
@@ -750,6 +832,7 @@ class SystemPipelineOrchestrator:
         fault_type: ScenarioFaultType,
         fault_start_s: float,
         severity: float,
+        scenario_kwargs: Optional[Dict[str, Any]] = None,
     ) -> FaultSchedule:
         """Helper to build simulator FaultSchedule without exposing labels to inference."""
         sched = FaultSchedule()
@@ -791,13 +874,20 @@ class SystemPipelineOrchestrator:
                 )
             )
         elif fault_type == ScenarioFaultType.SENSOR_FAULT:
+            sensor_ch = (scenario_kwargs or {}).get("sensor_channel")
+            if not sensor_ch:
+                import random
+                rng = random.Random(int(severity * 100) + int(fault_start_s))
+                channels = ["rpm", "cht", "egt", "oil_temp", "oil_pressure", "fuel_flow", "vibration"]
+                sensor_ch = rng.choice(channels)
+                
             sched.add_fault(
                 FaultState(
                     fault_type=FaultType.SENSOR_FAULT,
                     severity=severity,
                     start_time=fault_start_s,
                     affected_subsystem=FaultSubsystem.SENSOR,
-                    parameters={"sensor_channel": "cht", "sensor_mode": "bias"},
+                    parameters={"sensor_channel": sensor_ch, "sensor_mode": "bias"},
                 )
             )
         return sched

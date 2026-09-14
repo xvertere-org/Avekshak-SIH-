@@ -16,7 +16,13 @@ from fault_diagnosis.schema import FaultDiagnosisResult, DiagnosisDataQuality, C
 from health_index.schema import HealthIndexResult, HealthState, DegradationTrend
 from forecasting.schema import ForecastResult, ForecastQuality, ModelStatus
 from prognostics.schema import RULResult, RULStatus
-from explainability.schema import ExplainabilityResult
+from explainability.schema import (
+    ExplainabilityResult,
+    EvidenceQuality,
+    PhysicsEvidence,
+    EvidenceStatus,
+    EvidenceProvenance,
+)
 
 
 class ScenarioFaultType(str, Enum):
@@ -174,8 +180,40 @@ class DashboardStatePayload:
         return self._rul_result
 
     @property
-    def authoritative_explainability(self) -> Optional[ExplainabilityResult]:
-        return self._explainability_result
+    def authoritative_explainability(self) -> ExplainabilityResult:
+        if self._explainability_result is not None:
+            return self._explainability_result
+        return ExplainabilityResult(
+            engine_id=self.engine_id,
+            mission_id=self.mission_id,
+            timestamp=self.timestamp,
+            overall_quality=EvidenceQuality.INSUFFICIENT_DATA,
+            summary_explanation=self.summary_explanation or "Telemetry observation rejected or explainability unavailable.",
+            shap_evidence=None,
+            physics_evidence=PhysicsEvidence(
+                status=EvidenceStatus.INSUFFICIENT_DATA,
+                diagnosed_fault="none",
+                evidence_channels=[],
+                observed_residual_directions={},
+                expected_residual_directions={},
+                consistency_reason="Observation rejected or explainability result unavailable.",
+                supporting_channels=[],
+                conflicting_channels=[],
+                missing_channels=[],
+            ),
+            health_evidence=None,
+            temporal_evidence=None,
+            rul_evidence=None,
+            provenance=EvidenceProvenance(
+                engine_id=self.engine_id,
+                mission_id=self.mission_id,
+                timestamp=self.timestamp,
+                phase8_present=False,
+                phase9_present=False,
+                phase10_present=False,
+                phase11_present=False,
+            ),
+        )
 
     def to_dict(self) -> Dict[str, Any]:
         """Serialize payload to a clean dictionary for Streamlit or API serialization."""
@@ -311,3 +349,4 @@ class SimulationScenario:
     dt: float = 1.0
     engine_id: str = "ENG_001"
     mission_id: str = "MISSION_001"
+    scenario_kwargs: Dict[str, Any] = field(default_factory=dict)

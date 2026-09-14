@@ -74,7 +74,12 @@ def fast_dataset_config():
             )
         ],
     )
-    return DatasetConfig(dt=1.0, fault_onset_time=1.0, mission_profile=prof)
+    return DatasetConfig(
+        dt=1.0, 
+        fault_onset_time=1.0, 
+        mission_profile=prof,
+        dynamic_temporal_degradation=False
+    )
 
 
 @pytest.fixture(scope="module")
@@ -482,6 +487,7 @@ def trained_pipeline_and_data():
         physical_seed_pairs={0.3: [42, 100], 0.5: [200, 300], 0.7: [400, 500]},
         sensor_severities=[0.5, 0.7],
         binary_sensor_seeds=[42],
+        dynamic_temporal_degradation=False,
     )
     dataset = generate_fault_diagnosis_dataset(cfg)
     train_df, _, test_df = split_by_mission_run(dataset, random_state=42)

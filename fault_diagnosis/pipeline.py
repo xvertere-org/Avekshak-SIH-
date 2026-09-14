@@ -66,9 +66,28 @@ class FaultDiagnosisPipeline:
 
         # Cache global model feature importance
         if classifier.is_trained:
-            self._cached_feature_importance = classifier.get_feature_importance()
+            try:
+                self._cached_feature_importance = classifier.get_feature_importance()
+            except Exception:
+                self._cached_feature_importance = {}
         else:
             self._cached_feature_importance = {}
+
+    def get_feature_importance(self) -> Dict[str, float]:
+        """
+        Get global model-level feature importance (gain-based).
+
+        Returns:
+            Dict mapping feature name -> importance score, or empty dict if untrained.
+        """
+        if getattr(self, "classifier", None) is not None and getattr(self.classifier, "is_trained", False):
+            if not getattr(self, "_cached_feature_importance", None):
+                try:
+                    self._cached_feature_importance = self.classifier.get_feature_importance()
+                except Exception:
+                    self._cached_feature_importance = {}
+            return dict(self._cached_feature_importance)
+        return {}
 
     def diagnose_sample(
         self,
@@ -151,22 +170,32 @@ class FaultDiagnosisPipeline:
             else:
                 anomaly_scores = [None] * n_samples
 
-        # Model feature importance (global)
-        model_importance = dict(self._cached_feature_importance)
+        # AUDIT-030 FIX: Build per-row insufficiency mask BEFORE calling predict_proba.
+        # XGBoost's NaN routing produces numerically valid-looking probabilities on
+        # all-NaN inputs, but those probabilities carry no evidentiary basis.
+        # Mask out insufficient rows so predict_proba is never called on them.
+        is_insufficient_mask = (valid_core_counts < 4)
+        sufficient_indices = np.where(~is_insufficient_mask)[0]
 
-        # Get classifier predictions & probabilities for all rows
-        if self.classifier.is_trained:
-            prob_matrix = self.classifier.predict_proba(X)
-            preds = self.classifier.predict(X)
+        # Initialize output arrays
+        probs: List[Dict[str, float]] = [
+            {cls: 1.0 / len(CANONICAL_FAULT_LABELS) for cls in CANONICAL_FAULT_LABELS}
+            for _ in range(n_samples)
+        ]
+        preds: List[str] = ["none"] * n_samples
+
+        # Get classifier predictions only for rows with sufficient valid features
+        if self.classifier.is_trained and len(sufficient_indices) > 0:
+            X_sufficient = X.iloc[sufficient_indices] if hasattr(X, "iloc") else X[sufficient_indices]
+            prob_matrix = self.classifier.predict_proba(X_sufficient)
+            raw_preds = self.classifier.predict(X_sufficient)
             classes = self.classifier.classes
-            probs = [
-                {classes[j]: float(prob_matrix[i, j]) for j in range(len(classes))}
-                for i in range(n_samples)
-            ]
-        else:
-            # Fallback for untrained model
-            probs = [{cls: 1.0 / len(CANONICAL_FAULT_LABELS) for cls in CANONICAL_FAULT_LABELS} for _ in range(n_samples)]
-            preds = ["none" for _ in range(n_samples)]
+            for out_pos, src_idx in enumerate(sufficient_indices):
+                probs[src_idx] = {classes[j]: float(prob_matrix[out_pos, j]) for j in range(len(classes))}
+                preds[src_idx] = str(raw_preds[out_pos])
+
+        # Model feature importance (global)
+        model_importance = self.get_feature_importance()
 
         results: List[FaultDiagnosisResult] = []
 
@@ -189,17 +218,31 @@ class FaultDiagnosisPipeline:
                 # Uniform or zeroed confidence
                 prob_dict = {cls: 1.0 / len(CANONICAL_FAULT_LABELS) for cls in CANONICAL_FAULT_LABELS}
                 conf = 0.0
-            elif self.enable_phase7_gating and a_status == "NORMAL":
-                # Phase 7 gating: NORMAL flight reported as healthy
-                data_quality = DiagnosisDataQuality.VALID.value
-                pred_fault = "none"
-                prob_dict = {cls: (1.0 if cls == "none" else 0.0) for cls in CANONICAL_FAULT_LABELS}
-                conf = 1.0
             else:
-                data_quality = DiagnosisDataQuality.VALID.value
-                pred_fault = str(preds[i])
-                prob_dict = dict(probs[i])
-                conf = float(max(prob_dict.values()))
+                raw_pred = str(preds[i])
+                raw_prob_dict = dict(probs[i])
+                raw_conf = float(max(raw_prob_dict.values()))
+                
+                if self.enable_phase7_gating and a_status == "NORMAL":
+                    # Phase 7 gating: NORMAL flight reported as healthy
+                    # EXCEPTION: Do not allow a false negative to hide a genuine fault
+                    if raw_pred != "none" and raw_conf >= 0.75:
+                        data_quality = DiagnosisDataQuality.VALID.value
+                        pred_fault = raw_pred
+                        prob_dict = raw_prob_dict
+                        conf = raw_conf
+                    else:
+                        data_quality = DiagnosisDataQuality.VALID.value
+                        pred_fault = "none"
+                        prob_dict = {cls: (1.0 if cls == "none" else 0.0) for cls in CANONICAL_FAULT_LABELS}
+                        conf = 1.0
+                else:
+                    # For ANOMALY, WARNING, INSUFFICIENT_DATA, or ERROR from Phase 7, 
+                    # allow Phase 8 to make the diagnosis (temporary anomaly failures do not disable it).
+                    data_quality = DiagnosisDataQuality.VALID.value
+                    pred_fault = raw_pred
+                    prob_dict = raw_prob_dict
+                    conf = raw_conf
 
             # Perform suspect sensor identification when fault is sensor_fault
             if pred_fault == "sensor_fault":

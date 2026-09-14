@@ -77,25 +77,16 @@ class Phase13OutputContract:
         prognostics = data.get("prognostics") or data.get("rul") or data.get("rul_result") or data.get("_rul_result")
         explainability = data.get("explainability") or data.get("xai") or data.get("explainability_result") or data.get("_explainability_result")
 
-        # Authoritative forecast-assisted mode and status extraction
-        forecast_assisted_mode = bool(
-            data.get("forecast_assisted_mode")
-            if "forecast_assisted_mode" in data
-            else (
-                data.get("forecast_assisted")
-                if "forecast_assisted" in data
-                else (
-                    prognostics.get("forecast_assisted_mode", prognostics.get("forecast_assisted", False))
-                    if isinstance(prognostics, dict)
-                    else getattr(prognostics, "forecast_assisted_mode", getattr(prognostics, "forecast_assisted", False))
-                )
-            )
-        )
-        forecast_mode_status = str(
-            data.get("forecast_mode_status")
-            or (prognostics.get("forecast_mode_status") if isinstance(prognostics, dict) else getattr(prognostics, "forecast_mode_status", None))
-            or ("ACTIVE" if forecast_assisted_mode else "OFF")
-        )
+        # Authoritative forecast-assisted mode and status extraction relies on prognostics (Phase 11 output)
+        if isinstance(prognostics, dict):
+            forecast_assisted_mode = bool(prognostics.get("forecast_assisted_mode", prognostics.get("forecast_assisted", False)))
+            forecast_mode_status = str(prognostics.get("forecast_mode_status", "ACTIVE" if forecast_assisted_mode else "OFF"))
+        elif prognostics is not None:
+            forecast_assisted_mode = bool(getattr(prognostics, "forecast_assisted_mode", getattr(prognostics, "forecast_assisted", False)))
+            forecast_mode_status = str(getattr(prognostics, "forecast_mode_status", "ACTIVE" if forecast_assisted_mode else "OFF"))
+        else:
+            forecast_assisted_mode = False
+            forecast_mode_status = "OFF"
 
         return cls(
             timestamp=float(timestamp) if timestamp is not None else 0.0,

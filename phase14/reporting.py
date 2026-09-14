@@ -35,18 +35,37 @@ class MissionReportGenerator:
         if not payloads:
             raise ValueError("Cannot generate mission report from an empty payload sequence.")
 
-        first_p = payloads[0]
-        last_p = payloads[-1]
+        # Filter out rejected observations (out-of-order, duplicate, invalid timestamp)
+        valid_payloads = [
+            p for p in payloads
+            if "REJECTED" not in (getattr(p, "quality_status", None) or "")
+        ]
 
-        engine_id = first_p.engine_id
-        mission_id = first_p.mission_id or "UNKNOWN_MISSION"
-        duration_s = max(0.0, last_p.timestamp - first_p.timestamp)
-        mission_phase = last_p.mission_phase
-        simulation_mode = last_p.simulation_mode
-        meta = scenario_metadata or last_p.scenario_metadata or {}
-        scenario_name = meta.get("scenario_name", "standard_mission")
+        if valid_payloads:
+            first_p = valid_payloads[0]
+            effective_p = valid_payloads[-1]
+            engine_id = first_p.engine_id
+            mission_id = first_p.mission_id or "UNKNOWN_MISSION"
+            duration_s = max(0.0, effective_p.timestamp - first_p.timestamp)
+            mission_phase = effective_p.mission_phase
+            simulation_mode = effective_p.simulation_mode
+            meta = scenario_metadata or effective_p.scenario_metadata or {}
+            scenario_name = meta.get("scenario_name", "standard_mission")
+            dt = (valid_payloads[1].timestamp - valid_payloads[0].timestamp) if len(valid_payloads) > 1 else 1.0
+        else:
+            first_p = payloads[0]
+            effective_p = payloads[-1]
+            engine_id = first_p.engine_id
+            mission_id = first_p.mission_id or "UNKNOWN_MISSION"
+            duration_s = 0.0
+            mission_phase = effective_p.mission_phase
+            simulation_mode = effective_p.simulation_mode
+            meta = scenario_metadata or effective_p.scenario_metadata or {}
+            scenario_name = meta.get("scenario_name", "rejected_mission")
+            dt = 1.0
 
-        # 1. Telemetry Aggregation
+        # 1. Telemetry Aggregation (only over valid payloads if available)
+        aggregation_stream = valid_payloads if valid_payloads else payloads
         rpms: List[float] = []
         chts: List[float] = []
         egts: List[float] = []
@@ -55,7 +74,7 @@ class MissionReportGenerator:
         vibrations: List[float] = []
         fuel_flows: List[float] = []
 
-        for p in payloads:
+        for p in aggregation_stream:
             obs = p.observed_telemetry
             if "rpm" in obs and not np.isnan(obs["rpm"]):
                 rpms.append(obs["rpm"])
@@ -92,52 +111,50 @@ class MissionReportGenerator:
         vibration_mean = float(np.mean(vibrations)) if vibrations else float("nan")
 
         fuel_flow_mean = float(np.mean(fuel_flows)) if fuel_flows else float("nan")
-        # Approximate trapezoidal / rectangular integration for fuel in liters (flow is in L/h, dt in s)
-        dt = (payloads[1].timestamp - payloads[0].timestamp) if len(payloads) > 1 else 1.0
         fuel_flow_total = float(np.sum(fuel_flows) * (dt / 3600.0)) if fuel_flows else float("nan")
 
         # 2. PHM Summary Extraction
-        anomaly_count = sum(1 for p in payloads if p.anomaly_status in ("WARNING", "ANOMALY"))
+        anomaly_count = sum(1 for p in aggregation_stream if p.anomaly_status in ("WARNING", "ANOMALY"))
         
         # Aggregate contributing anomaly channels
         channel_set = set()
-        for p in payloads:
+        for p in aggregation_stream:
             for ch in p.anomaly_contributing_channels:
                 channel_set.add(ch)
         dominant_anomaly_channels = sorted(list(channel_set))
 
-        # Diagnosis (final step)
-        final_diagnosis = last_p.predicted_fault_class or "none"
-        # Extract probability of the predicted class from class_probabilities dictionary
-        diag_probs = last_p.diagnosis_probabilities or {}
-        final_diagnosis_prob = float(diag_probs.get(final_diagnosis, last_p.diagnostic_confidence))
+        # Diagnosis (final valid step)
+        final_diagnosis = effective_p.predicted_fault_class or "none"
+        diag_probs = effective_p.diagnosis_probabilities or {}
+        final_diagnosis_prob = float(diag_probs.get(final_diagnosis, effective_p.diagnostic_confidence))
 
         # Evidence quality from Phase 12 or Phase 8 data quality
-        # Clearly distinguished from ML probabilities
         evidence_quality = "VALID"
-        if last_p.fused_evidence and isinstance(last_p.fused_evidence, dict):
-            evidence_quality = str(last_p.fused_evidence.get("evidence_quality", "HIGH"))
-        elif last_p.diagnosis_data_quality:
-            evidence_quality = str(last_p.diagnosis_data_quality)
+        if not valid_payloads:
+            evidence_quality = "INSUFFICIENT_DATA"
+        elif effective_p.fused_evidence and isinstance(effective_p.fused_evidence, dict):
+            evidence_quality = str(effective_p.fused_evidence.get("evidence_quality", "HIGH"))
+        elif effective_p.diagnosis_data_quality:
+            evidence_quality = str(effective_p.diagnosis_data_quality)
 
         # Health Index
-        his = [p.smoothed_health_index for p in payloads if p.smoothed_health_index is not None and not np.isnan(p.smoothed_health_index)]
-        final_hi = last_p.smoothed_health_index if last_p.smoothed_health_index is not None else float("nan")
+        his = [p.smoothed_health_index for p in aggregation_stream if p.smoothed_health_index is not None and not np.isnan(p.smoothed_health_index)]
+        final_hi = effective_p.smoothed_health_index if effective_p.smoothed_health_index is not None else float("nan")
         min_hi = float(np.min(his)) if his else final_hi
-        deg_trend = last_p.degradation_trend
+        deg_trend = effective_p.degradation_trend
 
         # Prognostics RUL
-        final_rul = last_p.point_rul_seconds
-        rul_p05 = last_p.rul_uncertainty_p05
-        rul_p95 = last_p.rul_uncertainty_p95
-        limiting_factor = last_p.limiting_factor or "NONE"
-        forecast_status = last_p.forecast_status
-        forecast_source = last_p.forecast_source
+        final_rul = effective_p.point_rul_seconds
+        rul_p05 = effective_p.rul_uncertainty_p05
+        rul_p95 = effective_p.rul_uncertainty_p95
+        limiting_factor = effective_p.limiting_factor or "NONE"
+        forecast_status = effective_p.forecast_status
+        forecast_source = effective_p.forecast_source
 
         # 3. Explainability
         dominant_shap = []
-        if last_p.shap_attribution and isinstance(last_p.shap_attribution, dict):
-            raw_shap = last_p.shap_attribution.get("attributions") or last_p.shap_attribution.get("top_features") or []
+        if effective_p.shap_attribution and isinstance(effective_p.shap_attribution, dict):
+            raw_shap = effective_p.shap_attribution.get("attributions") or effective_p.shap_attribution.get("top_features") or []
             if isinstance(raw_shap, list):
                 dominant_shap = raw_shap
             elif isinstance(raw_shap, dict):
@@ -145,30 +162,33 @@ class MissionReportGenerator:
 
         phys_status = "UNKNOWN"
         phys_reason = ""
-        if last_p.physics_evidence and isinstance(last_p.physics_evidence, dict):
-            phys_status = str(last_p.physics_evidence.get("status", "VALID"))
-            phys_reason = str(last_p.physics_evidence.get("consistency_reason", ""))
+        if effective_p.physics_evidence and isinstance(effective_p.physics_evidence, dict):
+            phys_status = str(effective_p.physics_evidence.get("status", "VALID"))
+            phys_reason = str(effective_p.physics_evidence.get("consistency_reason", ""))
 
         temp_status = "STABLE"
-        if last_p.temporal_evidence and isinstance(last_p.temporal_evidence, dict):
-            temp_status = str(last_p.temporal_evidence.get("status", last_p.degradation_trend))
+        if effective_p.temporal_evidence and isinstance(effective_p.temporal_evidence, dict):
+            temp_status = str(effective_p.temporal_evidence.get("status", effective_p.degradation_trend))
 
-        fused_headline = last_p.summary_explanation or "Nominal operations verified across all sensors."
-        recommended_action = last_p.recommended_operator_action or "Continue nominal mission monitoring."
+        default_headline = "Nominal operations verified across all sensors." if valid_payloads else "Insufficient data: all observations rejected."
+        default_action = "Continue nominal mission monitoring." if valid_payloads else "Verify chronological and telemetry link integrity."
+        fused_headline = effective_p.summary_explanation or default_headline
+        recommended_action = effective_p.recommended_operator_action or default_action
 
         # 4. Decision Support Advisory Assessment
-        # Advisory action assessment mapping: GO, CAUTION, or MAINTENANCE
-        adv = last_p.advisory
+        adv = effective_p.advisory
         if adv is not None:
             adv_action_code = adv.action_code.value if hasattr(adv.action_code, "value") else str(adv.action_code)
             adv_headline = adv.headline
             adv_urgency = adv.urgency
         else:
-            adv_action_code = AdvisoryActionCode.NORMAL_MONITORING.value
-            adv_headline = "Nominal System Performance"
+            adv_action_code = AdvisoryActionCode.NORMAL_MONITORING.value if valid_payloads else AdvisoryActionCode.INSUFFICIENT_DATA.value
+            adv_headline = "Nominal System Performance" if valid_payloads else "Telemetry Insufficient Data"
             adv_urgency = "LOW"
 
-        if adv_action_code in (AdvisoryActionCode.CRITICAL_ABORT_ACTION.value, AdvisoryActionCode.MAINTENANCE_INSPECTION.value):
+        if not valid_payloads:
+            advisory_assessment = "INSUFFICIENT_DATA"
+        elif adv_action_code in (AdvisoryActionCode.CRITICAL_ABORT_ACTION.value, AdvisoryActionCode.MAINTENANCE_INSPECTION.value):
             advisory_assessment = "MAINTENANCE"
         elif adv_action_code == AdvisoryActionCode.ADVISORY_CAUTION.value:
             advisory_assessment = "CAUTION"
@@ -178,16 +198,32 @@ class MissionReportGenerator:
             advisory_assessment = "GO"
 
         # 5. Provenance & Limitations
+        trailing_rejected = 0
+        if valid_payloads and payloads[-1] != valid_payloads[-1]:
+            for p in reversed(payloads):
+                if "REJECTED" in (getattr(p, "quality_status", None) or ""):
+                    trailing_rejected += 1
+                else:
+                    break
+
         provenance = {
             "engine_id": engine_id,
             "mission_id": mission_id,
             "total_samples": len(payloads),
+            "valid_samples": len(valid_payloads),
+            "rejected_samples_count": len(payloads) - len(valid_payloads),
+            "trailing_rejected_samples": trailing_rejected,
             "step_dt": dt,
             "orchestrator_source": "Phase 13 Unified System Pipeline",
             "timesfm_status": forecast_status,
             "timesfm_source": forecast_source,
             "eol_definition": "Project-defined simulated functional-failure/EOL assumptions",
         }
+        if trailing_rejected > 0:
+            provenance["notice"] = (
+                f"{trailing_rejected} trailing sample(s) rejected by causal sequence guard; "
+                "report reflects the final valid operational observation."
+            )
 
         return MissionReportSummary(
             engine_id=engine_id,

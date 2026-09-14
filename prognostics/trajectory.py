@@ -94,11 +94,12 @@ class TheilSenExtrapolator:
         median_slope = round(float(np.median(slopes_arr)), 7)
 
         N = len(slopes_arr)
+        n_eff = (1.0 + np.sqrt(1.0 + 8.0 * N)) / 2.0
         # Sen (1968) exact Kendall rank variance accounting for pairwise dependencies
-        # V = (1 / 18) * [n * (n - 1) * (2n + 5) - sum_t t * (t - 1) * (2t + 5)]
+        # V = (1 / 18) * [n_eff * (n_eff - 1) * (2*n_eff + 5) - sum_t t * (t - 1) * (2t + 5)]
         _, tie_counts = np.unique(hi, return_counts=True)
         tie_sum = np.sum(tie_counts * (tie_counts - 1) * (2 * tie_counts + 5))
-        var_k = (n * (n - 1) * (2 * n + 5) - tie_sum) / 18.0
+        var_k = (n_eff * (n_eff - 1.0) * (2.0 * n_eff + 5.0) - tie_sum) / 18.0
         sigma_k = np.sqrt(max(0.0, var_k))
 
         # Standard error estimation via 1-sigma rank inversion (z = 1.0)
@@ -193,9 +194,10 @@ class TheilSenExtrapolator:
         median_slope = round(float(np.median(slopes_arr)), 7)
 
         N = len(slopes_arr)
+        n_eff = (1.0 + np.sqrt(1.0 + 8.0 * N)) / 2.0
         _, tie_counts = np.unique(hi, return_counts=True)
         tie_sum = np.sum(tie_counts * (tie_counts - 1) * (2 * tie_counts + 5))
-        var_k = (n * (n - 1) * (2 * n + 5) - tie_sum) / 18.0
+        var_k = (n_eff * (n_eff - 1.0) * (2.0 * n_eff + 5.0) - tie_sum) / 18.0
         sigma_k = np.sqrt(max(0.0, var_k))
 
         # Nominal confidence bounds (alpha=0.90 -> z_alpha = 1.6448536 for P05 / P95)

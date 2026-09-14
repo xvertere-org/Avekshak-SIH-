@@ -116,7 +116,8 @@ class HealthIndexResult:
     missing_channels: List[str]                   # Channels with NaN residual
     excluded_channels: List[str]                  # Isolated sensor-fault channels
     effective_channel_weights: Dict[str, float]   # Dynamically renormalized weights w'_i
-    data_quality: str                             # HealthDataQuality enum value
+    data_quality: str = "VALID"                      # HealthDataQuality enum value; default=VALID for backward compat
+
 
     # Optional Upstream Context (Passthrough only, NOT computed by Phase 9)
     diagnosed_fault: Optional[str] = None         # Phase 8 fault label if passed
