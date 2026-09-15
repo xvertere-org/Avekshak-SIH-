@@ -153,6 +153,7 @@ class DashboardStatePayload:
     # PROVENANCE & TIMING
     provenance: Dict[str, Any] = field(default_factory=dict)
     execution_latency_ms: float = 0.0
+    stage_latencies_ms: Dict[str, float] = field(default_factory=dict)
 
     # AUTHORITATIVE BACKING INSTANCES (Preserving exact Phase 6–12 objects)
     _raw_telemetry: Optional[Any] = field(default=None, repr=False)
@@ -292,6 +293,7 @@ class DashboardStatePayload:
             "advisory": self.advisory.to_dict() if self.advisory else None,
             "provenance": self.provenance,
             "execution_latency_ms": self.execution_latency_ms,
+            "stage_latencies_ms": self.stage_latencies_ms,
         }
 
 

@@ -268,27 +268,35 @@ class SystemPipelineOrchestrator:
 
         self.last_timestamp = timestamp
         self.step_count += 1
+        stage_latencies_ms: Dict[str, float] = {}
 
         # 2. Strict ground-truth sanitization: excise any fault injection metadata
+        t_prep_start = time.perf_counter()
         clean_telemetry = PipelineHandoffAdapter.sanitize_telemetry_for_inference(raw_dict)
+        stage_latencies_ms["telemetry_prep_ms"] = (time.perf_counter() - t_prep_start) * 1000.0
 
         # 3. Phase 6: Digital Twin & Residual Generation
+        t_physics_start = time.perf_counter()
         (
             residual_frame,
             expected_dict,
             raw_residuals,
             norm_residuals,
         ) = PipelineHandoffAdapter.step_digital_twin_streaming(self.twin, clean_telemetry)
+        stage_latencies_ms["physics_simulation_ms"] = (time.perf_counter() - t_physics_start) * 1000.0
 
         # 4. Phase 7: Hybrid Anomaly Detection
         # reset_state=False preserves causal EWMA and persistence counts
+        t_anom_start = time.perf_counter()
         anomaly_dict = PipelineHandoffAdapter.step_anomaly_detection_streaming(
             self.anomaly_detector, residual_frame
         )
         anomaly_status = anomaly_dict["anomaly_status"]
         anomaly_score = anomaly_dict["anomaly_score"]
+        stage_latencies_ms["anomaly_detection_ms"] = (time.perf_counter() - t_anom_start) * 1000.0
 
         # 5. Phase 8: Supervised Multiclass Fault Diagnosis
+        t_diag_start = time.perf_counter()
         diagnosis_result = PipelineHandoffAdapter.step_fault_diagnosis(
             self.diagnosis_pipeline,
             residual_frame=residual_frame,
@@ -297,8 +305,10 @@ class SystemPipelineOrchestrator:
             observed_telemetry=clean_telemetry,
             contributing_channels=anomaly_dict.get("contributing_channels", []),
         )
+        stage_latencies_ms["fault_diagnosis_ms"] = (time.perf_counter() - t_diag_start) * 1000.0
 
         # 6. Phase 9: Health Index & Causal Degradation Tracking
+        t_health_start = time.perf_counter()
         health_result = PipelineHandoffAdapter.step_health_index(
             self.health_pipeline,
             residual_frame=residual_frame,
@@ -306,8 +316,10 @@ class SystemPipelineOrchestrator:
             anomaly_status=anomaly_status,
             anomaly_score=anomaly_score,
         )
+        stage_latencies_ms["health_monitoring_ms"] = (time.perf_counter() - t_health_start) * 1000.0
 
         # 7. Phase 10: Forecasting
+        t_fc_start = time.perf_counter()
         forecast_result = PipelineHandoffAdapter.step_forecasting(
             self.forecasting_pipeline,
             telemetry_dict=clean_telemetry,
@@ -320,17 +332,21 @@ class SystemPipelineOrchestrator:
                 "isolated_channels": health_result.excluded_channels,
             },
         )
+        stage_latencies_ms["forecasting_ms"] = (time.perf_counter() - t_fc_start) * 1000.0
 
         # 8. Phase 11: Authoritative RUL & Weakest-Link EOL
+        t_rul_start = time.perf_counter()
         rul_result = PipelineHandoffAdapter.step_rul(
             self.rul_pipeline,
             health_result=health_result,
             forecast_result=forecast_result,
             telemetry_dict=clean_telemetry,
         )
+        stage_latencies_ms["prognostics_rul_ms"] = (time.perf_counter() - t_rul_start) * 1000.0
 
         # 9. Phase 12: Explainability & Multi-Modal Evidence Fusion
         # Extract Phase 8 16-feature vector for SHAP attribution
+        t_exp_start = time.perf_counter()
         features_df = self.diagnosis_pipeline.feature_extractor.transform(residual_frame.to_dataframe())
         explainability_result = PipelineHandoffAdapter.step_explainability(
             self.explainability_pipeline,
@@ -345,8 +361,10 @@ class SystemPipelineOrchestrator:
             rul_result=rul_result,
             classifier=self.diagnosis_pipeline.classifier,
         )
+        stage_latencies_ms["explainability_ms"] = (time.perf_counter() - t_exp_start) * 1000.0
 
         # 10. Operator Advisory Decision Support (Section 15)
+        t_adv_start = time.perf_counter()
         advisory = OperatorActionAdvisor.generate_advisory(
             anomaly_status=anomaly_status,
             diagnosis_fault=diagnosis_result.predicted_fault_type,
@@ -356,6 +374,7 @@ class SystemPipelineOrchestrator:
             dominant_channels=health_result.dominant_degraded_channels,
             recommended_action_from_phase12=explainability_result.summary_explanation,
         )
+        stage_latencies_ms["advisory_ms"] = (time.perf_counter() - t_adv_start) * 1000.0
 
         latency_ms = (time.perf_counter() - start_time) * 1000.0
 
@@ -378,6 +397,7 @@ class SystemPipelineOrchestrator:
             advisory=advisory,
             scenario_metadata=scenario_metadata or {},
             latency_ms=latency_ms,
+            stage_latencies_ms=stage_latencies_ms,
             raw_telemetry=telemetry,
             residual_frame=residual_frame,
         )
@@ -403,6 +423,7 @@ class SystemPipelineOrchestrator:
         latency_ms: float,
         raw_telemetry: Any,
         residual_frame: ResidualFrame,
+        stage_latencies_ms: Optional[Dict[str, float]] = None,
     ) -> DashboardStatePayload:
         """Helper to construct DashboardStatePayload containing authoritative results."""
         # Audit physical channel availability
@@ -555,6 +576,7 @@ class SystemPipelineOrchestrator:
                 "disclaimer": "Project-defined simulation criteria, not certified OEM/FAA limits.",
             },
             execution_latency_ms=round(latency_ms, 3),
+            stage_latencies_ms={k: round(v, 4) for k, v in stage_latencies_ms.items()} if stage_latencies_ms else {},
             _raw_telemetry=raw_telemetry,
             _residual_frame=residual_frame,
             _diagnosis_result=diagnosis_result,

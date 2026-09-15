@@ -51,7 +51,7 @@ def test_scenario_01_healthy(orchestrator, adapter):
     sc = SimulationScenario(
         engine_id="ENG_HLTHY_01",
         mission_id="MIS_HLTHY_01",
-        duration_s=15.0,
+        duration_s=35.0,
         fault_type=ScenarioFaultType.HEALTHY,
     )
     payloads: List[DashboardStatePayload] = orchestrator.run_simulation(sc)

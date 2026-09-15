@@ -1,0 +1,168 @@
+{
+  "benchmark_metadata": {
+    "total_steps": 60,
+    "device": "cuda",
+    "timesfm_status": "LOADED_PRETRAINED",
+    "init_bootstrap_seconds": 22.031
+  },
+  "cold_start_step0": {
+    "telemetry_prep_ms": 0.142,
+    "physics_simulation_ms": 18.829,
+    "anomaly_detection_ms": 14.435,
+    "fault_diagnosis_ms": 16.68,
+    "health_monitoring_ms": 2.393,
+    "forecasting_ms": 0.054,
+    "prognostics_rul_ms": 0.077,
+    "explainability_ms": 12.269,
+    "advisory_ms": 0.015,
+    "dashboard_adaptation_ms": 0.371,
+    "total_orchestrator_step_ms": 65.261,
+    "total_end_to_end_ms": 67.61
+  },
+  "warm_all_steps_stats": {
+    "orchestrator_step": {
+      "mean": 206.117,
+      "median": 75.704,
+      "p95": 415.982,
+      "p99": 549.354,
+      "min": 42.84,
+      "max": 706.218
+    },
+    "total_e2e": {
+      "mean": 207.738,
+      "median": 77.372,
+      "p95": 417.905,
+      "p99": 551.112,
+      "min": 44.015,
+      "max": 707.852
+    }
+  },
+  "buffering_mode_stats_steps_1_to_31": {
+    "description": "Pure ML + Physics baseline without TimesFM forward pass (buffering context)",
+    "orchestrator_step": {
+      "mean": 70.029,
+      "median": 44.712,
+      "p95": 75.227,
+      "p99": 517.064,
+      "min": 42.84,
+      "max": 706.218
+    },
+    "total_e2e": {
+      "mean": 71.337,
+      "median": 45.958,
+      "p95": 76.897,
+      "p99": 518.708,
+      "min": 44.015,
+      "max": 707.852
+    }
+  },
+  "active_foundation_model_stats_steps_32_plus": {
+    "description": "Complete pipeline with TimesFM-3 Deep Foundation Model running on CUDA",
+    "orchestrator_step": {
+      "mean": 356.786,
+      "median": 349.804,
+      "p95": 424.232,
+      "p99": 434.067,
+      "min": 289.807,
+      "max": 435.763
+    },
+    "total_e2e": {
+      "mean": 358.754,
+      "median": 351.707,
+      "p95": 426.278,
+      "p99": 435.989,
+      "min": 291.794,
+      "max": 437.611
+    }
+  },
+  "per_stage_warm_stats": {
+    "1_telemetry_prep": {
+      "mean": 0.005,
+      "median": 0.004,
+      "p95": 0.006,
+      "p99": 0.008,
+      "min": 0.003,
+      "max": 0.009
+    },
+    "2_physics_twin": {
+      "mean": 19.57,
+      "median": 15.809,
+      "p95": 29.307,
+      "p99": 33.365,
+      "min": 13.555,
+      "max": 34.837
+    },
+    "3_anomaly_detection": {
+      "mean": 10.84,
+      "median": 8.657,
+      "p95": 16.335,
+      "p99": 17.521,
+      "min": 7.51,
+      "max": 17.593
+    },
+    "4_fault_diagnosis_xgboost": {
+      "mean": 13.913,
+      "median": 11.414,
+      "p95": 20.83,
+      "p99": 22.455,
+      "min": 9.51,
+      "max": 24.259
+    },
+    "5_health_monitoring_ewma": {
+      "mean": 2.038,
+      "median": 1.703,
+      "p95": 3.006,
+      "p99": 3.29,
+      "min": 1.347,
+      "max": 3.293
+    },
+    "6_forecasting_buffering": {
+      "mean": 20.38,
+      "median": 0.025,
+      "p95": 0.037,
+      "p99": 441.682,
+      "min": 0.023,
+      "max": 630.957
+    },
+    "6_forecasting_active_timesfm": {
+      "mean": 280.315,
+      "median": 269.572,
+      "p95": 335.477,
+      "p99": 347.123,
+      "min": 234.795,
+      "max": 350.932
+    },
+    "7_prognostics_rul_theil_sen": {
+      "mean": 0.064,
+      "median": 0.059,
+      "p95": 0.105,
+      "p99": 0.145,
+      "min": 0.036,
+      "max": 0.18
+    },
+    "8_explainability_treeshap": {
+      "mean": 15.612,
+      "median": 17.436,
+      "p95": 22.283,
+      "p99": 23.71,
+      "min": 10.231,
+      "max": 24.084
+    },
+    "9_advisory_support": {
+      "mean": 0.016,
+      "median": 0.014,
+      "p95": 0.019,
+      "p99": 0.082,
+      "min": 0.009,
+      "max": 0.166
+    },
+    "10_dashboard_adaptation": {
+      "mean": 0.354,
+      "median": 0.353,
+      "p95": 0.468,
+      "p99": 0.555,
+      "min": 0.239,
+      "max": 0.596
+    }
+  }
+}
