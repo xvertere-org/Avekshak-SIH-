@@ -1,0 +1,300 @@
+{
+  "phase": "PHASE 11 \u2014 EVIDENCE, TRACEABILITY & ENGINEERING EXPLAINABILITY",
+  "git": {
+    "branch": "rotax-914-greybox-engine",
+    "source_commit": "be799fec93f7f965261275402da8280859af5ec4",
+    "head_sha": "be799fec93f7f965261275402da8280859af5ec4",
+    "origin_head": "300264f697b24ad9d7ce2663aedd7dac5dbc1dd9",
+    "main_sha": "a5353143cf7e7d89b562e7d0abffc9f87a077292",
+    "origin_main_sha": "53aa795794f5328ffe2bc7d7424ae464bce15e70",
+    "merge_base": "a5353143cf7e7d89b562e7d0abffc9f87a077292",
+    "working_tree": "## rotax-914-greybox-engine...origin/rotax-914-greybox-engine [ahead 1]\n?? docs/phase11_evidence_explainability.md\n?? scripts/generate_phase11_evidence.py"
+  },
+  "classification": "AUDITABLE_ENGINEERING_EXPLAINABILITY",
+  "golden_cases": {
+    "case_1_healthy_nominal": {
+      "hi_smooth": 0.9977009887814351,
+      "health_state": "HEALTHY",
+      "primary_fault": "HEALTHY",
+      "reason_codes": [
+        "RUL_UNAVAILABLE"
+      ],
+      "rendered_explanation": "ENGINE HEALTH: 0.9977 (State: HEALTHY)\n\nPrimary contributors:\n  - Thermal health: 1.0000\n  - Lubrication health: 1.0000\n  - Fuel health: 1.0000\n  - Combustion health: 1.0000\n  - Mechanical health: 1.0000\n  - Rotational health: 1.0000\n\nSupporting evidence:\n  - All observable channels operate within nominal residual thresholds (|z| < 1.5)\n\nDiagnosis:\n  Primary hypothesis: HEALTHY\n  Diagnostic confidence heuristic: 1.0000 (Status: NOMINAL)\n\nData quality:\n  Status: GOOD (Observability coverage: 100.0%)\n\nInterpretation:\n  Engine physical metrics reflect current mission operating point.\n\nLimitations:\n  - Synthetic grey-box validation; not operational or certified engine diagnosis.\n  - Diagnostic confidence and compatibility scores are engineering heuristics, not calibrated probabilities.\n  - RUL estimates are model-defined projections to horizon D_EOL and do not represent OEM maintenance limits."
+    },
+    "case_2_f1_injector": {
+      "hi_smooth": 0.9979686598417351,
+      "affected_cylinder": null,
+      "egt_cyl1_observed": 717.12,
+      "reason_codes": [
+        "RUL_UNAVAILABLE"
+      ],
+      "rendered_explanation": "ENGINE HEALTH: 0.9980 (State: HEALTHY)\n\nPrimary contributors:\n  - Thermal health: 1.0000\n  - Lubrication health: 1.0000\n  - Fuel health: 1.0000\n  - Combustion health: 1.0000\n  - Mechanical health: 1.0000\n  - Rotational health: 1.0000\n\nSupporting evidence:\n  - All observable channels operate within nominal residual thresholds (|z| < 1.5)\n\nDiagnosis:\n  Primary hypothesis: HEALTHY\n  Diagnostic confidence heuristic: 1.0000 (Status: NOMINAL)\n\nData quality:\n  Status: GOOD (Observability coverage: 100.0%)\n\nInterpretation:\n  Engine physical metrics reflect current mission operating point.\n\nLimitations:\n  - Synthetic grey-box validation; not operational or certified engine diagnosis.\n  - Diagnostic confidence and compatibility scores are engineering heuristics, not calibrated probabilities.\n  - RUL estimates are model-defined projections to horizon D_EOL and do not represent OEM maintenance limits."
+    },
+    "case_3_f2_lubrication": {
+      "oil_pressure_raw_res": -1.232,
+      "oil_pressure_norm_res": -2.464,
+      "primary_fault": "LUBRICATION_DEGRADATION",
+      "reason_codes": [
+        "ANOMALY_PERSISTENCE_SATISFIED",
+        "ENGINE_HEALTH_REDUCED",
+        "FAULT_SIGNATURE_MATCH",
+        "HEALTH_CHANNEL_DEGRADED",
+        "LUBRICATION_PRESSURE_DEVIATION",
+        "RUL_UNAVAILABLE",
+        "SUBSYSTEM_HEALTH_REDUCED"
+      ],
+      "rendered_explanation": "ENGINE HEALTH: 0.9572 (State: DEGRADED)\n\nPrimary contributors:\n  - Lubrication health: 0.7246\n  - Thermal health: 1.0000\n  - Fuel health: 1.0000\n  - Combustion health: 1.0000\n  - Mechanical health: 1.0000\n  - Rotational health: 1.0000\n\nSupporting evidence:\n  - OIL_PRESSURE residual: -1.23 bar (normalized z = -2.46)\n\nDiagnosis:\n  Primary hypothesis: LUBRICATION_DEGRADATION\n  Diagnostic confidence heuristic: 0.7115 (Status: CONFIRMED)\n\nData quality:\n  Status: GOOD (Observability coverage: 100.0%)\n\nInterpretation:\n  The modeled telemetry signature is consistent with LUBRICATION_DEGRADATION.\n\nLimitations:\n  - Synthetic grey-box validation; not operational or certified engine diagnosis.\n  - Diagnostic confidence and compatibility scores are engineering heuristics, not calibrated probabilities.\n  - RUL estimates are model-defined projections to horizon D_EOL and do not represent OEM maintenance limits."
+    },
+    "case_4_f3_cooling": {
+      "cht_raw_res": 20.73,
+      "cht_norm_res": 2.073,
+      "thermal_subsystem_health": 0.9454285714285714,
+      "reason_codes": [
+        "ENGINE_HEALTH_REDUCED",
+        "FAULT_SIGNATURE_MATCH",
+        "HEALTH_CHANNEL_DEGRADED",
+        "RUL_NON_DEGRADING",
+        "SUBSYSTEM_HEALTH_REDUCED",
+        "THERMAL_LIMIT_APPROACH"
+      ],
+      "rendered_explanation": "ENGINE HEALTH: 0.9928 (State: DEGRADED)\n\nPrimary contributors:\n  - Thermal health: 0.9454\n  - Lubrication health: 1.0000\n  - Fuel health: 1.0000\n  - Combustion health: 1.0000\n  - Mechanical health: 1.0000\n  - Rotational health: 1.0000\n\nSupporting evidence:\n  - CHT residual: +20.73 \u00b0C (normalized z = +2.07)\n  - CHT_CYL1 residual: +19.57 \u00b0C (normalized z = +1.63)\n  - CHT_CYL2 residual: +20.68 \u00b0C (normalized z = +1.72)\n  - CHT_CYL3 residual: +22.34 \u00b0C (normalized z = +1.86)\n  - CHT_CYL4 residual: +20.13 \u00b0C (normalized z = +1.68)\n\nDiagnosis:\n  Primary hypothesis: COOLING_DEGRADATION\n  Diagnostic confidence heuristic: 0.4280 (Status: SUSPECTED)\n\nData quality:\n  Status: GOOD (Observability coverage: 100.0%)\n\nInterpretation:\n  The modeled telemetry signature is consistent with COOLING_DEGRADATION.\n  Degradation trend is non-degrading or stable; finite RUL extrapolation is not applicable.\n\nLimitations:\n  - Synthetic grey-box validation; not operational or certified engine diagnosis.\n  - Diagnostic confidence and compatibility scores are engineering heuristics, not calibrated probabilities.\n  - RUL estimates are model-defined projections to horizon D_EOL and do not represent OEM maintenance limits."
+    },
+    "case_5_f4_misfire": {
+      "primary_fault": "COMBUSTION_MISFIRE",
+      "affected_cylinder": 2,
+      "confidence_heuristic": 0.5692,
+      "egt_norm_res": -2.7972,
+      "reason_codes": [
+        "ANOMALY_PERSISTENCE_SATISFIED",
+        "COMBUSTION_EGT_DEVIATION",
+        "CYLINDER_LOCALIZATION",
+        "ENGINE_HEALTH_REDUCED",
+        "FAULT_SIGNATURE_MATCH",
+        "HEALTH_CHANNEL_DEGRADED",
+        "RUL_TREND_SUPPORTED",
+        "SUBSYSTEM_HEALTH_REDUCED"
+      ],
+      "rendered_explanation": "ENGINE HEALTH: 0.8800 (State: DEGRADED)\n\nPrimary contributors:\n  - Combustion health: 0.6294\n  - Rotational health: 0.6800\n  - Thermal health: 1.0000\n  - Lubrication health: 1.0000\n  - Fuel health: 1.0000\n  - Mechanical health: 1.0000\n\nSupporting evidence:\n  - EGT residual: -69.93 \u00b0C (normalized z = -2.80)\n  - EGT_CYL1 residual: -58.90 \u00b0C (normalized z = -1.96)\n  - EGT_CYL2 residual: -146.47 \u00b0C (normalized z = -4.88)\n  - EGT_CYL4 residual: -52.33 \u00b0C (normalized z = -1.74)\n  - RPM residual: -374.00 RPM (normalized z = -3.74)\n  - Cylinder 2 localized via runner spread\n\nDiagnosis:\n  Primary hypothesis: COMBUSTION_MISFIRE\n  Diagnostic confidence heuristic: 0.5692 (Status: SUSPECTED)\n\nData quality:\n  Status: GOOD (Observability coverage: 100.0%)\n\nInterpretation:\n  The modeled telemetry signature is consistent with COMBUSTION_MISFIRE affecting cylinder 2.\n  Degradation trend is statistically significant; model-defined RUL projection is 0.0 hours to horizon D_EOL.\n\nLimitations:\n  - Synthetic grey-box validation; not operational or certified engine diagnosis.\n  - Diagnostic confidence and compatibility scores are engineering heuristics, not calibrated probabilities.\n  - RUL estimates are model-defined projections to horizon D_EOL and do not represent OEM maintenance limits."
+    },
+    "case_6_f5_mechanical": {
+      "vibration_raw_res": 0.663,
+      "vibration_norm_res": 3.315,
+      "reason_codes": [
+        "ANOMALY_PERSISTENCE_SATISFIED",
+        "ENGINE_HEALTH_REDUCED",
+        "FAULT_SIGNATURE_MATCH",
+        "HEALTH_CHANNEL_DEGRADED",
+        "MECHANICAL_VIBRATION_DEVIATION",
+        "RUL_UNAVAILABLE",
+        "SUBSYSTEM_HEALTH_REDUCED"
+      ],
+      "rendered_explanation": "ENGINE HEALTH: 0.9121 (State: DEGRADED)\n\nPrimary contributors:\n  - Mechanical health: 0.4814\n  - Thermal health: 1.0000\n  - Lubrication health: 1.0000\n  - Fuel health: 1.0000\n  - Combustion health: 1.0000\n  - Rotational health: 1.0000\n\nSupporting evidence:\n  - VIBRATION residual: +0.66 g (normalized z = +3.31)\n\nDiagnosis:\n  Primary hypothesis: MECHANICAL_DEGRADATION\n  Diagnostic confidence heuristic: 0.6920 (Status: CONFIRMED)\n\nData quality:\n  Status: GOOD (Observability coverage: 100.0%)\n\nInterpretation:\n  The modeled telemetry signature is consistent with MECHANICAL_DEGRADATION.\n\nLimitations:\n  - Synthetic grey-box validation; not operational or certified engine diagnosis.\n  - Diagnostic confidence and compatibility scores are engineering heuristics, not calibrated probabilities.\n  - RUL estimates are model-defined projections to horizon D_EOL and do not represent OEM maintenance limits."
+    },
+    "case_7_sensor_bias": {
+      "cht_observed": 73.47,
+      "coolant_temp_norm_res": 0.0067,
+      "oil_temp_norm_res": 0.0775,
+      "rendered_explanation": "ENGINE HEALTH: 0.9978 (State: HEALTHY)\n\nPrimary contributors:\n  - Thermal health: 1.0000\n  - Lubrication health: 1.0000\n  - Fuel health: 1.0000\n  - Combustion health: 1.0000\n  - Mechanical health: 1.0000\n  - Rotational health: 1.0000\n\nSupporting evidence:\n  - All observable channels operate within nominal residual thresholds (|z| < 1.5)\n\nDiagnosis:\n  Primary hypothesis: HEALTHY\n  Diagnostic confidence heuristic: 1.0000 (Status: NOMINAL)\n\nData quality:\n  Status: GOOD (Observability coverage: 100.0%)\n\nInterpretation:\n  Engine physical metrics reflect current mission operating point.\n\nLimitations:\n  - Synthetic grey-box validation; not operational or certified engine diagnosis.\n  - Diagnostic confidence and compatibility scores are engineering heuristics, not calibrated probabilities.\n  - RUL estimates are model-defined projections to horizon D_EOL and do not represent OEM maintenance limits."
+    },
+    "case_8_sensor_drift": {
+      "egt_raw_res": 11.84,
+      "rendered_explanation": "ENGINE HEALTH: 0.9977 (State: HEALTHY)\n\nPrimary contributors:\n  - Thermal health: 1.0000\n  - Lubrication health: 1.0000\n  - Fuel health: 1.0000\n  - Combustion health: 1.0000\n  - Mechanical health: 1.0000\n  - Rotational health: 1.0000\n\nSupporting evidence:\n  - All observable channels operate within nominal residual thresholds (|z| < 1.5)\n\nDiagnosis:\n  Primary hypothesis: HEALTHY\n  Diagnostic confidence heuristic: 1.0000 (Status: NOMINAL)\n\nData quality:\n  Status: GOOD (Observability coverage: 100.0%)\n\nInterpretation:\n  Engine physical metrics reflect current mission operating point.\n\nLimitations:\n  - Synthetic grey-box validation; not operational or certified engine diagnosis.\n  - Diagnostic confidence and compatibility scores are engineering heuristics, not calibrated probabilities.\n  - RUL estimates are model-defined projections to horizon D_EOL and do not represent OEM maintenance limits."
+    },
+    "case_9_sensor_dropout": {
+      "rpm_classification": "PREDICTED",
+      "rpm_quality": "MISSING",
+      "rendered_explanation": "ENGINE HEALTH: 0.9162 (State: WATCH)\n\nPrimary contributors:\n  - Rotational health: 0.4971\n  - Thermal health: 1.0000\n  - Lubrication health: 1.0000\n  - Fuel health: 1.0000\n  - Combustion health: 1.0000\n  - Mechanical health: 1.0000\n\nSupporting evidence:\n  - MAP_BAR residual: -0.16 bar (normalized z = -3.26)\n\nDiagnosis:\n  Primary hypothesis: SENSOR_DROPOUT\n  Diagnostic confidence heuristic: 0.4328 (Status: SUSPECTED)\n\nData quality:\n  Status: GOOD (Observability coverage: 88.9%)\n\nInterpretation:\n  The modeled telemetry signature is consistent with SENSOR_DROPOUT.\n  Divergence is localized to a single sensor channel without multi-channel physical coupling; evidence favors sensor anomaly.\n\nLimitations:\n  - Synthetic grey-box validation; not operational or certified engine diagnosis.\n  - Diagnostic confidence and compatibility scores are engineering heuristics, not calibrated probabilities.\n  - RUL estimates are model-defined projections to horizon D_EOL and do not represent OEM maintenance limits."
+    },
+    "case_10_sensor_stuck": {
+      "data_quality_status": "GOOD",
+      "rendered_explanation": "ENGINE HEALTH: 0.9581 (State: WATCH)\n\nPrimary contributors:\n  - Rotational health: 0.7486\n  - Thermal health: 1.0000\n  - Lubrication health: 1.0000\n  - Fuel health: 1.0000\n  - Combustion health: 1.0000\n  - Mechanical health: 1.0000\n\nSupporting evidence:\n  - MAP_BAR residual: -0.16 bar (normalized z = -3.26)\n\nDiagnosis:\n  Primary hypothesis: UNKNOWN\n  Diagnostic confidence heuristic: 0.2000 (Status: INSUFFICIENT_EVIDENCE)\n\nData quality:\n  Status: GOOD (Observability coverage: 100.0%)\n\nInterpretation:\n  Engine physical metrics reflect current mission operating point.\n\nLimitations:\n  - Synthetic grey-box validation; not operational or certified engine diagnosis.\n  - Diagnostic confidence and compatibility scores are engineering heuristics, not calibrated probabilities.\n  - RUL estimates are model-defined projections to horizon D_EOL and do not represent OEM maintenance limits."
+    },
+    "case_11_insufficient_data": {
+      "observability_coverage": 0.3333333333333333,
+      "engine_health_state": "UNAVAILABLE",
+      "reason_codes": [
+        "ENGINE_HEALTH_REDUCED",
+        "FAULT_SIGNATURE_MATCH",
+        "HEALTH_CHANNEL_DEGRADED",
+        "INSUFFICIENT_DATA",
+        "RUL_UNAVAILABLE",
+        "SUBSYSTEM_HEALTH_REDUCED"
+      ],
+      "rendered_explanation": "ENGINE HEALTH: UNAVAILABLE (State: UNAVAILABLE)\n\nPrimary contributors:\n  - Rotational health: 0.4971\n  - Thermal health: 1.0000\n  - Fuel health: 1.0000\n  - Lubrication health: UNAVAILABLE\n  - Combustion health: UNAVAILABLE\n  - Mechanical health: UNAVAILABLE\n\nSupporting evidence:\n  - MAP_BAR residual: -0.16 bar (normalized z = -3.26)\n\nDiagnosis:\n  Primary hypothesis: INSUFFICIENT_EVIDENCE\n  Diagnostic confidence heuristic: 0.0000 (Status: INSUFFICIENT_EVIDENCE)\n\nData quality:\n  Status: GOOD (Observability coverage: 33.3%)\n\nInterpretation:\n  The modeled telemetry signature is consistent with INSUFFICIENT_EVIDENCE.\n  Telemetry quality or observability coverage is impaired; health outputs are gated to prevent false physical assertions.\n\nLimitations:\n  - Synthetic grey-box validation; not operational or certified engine diagnosis.\n  - Diagnostic confidence and compatibility scores are engineering heuristics, not calibrated probabilities.\n  - RUL estimates are model-defined projections to horizon D_EOL and do not represent OEM maintenance limits."
+    },
+    "case_12_finite_rul": {
+      "rul_status": "COMPUTED",
+      "rul_estimate_hours": 48.5,
+      "rul_low": 42.0,
+      "rul_high": 56.0,
+      "reason_codes": [
+        "RUL_TREND_SUPPORTED"
+      ],
+      "rendered_explanation": "ENGINE HEALTH: UNAVAILABLE (State: HEALTHY)\n\nPrimary contributors:\n  - No subsystem assessments available\n\nSupporting evidence:\n  - All observable channels operate within nominal residual thresholds (|z| < 1.5)\n\nDiagnosis:\n  Primary hypothesis: UNKNOWN (Diagnostic assessment not active)\n\nData quality:\n  Status: GOOD (Observability coverage: 100.0%)\n\nInterpretation:\n  Degradation trend is statistically significant; model-defined RUL projection is 48.5 hours to horizon D_EOL.\n\nLimitations:\n  - Synthetic grey-box validation; not operational or certified engine diagnosis.\n  - Diagnostic confidence and compatibility scores are engineering heuristics, not calibrated probabilities.\n  - RUL estimates are model-defined projections to horizon D_EOL and do not represent OEM maintenance limits."
+    },
+    "case_13_unavailable_rul": {
+      "rul_status": "NON_DEGRADING",
+      "rul_estimate": null,
+      "rejection_reasons": [
+        "Degradation slope non-significant; engine operating within nominal stability"
+      ],
+      "reason_codes": [
+        "RUL_NON_DEGRADING"
+      ],
+      "rendered_explanation": "ENGINE HEALTH: UNAVAILABLE (State: HEALTHY)\n\nPrimary contributors:\n  - No subsystem assessments available\n\nSupporting evidence:\n  - All observable channels operate within nominal residual thresholds (|z| < 1.5)\n\nDiagnosis:\n  Primary hypothesis: UNKNOWN (Diagnostic assessment not active)\n\nData quality:\n  Status: GOOD (Observability coverage: 100.0%)\n\nInterpretation:\n  Degradation trend is non-degrading or stable; finite RUL extrapolation is not applicable.\n\nLimitations:\n  - Synthetic grey-box validation; not operational or certified engine diagnosis.\n  - Diagnostic confidence and compatibility scores are engineering heuristics, not calibrated probabilities.\n  - RUL estimates are model-defined projections to horizon D_EOL and do not represent OEM maintenance limits."
+    },
+    "case_14_mission_high_load": {
+      "delta_metrics": {
+        "max_cht": 11.8,
+        "max_egt": 32.5,
+        "min_oil_pressure": -0.15
+      },
+      "reason_codes": [
+        "COMBUSTION_EGT_DEVIATION",
+        "THERMAL_LIMIT_APPROACH"
+      ],
+      "serialized_json": "{\n  \"baseline_scenario_id\": \"NOMINAL\",\n  \"delta_metrics\": {\n    \"max_cht\": 11.8,\n    \"max_egt\": 32.5,\n    \"min_oil_pressure\": -0.15\n  },\n  \"envelope_event_count_delta\": 0,\n  \"limitations\": [\n    \"Comparative differences represent simulated grey-box scenario effects, not empirical flight test data.\",\n    \"Attributed modeled contributions are computational sensitivity partitions, not formal causal inference.\"\n  ],\n  \"modeled_contributions\": {\n    \"throttle_load\": \"sustained 95% continuous throttle rating\"\n  },\n  \"provenance\": \"SYNTHETIC_VALIDATION\",\n  \"reason_codes\": [\n    \"COMBUSTION_EGT_DEVIATION\",\n    \"THERMAL_LIMIT_APPROACH\"\n  ],\n  \"risk_index_delta\": 0.005,\n  \"scenario_id\": \"HIGH_LOAD\"\n}"
+    },
+    "case_15_mission_hot_day": {
+      "delta_metrics": {
+        "max_cht": 15.6,
+        "max_egt": 3.8,
+        "min_oil_pressure": -0.32
+      },
+      "reason_codes": [
+        "LUBRICATION_PRESSURE_DEVIATION",
+        "THERMAL_LIMIT_APPROACH"
+      ],
+      "serialized_json": "{\n  \"baseline_scenario_id\": \"NOMINAL\",\n  \"delta_metrics\": {\n    \"max_cht\": 15.6,\n    \"max_egt\": 3.8,\n    \"min_oil_pressure\": -0.32\n  },\n  \"envelope_event_count_delta\": 0,\n  \"limitations\": [\n    \"Comparative differences represent simulated grey-box scenario effects, not empirical flight test data.\",\n    \"Attributed modeled contributions are computational sensitivity partitions, not formal causal inference.\"\n  ],\n  \"modeled_contributions\": {\n    \"environment\": \"ISA + 15K ambient temperature offset\"\n  },\n  \"provenance\": \"SYNTHETIC_VALIDATION\",\n  \"reason_codes\": [\n    \"LUBRICATION_PRESSURE_DEVIATION\",\n    \"THERMAL_LIMIT_APPROACH\"\n  ],\n  \"risk_index_delta\": 0.011,\n  \"scenario_id\": \"HOT_DAY\"\n}"
+    }
+  },
+  "f4_lineage_trace": {
+    "pre_fault": {
+      "timestamp": 10.0,
+      "HI_smooth": 0.9948683164753964,
+      "primary_fault": "HEALTHY",
+      "affected_cylinder": null,
+      "egt_norm_res": 0.1852
+    },
+    "active_fault": {
+      "timestamp": 30.0,
+      "HI_smooth": 0.8836043534452125,
+      "combustion_health": 0.6012571428571429,
+      "rotational_health": 0.6808571428571428,
+      "primary_fault": "COMBUSTION_MISFIRE",
+      "confidence_heuristic": 0.5688,
+      "affected_cylinder": 2,
+      "egt_norm_res": -2.8956,
+      "traceability_chain": {
+        "chain_id": "LINEAGE_FAULT_DIAGNOSIS",
+        "target_metric": "primary_fault",
+        "nodes": [
+          {
+            "stage": "1_ANOMALY_DETECTION",
+            "source_entity": "HI_raw",
+            "output_entity": "temporal_detection_status",
+            "value_summary": "status=ANOMALOUS",
+            "relationship": "threshold_and_temporal_persistence",
+            "provenance": "ENGINEERING_HEURISTIC"
+          },
+          {
+            "stage": "2_FAULT_HYPOTHESIS_EVALUATION",
+            "source_entity": "residual_vector_and_cylinder_spread",
+            "output_entity": "ranked_hypotheses",
+            "value_summary": "top_fault=COMBUSTION_MISFIRE, score=0.5688",
+            "relationship": "physics_informed_rule_matching",
+            "provenance": "ENGINEERING_HEURISTIC"
+          },
+          {
+            "stage": "3_CYLINDER_LOCALIZATION",
+            "source_entity": "runner_spread_residuals",
+            "output_entity": "localized_cylinder",
+            "value_summary": "cylinder=2",
+            "relationship": "inter_cylinder_divergence_localization",
+            "provenance": "ENGINEERING_HEURISTIC"
+          }
+        ]
+      }
+    },
+    "post_fault_recovery": {
+      "timestamp": 50.0,
+      "HI_smooth": 0.9997926632677212,
+      "primary_fault": "HEALTHY",
+      "affected_cylinder": null,
+      "egt_norm_res": 0.118
+    }
+  },
+  "deterministic_serialization": {
+    "byte_identical": true,
+    "sha256_match": true,
+    "canonical_sha256": "23ee7c4ea88d6acde5835b189f13fd81bf5dd408d47ca041abcf8e52e7ce3ba1",
+    "serialized_byte_length": 17776
+  },
+  "completeness_audit": {
+    "scope": "STEP_EVIDENCE_RECORD",
+    "total_required": 17,
+    "total_present": 17,
+    "completeness_ratio": 1.0,
+    "required_fields": [
+      "timestamp",
+      "engine_id",
+      "source_telemetry_timestamp",
+      "canonical_timestamp",
+      "channel_evidence",
+      "subsystem_evidence",
+      "traceability_chains",
+      "data_quality_status",
+      "observability_coverage",
+      "synchronization_status",
+      "limitations",
+      "hi_raw",
+      "hi_smooth",
+      "engine_health_state",
+      "anomaly_evidence",
+      "diagnosis_evidence",
+      "prognostic_evidence"
+    ],
+    "present_fields": [
+      "timestamp",
+      "engine_id",
+      "source_telemetry_timestamp",
+      "canonical_timestamp",
+      "channel_evidence",
+      "subsystem_evidence",
+      "traceability_chains",
+      "data_quality_status",
+      "observability_coverage",
+      "synchronization_status",
+      "limitations",
+      "hi_raw",
+      "hi_smooth",
+      "engine_health_state",
+      "anomaly_evidence",
+      "diagnosis_evidence",
+      "prognostic_evidence"
+    ],
+    "missing_fields": []
+  },
+  "performance": {
+    "benchmark_sample_count": 150,
+    "mean_latency_ms": 0.086,
+    "median_latency_ms": 0.078,
+    "p95_latency_ms": 0.132,
+    "p99_latency_ms": 0.185,
+    "max_latency_ms": 0.208,
+    "execution_mode": "SYNCHRONOUS_DOWNSTREAM_ONLY",
+    "realtime_claim": "SOFT_REALTIME_SUITABLE_OFFLINE_OR_STREAMING"
+  },
+  "circularity_audit": {
+    "status": "PASS",
+    "upstream_files_audited": 43,
+    "violations_found": 0,
+    "violations": []
+  },
+  "non_claims": [
+    "Explainability outputs represent deterministic computational dependency traces, NOT formal causal proofs.",
+    "Hypothesis compatibility scores are engineering heuristics, NOT calibrated probabilities.",
+    "RUL estimates are model-defined extrapolations to D_EOL, NOT certified airworthiness or maintenance limits.",
+    "All telemetry and scenarios are synthetic grey-box models; no operational UAV flight validation is claimed."
+  ]
+}

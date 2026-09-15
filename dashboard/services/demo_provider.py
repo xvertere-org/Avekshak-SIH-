@@ -50,7 +50,7 @@ class DemoScenarioProvider:
             # Nominal Healthy
             telemetry = {
                 "timestamp": t_base,
-                "engine_id": "MALE_UAV_ROT912_01",
+                "engine_id": "MALE_UAV_ROT914_01",
                 "mission_id": "MIS_ISR_PATROL_01",
                 "mission_phase": "CRUISE",
                 "altitude": 3200.0,
@@ -190,7 +190,7 @@ class DemoScenarioProvider:
             # Severe CHT rise
             telemetry = {
                 "timestamp": t_base,
-                "engine_id": "MALE_UAV_ROT912_01",
+                "engine_id": "MALE_UAV_ROT914_01",
                 "mission_id": "MIS_ISR_PATROL_01",
                 "mission_phase": "CRUISE",
                 "altitude": 3200.0,
@@ -331,7 +331,7 @@ class DemoScenarioProvider:
             # Low oil pressure
             telemetry = {
                 "timestamp": t_base,
-                "engine_id": "MALE_UAV_ROT912_01",
+                "engine_id": "MALE_UAV_ROT914_01",
                 "mission_id": "MIS_ISR_PATROL_01",
                 "mission_phase": "CRUISE",
                 "altitude": 3200.0,
@@ -455,7 +455,7 @@ class DemoScenarioProvider:
             # 4. Sensor Dropout & Isolation
             telemetry = {
                 "timestamp": t_base,
-                "engine_id": "MALE_UAV_ROT912_01",
+                "engine_id": "MALE_UAV_ROT914_01",
                 "mission_id": "MIS_ISR_PATROL_01",
                 "mission_phase": "CRUISE",
                 "altitude": 3200.0,
@@ -580,7 +580,7 @@ class DemoScenarioProvider:
 
         contract = Phase13OutputContract(
             timestamp=t_base,
-            engine_id="MALE_UAV_ROT912_01",
+            engine_id="MALE_UAV_ROT914_01",
             mission_id="MIS_ISR_PATROL_01",
             execution_status="COMPLETED",
             is_synthetic_demo=True,

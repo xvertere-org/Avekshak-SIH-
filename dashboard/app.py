@@ -70,7 +70,7 @@ def run_live_simulation(
     }
     ft = fault_map.get(scenario_fault_str, ScenarioFaultType.HEALTHY)
     sc = SimulationScenario(
-        engine_id="UAV_AERO_ROT912_01",
+        engine_id="UAV_AERO_ROT914_01",
         mission_id="MIS_ISR_PATROL_01",
         duration_s=float(duration_s),
         fault_type=ft,

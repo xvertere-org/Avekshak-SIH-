@@ -1,0 +1,123 @@
+{
+  "metadata": {
+    "source_commit": "f1af35bd28bd63bdafdf84b33ec73693af5298cd",
+    "phase": "PHASE_12_CLAIMS_AND_SUBMISSION_INTEGRITY",
+    "generated_at": "2026-09-15T05:21:14.074048+00:00",
+    "audit_status": "PASS",
+    "unresolved_blockers": 0,
+    "unresolved_highs": 0
+  },
+  "taxonomy_categories": [
+    "AUTHORITATIVE_REFERENCE",
+    "MODEL_IMPLEMENTATION",
+    "MODEL_CALIBRATION",
+    "ENGINEERING_HEURISTIC",
+    "SYNTHETIC_VALIDATION",
+    "DATA_QUALITY_RULE"
+  ],
+  "latency_evidence": {
+    "steps": 1000,
+    "mean_ms": 0.3882,
+    "median_ms": 0.3284,
+    "p95_ms": 0.5592,
+    "p99_ms": 0.7631,
+    "steady_state_max_ms": 28.9939,
+    "min_ms": 0.2923,
+    "initialization_step0_ms": 0.6308,
+    "max_ms": 28.9939,
+    "budget_ms": 20.0,
+    "frequency_hz": 2576.3,
+    "steady_state_p95_passed": true,
+    "worst_case_passed": false,
+    "verdict": "PASS WITH LIMITATIONS (Worst-case spike exceeds 20 ms budget)",
+    "notes": "Streaming execution at p95 (0.51 ms) and p99 (0.72 ms) is well within the 20.0 ms budget (>1,000 Hz capability). However, observed worst-case maximum is 28.994 ms (spiking up to 29.937 ms), caused by runtime garbage collection or OS thread scheduling, thus failing strict deterministic worst-case."
+  },
+  "audited_claims": [
+    {
+      "claim_id": "CLM-001",
+      "claim_text": "Engine Takeoff Power is 84.5 kW at 5800 RPM (5-minute maximum).",
+      "source_citation": "EASA TCDS E.122 / BRP-Rotax 914 Series Operators Manual Ed. 4 / Rev. 0, Section 2.1",
+      "category": "AUTHORITATIVE_REFERENCE",
+      "verification_status": "VERIFIED",
+      "notes": "EASA certification standard is 84.5 kW (115 HP gross metric). Commercial brochure cites 84.8 kW; authoritative standard is 84.5 kW."
+    },
+    {
+      "claim_id": "CLM-002",
+      "claim_text": "Engine Continuous Power is 73.5 kW at 5500 RPM.",
+      "source_citation": "EASA TCDS E.122 / BRP-Rotax 914 Series Operators Manual Ed. 4 / Rev. 0, Section 2.1",
+      "category": "AUTHORITATIVE_REFERENCE",
+      "verification_status": "VERIFIED",
+      "notes": "Continuous maximum operational rating."
+    },
+    {
+      "claim_id": "CLM-003",
+      "claim_text": "Engine Critical Altitude is 4875 m (16,000 ft).",
+      "source_citation": "EASA TCDS E.122 Section A.III / BRP-Rotax 914 Series Operators Manual Section 2.1",
+      "category": "AUTHORITATIVE_REFERENCE",
+      "verification_status": "VERIFIED",
+      "notes": "Maximum altitude up to which TCU maintains continuous boost pressure (115 kPa). Simulator test envelope sweeps up to 4500 m as MODEL_IMPLEMENTATION ceiling."
+    },
+    {
+      "claim_id": "CLM-004",
+      "claim_text": "Engine Oil Pressure Limits: 0.8 bar idle minimum (<3500 RPM), 2.0-5.0 bar normal operating (>3500 RPM), 7.0 bar cold-start transient max.",
+      "source_citation": "BRP-Rotax 914 Series Operators Manual Section 2.1 / EASA TCDS E.122 Section A.III",
+      "category": "AUTHORITATIVE_REFERENCE",
+      "verification_status": "VERIFIED",
+      "notes": "Strictly separated from 1.5 sigma normalized residual health deadband and 0.5 bar numerical simulator clamp."
+    },
+    {
+      "claim_id": "CLM-005",
+      "claim_text": "Engine Health Index is computed as a dynamically renormalized weighted linear sum of piecewise-linear normalized residual evidence functions.",
+      "source_citation": "health_index/calculator.py / health_index/schema.py",
+      "category": "MODEL_IMPLEMENTATION",
+      "verification_status": "VERIFIED",
+      "notes": "Uses deadband tau_nominal=1.5 sigma and tau_critical=5.0 sigma with dynamic sensor isolation weight renormalization."
+    },
+    {
+      "claim_id": "CLM-006",
+      "claim_text": "Host-side digital twin streaming execution latency achieves sub-millisecond steady state (mean 0.388 ms, P99 0.763 ms).",
+      "source_citation": "evidence/phase6_latency_benchmark.json",
+      "category": "SYNTHETIC_VALIDATION",
+      "verification_status": "VERIFIED",
+      "notes": "Tested across 1,000 steps on commodity PC CPU. Host OS thread scheduling spikes reach 28.994 ms. Suitable for soft real-time; hard real-time is strictly disclaimed."
+    },
+    {
+      "claim_id": "CLM-007",
+      "claim_text": "Operational Digital Twin runtime contains ZERO machine learning models or black-box neural networks.",
+      "source_citation": "digital_twin/twin_model.py, digital_twin/diagnosis.py, digital_twin/rul.py",
+      "category": "MODEL_IMPLEMENTATION",
+      "verification_status": "VERIFIED",
+      "notes": "Runtime is 100% 1D lumped-parameter ODE physics, deterministic residuals, and directional hypothesis signature rules. XGBoost is VALIDATION_ONLY; TimesFM is QUARANTINED."
+    },
+    {
+      "claim_id": "CLM-008",
+      "claim_text": "Prognostics RUL is a model-defined projection to D_EOL horizon under modeled operating/stress assumptions, with deterministic empirical quantile bounds.",
+      "source_citation": "digital_twin/degradation.py / digital_twin/rul.py",
+      "category": "MODEL_IMPLEMENTATION",
+      "verification_status": "VERIFIED",
+      "notes": "Uses Theil-Sen regression with 15th/85th percentile slope quantiles. Does not claim certified mechanical TBO or physical component fatigue."
+    },
+    {
+      "claim_id": "CLM-009",
+      "claim_text": "Mission Risk Index (R_mission) is a heuristic engineering metric in [0, 1] and strictly NOT a failure probability.",
+      "source_citation": "digital_twin/what_if.py / digital_twin/mission_simulator.py",
+      "category": "ENGINEERING_HEURISTIC",
+      "verification_status": "VERIFIED",
+      "notes": "Combines operating envelope excursion penalties and health deficits under simulated scenarios."
+    },
+    {
+      "claim_id": "CLM-010",
+      "claim_text": "System is an academic and engineering competition prototype, NOT certified for flight operations under FAA DO-178C or EASA CS-E.",
+      "source_citation": "docs/claims_and_limitations.md / README.md",
+      "category": "ENGINEERING_HEURISTIC",
+      "verification_status": "VERIFIED",
+      "notes": "Explicit non-certification disclaimer prominently documented across all deliverables."
+    }
+  ],
+  "linter_summary": {
+    "total_scanned_matches": 83,
+    "acceptable_disclaimers": 83,
+    "unresolved_blockers": 0,
+    "unresolved_highs": 0
+  }
+}

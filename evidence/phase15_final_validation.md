@@ -52,7 +52,7 @@ All test suites were executed sequentially in the production runtime environment
 ```
 Mission Configuration (Altitude, Throttle, Duration, Fault Injection)
                         ↓
-      Physics-Informed Aero-Piston Simulator (Rotax 912 ODEs)
+      Physics-Informed Aero-Piston Simulator (Rotax 914 ODEs)
                         ↓
             Canonical 7-Channel Telemetry (1 Hz)
                         ↓
@@ -66,7 +66,7 @@ Mission Configuration (Altitude, Throttle, Duration, Fault Injection)
                         ↓
       Supervised Multiclass Fault Diagnosis (XGBoost)
                         ↓
-        Health Index & Causal Degradation Tracking
+        Health Index & Directional Degradation Tracking
                         ↓
         Future Telemetry Forecast (TimesFM-3.0 / Baseline)
                         ↓

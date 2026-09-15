@@ -307,7 +307,7 @@ class SystemPipelineOrchestrator:
         )
         stage_latencies_ms["fault_diagnosis_ms"] = (time.perf_counter() - t_diag_start) * 1000.0
 
-        # 6. Phase 9: Health Index & Causal Degradation Tracking
+        # 6. Phase 9: Health Index & Directional Degradation Tracking
         t_health_start = time.perf_counter()
         health_result = PipelineHandoffAdapter.step_health_index(
             self.health_pipeline,
