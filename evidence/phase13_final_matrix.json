@@ -1,19 +1,19 @@
 {
   "metadata": {
     "phase": "PHASE_13_FINAL_ADVERSARIAL_RELEASE_GATE",
-    "generated_at": "2026-09-15T06:14:58.404994+00:00",
-    "source_commit": "cdf87a5417dfa823689a9f4c10e73204d35171f7",
+    "generated_at": "2026-09-15T06:16:13.312523+00:00",
+    "source_commit": "c3ae53dc96eb8a6cf63fc4e35fb3c3c5c3e88ce0",
     "phase12_baseline_commit": "47c829522ea1f5a739c59ea19f5e9908f924f0bb",
     "protected_main_commit": "a5353143cf7e7d89b562e7d0abffc9f87a077292",
     "git_forensics": {
       "active_branch": "rotax-914-greybox-engine",
-      "head_sha": "cdf87a5417dfa823689a9f4c10e73204d35171f7",
+      "head_sha": "c3ae53dc96eb8a6cf63fc4e35fb3c3c5c3e88ce0",
       "phase12_baseline_sha": "47c829522ea1f5a739c59ea19f5e9908f924f0bb",
       "protected_local_main_sha": "a5353143cf7e7d89b562e7d0abffc9f87a077292",
       "merge_base_sha": "a5353143cf7e7d89b562e7d0abffc9f87a077292",
       "main_untouched": true,
       "is_descendant_of_baseline": true,
-      "working_tree_dirty": true,
+      "working_tree_dirty": false,
       "phase13_modified_files": [
         "docs/phase13_final_adversarial_audit.md",
         "evidence/phase13_final_matrix.json",
@@ -40,17 +40,17 @@
     "host_platform": "Windows-11-10.0.26200-SP0",
     "host_processor": "Intel64 Family 6 Model 186 Stepping 2, GenuineIntel",
     "python_version": "3.12.10",
-    "warmup_latency_ms": 0.7285,
-    "mean_latency_ms": 1.4092,
-    "median_latency_ms": 1.6277,
-    "p95_latency_ms": 2.5627,
-    "p99_latency_ms": 3.0162,
-    "max_latency_ms": 3.1344,
-    "min_latency_ms": 0.5656,
+    "warmup_latency_ms": 0.7545,
+    "mean_latency_ms": 1.314,
+    "median_latency_ms": 1.5879,
+    "p95_latency_ms": 2.2473,
+    "p99_latency_ms": 2.6908,
+    "max_latency_ms": 3.1445,
+    "min_latency_ms": 0.5426,
     "soft_real_time_compliance_10hz": true,
     "hard_real_time_guaranteed": false,
     "timing_classification": "HOST_SIDE_SOFT_REAL_TIME",
-    "bimodal_distribution_analysis": "The execution latency exhibits a bimodal profile: 124 samples completed in fast cache execution (< 1.0 ms) and 176 samples in full-path execution (>= 1.0 ms). In such bimodal distributions, the median (50th percentile) falls into the upper cluster (1.63 ms) while the arithmetic mean (1.41 ms) is pulled down by the fast cluster."
+    "bimodal_distribution_analysis": "The execution latency exhibits a bimodal profile: 143 samples completed in fast cache execution (< 1.0 ms) and 157 samples in full-path execution (>= 1.0 ms). In such bimodal distributions, the median (50th percentile) falls into the upper cluster (1.59 ms) while the arithmetic mean (1.31 ms) is pulled down by the fast cluster."
   },
   "feature_taxonomy": [
     {
