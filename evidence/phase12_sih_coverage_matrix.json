@@ -1,0 +1,135 @@
+{
+  "metadata": {
+    "source_commit": "f1e2b6c46d7872fc459b700a8d648766a4099521",
+    "phase": "PHASE_12_SIH_COVERAGE_AUDIT",
+    "generated_at": "2026-09-15T05:15:53.308721+00:00",
+    "total_requirements": 13,
+    "status_counts": {
+      "IMPLEMENTED": 9,
+      "PARTIALLY_IMPLEMENTED": 1,
+      "PROTOTYPE_ONLY": 0,
+      "VALIDATION_ONLY": 1,
+      "NOT_IMPLEMENTED": 1,
+      "OUT_OF_SCOPE": 1
+    }
+  },
+  "requirements": [
+    {
+      "req_id": "SIH-REQ-01",
+      "title": "Physics-Informed Digital Twin of Aero Piston Engine",
+      "status": "IMPLEMENTED",
+      "executable_behavior": "1D lumped-parameter thermal, lubrication, and rotational ODE model synchronized with incoming telemetry.",
+      "evidence_path": "evidence/phase2_operating_matrix.json",
+      "test_suite": "tests/test_phase2_operating_matrix.py",
+      "limitations": "Reduced-order lumped parameter model; not 3D CFD or acoustic combustion dynamometer."
+    },
+    {
+      "req_id": "SIH-REQ-02",
+      "title": "Real-Time Telemetry Processing Capability",
+      "status": "PARTIALLY_IMPLEMENTED",
+      "executable_behavior": "Host-side streaming execution achieves sub-millisecond mean latency (0.388 ms), suitable for 1-10 Hz telemetry streams.",
+      "evidence_path": "evidence/phase6_latency_benchmark.json",
+      "test_suite": "tests/test_fault_diagnosis_phase6.py",
+      "limitations": "Host-side soft real-time verified on commodity CPU. Operating system spikes reach 28.99 ms; hard real-time embedded RTOS deployment is OUT_OF_SCOPE."
+    },
+    {
+      "req_id": "SIH-REQ-03",
+      "title": "Multi-Rate Telemetry Ingestion Infrastructure",
+      "status": "IMPLEMENTED",
+      "executable_behavior": "Ingestion pipeline with unit conversions, clock skew detection, sequence gap handling, and multi-rate interpolation.",
+      "evidence_path": "evidence/phase9_telemetry_matrix.json",
+      "test_suite": "tests/test_phase9_real_telemetry.py",
+      "limitations": "All input streams tested are synthetic or replayed. No physical flight test logs claimed."
+    },
+    {
+      "req_id": "SIH-REQ-04",
+      "title": "Empirical Flight Data Validation on Operational Fleet",
+      "status": "NOT_IMPLEMENTED",
+      "executable_behavior": "No physical flight test dataset from an operational Rotax 914 UAV fleet is present or claimed.",
+      "evidence_path": "evidence/phase9_telemetry_matrix.json",
+      "test_suite": "tests/test_phase9_real_telemetry.py",
+      "limitations": "All degradation trajectories and operational scenarios are synthetic/replayed benchmarks."
+    },
+    {
+      "req_id": "SIH-REQ-05",
+      "title": "Multi-Fault Physics Degradation Simulation",
+      "status": "IMPLEMENTED",
+      "executable_behavior": "Simulates 6 distinct physical fault classes: cooling loss, lubrication degradation, injector clogging, misfire, mechanical friction, and sensor drift.",
+      "evidence_path": "evidence/evidence_package.json",
+      "test_suite": "tests/test_fault_physics_phase4.py",
+      "limitations": "Parameterized continuous wear states; does not model sudden catastrophic structural breakage."
+    },
+    {
+      "req_id": "SIH-REQ-06",
+      "title": "Propulsion Health Assessment (Health Index)",
+      "status": "IMPLEMENTED",
+      "executable_behavior": "Computes continuous health index in [0, 1] across engine and subsystems using dynamically renormalized residual evidence sums.",
+      "evidence_path": "evidence/phase5_health_assessment_matrix.json",
+      "test_suite": "tests/test_health_assessment_phase5.py",
+      "limitations": "Normalized residual metric; not an airworthiness certificate."
+    },
+    {
+      "req_id": "SIH-REQ-07",
+      "title": "Physics-Informed Fault Diagnosis & Hypothesis Isolation",
+      "status": "IMPLEMENTED",
+      "executable_behavior": "Evaluates residual signatures and directional physical coupling to isolate primary fault hypotheses.",
+      "evidence_path": "evidence/phase6_fault_diagnosis_matrix.json",
+      "test_suite": "tests/test_fault_diagnosis_phase6.py",
+      "limitations": "Assumes primary fault dominance; complex concurrent sensor faults may yield ambiguous rankings."
+    },
+    {
+      "req_id": "SIH-REQ-08",
+      "title": "Prognostics & Remaining Useful Life (RUL) Estimation",
+      "status": "IMPLEMENTED",
+      "executable_behavior": "Projects time to model horizon D_EOL using robust Theil-Sen regression with deterministic empirical quantile bounds under modeled stress.",
+      "evidence_path": "evidence/phase8_rul_matrix.json",
+      "test_suite": "tests/test_phase8_rul.py",
+      "limitations": "Mathematical horizon under stated model assumptions; not physical TBO."
+    },
+    {
+      "req_id": "SIH-REQ-09",
+      "title": "Mission Reliability & Counterfactual What-If Simulation",
+      "status": "IMPLEMENTED",
+      "executable_behavior": "Simulates alternate flight profiles and fault injections to compute mission risk index R_mission and envelope margins.",
+      "evidence_path": "evidence/phase10_mission_matrix.json",
+      "test_suite": "tests/test_phase10_mission.py",
+      "limitations": "Heuristic risk index; strictly not a failure probability."
+    },
+    {
+      "req_id": "SIH-REQ-10",
+      "title": "Structured Engineering Explainability",
+      "status": "IMPLEMENTED",
+      "executable_behavior": "Generates provenance-traced explanations linking every diagnostic/prognostic output to sensor channels, residuals, and rules.",
+      "evidence_path": "evidence/phase11_explainability_matrix.json",
+      "test_suite": "tests/test_phase11_explainability.py",
+      "limitations": "Deterministic rule/residual attribution; not deep learning SHAP in operational runtime."
+    },
+    {
+      "req_id": "SIH-REQ-11",
+      "title": "Interactive Operator Decision Support Dashboard",
+      "status": "IMPLEMENTED",
+      "executable_behavior": "Streamlit application displaying digital twin synchronization, health gauges, telemetry replay, and scenario what-if controls.",
+      "evidence_path": "dashboard/app.py",
+      "test_suite": "tests/test_phase12_claims_audit.py",
+      "limitations": "Presentation and decision-support layer; does not control aircraft avionics."
+    },
+    {
+      "req_id": "SIH-REQ-12",
+      "title": "Machine Learning Diagnostic Classifiers",
+      "status": "VALIDATION_ONLY",
+      "executable_behavior": "XGBoost and Random Forest classifiers trained on synthetic population benchmarks for comparative validation.",
+      "evidence_path": "fault_diagnosis/classifier.py",
+      "test_suite": "tests/test_phase7_population.py",
+      "limitations": "Trained solely on synthetic datasets; not invoked in operational digital twin runtime."
+    },
+    {
+      "req_id": "SIH-REQ-13",
+      "title": "FAA DO-178C / EASA Flight Certification",
+      "status": "OUT_OF_SCOPE",
+      "executable_behavior": "No flight certification processes executed.",
+      "evidence_path": "docs/claims_and_limitations.md",
+      "test_suite": "tests/test_phase12_claims_audit.py",
+      "limitations": "Academic research and competition prototype."
+    }
+  ]
+}

@@ -19,7 +19,7 @@ Phase 7: Hybrid Anomaly Detection (Threshold + EWMA + Persistence + Isolation Fo
                   ↓
 Phase 8: Multiclass Supervised Fault Diagnosis (XGBoost 6-Class)
                   ↓
-Phase 9: Health Index & Causal Degradation Tracking (HI + Rate + Trend + Sensor Isolation)
+Phase 9: Health Index & Directional Degradation Tracking (HI + Rate + Trend + Sensor Isolation)
                   ↓
 Phase 10: TimesFM-3 Future Telemetry Forecasting (with Gated/Baseline Fallback)
                   ↓

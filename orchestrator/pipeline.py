@@ -227,7 +227,7 @@ class SystemPipelineOrchestrator:
             anomaly_score=anomaly_score,
         )
 
-        # 6. Phase 9: Health Index & Causal Degradation Tracking
+        # 6. Phase 9: Health Index & Directional Degradation Tracking
         health_result = PipelineHandoffAdapter.step_health_index(
             self.health_pipeline,
             residual_frame=residual_frame,

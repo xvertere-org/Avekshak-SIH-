@@ -1,220 +1,146 @@
-# NIRVANAA — SIH26054 Digital Twin System
+# NIRVANAA — SIH26054 Rotax 914 Aero Piston Engine Digital Twin
 
-> **AI-Enabled Real-Time Digital Twin System for Health Monitoring, Fault Prediction and Mission Reliability Enhancement of Aero Piston Engines used in MALE UAVs**
-
----
-
-## 1. Problem Overview (SIH26054)
-
-Medium Altitude Long Endurance (MALE) Unmanned Aerial Vehicles (UAVs) rely heavily on aero piston propulsion systems for extended ISR (Intelligence, Surveillance, and Reconnaissance) missions. Engine health degradation during critical mission phases (e.g., thermal runaway, oil pressure drop, injector clogging) can jeopardize mission success and asset survivability.
-
-This project delivers a modular, real-time Digital Twin and Prognostics & Health Management (PHM) system that combines reduced-order physics modeling with machine learning to provide real-time state estimation, early fault detection, Remaining Useful Life (RUL) estimation, and human-interpretable diagnostic explanations.
+> **Physics-Informed Reduced-Order Grey-Box Digital Twin & Prognostics System for Health Monitoring, Fault Diagnosis, and Mission Reliability of MALE UAV Propulsion Systems**
 
 ---
 
-## 2. System Status — Complete ✅
+## 1. Problem Overview & Scope (SIH26054)
 
-| Phase | Component | Status |
-| :--- | :--- | :--- |
-| **Phase 1** | Project Setup & Architecture | ✅ Complete |
-| **Phase 2B** | Physics-Informed Engine Simulator (Reduced-Order Grey-Box Prototype; Rotax 914 UL/F Reference) | ✅ Complete |
-| **Phase 3** | Simulator Calibration & Validation (8 suites, golden baseline) | ✅ Complete |
-| **Phase 4A** | Fault & Degradation Interface (typed contracts) | ✅ Complete |
-| **Phase 4B** | Cooling Degradation Physics (conductance degradation) | ✅ Complete |
-| **Phase 4C** | Lubrication Degradation Physics (pressure/friction) | ✅ Complete |
-| **Phase 4D** | Fuel / Injection Abnormality Physics (lean/rich) | ✅ Complete |
-| **Phase 4E** | Mechanical Degradation Physics (bearing wear, vibration) | ✅ Complete |
-| **Phase 4F** | Sensor Fault Physics (bias, drift, stochastic noise) | ✅ Complete |
-| **Phase 5** | Telemetry Pipeline & Canonical Ingestion | ✅ Complete |
-| **Phase 6** | Digital Twin State Estimation & Residual Generation | ✅ Complete |
-| **Phase 7** | Hybrid Anomaly Detection (Threshold + EWMA + Persistence + Isolation Forest) | ✅ Complete |
-| **Phase 8** | Multiclass Fault Diagnosis (XGBoost 6-Class Classifier) | ✅ Complete |
-| **Phase 9** | Health Index & Causal Degradation Tracking | ✅ Complete |
-| **Phase 10** | TimesFM-3 Future Telemetry Forecasting (Gated/Baseline Fallback) | ✅ Complete |
-| **Phase 11** | Authoritative RUL & Prognostics (Theil–Sen + MC Uncertainty) | ✅ Complete |
-| **Phase 12** | Explainability & Multi-Modal Evidence Fusion (SHAP + Physics + Temporal) | ✅ Complete |
-| **Phase 13** | Unified System Pipeline Orchestrator | ✅ Complete |
+Medium Altitude Long Endurance (MALE) Unmanned Aerial Vehicles (UAVs) rely on turbocharged aero piston propulsion systems for extended Intelligence, Surveillance, and Reconnaissance (ISR) missions. Undetected in-flight propulsion degradation—such as thermal conductance loss, oil pressure drops, injector delivery abnormalities, combustion misfires, or sensor calibration drift—can jeopardize mission success and asset survivability.
 
-**Total Automated Tests: 340+ passed**
+**NIRVANAA** delivers a modular, physics-informed grey-box Digital Twin and Prognostics & Health Management (PHM) system calibrated against the **turbocharged BRP-Rotax 914 UL/F** aero engine architecture. It synchronizes incoming flight telemetry with 1D lumped-parameter thermodynamic and rotational state estimators, tracks physical residuals, isolates fault signatures through directional subsystem coupling, projects model-defined degradation horizons ($D_\text{EOL}$), and evaluates counterfactual what-if mission completion risk.
 
 ---
 
-## 3. End-to-End Pipeline Architecture
+## 2. System Capabilities & Authoritative Evidence Matrix
+
+Every claimed capability in NIRVANAA is tied directly to an auditable, deterministic evidence artifact and automated regression suite:
+
+| System Capability | Implementation Paradigm | Evidence Artifact | Automated Verification Suite |
+| :--- | :--- | :--- | :--- |
+| **Engine State Estimation** | 1D lumped-parameter thermal, lubrication, and rotational ODE network | [`evidence/phase2_operating_matrix.json`](file:///d:/SIH%20Drone/evidence/phase2_operating_matrix.json) | [`tests/test_phase2_operating_matrix.py`](file:///d:/SIH%20Drone/tests/test_phase2_operating_matrix.py) |
+| **Simulator Validation & Calibration** | 8 validation suites against OEM steady-state & transient limits | [`evidence/final_validation_report.md`](file:///d:/SIH%20Drone/evidence/final_validation_report.md) | [`tests/test_simulator_validation.py`](file:///d:/SIH%20Drone/tests/test_simulator_validation.py) |
+| **Multi-Fault Physics Simulation** | 6 physical fault modes (cooling, lubrication, injector, misfire, friction, sensor) | [`evidence/evidence_package.json`](file:///d:/SIH%20Drone/evidence/evidence_package.json) | [`tests/test_fault_physics_phase4.py`](file:///d:/SIH%20Drone/tests/test_fault_physics_phase4.py) |
+| **Dynamic Residual Generation** | Physical & normalized residuals against synchronized nominal twin | [`evidence/phase6_fault_diagnosis_matrix.json`](file:///d:/SIH%20Drone/evidence/phase6_fault_diagnosis_matrix.json) | [`tests/test_fault_diagnosis_phase6.py`](file:///d:/SIH%20Drone/tests/test_fault_diagnosis_phase6.py) |
+| **Health Index Assessment (HI)** | Dynamically renormalized weighted linear sum of piecewise-linear residual evidence | [`evidence/phase5_health_assessment_matrix.json`](file:///d:/SIH%20Drone/evidence/phase5_health_assessment_matrix.json) | [`tests/test_health_assessment_phase5.py`](file:///d:/SIH%20Drone/tests/test_health_assessment_phase5.py) |
+| **Fault Diagnosis & Isolation** | Residual signature lookup & directional physical coupling rules | [`evidence/phase6_fault_diagnosis_matrix.json`](file:///d:/SIH%20Drone/evidence/phase6_fault_diagnosis_matrix.json) | [`tests/test_fault_diagnosis_phase6.py`](file:///d:/SIH%20Drone/tests/test_fault_diagnosis_phase6.py) |
+| **Synthetic Fleet Population** | Parameterized Monte Carlo variations across synthetic engine cohorts | [`evidence/phase7_population_matrix.json`](file:///d:/SIH%20Drone/evidence/phase7_population_matrix.json) | [`tests/test_phase7_population.py`](file:///d:/SIH%20Drone/tests/test_phase7_population.py) |
+| **Prognostics & RUL Estimation** | Robust Theil–Sen linear regression with deterministic empirical quantile bounds | [`evidence/phase8_rul_matrix.json`](file:///d:/SIH%20Drone/evidence/phase8_rul_matrix.json) | [`tests/test_phase8_rul.py`](file:///d:/SIH%20Drone/tests/test_phase8_rul.py) |
+| **Telemetry Ingestion & Replay** | Canonical schema, unit conversions, clock skew detection, multi-rate sync | [`evidence/phase9_telemetry_matrix.json`](file:///d:/SIH%20Drone/evidence/phase9_telemetry_matrix.json) | [`tests/test_phase9_real_telemetry.py`](file:///d:/SIH%20Drone/tests/test_phase9_real_telemetry.py) |
+| **Mission Reliability & What-If** | Counterfactual scenario simulation & mission risk scoring ($R_\text{mission}$) | [`evidence/phase10_mission_matrix.json`](file:///d:/SIH%20Drone/evidence/phase10_mission_matrix.json) | [`tests/test_phase10_mission.py`](file:///d:/SIH%20Drone/tests/test_phase10_mission.py) |
+| **Engineering Explainability** | Structured attribution tracing decisions to residuals, sensors, and rules | [`evidence/phase11_explainability_matrix.json`](file:///d:/SIH%20Drone/evidence/phase11_explainability_matrix.json) | [`tests/test_phase11_explainability.py`](file:///d:/SIH%20Drone/tests/test_phase11_explainability.py) |
+| **Claims & Submission Integrity** | Automated two-pass lexical & contextual disclaimer linter | [`evidence/phase12_claims_matrix.json`](file:///d:/SIH%20Drone/evidence/phase12_claims_matrix.json) | [`tests/test_phase12_claims_audit.py`](file:///d:/SIH%20Drone/tests/test_phase12_claims_audit.py) |
+
+---
+
+## 3. End-to-End System Pipeline Architecture
 
 ```
-Mission Configuration & Fault Scenario
+Telemetry Stream / Replay Buffer (CanonicalTelemetryPacket)
                   ↓
-Physics-Informed Engine Simulator (Reduced-Order Grey-Box Prototype; Rotax 914 UL/F Reference)
+Telemetry Preprocessing & Validation (Units, Clock Skew, Multi-Rate Sync)
                   ↓
-Canonical Telemetry Ingestion (with quality & dropout handling)
+Synchronized Physics-Informed Digital Twin (1D Lumped-Parameter Grey-Box State)
                   ↓
-Phase 6: Physics-Informed Digital Twin & Dynamic Residuals
+Residual Generation Engine (Physical Residuals & Normalized Z-Scores)
                   ↓
-Phase 7: Hybrid Anomaly Detection (Threshold + EWMA + Persistence + Isolation Forest)
+Physics-Informed Health Assessment (Dynamically Renormalized Piecewise-Linear Evidence)
                   ↓
-Phase 8: Multiclass Supervised Fault Diagnosis (XGBoost 6-Class)
+Hypothesis Isolation & Diagnosis (Residual Signatures & Sensor Disambiguation)
                   ↓
-Phase 9: Health Index & Causal Degradation Tracking (HI + Rate + Trend + Sensor Isolation)
+Degradation Tracking & RUL Estimation (Theil–Sen Regression with Empirical Quantile Bounds)
                   ↓
-Phase 10: TimesFM-3 Future Telemetry Forecasting (with Gated/Baseline Fallback)
+Counterfactual What-If Simulation (Mission Risk Index R_mission under Stress Scenarios)
                   ↓
-Phase 11: Authoritative Prognostics & RUL (Theil–Sen + MC Uncertainty + Weakest Link EOL)
+Auditable Evidence & Explainability Layer (Provenance Attribution to Residuals & Rules)
                   ↓
-Phase 12: Explainability & Multi-Modal Evidence Fusion (SHAP + Physics + Temporal + RUL)
-                  ↓
-DashboardStatePayload (Unified System State)
-                  ↓
-Streamlit UI & Operator Decision Support Advisory
+Operator Advisory Dashboard (Streamlit UI & Decision Support)
 ```
 
 ---
 
-## 4. Key Performance Metrics
+## 4. Transparent 6-Tier AI/ML Runtime Inventory
 
-| Metric | Value | Budget |
-| :--- | :--- | :--- |
-| **Mean Inference Latency** | ~53 ms | < 200 ms |
-| **Median (P50) Latency** | ~55 ms | < 200 ms |
-| **P95 Latency** | ~84 ms | < 200 ms |
-| **P99 Latency** | ~88 ms | < 200 ms |
-| **Real-Time Margin** | >16× | > 1× |
-| **Forecast Mode** | Causal EWMA Baseline | (TimesFM gated) |
-| **Orchestrator Init (Bootstrap)** | ~4.8 s | One-time |
+To ensure absolute clarity regarding machine learning utilization, every analytical component is classified into exactly one operational tier:
 
-*Standard aero telemetry at 1.0 Hz (1000 ms budget). Pipeline processes in ~55 ms.*
-
----
-
-## 5. Project Directory Structure
-
-```
-NIRVANAA-SIH-SUBMISSION/
-├── simulator/            # Physics-Informed Engine Simulator & Subsystems
-├── validation/           # Validation suites, metrics, and calibration sweeps
-├── telemetry/            # Schemas, provenance tracking, and buffer
-├── digital_twin/         # Digital Twin state tracking & residual engine
-├── anomaly_detection/    # Phase 7: Hybrid anomaly detection
-├── fault_diagnosis/      # Phase 8: XGBoost multiclass fault classification
-├── health_index/         # Phase 9: Health index & degradation tracking
-├── forecasting/          # Phase 10: TimesFM forecasting (gated/baseline)
-├── prognostics/          # Phase 11: RUL & prognostic estimation
-├── explainability/       # Phase 12: Multi-modal evidence fusion (SHAP+Physics+Temporal)
-├── orchestrator/         # Phase 13: Unified system pipeline orchestrator
-├── phm/                  # Legacy PHM interface (Phase 1)
-├── dashboard/            # Operator dashboard interface
-├── configs/              # Mission, engine, and telemetry configurations
-├── data/                 # Data storage & Golden Baseline summary
-├── docs/                 # Architecture docs, physics manual, validation reports
-│   └── plots/            # Interactive Plotly validation figures (13 plots)
-├── evidence/             # Final validation & evidence package
-├── scripts/              # Validation plot & evidence generation scripts
-├── tests/                # Automated test suite (340 test cases, 23 test files)
-├── requirements.txt
-└── main.py               # Phase 13 production entrypoint
-```
+| Computational Tier | Components Included | Implementation Method | Operational Digital Twin Role |
+| :--- | :--- | :--- | :--- |
+| **1. OPERATIONAL_RUNTIME** | Synchronizer, Residuals, Health, Diagnosis, Degradation, RUL, What-If | 1D ODE physics, piecewise-linear evidence deadbands, directional signature matching, Theil–Sen robust linear regression. | **Active Core Runtime**: Powers all real-time state estimation, health tracking, and diagnostic isolation. **Contains ZERO black-box neural networks.** |
+| **2. VALIDATION_ONLY** | `fault_diagnosis/classifier.py`, `evaluation.py` | XGBoost & Random Forest multi-class classifiers. | Evaluated in validation test suites as comparative models; **NOT invoked in operational runtime**. |
+| **3. QUARANTINED** | `forecasting/timesfm_wrapper.py` | TimesFM zero-shot foundation time-series neural network. | Quarantined/bypassed in production orchestrator due to heavy dependencies and non-deterministic execution. |
+| **4. OFFLINE_EXPERIMENT** | `prognostics/uncertainty.py`, `telemetry/features.py` | Monte Carlo trajectory sampling ($M=500$ realizations), FFT spectral band analytics. | Offline parameter sensitivity sweeps and dataset feature engineering. |
+| **5. LEGACY** | `phase14/` | Early proof-of-concept prototypes. | Retained for historical development context; not part of active runtime. |
+| **6. UNUSED** | Orphaned experimental scripts | N/A | Excluded from test suites and production handoffs. |
 
 ---
 
-## 6. Technology Stack
+## 5. Measured Host-Side Latency Benchmark
 
-- **Core Runtime**: Python 3.10+
-- **Data & Scientific Computing**: `numpy`, `scipy`, `pandas`
-- **Machine Learning & Modeling**: `scikit-learn`, `xgboost`
-- **Visualization & UI**: `plotly`, `streamlit`, `matplotlib`
-- **Explainability**: `shap`
-- **Testing**: `pytest`
+Latency was empirically measured across 1,000 continuous digital twin update steps (state synchronization, residual evaluation, anomaly detection, health calculation) on commodity desktop hardware (Python 3.11, Windows/x86_64 CPU).
+
+| Latency Metric | Measured Value | Operational Processing Budget | Status |
+| :--- | :--- | :--- | :--- |
+| **Mean Latency** | **0.388 ms** | 20.0 ms (50 Hz streaming budget) / 1000 ms (1 Hz telemetry) | ✅ Well within budget |
+| **Median (P50) Latency** | **0.328 ms** | 20.0 ms | ✅ Sub-millisecond steady-state |
+| **P95 Latency** | **0.559 ms** | 20.0 ms | ✅ Sub-millisecond steady-state |
+| **P99 Latency** | **0.763 ms** | 20.0 ms | ✅ Sub-millisecond steady-state |
+| **Maximum Latency (Spike)**| **28.994 ms** | 20.0 ms | ⚠️ OS scheduling / GC spike |
+| **Real-Time Classification**| **Soft Real-Time** | 1.0–10.0 Hz telemetry ingestion | Host-side soft real-time suitable; hard real-time explicitly disclaimed |
+
+*Authoritative Source: [`evidence/phase6_latency_benchmark.json`](file:///d:/SIH%20Drone/evidence/phase6_latency_benchmark.json).*
 
 ---
 
-## 7. Installation & Setup
+## 6. Authoritative Rotax 914 UL/F OEM Reference Specifications
+
+Key engine parameters are cross-checked against official type certification and manufacturer documentation:
+
+| Parameter | Authoritative Value | Source Document & Section | Engineering Provenance & Classification |
+| :--- | :--- | :--- | :--- |
+| **Takeoff Power (5 min)** | **84.5 kW** (5800 RPM) | EASA TCDS E.122 / Rotax 914 OM Sec 2.1 | `AUTHORITATIVE_REFERENCE`: Takeoff limit ($115\,\text{HP}$ gross metric; brochure cites $84.8\,\text{kW}$, authoritative certification standard is $84.5\,\text{kW}$). |
+| **Continuous Power** | **73.5 kW** (5500 RPM) | EASA TCDS E.122 / Rotax 914 OM Sec 2.1 | `AUTHORITATIVE_REFERENCE`: Max continuous cruising power ($100\,\text{HP}$). |
+| **Critical Altitude** | **4875 m** ($16,000\,\text{ft}$) | EASA TCDS E.122 / Rotax 914 OM Sec 2.1 | `AUTHORITATIVE_REFERENCE`: Critical turbo boost ceiling ($115\,\text{kPa}$). *Simulator test envelope sweeps up to $4500\,\text{m}$ as `MODEL_IMPLEMENTATION` test ceiling.* |
+| **Idle Oil Pressure** | **0.8 bar** | Rotax 914 OM Sec 2.1 | `AUTHORITATIVE_REFERENCE`: Minimum permissible oil pressure below $3500\,\text{RPM}$. |
+| **Normal Oil Pressure** | **2.0 – 5.0 bar** | Rotax 914 OM Sec 2.1 | `AUTHORITATIVE_REFERENCE`: Operational oil pressure envelope above $3500\,\text{RPM}$. |
+| **Cold-Start Oil Pressure** | **7.0 bar** | Rotax 914 OM Sec 2.1 / EASA TCDS E.122 | `AUTHORITATIVE_REFERENCE`: Maximum permissible transient pressure during cold start. |
+| **Max CHT Limit** | **135 °C** | EASA TCDS E.122 / Rotax 914 OM Sec 2.1 | `AUTHORITATIVE_REFERENCE`: Maximum allowable cylinder head temperature. |
+| **Gearbox Ratio** | **2.4286:1** (51/21 teeth) | Rotax 914 OM Sec 2.1 | `AUTHORITATIVE_REFERENCE`: Propeller gearbox reduction ratio. |
+| **Health Deadband** | **1.5 $\sigma$** | Phase 5 Health Specification (`health_index/schema.py`) | `ENGINEERING_HEURISTIC`: Normalized residual deadband ($\tau_\text{nominal}$) — *NOT a bar pressure unit*. |
+
+---
+
+## 7. Preserved Technical Limitations & Disclaimers
+
+The following fundamental engineering limitations govern the system and its outputs:
+
+1. **Synthetic Grey-Box Simulator**: The simulation engine is a 1D lumped-parameter model. It does not replace 3D CFD, combustion acoustics, or finite-element structural modeling.
+2. **Absence of Real Engine Fleet Validation**: All degradation trajectories and fault responses are validated on synthetic, simulated, or replayed benchmarks. The system has **not** been validated against an operational fleet of physical Rotax 914 engines.
+3. **Non-Certification**: NIRVANAA is a research and engineering competition prototype (SIH 2026). It is **not** certified under FAA DO-178C, FAA Part 33, or EASA CS-E airworthiness standards.
+4. **Model-Defined RUL**: Remaining Useful Life represents the projected time for modeled degradation state $D(t)$ to reach threshold $D_\text{EOL} = 0.50$ under the estimator's modeled operating/stress assumptions. It does **not** predict certified mechanical Time Between Overhaul (TBO).
+5. **Heuristic Mission Risk Index ($R_\text{mission}$)**: The mission risk score is an engineering metric ($[0, 1]$) combining envelope excursions and degradation rates. It is **strictly not** a frequentist or Bayesian failure probability.
+6. **Host-Side Execution Latency**: Real-time throughput is demonstrated on desktop hardware (mean $<0.4\,\text{ms}$). OS scheduling spikes reach $\sim 29\,\text{ms}$. Hard real-time determinism and avionics RTOS execution are not provided.
+7. **Single-Fault Dominance Assumption**: Fault diagnosis evaluates residual signatures assuming a primary physical failure mode. Complex cascading multi-fault interactions may yield ambiguous hypotheses.
+8. **Synthetic Population Assumptions**: Fleet variability is generated via parameterized Monte Carlo perturbations of model coefficients, not empirical manufacturing tolerances.
+9. **Absence of Calibrated Failure Probabilities**: The system outputs deterministic health indices and heuristic risk scores; it does not output calibrated failure probabilities ($P(\text{failure})$).
+
+For complete technical specifications, see [`docs/claims_and_limitations.md`](file:///d:/SIH%20Drone/docs/claims_and_limitations.md).
+
+---
+
+## 8. Automated Verification & Testing
+
+The repository maintains full regression test coverage across all subsystems:
 
 ```bash
-git clone https://github.com/Yashuuuu02/NIRVANAA-SIH-SUBMISSION.git
-cd NIRVANAA-SIH-SUBMISSION
-pip install -r requirements.txt
+# Run the automated claims and submission integrity audit
+python scripts/audit_claims.py
+
+# Generate Phase 12 claims and SIH coverage evidence matrices
+python scripts/generate_phase12_claims_audit.py
+
+# Run Phase 12 claims audit test suite
+pytest tests/test_phase12_claims_audit.py -v
+
+# Run full repository test suite (>730 automated tests)
+pytest tests/ -q
 ```
-
----
-
-## 8. Running the System
-
-### Run Full Test Suite (340 tests)
-```bash
-pytest -v
-```
-
-### Run Production Pipeline (Phase 13)
-```bash
-python main.py                                    # Healthy scenario (35s)
-python main.py --scenario cooling --duration 120  # Cooling fault injection
-python main.py --scenario cooling --benchmark     # With latency profiling
-```
-
-### Run Legacy Phase 1 Dry-Run
-```bash
-python main.py --legacy-phase1
-```
-
-### Generate Evidence Package
-```bash
-python scripts/generate_evidence_package.py
-```
-
-### Generate Interactive Validation Plots
-```bash
-python scripts/generate_validation_plots.py
-```
-
-### Run Simulator Validation Runner
-```bash
-python validation/validation_runner.py
-```
-
----
-
-## 9. Architectural Declarations
-
-### Algorithm Freezing Statement
-Phase 13 does not redesign, retune, replace, or modify the algorithms, thresholds, schemas, or training procedures of Phases 1–12. For runtime inference, Phase 13 deterministically bootstraps Phase 7 Isolation Forest and Phase 8 XGBoost model instances using the existing training procedures and synthetic simulator-generated data. This is synthetic bootstrap model fitting, not external-dataset training or algorithm redesign.
-
-### Preserved Distinctions
-- **Algorithm & Training Procedure Freezing**: Feature schemas, classifier configurations, EWMA thresholds, Theil–Sen estimator rules, and multi-modal fusion equations from Phases 1–12 remain unmodified.
-- **Runtime Model Fitting**: Deterministic synthetic bootstrap fitting is executed on synthetic simulator data with fixed seeds during orchestrator startup.
-- **Pretrained TimesFM Weights**: Gated external model weights remain unauthenticated in the local execution environment, preserving the explicit fallback path (`BLOCKED_UNAUTHENTICATED_GATED`) without fabricating weights.
-
-### Engineering Reference Anchor & Fidelity Boundary
-- **Authoritative Reference Engine**: **Rotax 914 UL/F** (4-cylinder, 1211.2 cc, turbocharged, 84.5 kW takeoff / 73.5 kW continuous rating, 2.4286:1 reduction gearbox). Specification and parameter provenance are maintained in [`configs/engine_reference/rotax_914_ul_f.json`](file:///d:/SIH%20Drone/configs/engine_reference/rotax_914_ul_f.json).
-- **Current Simulator Fidelity**: Reduced-order lumped-parameter 0D/1D grey-box prototype. The simulator uses naturally aspirated density derating, a 1:1 direct propeller load simplification ($J=0.28\text{ kg}\cdot\text{m}^2$), and lumped thermal nodes.
-- **Missing Physics**: Exhaust gas turbocharger, compressor map, turbine expansion, wastegate actuator, electronic Turbo Control Unit (TCU), manifold absolute pressure (MAP), charge-air heating, 2.43:1 reduction gearbox dynamics, 4-cylinder individual thermal/exhaust runner networks, and electrical/ignition systems. Detailed in [`docs/physics_contract.md`](file:///d:/SIH%20Drone/docs/physics_contract.md).
-- **Prohibited Claims**: The system does **NOT** claim to be a "full Rotax 914 F digital twin", "production-ready", "airworthiness validated", or "experimentally validated on real UAV flight recordings".
-
-### Claim Taxonomy
-The project adheres to a four-tier verification and validation taxonomy:
-1. **`IMPLEMENTED`**: Executable functionality exists in the repository codebase.
-2. **`VERIFIED`**: Executable tests/evidence demonstrate that the implementation behaves as mathematically intended. (Reference specifications are verified against official OEM manuals; simulator equations are verified against internal unit tests).
-3. **`VALIDATED`**: Compared against an independent authoritative model, certified simulator, or regulatory reference dataset (NOT claimed for the simulator dynamics).
-4. **`EXPERIMENTALLY VALIDATED`**: Validated against physical engine test-cell dynamometer recordings or operational flight data (**STRICTLY NOT CLAIMED**; all telemetry is synthetic).
-
----
-
-## 10. Documentation
-
-| Document | Description |
-| :--- | :--- |
-| `docs/physics_contract.md` | System-wide Physics Contract, fidelity boundary & claim taxonomy |
-| `configs/engine_reference/rotax_914_ul_f.json` | Authoritative Rotax 914 UL/F reference spec with source provenance |
-| `docs/architecture.md` | System architecture specification |
-| `docs/simulator_physics.md` | Physics subsystem equations & parameters |
-| `docs/simulator_validation.md` | Calibration & validation report |
-| `docs/anomaly_detection.md` | Phase 7: Anomaly detection design |
-| `docs/fault_diagnosis.md` | Phase 8: Fault diagnosis design |
-| `docs/health_index.md` | Phase 9: Health index design |
-| `docs/forecasting.md` | Phase 10: Forecasting design |
-| `docs/prognostics_rul.md` | Phase 11: RUL & prognostics design |
-| `docs/explainability.md` | Phase 12: Explainability design |
-| `docs/system_orchestrator.md` | Phase 13: System orchestrator design |
-| `docs/cooling_degradation.md` | Cooling fault physics |
-| `docs/lubrication_degradation.md` | Lubrication fault physics |
-| `docs/fuel_injection_abnormality.md` | Fuel injection fault physics |
-| `docs/fault_interface.md` | Fault interface contracts |
-

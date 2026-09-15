@@ -2,7 +2,7 @@
 **SIH26054 / AVEKSHAK Digital Twin**
 
 ## 1. Overview & Architectural Scope
-Phase 14 represents the operational decision-support and post-mission evaluation layer for the SIH26054 Rotax 912 grey-box aero engine digital twin. It wraps around the authoritative backend (`SystemPipelineOrchestrator`) and consumption contracts (`DashboardStatePayload`) developed and frozen in Phases 1–13.
+Phase 14 represents the operational decision-support and post-mission evaluation layer for the SIH26054 Rotax 914 grey-box aero engine digital twin. It wraps around the authoritative backend (`SystemPipelineOrchestrator`) and consumption contracts (`DashboardStatePayload`) developed and frozen in Phases 1–13.
 
 Phase 14 delivers three capabilities:
 1. **Mission Replay**: Chronological playback and scrubbing of executed synthetic missions using existing Phase 13 output contracts without recomputing PHM logic in the presentation layer.
